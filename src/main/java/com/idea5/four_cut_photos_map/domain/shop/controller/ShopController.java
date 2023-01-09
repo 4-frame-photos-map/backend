@@ -37,14 +37,10 @@ public class ShopController {
 
         // 카카오맵 api 사용 (카카오맵에서 받아온다 가정)
         List<ResponseShop> apiShops = TempApi.tempDataBySearch(keyword);
-
         // db 비교
         List<ResponseShop> shops = shopService.findShops(apiShops, keyword);
-        for (ResponseShop shop : shops) {
-            System.out.println("shop = " + shop);
-        }
 
-        return null;
+        return ResponseEntity.ok(shops);
     }
     //현재 위치 기준
 //    @GetMapping("/search")
