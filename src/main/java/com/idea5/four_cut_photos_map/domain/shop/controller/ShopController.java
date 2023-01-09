@@ -1,14 +1,19 @@
 package com.idea5.four_cut_photos_map.domain.shop.controller;
 
+import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseMarker;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
-import com.idea5.four_cut_photos_map.global.common.data.TempApi;
+import com.idea5.four_cut_photos_map.global.common.data.Brand;
+import com.idea5.four_cut_photos_map.global.common.data.TempKaKaO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/shop")
@@ -36,23 +41,33 @@ public class ShopController {
     public ResponseEntity<List<ResponseShop>> keywordSearch(@RequestParam String keyword){
 
         // 카카오맵 api 사용 (카카오맵에서 받아온다 가정)
-        List<ResponseShop> apiShops = TempApi.tempDataBySearch(keyword);
+        List<ResponseShop> apiShops = TempKaKaO.tempDataBySearch(keyword);
         // db 비교
         List<ResponseShop> shops = shopService.findShops(apiShops, keyword);
 
         return ResponseEntity.ok(shops);
     }
-    //현재 위치 기준
-//    @GetMapping("/search")
-//    public ResponseEntity<List<ResponseShop>> currentLocationSearch(@ModelAttribute RequestShop requestShop){
-//
-//
-//
-//        // 카카오 맵 API 호출 (임시)
-////        List<ResponseShop> apiShops = sampleData();
-////        shopService.findShops(apiShops, requestShop);
-//        return null;
-//    }
+
+    //현재 위치 기준, 반경 2km
+    @GetMapping("/search/marker")
+    public ResponseEntity<Map<String, List<ResponseMarker>>> currentLocationSearch(@ModelAttribute RequestShop requestShop){
+
+        String[] names = Brand.Names; // 브랜드명 ( 하루필름, 인생네컷 ... )
+
+        // 카카오 api -> 필요한 변수 = {브랜드명, 위도, 경도, 반경}
+        // 일단 샘플로 테스트
+
+        Map<String, List<ResponseMarker>> maps = new HashMap<>();
+        for (String brandName : names) {
+            List<ResponseMarker> list = TempKaKaO.tempDataByBrand(brandName);
+            maps.put(brandName, list);
+        }
+
+        Map<String, List<ResponseMarker>> maker = shopService.findMaker(maps);
+
+
+        return ResponseEntity.ok(maker);
+    }
 
 
 

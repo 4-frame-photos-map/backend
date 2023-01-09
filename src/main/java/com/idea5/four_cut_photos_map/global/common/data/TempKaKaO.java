@@ -1,16 +1,27 @@
 package com.idea5.four_cut_photos_map.global.common.data;
 
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseMarker;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TempApi {
+public class TempKaKaO {
     public static List<ResponseShop> tempDataBySearch(String keyword){
         List<ResponseShop> shops = new ArrayList<>();
         for (ResponseShop shop : sampleData()) {
             if(shop.getBrand().equals(keyword)){
                 shops.add(shop);
+            }
+        }
+        return shops;
+    }
+
+    public static List<ResponseMarker> tempDataByBrand(String keyword){
+        List<ResponseMarker> shops = new ArrayList<>();
+        for (ResponseShop shop : sampleData()) {
+            if(shop.getBrand().equals(keyword)){
+                shops.add(new ResponseMarker(shop.getName(), shop.getLatitude(), shop.getLongitude(), shop.getDistance()));
             }
         }
         return shops;
@@ -26,12 +37,4 @@ public class TempApi {
         shops.add(new ResponseShop("브랜드2", "브랜드2 강남점", "서울 강남구", 20.23, 11.32, 300));
         return shops;
     }
-    public static class KaKaoData {
-
-    }
-
-
-
-
-
 }
