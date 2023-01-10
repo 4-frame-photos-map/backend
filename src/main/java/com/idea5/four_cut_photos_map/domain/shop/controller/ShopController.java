@@ -4,15 +4,18 @@ import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseMarker;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.global.common.data.Brand;
 import com.idea5.four_cut_photos_map.global.common.data.TempKaKaO;
+import jdk.dynalink.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,8 +73,14 @@ public class ShopController {
         return ResponseEntity.ok(maker);
     }
 
-//    @GetMapping("/detail")
-//    public ResponseEntity
+    @GetMapping("/detail/{shopId}")
+    public ResponseEntity<ResponseShopDetail> detail(@PathVariable(name = "shopId") Long id,
+                                                     @RequestParam("distance") @NotEmpty(message = "필수 입력 값 입니다.") String distance) {
+
+        ResponseShopDetail shopDetailDto = shopService.findShopById(id, distance);
+        return ResponseEntity.ok(shopDetailDto);
+
+    }
 
 
 

@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 @NoArgsConstructor
 public enum ErrorCode {
-    TEST(HttpStatus.INTERNAL_SERVER_ERROR, "001", "business Error");
+    TEST(HttpStatus.INTERNAL_SERVER_ERROR, "001", "business Error"),
+    SHOP_NOT_Found(HttpStatus.NOT_FOUND, "404", "상점을 찾을 수 없습니다.");
 
     private HttpStatus httpStatus;
     private String errorCode;

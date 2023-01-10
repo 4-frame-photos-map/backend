@@ -3,16 +3,17 @@ package com.idea5.four_cut_photos_map.domain.shop.service;
 import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseMarker;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
+import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_Found;
 
 @Service
 @RequiredArgsConstructor
@@ -69,5 +70,14 @@ public class ShopService {
             temp.put(brandName, list);
         }
         return temp;
+    }
+
+
+    // todo : Review, 찜 추가
+    public ResponseShopDetail findShopById(Long id, String distance) {
+        Shop shop = shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_Found));
+        ResponseShopDetail shopDto = ResponseShopDetail.of(shop, distance);
+        return shopDto;
+
     }
 }
