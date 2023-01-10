@@ -15,7 +15,7 @@ public class ResponseShop {
     private String address; // 전체 도로명 주소
     private double latitude; // 위도
     private double longitude; // 경도
-    private double distance; // 중심좌표까지의 거리
+    private String distance; // 중심좌표까지의 거리
 
     public static ResponseShop from(Shop shop){
         return ResponseShop.builder()
@@ -26,7 +26,7 @@ public class ResponseShop {
                 .longitude(shop.getLongitude())
                 .build();
     }
-    public void setDistance(double distance){
+    public void setDistance(String distance){
         this.distance = distance;
     }
 

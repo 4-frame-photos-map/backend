@@ -34,42 +34,44 @@ public class ShopService {
         }
 
         // 카카오 맵 api로 부터 받아온 Shop 리스트와 db에 저장된 Shop 비교
-        List<ResponseShop> list = new ArrayList<>();
         for (ShopDto apiShop : apiShops) {
             for (ResponseShop responseShop : responseShops) {
                 if(apiShop.getName().equals(responseShop.getName())){
                     responseShop.setDistance(apiShop.getDistance());
-                    list.add(responseShop);
                 }
             }
         }
 
-        return list;
+        return responseShops;
     }
 
-    public Map<String, List<ResponseMarker>> findMaker(Map<String, List<ShopDto>> maps) {
+    public Map<String, List<ResponseMarker>> findMaker(Map<String, List<ShopDto>> apiShopMaps) {
         Map<String, List<ResponseMarker>> temp = new HashMap<>();
 
         // 브랜드별로, 카카오 맵 api로 부터 받아온 Shop 리스트와 db에 저장된 Shop 비교
-        for (String brandName : maps.keySet()) {
+        for (String brandName : apiShopMaps.keySet()) {
 
             // 브랜드명으로 map에 저장된 shop List 얻기
-            List<ShopDto> apiShops = maps.get(brandName);
+            List<ShopDto> apiShops = apiShopMaps.get(brandName);
 
             // 브랜드명으로 실제 DB에 저장되어있는 shop List 얻기
             List<Shop> dbShops = shopRepository.findByBrand(brandName).orElseThrow(() -> new BusinessException(SHOP_NOT_Found));
-
             // entity -> dto
             List<ResponseMarker> responseMarkers = new ArrayList<>();
             for (Shop dbShop : dbShops) {
-                responseMarkers.add(ResponseMarker.from(dbShop));
+                responseMarkers.add(ResponseMarker.of(dbShop));
             }
 
-            // stream을 활용하여 지점명 비교
-            List<ResponseMarker> list = responseMarkers.stream()
-                    .filter(filter -> apiShops.stream()
-                    .anyMatch(target->filter.getName().equals(target.getName())))
-                    .collect(Collectors.toList());
+
+            List<ResponseMarker> list = new ArrayList<>();
+            for (ShopDto apiShop : apiShops) {
+                for (ResponseMarker responseMarker : responseMarkers) {
+                    if(apiShop.getName().equals(responseMarker.getName())){
+                        responseMarker.setDistance(apiShop.getDistance());
+                        list.add(responseMarker);
+                    }
+                }
+            }
 
             temp.put(brandName, list);
         }

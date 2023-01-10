@@ -16,10 +16,10 @@ public class ResponseMarker {
     private String name;// 장소명
     private double latitude; // 위도
     private double longitude; // 경도
-    private double distance; // 중심좌표까지의 거리
+    private String distance; // 중심좌표까지의 거리
 
 
-    public static ResponseMarker from(Shop shop){
+    public static ResponseMarker of(Shop shop){
         return ResponseMarker.builder()
                 .id(shop.getId())
                 .name(shop.getName())
@@ -27,4 +27,9 @@ public class ResponseMarker {
                 .longitude(shop.getLongitude())
                 .build();
     }
+
+    public void setDistance(String distance){
+        this.distance = distance;
+    }
+
 }
