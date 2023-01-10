@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.stream.Collectors;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_Found;
@@ -23,7 +24,10 @@ public class ShopService {
     public List<ResponseShop> findShops(List<ShopDto> apiShops, String keyword) {
 
         // DB 조회 -> Dto 변환
-        List<Shop> dbShops = shopRepository.findByBrand(keyword).orElse(null);
+        List<Shop> dbShops = shopRepository.findByBrand(keyword).orElseThrow(() -> new BusinessException(SHOP_NOT_Found));
+        if(dbShops.isEmpty())
+            throw new BusinessException(SHOP_NOT_Found);
+
         List<ResponseShop> responseShops = new ArrayList<>();
         for (Shop dbShop : dbShops) {
             responseShops.add(ResponseShop.from(dbShop));
@@ -53,7 +57,7 @@ public class ShopService {
             List<ShopDto> apiShops = maps.get(brandName);
 
             // 브랜드명으로 실제 DB에 저장되어있는 shop List 얻기
-            List<Shop> dbShops = shopRepository.findByBrand(brandName).orElse(null);
+            List<Shop> dbShops = shopRepository.findByBrand(brandName).orElseThrow(() -> new BusinessException(SHOP_NOT_Found));
 
             // entity -> dto
             List<ResponseMarker> responseMarkers = new ArrayList<>();
