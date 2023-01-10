@@ -1,5 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.shop.controller;
 
+import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseMarker;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
@@ -42,7 +43,7 @@ public class ShopController {
     public ResponseEntity<List<ResponseShop>> keywordSearch(@RequestParam String keyword){
 
         // 카카오맵 api 사용 (카카오맵에서 받아온다 가정)
-        List<ResponseShop> apiShops = TempKaKaO.tempDataBySearch(keyword);
+        List<ShopDto> apiShops = TempKaKaO.tempDataBySearch(keyword);
         // db 비교
         List<ResponseShop> shops = shopService.findShops(apiShops, keyword);
 
@@ -57,10 +58,9 @@ public class ShopController {
 
         // 카카오 api -> 필요한 변수 = {브랜드명, 위도, 경도, 반경}
         // 일단 샘플로 테스트
-
-        Map<String, List<ResponseMarker>> maps = new HashMap<>();
+        Map<String, List<ShopDto>> maps = new HashMap<>();
         for (String brandName : names) {
-            List<ResponseMarker> list = TempKaKaO.tempDataByBrand(brandName);
+            List<ShopDto> list = TempKaKaO.tempDataBySearch(brandName);
             maps.put(brandName, list);
         }
 
@@ -69,6 +69,9 @@ public class ShopController {
 
         return ResponseEntity.ok(maker);
     }
+
+//    @GetMapping("/detail")
+//    public ResponseEntity
 
 
 

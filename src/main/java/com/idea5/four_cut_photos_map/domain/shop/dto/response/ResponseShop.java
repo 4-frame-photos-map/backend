@@ -1,14 +1,12 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
+import lombok.*;
 
 @Getter
-@Setter
 @AllArgsConstructor
 @ToString
+@Builder
 public class ResponseShop {
 
     private String brand; // 브랜드명
@@ -19,6 +17,17 @@ public class ResponseShop {
     private double longitude; // 경도
     private double distance; // 중심좌표까지의 거리
 
-
+    public static ResponseShop from(Shop shop){
+        return ResponseShop.builder()
+                .brand(shop.getBrand())
+                .name(shop.getName())
+                .address(shop.getAddress())
+                .latitude(shop.getLatitude())
+                .longitude(shop.getLongitude())
+                .build();
+    }
+    public void setDistance(double distance){
+        this.distance = distance;
+    }
 
 }
