@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +51,7 @@ public class ShopController {
 
     //현재 위치 기준, 반경 2km
     @GetMapping("/search/marker")
-    public ResponseEntity<Map<String, List<ResponseMarker>>> currentLocationSearch(@ModelAttribute RequestShop requestShop){
+    public ResponseEntity<Map<String, List<ResponseMarker>>> currentLocationSearch(@ModelAttribute @Valid RequestShop requestShop){
 
         String[] names = Brand.Names; // 브랜드명 ( 하루필름, 인생네컷 ... )
 

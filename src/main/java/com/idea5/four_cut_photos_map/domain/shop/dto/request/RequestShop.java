@@ -4,10 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 @Getter
 @Setter
 @AllArgsConstructor
 public class RequestShop {
-    private double latitude; // 위도
-    private double longitude; // 경도
+
+    @NotNull(message = "위도는 필수 입력값 입니다.")
+    private Double latitude; // 위도
+
+    @NotNull(message = "경도는 필수 입력값 입니다.")
+    private Double longitude; // 경도
 }
