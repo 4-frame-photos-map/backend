@@ -6,7 +6,6 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class ShopDto {
-    private String brand; // 브랜드명
     private String name;// 장소명
 
     private String address; // 전체 도로명 주소

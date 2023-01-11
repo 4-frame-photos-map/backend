@@ -1,7 +1,9 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
 import lombok.Data;
+import lombok.Getter;
 
+@Getter
 public class KaKaoSearchResponseDto {
     public Document[] documents;
 

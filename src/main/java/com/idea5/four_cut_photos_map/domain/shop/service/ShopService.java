@@ -1,18 +1,19 @@
 package com.idea5.four_cut_photos_map.domain.shop.service;
 
 import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.KaKaoSearchResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseMarker;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
+import com.idea5.four_cut_photos_map.domain.shop.service.kakao.KeywordSearchKakaoApi;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.stream.Collectors;
+
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUND;
 
@@ -20,8 +21,12 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUN
 @RequiredArgsConstructor
 public class ShopService {
     private final ShopRepository shopRepository;
+    private final KeywordSearchKakaoApi keywordSearchKakaoApi;
 
-    public List<ResponseShop> findShops(List<ShopDto> apiShops, String keyword) {
+    public List<ResponseShop> findShops(KaKaoSearchResponseDto apiShopArray, String keyword) {
+
+        // Todo: api 응답 데이터(JSON 배열) -> List<ShopDto>로 변환
+        List<ShopDto> apiShops = new ArrayList<>();
 
         // DB 조회 -> Dto 변환
         List<Shop> dbShops = shopRepository.findByBrand(keyword).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
@@ -85,5 +90,9 @@ public class ShopService {
         ResponseShopDetail shopDto = ResponseShopDetail.of(shop, distance);
         return shopDto;
 
+    }
+
+    public KaKaoSearchResponseDto searchByKeyword(String keyword) {
+        return keywordSearchKakaoApi.searchByKeyword(keyword);
     }
 }

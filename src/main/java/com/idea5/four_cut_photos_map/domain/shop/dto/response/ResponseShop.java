@@ -9,7 +9,6 @@ import lombok.*;
 @Builder
 public class ResponseShop {
 
-    private String brand; // 브랜드명
     private String name;// 장소명
 
     private String address; // 전체 도로명 주소
@@ -19,7 +18,6 @@ public class ResponseShop {
 
     public static ResponseShop from(Shop shop){
         return ResponseShop.builder()
-                .brand(shop.getBrand())
                 .name(shop.getName())
                 .address(shop.getAddress())
                 .latitude(shop.getLatitude())

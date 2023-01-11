@@ -2,6 +2,7 @@ package com.idea5.four_cut_photos_map.domain.shop.controller;
 
 import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.KaKaoSearchResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseMarker;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DISTANCE_IS_EMPTY;
+
 
 @RestController
 @RequestMapping("/shop")
@@ -44,10 +46,11 @@ public class ShopController {
      */
 
     @GetMapping("/search")
-    public ResponseEntity<List<ResponseShop>> keywordSearch(@RequestParam String keyword){
+    public ResponseEntity<List<ResponseShop>> keywordSearch(@RequestParam(defaultValue = "즉석사진") String keyword){
 
         // 카카오맵 api 사용 (카카오맵에서 받아온다 가정)
-        List<ShopDto> apiShops = TempKaKaO.tempDataBySearch(keyword);
+        KaKaoSearchResponseDto apiShops = shopService.searchByKeyword(keyword);
+
         // db 비교
         List<ResponseShop> shops = shopService.findShops(apiShops, keyword);
 
@@ -84,7 +87,4 @@ public class ShopController {
         return ResponseEntity.ok(shopDetailDto);
 
     }
-
-
-
 }
