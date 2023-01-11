@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.stream.Collectors;
 
-import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_Found;
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -24,9 +24,9 @@ public class ShopService {
     public List<ResponseShop> findShops(List<ShopDto> apiShops, String keyword) {
 
         // DB 조회 -> Dto 변환
-        List<Shop> dbShops = shopRepository.findByBrand(keyword).orElseThrow(() -> new BusinessException(SHOP_NOT_Found));
+        List<Shop> dbShops = shopRepository.findByBrand(keyword).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
         if(dbShops.isEmpty())
-            throw new BusinessException(SHOP_NOT_Found);
+            throw new BusinessException(SHOP_NOT_FOUND);
 
         List<ResponseShop> responseShops = new ArrayList<>();
         for (Shop dbShop : dbShops) {
@@ -55,7 +55,7 @@ public class ShopService {
             List<ShopDto> apiShops = apiShopMaps.get(brandName);
 
             // 브랜드명으로 실제 DB에 저장되어있는 shop List 얻기
-            List<Shop> dbShops = shopRepository.findByBrand(brandName).orElseThrow(() -> new BusinessException(SHOP_NOT_Found));
+            List<Shop> dbShops = shopRepository.findByBrand(brandName).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
             // entity -> dto
             List<ResponseMarker> responseMarkers = new ArrayList<>();
             for (Shop dbShop : dbShops) {
@@ -81,7 +81,7 @@ public class ShopService {
 
     // todo : Review, 찜 추가
     public ResponseShopDetail findShopById(Long id, String distance) {
-        Shop shop = shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_Found));
+        Shop shop = shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
         ResponseShopDetail shopDto = ResponseShopDetail.of(shop, distance);
         return shopDto;
 

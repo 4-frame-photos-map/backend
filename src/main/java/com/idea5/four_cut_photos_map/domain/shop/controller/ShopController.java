@@ -8,17 +8,25 @@ import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.global.common.data.Brand;
 import com.idea5.four_cut_photos_map.global.common.data.TempKaKaO;
+import com.idea5.four_cut_photos_map.global.error.ErrorCode;
+import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import jdk.dynalink.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.Basic;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DISTANCE_IS_EMPTY;
 
 @RestController
 @RequestMapping("/shop")
@@ -73,10 +81,12 @@ public class ShopController {
         return ResponseEntity.ok(maker);
     }
 
+    // todo : @Validated 유효성 검사 시, httpstatus code 전달하는 방법
     @GetMapping("/detail/{shopId}")
-    public ResponseEntity<ResponseShopDetail> detail(@PathVariable(name = "shopId") Long id,
-                                                     @RequestParam("distance") @NotEmpty(message = "필수 입력 값 입니다.") String distance) {
-
+    public ResponseEntity<ResponseShopDetail> detail(@PathVariable(name = "shopId") Long id, @RequestParam(name = "distance", required = false, defaultValue = "") String distance) {
+        if (distance.isEmpty()){
+            throw new BusinessException(DISTANCE_IS_EMPTY);
+        }
         ResponseShopDetail shopDetailDto = shopService.findShopById(id, distance);
         return ResponseEntity.ok(shopDetailDto);
 
