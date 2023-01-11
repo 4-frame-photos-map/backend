@@ -1,4 +1,4 @@
-package com.idea5.four_cut_photos_map.global.base.entity.domain.shop.dto.response;
+package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
 import lombok.Data;
 
