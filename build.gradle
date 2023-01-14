@@ -43,6 +43,9 @@ dependencies {
 
     // apache httpclient
     implementation 'org.apache.httpcomponents:httpclient:4.5'
+
+    //유효성 검증
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('test') {
