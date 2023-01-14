@@ -1,8 +1,6 @@
 package com.idea5.four_cut_photos_map.global.common.data;
 
 import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseMarker;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
 
 import java.util.ArrayList;
 import java.util.List;

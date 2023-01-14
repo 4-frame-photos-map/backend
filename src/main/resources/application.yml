@@ -5,6 +5,12 @@ server:
 
 
 spring:
+  # 개발모드 활성화
+  profiles:
+    active: dev
+    include:
+      - base-addi
+
   # todo 개발 데이터베이스 연결 ( h2가 편하면 h2로 바꾸자 )
   datasource:
     url: jdbc:mariadb://localhost:3306/four_cut_photos_map?useUnicode=true&characterEncoding=utf8&serverTimeZone=Asia/Seoul&allowPublicKeyRetrieval=true&useSSL=false
