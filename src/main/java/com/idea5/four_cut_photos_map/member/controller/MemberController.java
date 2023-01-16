@@ -5,6 +5,7 @@ import com.idea5.four_cut_photos_map.global.util.Util;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.member.dto.response.KakaoUserInfoDto;
 import com.idea5.four_cut_photos_map.member.entity.Member;
+import com.idea5.four_cut_photos_map.member.entity.MemberContext;
 import com.idea5.four_cut_photos_map.member.service.KakaoService;
 import com.idea5.four_cut_photos_map.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -56,5 +58,15 @@ public class MemberController {
                 )
         );
         return new ResponseEntity<>(body, headers, HttpStatus.OK);
+    }
+
+    // MemberContext 값 잘 주입되는지 테스트용
+    @GetMapping("/info")
+    public ResponseEntity<RsData> getProfile(@AuthenticationPrincipal MemberContext memberContext) {
+        log.info(memberContext.getId().toString());
+        RsData<Map<String, Object>> body = new RsData<>(
+                200, "회원정보 조회 성공", Util.mapOf("memberContext", memberContext)
+        );
+        return new ResponseEntity<>(body, HttpStatus.OK);
     }
 }

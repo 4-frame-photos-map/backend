@@ -47,7 +47,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             // TODO: 화이트리스트를 관리하는 방식이 괜찮은가? 보통은 DB 에 accessToken 대신 refresh 토큰을 저장함
             // 2. 2차 체크(해당 엑세스 토큰이 화이트 리스트에 포함되는지 검증) -> 탈취된 토큰 무효화
             if(member != null) {
-                log.info("인증처리 성공");
+                log.info("JwtAuthorizationFilter 인증처리");
                 forceAuthentication(member);
             }
         }
@@ -65,6 +65,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     // 강제 로그인 처리
     private void forceAuthentication(Member member) {
+        log.info(member.getId().toString());
         // Member 를 기반으로 User 를 상속한 MemberContext 객체 생성
         MemberContext memberContext = new MemberContext(member);
         UsernamePasswordAuthenticationToken authentication =
