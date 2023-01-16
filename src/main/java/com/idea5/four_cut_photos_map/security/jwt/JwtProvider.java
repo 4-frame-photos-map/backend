@@ -1,6 +1,5 @@
 package com.idea5.four_cut_photos_map.security.jwt;
 
-import com.idea5.four_cut_photos_map.global.util.Util;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,9 +37,9 @@ public class JwtProvider {
         claims.put("modifyDate", claims.get("modifyDate").toString());
 
         return Jwts.builder()
+                .setClaims(claims)          // Custom Claims 정보(맨 위에 적지않으면 아래 값이 덮어씌워져 누락됨!)
                 .setIssuedAt(new Date())    // 토큰 발급 시간
                 .setExpiration(new Date(new Date().getTime() + 1000L * ACCESS_TOKEN_VALIDATION_SECOND)) // 토큰 만료 시간
-                .setClaims(claims)          // Custom Claims 정보
                 .signWith(getSecretKey(), SignatureAlgorithm.HS512) // HS512, 비밀키로 서명
                 .compact();                                         // 토큰 생성
     }
@@ -67,16 +66,21 @@ public class JwtProvider {
         return false;
     }
 
-    // TODO: 수정 예정
     // accessToken 으로부터 Claim 정보 얻기
-    public Map<String, Object> getClaims(String accessToken) {
-        String body = Jwts.parserBuilder()
+    private Claims parseClaims(String accessToken) {
+        Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getSecretKey())
                 .build()
                 .parseClaimsJws(accessToken)
-                .getBody()
-                .get("body", String.class);
+                .getBody();
+        log.info(claims.toString());
+        return claims;
+    }
 
-        return Util.json.toMap(body);
+    // Claims 에서 id
+    public Long getId(String accessToken) {
+        Claims claims = parseClaims(accessToken);
+        // java.lang.Integer cannot be cast to java.lang.Long 오류해결
+        return ((Number) claims.get("id")).longValue();
     }
 }

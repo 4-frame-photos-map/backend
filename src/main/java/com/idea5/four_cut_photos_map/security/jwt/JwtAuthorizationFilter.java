@@ -1,0 +1,81 @@
+package com.idea5.four_cut_photos_map.security.jwt;
+
+import com.idea5.four_cut_photos_map.member.entity.Member;
+import com.idea5.four_cut_photos_map.member.entity.MemberContext;
+import com.idea5.four_cut_photos_map.member.service.MemberService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+/**
+ * JWT 인증처리 필터
+ * - OncePerRequestFilter: 한 요청에 대해 딱 한 번만 실행하는 필터(한 요청에 대해서 redirect 로 인해 불필요하게 인증필터를 n번 이상 거치는 다중인증처리 상황을 해결하기 위함)
+ * @See <a href="https://dev-racoon.tistory.com/34">OncePerRequestFilter</a>
+ * @See <a href="https://velog.io/@shinmj1207/Spring-Spring-Security-JWT-%EB%A1%9C%EA%B7%B8%EC%9D%B8">Spring Security + JWT 로그인</a>
+ * @See <a href="https://alkhwa-113.tistory.com/entry/TIL-JWT-%EC%99%80-%EB%B3%B4%EC%95%88-CORS">JWT 토큰 무효화 참고1</a>
+ * @See <a href="https://mellowp-dev.tistory.com/8">JWT 토큰 무효화 참고2</a>
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class JwtAuthorizationFilter extends OncePerRequestFilter {
+    private final JwtProvider jwtProvider;
+    private final MemberService memberService;
+    private final String BEARER_TOKEN_PREFIX = "Bearer ";
+
+    // 토큰 유효성 검증 후 인증(로그인)처리
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        log.info("JwtAuthorizationFilter doFilterInternal()");
+        String accessToken = getJwtAccessToken(request);
+        // 1. 1차 체크(토큰이 유효한지 검증)
+        if(StringUtils.hasText(accessToken) && jwtProvider.verify(accessToken)) {
+            // member 조회할 때, 캐시(redis) 사용
+            Long memberId = jwtProvider.getId(accessToken);
+            Member member = memberService.findById(memberId);
+            // TODO: 화이트리스트를 관리하는 방식이 괜찮은가? 보통은 DB 에 accessToken 대신 refresh 토큰을 저장함
+            // 2. 2차 체크(해당 엑세스 토큰이 화이트 리스트에 포함되는지 검증) -> 탈취된 토큰 무효화
+            if(member != null) {
+                log.info("인증처리 성공");
+                forceAuthentication(member);
+            }
+        }
+        filterChain.doFilter(request, response);
+    }
+
+    // request Authorization header 의 jwt accessToken 값 꺼내기
+    private String getJwtAccessToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_TOKEN_PREFIX)) {
+            return bearerToken.substring(BEARER_TOKEN_PREFIX.length());
+        }
+        return null;
+    }
+
+    // 강제 로그인 처리
+    private void forceAuthentication(Member member) {
+        // Member 를 기반으로 User 를 상속한 MemberContext 객체 생성
+        MemberContext memberContext = new MemberContext(member);
+        UsernamePasswordAuthenticationToken authentication =
+                UsernamePasswordAuthenticationToken.authenticated(
+                        memberContext,
+                        null,
+                        member.getAuthorities()
+                );
+        // 이후 컨트롤러 단에서 MemberContext 객체 사용O
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+    }
+}

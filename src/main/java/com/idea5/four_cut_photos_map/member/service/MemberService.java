@@ -55,4 +55,8 @@ public class MemberService {
         }
         return accessToken;
     }
+
+    public Member findById(Long id) {
+        return memberRepository.findById(id).orElse(null);
+    }
 }
