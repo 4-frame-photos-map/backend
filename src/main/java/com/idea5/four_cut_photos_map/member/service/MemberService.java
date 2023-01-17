@@ -1,16 +1,14 @@
 package com.idea5.four_cut_photos_map.member.service;
 
-import com.idea5.four_cut_photos_map.member.CachedMemberParam;
 import com.idea5.four_cut_photos_map.member.dto.response.KakaoUserInfoDto;
 import com.idea5.four_cut_photos_map.member.entity.Member;
 import com.idea5.four_cut_photos_map.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
+import com.idea5.four_cut_photos_map.security.jwt.dto.response.Token;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 @Service
 @Slf4j
@@ -39,20 +37,20 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
-    // 회원의 AccessToken 가져오기(토큰이 없으면 발급)
+    // accessToken, refreshToken 발급
     @Transactional
-    public String getAccessToken(Member member) {
+    public Token generateTokens(Member member) {
         log.info("회원의 jwt Access Token 가져오기");
-        // 1. DB에서 AccessToken 조회
-        String accessToken = member.getAccessToken();
-        // 2. 만료시, 토큰 새로 발급
-        if (StringUtils.hasLength(accessToken) == false) {
-            // 지금으로부터 100년간의 유효기간을 가지는 토큰을 생성, DB에 토큰 저장
-            accessToken = jwtProvider.generateAccessToken(member.getId(), member.getAuthorities());
-            member.updateAccessToken(accessToken);
-            memberRepository.save(member);  // TODO: 생략하면 저장 안됨(변경감지X)
-        }
-        return accessToken;
+        String accessToken = jwtProvider.generateAccessToken(member.getId(), member.getAuthorities());
+        String refreshToken = jwtProvider.generateRefreshToken(member.getId(), member.getAuthorities());
+        // TODO: DB에 refresh 를 저장하는 것으로 수정예정
+        member.updateAccessToken(accessToken);
+        memberRepository.save(member);  // 생략하면 저장 안됨(변경감지X)
+
+        return Token.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     public Member findById(Long id) {

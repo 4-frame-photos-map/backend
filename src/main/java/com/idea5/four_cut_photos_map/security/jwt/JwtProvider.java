@@ -22,7 +22,11 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtProvider {
     private final SecretKey jwtSecretKey;   // 비밀키
-    private long ACCESS_TOKEN_VALIDATION_SECOND = 60 * 60 * 24 * 365 * 100L;    // accessToken 유효기간(100년)
+    private final long ACCESS_TOKEN_VALIDATION_SECOND = 60 * 30L; // accessToken 유효기간(30분)
+    private final long REFRESH_TOKEN_VALIDATION_SECOND = 60 * 60 * 24 * 30L;  // accessToken 유효기간(1달)
+
+    private final String ACCESS_TOKEN_TYPE = "access token";
+    private final String REFRESH_TOKEN_TYPE = "refresh token";
 
     private SecretKey getSecretKey() {
         return jwtSecretKey;
@@ -32,15 +36,16 @@ public class JwtProvider {
      * JWT Access Token 발급
      * @param memberId 회원 id
      * @param authorities 회원 Authority 리스트
+     * @param tokenValid 토큰 유효기간
      * @return jwt access token
      */
-    public String generateAccessToken(Long memberId, Collection<? extends GrantedAuthority> authorities) {
-        log.info("accessToken 발급");
+    public String generateToken(Long memberId, Collection<? extends GrantedAuthority> authorities, String tokenType, Long tokenValid) {
         Date now = new Date();
         Claims claims = Jwts.claims()
                 .setIssuer("four_cut_photos_map")   // 토큰 발급자
                 .setIssuedAt(now)   // 토큰 발급 시간
-                .setExpiration(new Date(now.getTime() + 1000L * ACCESS_TOKEN_VALIDATION_SECOND));   // 토큰 만료 시간
+                .setExpiration(new Date(now.getTime() + 1000L * tokenValid));   // 토큰 만료 시간
+        claims.put("token_type", tokenType);    // 토큰 타입
         // 회원 기반 정보
         claims.put("id", memberId);
         claims.put("authorities", authorities);
@@ -49,6 +54,18 @@ public class JwtProvider {
                 .setClaims(claims)  // Custom Claims 정보(맨 위에 적지않으면 아래 값이 덮어씌워져 누락됨!)
                 .signWith(getSecretKey(), SignatureAlgorithm.HS512) // HS512, 비밀키로 서명
                 .compact(); // 토큰 생성
+    }
+
+    // accessToken 발급
+    public String generateAccessToken(Long memberId, Collection<? extends GrantedAuthority> authorities) {
+        log.info("accessToken 발급");
+        return generateToken(memberId, authorities, ACCESS_TOKEN_TYPE, ACCESS_TOKEN_VALIDATION_SECOND);
+    }
+
+    // refreshToken 발급
+    public String generateRefreshToken(Long memberId, Collection<? extends GrantedAuthority> authorities) {
+        log.info("refreshToken 발급");
+        return generateToken(memberId, authorities, REFRESH_TOKEN_TYPE, REFRESH_TOKEN_VALIDATION_SECOND);
     }
 
     // JWT Access Token 검증
