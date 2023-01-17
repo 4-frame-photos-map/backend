@@ -4,6 +4,7 @@ import com.idea5.four_cut_photos_map.security.jwt.JwtAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -11,7 +12,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
-@EnableWebSecurity
+@EnableWebSecurity  // spring security 활성화
+@EnableGlobalMethodSecurity(prePostEnabled = true)  // spring security @PreAuthorize 활성화
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtAuthorizationFilter jwtAuthorizationFilter;
@@ -19,6 +21,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationConfiguration authenticationConfiguration) throws Exception {
         http
+                // TODO: 인가 정책 설정을 @PreAuthorize 로 설정할 것인지, 설정파일에서 할 것인지 고민중
+//                .authorizeRequests(
+//                        // 소셜로그인 외 모든 요청은 로그인 필수
+//                        authorizeRequests -> authorizeRequests
+//                                .antMatchers("/member/login/**").permitAll()
+//                                .anyRequest()
+//                                .authenticated()
+//                )
                 .cors().disable() // 타 도메인에서 API 호출 가능
                 .csrf().disable() // CSRF 토큰 끄기
                 .httpBasic().disable() // Spring Security 가 제공하는 기본 로그인 화면 사용X

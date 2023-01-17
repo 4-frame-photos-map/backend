@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +34,7 @@ public class MemberController {
      * 카카오 로그인
      * @param code 인가코드
      */
+    @PreAuthorize("isAnonymous()")
     @GetMapping("/login/oauth2/kakao")
     public ResponseEntity<RsData> kakaoLogin(@RequestParam String code) throws JsonProcessingException {
         log.info("카카오 로그인 콜백 요청");
@@ -61,6 +63,7 @@ public class MemberController {
     }
 
     // MemberContext 값 잘 주입되는지 테스트용
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/info")
     public ResponseEntity<RsData> getProfile(@AuthenticationPrincipal MemberContext memberContext) {
         log.info(memberContext.getId().toString());
