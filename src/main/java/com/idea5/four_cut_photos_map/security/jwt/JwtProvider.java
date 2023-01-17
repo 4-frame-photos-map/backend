@@ -3,16 +3,19 @@ package com.idea5.four_cut_photos_map.security.jwt;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.util.Collection;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * JWT 토큰 생성, 검증 관여
  * @See<a href="https://brunch.co.kr/@jinyoungchoi95/1">jwt</>
  * @See<a href="https://annajin.tistory.com/217">jwt 토큰 검증 예외</>
+ * @See<a href="https://yeon-blog.tistory.com/3">Claims 객체</>
+ * @See<a href="https://velog.io/@jkijki12/Jwt-Refresh-Token-%EC%A0%81%EC%9A%A9%EA%B8%B0">refresh token 발급</>
  */
 @Slf4j
 @Component
@@ -27,21 +30,25 @@ public class JwtProvider {
 
     /**
      * JWT Access Token 발급
-     * @param claims jwt claim 에 들어갈 회원정보를 담은 map 객체
+     * @param memberId 회원 id
+     * @param authorities 회원 Authority 리스트
      * @return jwt access token
      */
-    public String generateAccessToken(Map<String, Object> claims) {
+    public String generateAccessToken(Long memberId, Collection<? extends GrantedAuthority> authorities) {
         log.info("accessToken 발급");
-        // TODO : LocalDateTime 직렬화 문제, LocalDateTime -> String 변환
-        claims.put("createDate", claims.get("createDate").toString());
-        claims.put("modifyDate", claims.get("modifyDate").toString());
+        Date now = new Date();
+        Claims claims = Jwts.claims()
+                .setIssuer("four_cut_photos_map")   // 토큰 발급자
+                .setIssuedAt(now)   // 토큰 발급 시간
+                .setExpiration(new Date(now.getTime() + 1000L * ACCESS_TOKEN_VALIDATION_SECOND));   // 토큰 만료 시간
+        // 회원 기반 정보
+        claims.put("id", memberId);
+        claims.put("authorities", authorities);
 
         return Jwts.builder()
-                .setClaims(claims)          // Custom Claims 정보(맨 위에 적지않으면 아래 값이 덮어씌워져 누락됨!)
-                .setIssuedAt(new Date())    // 토큰 발급 시간
-                .setExpiration(new Date(new Date().getTime() + 1000L * ACCESS_TOKEN_VALIDATION_SECOND)) // 토큰 만료 시간
+                .setClaims(claims)  // Custom Claims 정보(맨 위에 적지않으면 아래 값이 덮어씌워져 누락됨!)
                 .signWith(getSecretKey(), SignatureAlgorithm.HS512) // HS512, 비밀키로 서명
-                .compact();                                         // 토큰 생성
+                .compact(); // 토큰 생성
     }
 
     // JWT Access Token 검증

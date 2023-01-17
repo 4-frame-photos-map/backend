@@ -1,16 +1,16 @@
 package com.idea5.four_cut_photos_map.member.service;
 
+import com.idea5.four_cut_photos_map.member.CachedMemberParam;
 import com.idea5.four_cut_photos_map.member.dto.response.KakaoUserInfoDto;
 import com.idea5.four_cut_photos_map.member.entity.Member;
 import com.idea5.four_cut_photos_map.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -48,8 +48,7 @@ public class MemberService {
         // 2. 만료시, 토큰 새로 발급
         if (StringUtils.hasLength(accessToken) == false) {
             // 지금으로부터 100년간의 유효기간을 가지는 토큰을 생성, DB에 토큰 저장
-            Map<String, Object> claims = member.getAccessTokenClaims();
-            accessToken = jwtProvider.generateAccessToken(claims);
+            accessToken = jwtProvider.generateAccessToken(member.getId(), member.getAuthorities());
             member.updateAccessToken(accessToken);
             memberRepository.save(member);  // TODO: 생략하면 저장 안됨(변경감지X)
         }
