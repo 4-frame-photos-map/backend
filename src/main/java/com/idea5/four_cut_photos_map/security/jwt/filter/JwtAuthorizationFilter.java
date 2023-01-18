@@ -4,6 +4,7 @@ import com.idea5.four_cut_photos_map.member.entity.Member;
 import com.idea5.four_cut_photos_map.member.entity.MemberContext;
 import com.idea5.four_cut_photos_map.member.service.MemberService;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +19,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
+import static com.idea5.four_cut_photos_map.security.jwt.dto.TokenType.ACCESS_TOKEN;
+import static com.idea5.four_cut_photos_map.security.jwt.dto.TokenType.REFRESH_TOKEN;
 
 /**
  * JWT 인증처리 필터
@@ -39,17 +43,22 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("JwtAuthorizationFilter doFilterInternal()");
-        String accessToken = getJwtAccessToken(request);
+        String token = getJwtToken(request);
         // 1. 1차 체크(토큰이 유효한지 검증)
-        if(StringUtils.hasText(accessToken) && jwtProvider.verify(accessToken)) {
-            // member 조회할 때, 캐시(redis) 사용
-            Long memberId = jwtProvider.getId(accessToken);
-            // 매 요청마다 DB 조회하면 성능 문제(jwt 쓰는 이유가 없음) -> Redis 캐시로 해결
+        if(StringUtils.hasText(token) && jwtProvider.verify(token)) {
+            Long memberId = jwtProvider.getId(token);
+            String tokenType = jwtProvider.getTokenType(token);
+            String requestURI = request.getRequestURI();
+            // 2가지 경우에 대한 예외처리
+            if(tokenType.equals(ACCESS_TOKEN.getName()) && requestURI.equals("/member/refresh")
+            || tokenType.equals(REFRESH_TOKEN.getName()) && !requestURI.equals("/member/refresh")) {
+                throw new JwtException("유효하지 않은 토큰입니다.");
+            }
+            // TODO: 매 요청마다 DB 조회하면 성능 문제(jwt 쓰는 이유가 없음) -> Redis 캐시로 해결
             Member member = memberService.findById(memberId);
 //            CachedMemberParam cachedMember = memberService.findCachedById(memberId);
 //            log.info(cachedMember.getId().toString());
 //            log.info(cachedMember.getNickname());
-            // TODO: 화이트리스트를 관리하는 방식이 괜찮은가? 보통은 DB 에 accessToken 대신 refresh 토큰을 저장함
             // 2. 2차 체크(해당 엑세스 토큰이 화이트 리스트에 포함되는지 검증) -> 탈취된 토큰 무효화
             if(member != null) {
                 log.info("JwtAuthorizationFilter 인증처리");
@@ -60,11 +69,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     // request Authorization header 의 jwt accessToken 값 꺼내기
-    private String getJwtAccessToken(HttpServletRequest request) {
+    private String getJwtToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-//        if(!StringUtils.hasText(bearerToken)) {
-//            throw new IllegalStateException();
-//        }
         if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_TOKEN_PREFIX)) {
             return bearerToken.substring(BEARER_TOKEN_PREFIX.length());
         }
@@ -86,10 +92,5 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
-    }
-
-    // 토큰이 있는지 여부
-    private boolean hasToken(String token) {
-        return StringUtils.hasText(token);
     }
 }

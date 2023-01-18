@@ -8,6 +8,7 @@ import com.idea5.four_cut_photos_map.member.entity.Member;
 import com.idea5.four_cut_photos_map.member.entity.MemberContext;
 import com.idea5.four_cut_photos_map.member.service.KakaoService;
 import com.idea5.four_cut_photos_map.member.service.MemberService;
+import com.idea5.four_cut_photos_map.security.jwt.dto.response.AccessToken;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.Token;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,10 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -58,6 +56,27 @@ public class MemberController {
                 200,
                 "카카오 로그인 성공, Access Token 발급",
                 token
+        );
+        return new ResponseEntity<>(body, headers, HttpStatus.OK);
+    }
+
+    // refreshToken 으로 accessToken 재발급
+    @PostMapping("/refresh")
+    public ResponseEntity<RsData> refreshToken(
+            @RequestHeader("Authorization") String bearerToken,
+            @AuthenticationPrincipal MemberContext memberContext
+    ) {
+        log.info("accessToken 재발급 요청");
+        String refreshToken = bearerToken.substring("Bearer ".length());
+        AccessToken accessToken = memberService.reissueAccessToken(refreshToken, memberContext.getId(), memberContext.getAuthorities());
+        // header 에 토큰 담기
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authentication", accessToken.getAccessToken());
+        // body 에 토큰 담기
+        RsData<AccessToken> body = new RsData<>(
+                200,
+                "Access Token 재발급 성공",
+                accessToken
         );
         return new ResponseEntity<>(body, headers, HttpStatus.OK);
     }

@@ -26,6 +26,7 @@ import static com.idea5.four_cut_photos_map.security.jwt.dto.ErrorCode.INVALID_T
  * 2) 유효하지 않은 JWT 토큰(잘못된 서명, 올바르지 않은 JWT 구조 등 여러 예외 통합 처리)
  * @See <a href="https://devjem.tistory.com/m/72">JwtExceptionFilter 1</a>
  * @See <a href="https://jhkimmm.tistory.com/29">JwtExceptionFilter 2</a>
+ * @See <a href="https://beemiel.tistory.com/11">JWT 예외처리</a>
  */
 @Slf4j
 @Component

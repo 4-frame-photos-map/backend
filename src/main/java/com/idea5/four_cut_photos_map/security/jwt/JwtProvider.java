@@ -1,6 +1,10 @@
 package com.idea5.four_cut_photos_map.security.jwt;
 
-import io.jsonwebtoken.*;
+import com.idea5.four_cut_photos_map.global.common.RedisDao;
+import com.idea5.four_cut_photos_map.security.jwt.dto.response.AccessToken;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
@@ -9,6 +13,9 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Collection;
 import java.util.Date;
+
+import static com.idea5.four_cut_photos_map.security.jwt.dto.TokenType.ACCESS_TOKEN;
+import static com.idea5.four_cut_photos_map.security.jwt.dto.TokenType.REFRESH_TOKEN;
 
 /**
  * JWT 토큰 생성, 검증 관여
@@ -22,12 +29,10 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtProvider {
     private final SecretKey jwtSecretKey;   // 비밀키
+    private final RedisDao redisDao;
     // TODO: 테스트를 위해 유효기간을 30초로 세팅
     private final long ACCESS_TOKEN_VALIDATION_SECOND = 30 * 1L; // accessToken 유효기간(30분)
     private final long REFRESH_TOKEN_VALIDATION_SECOND = 60 * 60 * 24 * 30L;  // accessToken 유효기간(1달)
-
-    private final String ACCESS_TOKEN_TYPE = "access token";
-    private final String REFRESH_TOKEN_TYPE = "refresh token";
 
     private SecretKey getSecretKey() {
         return jwtSecretKey;
@@ -60,13 +65,13 @@ public class JwtProvider {
     // accessToken 발급
     public String generateAccessToken(Long memberId, Collection<? extends GrantedAuthority> authorities) {
         log.info("accessToken 발급");
-        return generateToken(memberId, authorities, ACCESS_TOKEN_TYPE, ACCESS_TOKEN_VALIDATION_SECOND);
+        return generateToken(memberId, authorities, ACCESS_TOKEN.getName(), ACCESS_TOKEN_VALIDATION_SECOND);
     }
 
     // refreshToken 발급
     public String generateRefreshToken(Long memberId, Collection<? extends GrantedAuthority> authorities) {
         log.info("refreshToken 발급");
-        return generateToken(memberId, authorities, REFRESH_TOKEN_TYPE, REFRESH_TOKEN_VALIDATION_SECOND);
+        return generateToken(memberId, authorities, REFRESH_TOKEN.getName(), REFRESH_TOKEN_VALIDATION_SECOND);
     }
 
     // JWT Access Token 검증
@@ -89,10 +94,32 @@ public class JwtProvider {
         return claims;
     }
 
-    // Claims 에서 id
+    // Claims 에서 id 조회
     public Long getId(String accessToken) {
         Claims claims = parseClaims(accessToken);
         // java.lang.Integer cannot be cast to java.lang.Long 오류해결
         return ((Number) claims.get("id")).longValue();
+    }
+
+    // Claims 에서 id 조회
+    public String getTokenType(String accessToken) {
+        Claims claims = parseClaims(accessToken);
+        // java.lang.Integer cannot be cast to java.lang.Long 오류해결
+        return claims.get("token_type").toString();
+    }
+
+    // accessToken 재발급
+    public AccessToken reissueAccessToken(String refreshToken, Long memberId, Collection<? extends GrantedAuthority> authorities) {
+        // 1. redis 에서 memberId(key)로 refreshToken 조회
+        String redisRefreshToken = redisDao.getValues(memberId.toString());
+        // 2. redis 에 저장된 refreshToken 과 요청 헤더로 전달된 refreshToken 값이 일치하는지 확인
+        if(!refreshToken.equals(redisRefreshToken)) {
+            throw new RuntimeException("refreshToken 불일치");
+        }
+        // 3. accessToken 재발급
+        String newAccessToken = generateAccessToken(memberId, authorities);
+        return AccessToken.builder()
+                .accessToken(newAccessToken)
+                .build();
     }
 }
