@@ -59,14 +59,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    // TODO: 고치기
     // request Authorization header 의 jwt accessToken 값 꺼내기
     private String getJwtAccessToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        if(!StringUtils.hasText(bearerToken)) {
-            throw new IllegalStateException();
-        }
-        if(bearerToken.startsWith(BEARER_TOKEN_PREFIX)) {
+//        if(!StringUtils.hasText(bearerToken)) {
+//            throw new IllegalStateException();
+//        }
+        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_TOKEN_PREFIX)) {
             return bearerToken.substring(BEARER_TOKEN_PREFIX.length());
         }
         return null;

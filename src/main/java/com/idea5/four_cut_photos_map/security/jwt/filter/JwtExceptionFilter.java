@@ -40,12 +40,9 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         }  catch(ExpiredJwtException e) {
             // 1. 만료된 토큰 예외처리
             setErrorResponse(response, EXPIRED_TOKEN.getCode(), EXPIRED_TOKEN.getMessage());
-        } catch (JwtException e) {
+        } catch (JwtException | IllegalStateException e) {
             // 2. 유효하지 않은 토큰 예외처리
             setErrorResponse(response, INVALID_TOKEN.getCode(), INVALID_TOKEN.getMessage());
-        } catch(IllegalStateException e) {
-            // 3.
-            setErrorResponse(response, NON_TOKEN.getCode(), NON_TOKEN.getMessage());
         }
     }
 
