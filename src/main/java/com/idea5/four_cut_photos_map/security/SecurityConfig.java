@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.security;
 
-import com.idea5.four_cut_photos_map.security.jwt.JwtAuthorizationFilter;
+import com.idea5.four_cut_photos_map.security.jwt.filter.JwtAuthorizationFilter;
+import com.idea5.four_cut_photos_map.security.jwt.filter.JwtExceptionFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -17,6 +18,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtAuthorizationFilter jwtAuthorizationFilter;
+    private final JwtExceptionFilter jwtExceptionFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -37,12 +39,16 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(STATELESS)
                 )
-                // UsernamePasswordAuthenticationFilter 앞에 jwtAuthorizationFilter 추가(jwtAuthorizationFilter 먼저 실행)
+                // UsernamePasswordAuthenticationFilter 앞단에 jwtAuthorizationFilter 추가
                 .addFilterBefore(
                         jwtAuthorizationFilter,
                         UsernamePasswordAuthenticationFilter.class
+                )
+                // JwtAuthorizationFilter 앞단에 jwtExceptionFilter 추가(Jwt 필터단에서 발생하는 예외처리를 위함)
+                .addFilterBefore(
+                        jwtExceptionFilter,
+                        JwtAuthorizationFilter.class
                 );
-
         return http.build();
     }
 }

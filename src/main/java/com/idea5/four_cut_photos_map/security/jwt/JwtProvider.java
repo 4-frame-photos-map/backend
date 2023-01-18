@@ -22,7 +22,8 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtProvider {
     private final SecretKey jwtSecretKey;   // 비밀키
-    private final long ACCESS_TOKEN_VALIDATION_SECOND = 60 * 30L; // accessToken 유효기간(30분)
+    // TODO: 테스트를 위해 유효기간을 30초로 세팅
+    private final long ACCESS_TOKEN_VALIDATION_SECOND = 30 * 1L; // accessToken 유효기간(30분)
     private final long REFRESH_TOKEN_VALIDATION_SECOND = 60 * 60 * 24 * 30L;  // accessToken 유효기간(1달)
 
     private final String ACCESS_TOKEN_TYPE = "access token";
@@ -70,24 +71,11 @@ public class JwtProvider {
 
     // JWT Access Token 검증
     public boolean verify(String accessToken) {
-        try {
-            Jwts.parserBuilder()
-                    .setSigningKey(getSecretKey())  // 비밀키
-                    .build()
-                    .parseClaimsJws(accessToken);   // 파싱 및 검증(실패시 에러)
-            return true;
-        } catch (SignatureException e) {
-            log.info("잘못된 JWT 서명입니다.");
-        } catch (MalformedJwtException e) {
-            log.info("유효하지 않은 구성의 JWT 토큰입니다.");
-        } catch (ExpiredJwtException e) {
-            log.info("만료된 JWT 토큰입니다.");
-        } catch (UnsupportedJwtException e) {
-            log.info("지원되지 않는 형식이나 구성의 JWT 토큰입니다.");
-        } catch (IllegalArgumentException e) {
-            log.info("JWT 토큰이 잘못되었습니다.");
-        }
-        return false;
+        Jwts.parserBuilder()
+                .setSigningKey(getSecretKey())  // 비밀키
+                .build()
+                .parseClaimsJws(accessToken);   // 파싱 및 검증(실패시 에러)
+        return true;
     }
 
     // accessToken 으로부터 Claim 정보 얻기

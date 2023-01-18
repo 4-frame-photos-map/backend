@@ -1,8 +1,9 @@
-package com.idea5.four_cut_photos_map.security.jwt;
+package com.idea5.four_cut_photos_map.security.jwt.filter;
 
 import com.idea5.four_cut_photos_map.member.entity.Member;
 import com.idea5.four_cut_photos_map.member.entity.MemberContext;
 import com.idea5.four_cut_photos_map.member.service.MemberService;
+import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,7 +44,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         if(StringUtils.hasText(accessToken) && jwtProvider.verify(accessToken)) {
             // member 조회할 때, 캐시(redis) 사용
             Long memberId = jwtProvider.getId(accessToken);
+            // 매 요청마다 DB 조회하면 성능 문제(jwt 쓰는 이유가 없음) -> Redis 캐시로 해결
             Member member = memberService.findById(memberId);
+//            CachedMemberParam cachedMember = memberService.findCachedById(memberId);
+//            log.info(cachedMember.getId().toString());
+//            log.info(cachedMember.getNickname());
             // TODO: 화이트리스트를 관리하는 방식이 괜찮은가? 보통은 DB 에 accessToken 대신 refresh 토큰을 저장함
             // 2. 2차 체크(해당 엑세스 토큰이 화이트 리스트에 포함되는지 검증) -> 탈취된 토큰 무효화
             if(member != null) {
@@ -54,10 +59,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    // TODO: 고치기
     // request Authorization header 의 jwt accessToken 값 꺼내기
     private String getJwtAccessToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_TOKEN_PREFIX)) {
+        if(!StringUtils.hasText(bearerToken)) {
+            throw new IllegalStateException();
+        }
+        if(bearerToken.startsWith(BEARER_TOKEN_PREFIX)) {
             return bearerToken.substring(BEARER_TOKEN_PREFIX.length());
         }
         return null;
@@ -78,5 +87,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
+    }
+
+    // 토큰이 있는지 여부
+    private boolean hasToken(String token) {
+        return StringUtils.hasText(token);
     }
 }
