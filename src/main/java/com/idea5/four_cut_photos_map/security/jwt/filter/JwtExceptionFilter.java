@@ -16,7 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.idea5.four_cut_photos_map.security.jwt.dto.ErrorCode.*;
+import static com.idea5.four_cut_photos_map.security.jwt.dto.ErrorCode.EXPIRED_TOKEN;
+import static com.idea5.four_cut_photos_map.security.jwt.dto.ErrorCode.INVALID_TOKEN;
 
 /**
  * JWT AuthorizationFilter 예외처리 필터
