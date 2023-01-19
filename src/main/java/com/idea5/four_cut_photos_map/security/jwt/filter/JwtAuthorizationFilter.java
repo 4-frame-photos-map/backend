@@ -1,7 +1,7 @@
 package com.idea5.four_cut_photos_map.security.jwt.filter;
 
 import com.idea5.four_cut_photos_map.member.entity.Member;
-import com.idea5.four_cut_photos_map.member.entity.MemberContext;
+import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import com.idea5.four_cut_photos_map.member.service.MemberService;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import io.jsonwebtoken.JwtException;

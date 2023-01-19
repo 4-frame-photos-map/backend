@@ -5,7 +5,7 @@ import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.member.dto.KakaoUserInfoParam;
 import com.idea5.four_cut_photos_map.member.dto.response.MemberInfoResp;
 import com.idea5.four_cut_photos_map.member.entity.Member;
-import com.idea5.four_cut_photos_map.member.entity.MemberContext;
+import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import com.idea5.four_cut_photos_map.member.service.KakaoService;
 import com.idea5.four_cut_photos_map.member.service.MemberService;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.AccessToken;
