@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
@@ -28,11 +29,15 @@ import static com.idea5.four_cut_photos_map.security.jwt.dto.TokenType.REFRESH_T
 @Component
 @RequiredArgsConstructor
 public class JwtProvider {
+    // TODO: 테스트를 위해 유효기간을 30초로 세팅
+    @Value("${jwt.atk.expiration}")
+    private long accessTokenValidationSecond; // accessToken 유효기간(30분)
+
+    @Value("${jwt.rtk.expiration}")
+    private long refreshTokenValidationSecond;    // accessToken 유효기간(1달)
+
     private final SecretKey jwtSecretKey;   // 비밀키
     private final RedisDao redisDao;
-    // TODO: 테스트를 위해 유효기간을 30초로 세팅
-    private final long ACCESS_TOKEN_VALIDATION_SECOND = 30 * 1L; // accessToken 유효기간(30분)
-    private final long REFRESH_TOKEN_VALIDATION_SECOND = 60 * 60 * 24 * 30L;  // accessToken 유효기간(1달)
 
     private SecretKey getSecretKey() {
         return jwtSecretKey;
@@ -65,13 +70,13 @@ public class JwtProvider {
     // accessToken 발급
     public String generateAccessToken(Long memberId, Collection<? extends GrantedAuthority> authorities) {
         log.info("accessToken 발급");
-        return generateToken(memberId, authorities, ACCESS_TOKEN.getName(), ACCESS_TOKEN_VALIDATION_SECOND);
+        return generateToken(memberId, authorities, ACCESS_TOKEN.getName(), accessTokenValidationSecond);
     }
 
     // refreshToken 발급
     public String generateRefreshToken(Long memberId, Collection<? extends GrantedAuthority> authorities) {
         log.info("refreshToken 발급");
-        return generateToken(memberId, authorities, REFRESH_TOKEN.getName(), REFRESH_TOKEN_VALIDATION_SECOND);
+        return generateToken(memberId, authorities, REFRESH_TOKEN.getName(), refreshTokenValidationSecond);
     }
 
     // JWT Access Token 검증

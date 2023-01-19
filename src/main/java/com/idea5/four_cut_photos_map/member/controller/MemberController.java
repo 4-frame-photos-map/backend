@@ -27,6 +27,7 @@ public class MemberController {
     private final MemberService memberService;
     private final KakaoService kakaoService;
 
+
     /**
      * 카카오 로그인
      * @param code 인가코드
