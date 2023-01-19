@@ -2,20 +2,17 @@ package com.idea5.four_cut_photos_map.member.entity;
 
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
 import com.idea5.four_cut_photos_map.global.util.Util;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.idea5.four_cut_photos_map.review.entity.Review;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+import java.util.*;
 
 @Entity
 @Getter
@@ -31,6 +28,11 @@ public class Member extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
     private String accessToken; // jwt access token
+
+    @OneToMany(mappedBy = "writer", fetch = FetchType.EAGER)
+    @Builder.Default
+    @ToString.Exclude
+    private List<Review> reviewList = new LinkedList<>();
 
     // TODO: 이후 활용
     // 현재 회원이 가지고 있는 권한들을 List<GrantedAuthority> 형태로 리턴
@@ -58,5 +60,10 @@ public class Member extends BaseEntity {
                 "nickname", getNickname(),
                 "authorities", getAuthorities()
         );
+    }
+
+    public void addReview(Review review) {
+        review.setWriter(this);
+        this.reviewList.add(review);
     }
 }
