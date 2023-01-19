@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @AutoConfigureMockMvc
 @Slf4j
-class ShopControllerTest {
+class zShopControllerTest {
     // todo : 실패 케이스도 추가하기
     @Autowired
     private MockMvc mockMvc;
