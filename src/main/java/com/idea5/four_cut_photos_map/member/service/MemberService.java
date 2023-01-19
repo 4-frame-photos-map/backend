@@ -1,7 +1,7 @@
 package com.idea5.four_cut_photos_map.member.service;
 
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
-import com.idea5.four_cut_photos_map.member.dto.response.KakaoUserInfoDto;
+import com.idea5.four_cut_photos_map.member.dto.KakaoUserInfoParam;
 import com.idea5.four_cut_photos_map.member.dto.response.MemberInfoResp;
 import com.idea5.four_cut_photos_map.member.entity.Member;
 import com.idea5.four_cut_photos_map.member.repository.MemberRepository;
@@ -29,19 +29,19 @@ public class MemberService {
     // TODO: 신규가입자인 경우에만 save 가 일어나는데 @Transactional 을 여기에 붙어도 되는가?, DTO 로 반환하는게 맞을까?
     // 회원 가져오기
     @Transactional
-    public Member getMember(KakaoUserInfoDto kakaoUserInfoDto) {
+    public Member getMember(KakaoUserInfoParam kakaoUserInfoParam) {
         // Unique 한 값인 kakaoId 로 조회
-        Member member = memberRepository.findByKakaoId(kakaoUserInfoDto.getId()).orElse(null);
+        Member member = memberRepository.findByKakaoId(kakaoUserInfoParam.getId()).orElse(null);
         // 신규 사용자인 경우 회원가입
         if(member == null) {
-            member = join(kakaoUserInfoDto);
+            member = join(kakaoUserInfoParam);
         }
         return member;
     }
 
     // 회원가입
-    public Member join(KakaoUserInfoDto kakaoUserInfoDto) {
-        Member member = KakaoUserInfoDto.toEntity(kakaoUserInfoDto);
+    public Member join(KakaoUserInfoParam kakaoUserInfoParam) {
+        Member member = KakaoUserInfoParam.toEntity(kakaoUserInfoParam);
         return memberRepository.save(member);
     }
 

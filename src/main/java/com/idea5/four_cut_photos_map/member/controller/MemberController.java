@@ -2,7 +2,7 @@ package com.idea5.four_cut_photos_map.member.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
-import com.idea5.four_cut_photos_map.member.dto.response.KakaoUserInfoDto;
+import com.idea5.four_cut_photos_map.member.dto.KakaoUserInfoParam;
 import com.idea5.four_cut_photos_map.member.dto.response.MemberInfoResp;
 import com.idea5.four_cut_photos_map.member.entity.Member;
 import com.idea5.four_cut_photos_map.member.entity.MemberContext;
@@ -40,9 +40,9 @@ public class MemberController {
         // 1. 인가 코드로 토큰 발급 요청
         String kakaoAccessToken = kakaoService.getKakaoAccessToken(code);
         // 2. 토큰으로 사용자 정보 가져오기 요청
-        KakaoUserInfoDto kakaoUserInfoDto = kakaoService.getKakaoUserInfo(kakaoAccessToken);
+        KakaoUserInfoParam kakaoUserInfoParam = kakaoService.getKakaoUserInfo(kakaoAccessToken);
         // 3. 제공받은 사용자 정보로 서비스 회원 여부 확인후 회원가입 처리
-        Member member = memberService.getMember(kakaoUserInfoDto);
+        Member member = memberService.getMember(kakaoUserInfoParam);
         // 4. 서비스 로그인
         // jwt accessToken, refreshToken 발급
         Token token = memberService.generateTokens(member);
