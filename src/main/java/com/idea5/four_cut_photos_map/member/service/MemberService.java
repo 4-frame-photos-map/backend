@@ -2,6 +2,7 @@ package com.idea5.four_cut_photos_map.member.service;
 
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import com.idea5.four_cut_photos_map.member.dto.response.KakaoUserInfoDto;
+import com.idea5.four_cut_photos_map.member.dto.response.MemberInfoResp;
 import com.idea5.four_cut_photos_map.member.entity.Member;
 import com.idea5.four_cut_photos_map.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
@@ -68,5 +69,11 @@ public class MemberService {
     // accessToken 재발급
     public AccessToken reissueAccessToken(String refreshToken, Long memberId, Collection<? extends GrantedAuthority> authorities) {
         return jwtProvider.reissueAccessToken(refreshToken, memberId, authorities);
+    }
+
+    // 회원 id 로 기본 정보 조회
+    public MemberInfoResp getMemberInfo(Long id) {
+        Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException());
+        return MemberInfoResp.toDto(member);
     }
 }

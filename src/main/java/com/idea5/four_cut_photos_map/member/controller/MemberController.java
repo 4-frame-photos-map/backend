@@ -2,8 +2,8 @@ package com.idea5.four_cut_photos_map.member.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
-import com.idea5.four_cut_photos_map.global.util.Util;
 import com.idea5.four_cut_photos_map.member.dto.response.KakaoUserInfoDto;
+import com.idea5.four_cut_photos_map.member.dto.response.MemberInfoResp;
 import com.idea5.four_cut_photos_map.member.entity.Member;
 import com.idea5.four_cut_photos_map.member.entity.MemberContext;
 import com.idea5.four_cut_photos_map.member.service.KakaoService;
@@ -18,8 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -93,13 +91,13 @@ public class MemberController {
 //        return new ResponseEntity<>(HttpStatus.OK);
 //    }
 
-    // MemberContext 값 잘 주입되는지 테스트용
+    // 회원 기본정보 조회
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/info")
     public ResponseEntity<RsData> getProfile(@AuthenticationPrincipal MemberContext memberContext) {
-        log.info(memberContext.getId().toString());
-        RsData<Map<String, Object>> body = new RsData<>(
-                200, "회원정보 조회 성공", Util.mapOf("memberContext", memberContext)
+        MemberInfoResp memberInfoResp = memberService.getMemberInfo(memberContext.getId());
+        RsData<MemberInfoResp> body = new RsData<>(
+                200, "회원 정보 조회 성공", memberInfoResp
         );
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
