@@ -21,7 +21,7 @@ public class KeywordSearchKakaoApi {
     private String kakao_apikey;
     private final RestTemplate restTemplate;
 
-    public HashMap<String, Object> searchByKeyword(String keyword) {
+    public KaKaoSearchResponseDto searchByKeyword(String keyword) {
         // 1. 결과값 담을 객체 생성
         HashMap<String, Object> resultMap = new HashMap<String, Object>();
 
@@ -38,11 +38,6 @@ public class KeywordSearchKakaoApi {
         // 4. exchange 메서드로 api 호출
         ResponseEntity<KaKaoSearchResponseDto> response = restTemplate.exchange(apiURL, HttpMethod.GET, entity,KaKaoSearchResponseDto.class);
 
-        // 5. 요청한 결과를 HashMap에 추가
-        resultMap.put("statusCode", response.getStatusCodeValue()); // Http Status Code
-        resultMap.put("header", response.getHeaders());
-        resultMap.put("body", response.getBody()); // 반환받은 실제 데이터 정보
-
-        return resultMap;
+        return response.getBody();
     }
 }
