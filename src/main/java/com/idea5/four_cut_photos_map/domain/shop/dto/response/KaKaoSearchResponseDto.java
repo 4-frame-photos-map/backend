@@ -8,7 +8,7 @@ public class KaKaoSearchResponseDto {
     public Document[] documents;
 
     @Data
-    static class Document {
+    public static class Document {
         public String place_name; // 장소명
         public String road_address_name; // 도로명 주소
         public String x; // 경도

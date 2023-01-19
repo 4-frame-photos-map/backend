@@ -36,8 +36,6 @@ public class KeywordSearchKakaoApi {
                 + "query=" + keyword; // request param (x, y, radius 등 검색 조건 추가 가능)
 
         // 4. exchange 메서드로 api 호출
-        ResponseEntity<KaKaoSearchResponseDto> response = restTemplate.exchange(apiURL, HttpMethod.GET, entity,KaKaoSearchResponseDto.class);
-
-        return response.getBody();
+        return restTemplate.exchange(apiURL, HttpMethod.GET, entity,KaKaoSearchResponseDto.class).getBody();
     }
 }

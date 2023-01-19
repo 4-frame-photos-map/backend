@@ -1,30 +1,21 @@
 package com.idea5.four_cut_photos_map.domain.shop.controller;
 
-import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
-import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.KaKaoSearchResponseDto;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseMarker;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
-import com.idea5.four_cut_photos_map.global.common.data.Brand;
-import com.idea5.four_cut_photos_map.global.common.data.TempKaKaO;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DISTANCE_IS_EMPTY;
 
 
-@RestController
+//@RestController
 @RequestMapping("/shop")
+@RestController
 @RequiredArgsConstructor
 @Slf4j
 public class ShopController {
@@ -45,18 +36,48 @@ public class ShopController {
      * 하루필름, 인생네컷, 포토이즘, 포토그레이
      */
 
-    @GetMapping("/search")
+    @GetMapping(value = "/search")
     public ResponseEntity<List<ResponseShop>> keywordSearch(@RequestParam(defaultValue = "즉석사진") String keyword){
+        // 1. 카카오맵 api 응답 데이터 받아오기
+        KaKaoSearchResponseDto apiShopJson = shopService.searchByKeyword(keyword);
 
-        // 카카오맵 api 사용 (카카오맵에서 받아온다 가정)
-        KaKaoSearchResponseDto apiShops = shopService.searchByKeyword(keyword);
+        // 2. 카카오 api 응답 DTO 에서 List<DTO.Document>로 변환
+        List<KaKaoSearchResponseDto.Document> dtos = new ArrayList<>();
 
-        // db 비교
-        List<ResponseShop> shops = shopService.findShops(apiShops, keyword);
+        for (int i = 0; i < apiShopJson.getDocuments().length; i++) {
+            KaKaoSearchResponseDto.Document dto = new KaKaoSearchResponseDto.Document();
+
+            //log.info("name="+apiShopJson.getDocuments()[i].getPlace_name());
+            //log.info("distance="+apiShopJson.getDocuments()[i].getDistance());
+
+            /** TODO:
+             1차 리팩토링-> builder로 수정
+             2차 리팩토링 -> 현업에서 사용하는 방식(Jackson으로 처리)으로 수정
+            */
+
+            String place_name = apiShopJson.getDocuments()[i].getPlace_name();
+            String road_address_name = apiShopJson.getDocuments()[i].getRoad_address_name();
+            String x = apiShopJson.getDocuments()[i].getX();
+            String y = apiShopJson.getDocuments()[i].getY();
+            String distance = apiShopJson.getDocuments()[i].getDistance();
+
+            dto.setPlace_name(place_name);
+            dto.setRoad_address_name(road_address_name);
+            dto.setX(x);
+            dto.setY(y);
+            dto.setDistance(distance);
+
+            dtos.add(dto);
+        }
+
+        // 3. db 데이터와 비교
+        List<ResponseShop> shops = shopService.findShops(dtos, keyword);
 
         return ResponseEntity.ok(shops);
     }
 
+
+    /*
     //현재 위치 기준, 반경 2km
     @GetMapping("/search/marker")
     public ResponseEntity<Map<String, List<ResponseMarker>>> currentLocationSearch(@ModelAttribute @Valid RequestShop requestShop){
@@ -76,6 +97,7 @@ public class ShopController {
 
         return ResponseEntity.ok(maker);
     }
+     */
 
     // todo : @Validated 유효성 검사 시, httpstatus code 전달하는 방법
     @GetMapping("/detail/{shopId}")
