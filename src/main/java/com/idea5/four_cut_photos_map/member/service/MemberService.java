@@ -50,9 +50,6 @@ public class MemberService {
     public Token generateTokens(Member member) {
         String accessToken = jwtProvider.generateAccessToken(member.getId(), member.getAuthorities());
         String refreshToken = jwtProvider.generateRefreshToken(member.getId(), member.getAuthorities());
-        // TODO: DB에 refresh 를 저장하는 것으로 수정예정
-        member.updateAccessToken(accessToken);
-        memberRepository.save(member);  // 생략하면 저장 안됨(변경 감지X)
         // refreshToken redis 에 저장(key, value, 유효시간)
         redisDao.setValues(member.getId().toString(), refreshToken, Duration.ofMillis(60 * 60 * 24 * 30L));
 

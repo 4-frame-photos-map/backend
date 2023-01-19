@@ -27,9 +27,6 @@ public class Member extends BaseEntity {
 
     private String nickname;    // 닉네임(default kakao nickname)
 
-    @Column(columnDefinition = "TEXT")
-    private String accessToken; // jwt access token
-
     // TODO: 이후 활용
     // 현재 회원이 가지고 있는 권한들을 List<GrantedAuthority> 형태로 리턴
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -37,10 +34,5 @@ public class Member extends BaseEntity {
         authorities.add(new SimpleGrantedAuthority("MEMBER"));
 
         return authorities;
-    }
-
-    // accessToken 변경
-    public void updateAccessToken(String accessToken) {
-        this.accessToken = accessToken;
     }
 }
