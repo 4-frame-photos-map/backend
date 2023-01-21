@@ -3,7 +3,6 @@ package com.idea5.four_cut_photos_map.member.entity;
 import com.idea5.four_cut_photos_map.domain.like.entity.Like;
 import com.idea5.four_cut_photos_map.domain.titleLog.entity.TitleLog;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
-import com.idea5.four_cut_photos_map.global.util.Util;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +18,6 @@ import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 @Entity
 @Getter
@@ -52,24 +50,5 @@ public class Member extends BaseEntity {
         authorities.add(new SimpleGrantedAuthority("MEMBER"));
 
         return authorities;
-    }
-
-    // accessToken 변경
-    public void updateAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    /**
-     * AccessToken 발급을 위해 회원정보를 기반으로 Claim 객체 생성
-     * @return 회원정보를 담고있는 Claim Map 객체
-     */
-    public Map<String, Object> getAccessTokenClaims() {
-        return Util.mapOf(
-                "id", getId(),
-                "createDate", getCreateDate(),
-                "modifyDate", getModifyDate(),
-                "nickname", getNickname(),
-                "authorities", getAuthorities()
-        );
     }
 }
