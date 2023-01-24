@@ -46,14 +46,13 @@ public class ShopController {
         List<KaKaoSearchResponseDto.Document> dtos = new ArrayList<>();
 
         for (int i = 0; i < apiShopJson.getDocuments().length; i++) {
-            KaKaoSearchResponseDto.Document dto = new KaKaoSearchResponseDto.Document();
 
             //log.info("name="+apiShopJson.getDocuments()[i].getPlace_name());
             //log.info("distance="+apiShopJson.getDocuments()[i].getDistance());
 
             /** TODO:
-             1차 리팩토링-> builder로 수정
-             2차 리팩토링 -> 현업에서 사용하는 방식(Jackson으로 처리)으로 수정
+             - 1차: builder로 수정 [v]
+             - 2차: 현업에서 사용하는 방식(Jackson으로 처리)으로 수정 [ ]
             */
 
             String place_name = apiShopJson.getDocuments()[i].getPlace_name();
@@ -62,11 +61,13 @@ public class ShopController {
             String y = apiShopJson.getDocuments()[i].getY();
             String distance = apiShopJson.getDocuments()[i].getDistance();
 
-            dto.setPlace_name(place_name);
-            dto.setRoad_address_name(road_address_name);
-            dto.setX(x);
-            dto.setY(y);
-            dto.setDistance(distance);
+            KaKaoSearchResponseDto.Document dto = KaKaoSearchResponseDto.Document.builder()
+                    .place_name(place_name)
+                    .road_address_name(road_address_name)
+                    .x(x)
+                    .y(y)
+                    .distance(distance)
+                    .build();
 
             dtos.add(dto);
         }
