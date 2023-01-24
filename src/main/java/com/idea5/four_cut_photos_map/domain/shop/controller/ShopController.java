@@ -2,6 +2,7 @@ package com.idea5.four_cut_photos_map.domain.shop.controller;
 
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
+import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,7 @@ public class ShopController {
      */
 
     @GetMapping(value = "/search")
-    public ResponseEntity<List<ResponseShop>> keywordSearch(@RequestParam(defaultValue = "즉석사진") String keyword){
+    public RsData<List<ResponseShop>> showKeywordSearchList(@RequestParam(defaultValue = "즉석사진") String keyword){
         // 1. 카카오맵 api 응답 데이터 받아오기
         KaKaoSearchResponseDto apiShopJson = shopService.searchByKeyword(keyword);
 
@@ -73,7 +74,7 @@ public class ShopController {
         // 3. db 데이터와 비교
         List<ResponseShop> shops = shopService.findShops(dtos, keyword);
 
-        return ResponseEntity.ok(shops);
+        return new RsData<List<ResponseShop>>(200,"Ok",shops);
     }
 
 
