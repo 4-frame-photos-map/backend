@@ -21,8 +21,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Duration;
-
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -65,7 +63,11 @@ public class MemberController {
         return new ResponseEntity<>(body, headers, HttpStatus.OK);
     }
 
-    // refreshToken 으로 accessToken 재발급
+    /**
+     * refreshToken 으로 accessToken 재발급
+     * @param bearerToken refreshToken
+     * @param memberContext
+     */
     @PostMapping("/refresh")
     public ResponseEntity<RsData> refreshToken(
             @RequestHeader("Authorization") String bearerToken,
@@ -89,7 +91,6 @@ public class MemberController {
     /**
      * 서비스 로그아웃
      * @param bearerToken accessToken
-     * @return
      */
     @GetMapping("/logout/oauth2/kakao")
     public ResponseEntity<RsData> kakaoLogout(@RequestHeader("Authorization") String bearerToken) {
@@ -97,8 +98,7 @@ public class MemberController {
         log.info("서비스 로그아웃");
         String accessToken = bearerToken.substring("bearer ".length());
         // redis 에 해당 accessToken 블랙리스트로 저장하기
-        Long expiration = jwtProvider.getExpiration(accessToken);
-        redisDao.setValues(accessToken, "logout", Duration.ofMillis(expiration));
+        memberService.logout(accessToken);
         RsData<Object> body = new RsData<>(
                 200,
                 "로그아웃 성공",
