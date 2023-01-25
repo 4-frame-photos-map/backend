@@ -6,6 +6,7 @@ import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,14 +60,12 @@ public class ShopController {
             String address = apiShopJson.getDocuments()[i].getRoad_address_name();
             String longitude = apiShopJson.getDocuments()[i].getX();
             String latitude = apiShopJson.getDocuments()[i].getY();
-            String distance = apiShopJson.getDocuments()[i].getDistance();
 
             KaKaoSearchResponseDto.Document dto = KaKaoSearchResponseDto.Document.builder()
                     .place_name(name)
                     .road_address_name(address)
                     .x(longitude)
                     .y(latitude)
-                    .distance(distance)
                     .build();
 
             dtos.add(dto);
@@ -75,7 +74,7 @@ public class ShopController {
         // 3. db 데이터와 비교
         List<ResponseShop> shops = shopService.findShops(dtos, keyword);
 
-        return new RsData<List<ResponseShop>>(200,"Ok",shops);
+        return new RsData<List<ResponseShop>>(HttpStatus.OK.value(), "OK", shops);
     }
 
 

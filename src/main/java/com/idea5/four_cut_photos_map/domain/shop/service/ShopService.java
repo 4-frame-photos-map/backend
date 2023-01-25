@@ -45,10 +45,9 @@ public class ShopService {
                 if (apiShop.getPlace_name().equals(responseShop.getName())
                         && Double.parseDouble(apiShop.getX()) == responseShop.getLongitude()
                         && Double.parseDouble(apiShop.getY()) == responseShop.getLatitude()) {
-                    responseShop.setDistance(apiShop.getDistance());
+                    responseShops.add(responseShop);
                 }
 
-                responseShops.add(responseShop);
             }
         }
 
