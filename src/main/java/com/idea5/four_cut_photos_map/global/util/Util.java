@@ -3,6 +3,10 @@ package com.idea5.four_cut_photos_map.global.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idea5.four_cut_photos_map.AppConfig;
+import com.idea5.four_cut_photos_map.global.common.response.RsData;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -54,5 +58,28 @@ public class Util {
             map.put(key, value);
         }
         return map;
+    }
+
+    public static class spring {
+        public static <T> ResponseEntity<RsData> responseEntityOf(RsData<T> rsData) {
+            return responseEntityOf(rsData, null);
+        }
+
+        public static <T> ResponseEntity<RsData> responseEntityOf(RsData<T> rsData, HttpHeaders headers) {
+            return new ResponseEntity<>(rsData, headers, rsData.isSuccess() ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+        }
+
+        public static HttpHeaders httpHeadersOf(String... args) {
+            HttpHeaders headers = new HttpHeaders();
+
+            Map<String, String> map = mapOf(args);
+
+            for (String key : map.keySet()) {
+                String value = map.get(key);
+                headers.set(key, value);
+            }
+
+            return headers;
+        }
     }
 }

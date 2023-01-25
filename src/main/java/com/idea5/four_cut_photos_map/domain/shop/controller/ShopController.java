@@ -29,6 +29,8 @@ public class ShopController {
 
     private final ShopService shopService;
 
+
+
     /**
      * todo : 카카오맵 api 완료시, 표시할 shop 조회
      * 순서)

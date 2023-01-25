@@ -16,7 +16,7 @@ spring:
     url: jdbc:mariadb://localhost:3306/four_cut_photos_map?useUnicode=true&characterEncoding=utf8&serverTimeZone=Asia/Seoul&allowPublicKeyRetrieval=true&useSSL=false
     driver-class-name: org.mariadb.jdbc.Driver
     username: root
-    password: 1234
+    password:
     hikari:
 
 
