@@ -14,6 +14,8 @@ public enum ErrorCode {
     DISTANCE_IS_EMPTY(HttpStatus.BAD_REQUEST, "400", "[distance] 거리는 필수 입력값 입니다.");
 
 
+
+
     private HttpStatus httpStatus;
     private String errorCode;
     private String message;
