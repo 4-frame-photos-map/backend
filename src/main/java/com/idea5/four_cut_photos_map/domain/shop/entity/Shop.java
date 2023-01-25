@@ -30,4 +30,12 @@ public class Shop extends BaseEntity {
     @OneToMany
     @JoinColumn(name = "shop_id")
     private List<Like> likes = new ArrayList<>();
+
+    public Shop(String brand, String name, String address, double latitude, double longitude) {
+        this.brand = brand;
+        this.name = name;
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 }
