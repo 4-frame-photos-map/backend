@@ -3,7 +3,7 @@ package com.idea5.four_cut_photos_map.member.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.idea5.four_cut_photos_map.member.dto.response.KakaoUserInfoDto;
+import com.idea5.four_cut_photos_map.member.dto.KakaoUserInfoParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -76,7 +76,7 @@ public class KakaoService {
      * @param accessToken
      * @return 사용자 정보
      */
-    public KakaoUserInfoDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
+    public KakaoUserInfoParam getKakaoUserInfo(String accessToken) throws JsonProcessingException {
         log.info("토큰으로 사용자 정보 가져오기 요청");
         String url = "https://kapi.kakao.com/v2/user/me";
         // header 생성
@@ -96,7 +96,7 @@ public class KakaoService {
         Long id = jsonNode.get("id").asLong();
         String nickname = jsonNode.get("properties").get("nickname").asText();
 
-        return KakaoUserInfoDto.builder()
+        return KakaoUserInfoParam.builder()
                 .id(id)
                 .nickname(nickname)
                 .build();

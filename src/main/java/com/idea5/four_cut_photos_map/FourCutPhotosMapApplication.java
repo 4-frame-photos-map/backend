@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
 @EnableJpaAuditing  // @CreatedDate, @LastModifiedDate 기능 사용
+//@EnableCaching      //
 public class FourCutPhotosMapApplication {
 
     public static void main(String[] args) {

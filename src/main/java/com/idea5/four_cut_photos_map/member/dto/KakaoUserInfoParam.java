@@ -1,4 +1,4 @@
-package com.idea5.four_cut_photos_map.member.dto.response;
+package com.idea5.four_cut_photos_map.member.dto;
 
 import com.idea5.four_cut_photos_map.member.entity.Member;
 import lombok.Builder;
@@ -8,14 +8,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class KakaoUserInfoDto {
+public class KakaoUserInfoParam {
     private Long id;            // 회원번호
     private String nickname;
 
-    public static Member toEntity(KakaoUserInfoDto kakaoUserInfoDto) {
+    public static Member toEntity(KakaoUserInfoParam kakaoUserInfoParam) {
         return Member.builder()
-                .kakaoId(kakaoUserInfoDto.getId())
-                .nickname(kakaoUserInfoDto.getNickname())
+                .kakaoId(kakaoUserInfoParam.getId())
+                .nickname(kakaoUserInfoParam.getNickname())
                 .build();
     }
 }
