@@ -26,7 +26,6 @@ public class MemberService {
     private final JwtProvider jwtProvider;
     private final RedisDao redisDao;
 
-    // TODO: 신규가입자인 경우에만 save 가 일어나는데 @Transactional 을 여기에 붙어도 되는가?, DTO 로 반환하는게 맞을까?
     // 회원 가져오기
     @Transactional
     public Member getMember(KakaoUserInfoParam kakaoUserInfoParam) {

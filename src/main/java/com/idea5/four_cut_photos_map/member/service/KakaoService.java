@@ -42,9 +42,6 @@ public class KakaoService {
     public String getKakaoAccessToken(String code) throws JsonProcessingException {
         log.info("인가코드로 카카오 토큰 발급 요청");
         String url = "https://kauth.kakao.com/oauth/token";
-        String accessToken = "";
-        // TODO: refreshToken 은 응답값이 제대로 넘어오는지 확인 용도로만 사용중!
-        String refreshToken = "";
         // header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -64,8 +61,8 @@ public class KakaoService {
 
         // 응답 정보 역직렬화
         JsonNode jsonNode = objectMapper.readValue(response.getBody(), JsonNode.class);
-        accessToken = jsonNode.get("access_token").asText();
-        refreshToken = jsonNode.get("refresh_token").asText();
+        String accessToken = jsonNode.get("access_token").asText();
+        String refreshToken = jsonNode.get("refresh_token").asText();
         log.info("access-token = " + accessToken);
         log.info("refresh-token = " + refreshToken);
         return accessToken;

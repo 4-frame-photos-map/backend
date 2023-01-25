@@ -29,7 +29,6 @@ import static com.idea5.four_cut_photos_map.security.jwt.dto.TokenType.REFRESH_T
 @Component
 @RequiredArgsConstructor
 public class JwtProvider {
-    // TODO: 테스트를 위해 유효기간을 30초로 세팅
     @Value("${jwt.atk.expiration}")
     private long accessTokenValidationSecond; // accessToken 유효기간(30분)
 
