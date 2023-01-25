@@ -1,5 +1,6 @@
 package com.idea5.four_cut_photos_map.global.error;
 
+import com.idea5.four_cut_photos_map.global.common.response.RsDataV2;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
@@ -18,11 +19,13 @@ public class GlobalExceptionHandler {
      * javax.validation.Valid 또는 @Validated binding error가 발생할 경우
      */
     @ExceptionHandler(BindException.class)
-    protected ResponseEntity<RsData> handleBindException(BindException e) {
+    protected ResponseEntity<RsDataV2> handleBindException(BindException e) {
         log.error("handleBindException", e);
         ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST.toString(),
                 e.getBindingResult());
-        RsData<ErrorResponse> rsData = new RsData<>(400, "handleBindException", errorResponse);
+//        RsData<ErrorResponse> rsData = new RsData<>(400, "handleBindException", errorResponse);
+
+        RsDataV2<Object> rsData = new RsDataV2<>(false, errorResponse);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(rsData);
     }
@@ -30,12 +33,13 @@ public class GlobalExceptionHandler {
      * 주로 @RequestParam enum으로 binding 못했을 경우 발생
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    protected ResponseEntity<RsData>
+    protected ResponseEntity<RsDataV2>
     handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
         log.error("handleMethodArgumentTypeMismatchException", e);
         ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST.toString(),
                 e.getMessage());
-        RsData rsData = new RsData(400, "handleMethodArgumentTypeMismatchException", errorResponse);
+//        RsData rsData = new RsData(400, "handleMethodArgumentTypeMismatchException", errorResponse);
+        RsDataV2<Object> rsData = new RsDataV2<>(false, errorResponse);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(rsData);
     }
@@ -43,22 +47,24 @@ public class GlobalExceptionHandler {
      * 지원하지 않은 HTTP method 호출 할 경우 발생
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    protected ResponseEntity<RsData>
+    protected ResponseEntity<RsDataV2>
     handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
         log.error("handleHttpRequestMethodNotSupportedException", e);
         ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.METHOD_NOT_ALLOWED.toString(),
                 e.getMessage());
-        RsData rsData = new RsData(400, "handleHttpRequestMethodNotSupportedException", errorResponse);
+//        RsData rsData = new RsData(400, "handleHttpRequestMethodNotSupportedException", errorResponse);
+        RsDataV2<Object> rsData = new RsDataV2<>(false, errorResponse);
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(rsData);
     }
     /**
      * 비즈니스 로직 실행 중 오류 발생
      */
     @ExceptionHandler(value = { BusinessException.class })
-    protected ResponseEntity<RsData> handleConflict(BusinessException e) {
+    protected ResponseEntity<RsDataV2> handleConflict(BusinessException e) {
         log.error("BusinessException", e);
         ErrorResponse errorResponse = ErrorResponse.of(e.getErrorCode().getErrorCode(), e.getMessage());
-        RsData rsData = new RsData(400, "BusinessException", errorResponse);
+//        RsData rsData = new RsData(400, "BusinessException", errorResponse);
+        RsDataV2<Object> rsData = new RsDataV2<>(false, errorResponse);
         return ResponseEntity.status(e.getErrorCode().getHttpStatus())
                 .body(rsData);
     }
@@ -68,10 +74,11 @@ public class GlobalExceptionHandler {
      * 1) 로그인이 필요한 요청 헤더에 토큰이 없는 경우
      */
     @ExceptionHandler(AccessDeniedException.class)
-    protected ResponseEntity<RsData> handleAccessDenied(AccessDeniedException e) {
+    protected ResponseEntity<RsDataV2> handleAccessDenied(AccessDeniedException e) {
         log.error("AccessDeniedException", e);
         ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.FORBIDDEN.toString(), e.getMessage());
-        RsData rsData = new RsData(400, "AccessDeniedException", errorResponse);
+//        RsData rsData = new RsData(400, "AccessDeniedException", errorResponse);
+        RsDataV2<Object> rsData = new RsDataV2<>(false, errorResponse);
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(rsData);
     }
@@ -80,11 +87,12 @@ public class GlobalExceptionHandler {
      * 나머지 예외 발생
      */
     @ExceptionHandler(value = Exception.class)
-    protected ResponseEntity<RsData> handleException(Exception e) {
+    protected ResponseEntity<RsDataV2> handleException(Exception e) {
         log.error("Exception", e);
         ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.toString(),
                 e.getMessage());
-        RsData rsData = new RsData(400, "Exception", errorResponse);
+//        RsData rsData = new RsData(400, "Exception", errorResponse);
+        RsDataV2<Object> rsData = new RsDataV2<>(false, errorResponse);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(rsData);
     }
 }
