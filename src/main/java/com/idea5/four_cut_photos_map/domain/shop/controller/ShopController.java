@@ -55,17 +55,17 @@ public class ShopController {
              - 2차: 현업에서 사용하는 방식(Jackson으로 처리)으로 수정 [ ]
             */
 
-            String place_name = apiShopJson.getDocuments()[i].getPlace_name();
-            String road_address_name = apiShopJson.getDocuments()[i].getRoad_address_name();
-            String x = apiShopJson.getDocuments()[i].getX();
-            String y = apiShopJson.getDocuments()[i].getY();
+            String name = apiShopJson.getDocuments()[i].getPlace_name();
+            String address = apiShopJson.getDocuments()[i].getRoad_address_name();
+            String longitude = apiShopJson.getDocuments()[i].getX();
+            String latitude = apiShopJson.getDocuments()[i].getY();
             String distance = apiShopJson.getDocuments()[i].getDistance();
 
             KaKaoSearchResponseDto.Document dto = KaKaoSearchResponseDto.Document.builder()
-                    .place_name(place_name)
-                    .road_address_name(road_address_name)
-                    .x(x)
-                    .y(y)
+                    .place_name(name)
+                    .road_address_name(address)
+                    .x(longitude)
+                    .y(latitude)
                     .distance(distance)
                     .build();
 

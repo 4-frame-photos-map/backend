@@ -42,9 +42,9 @@ public class ShopService {
                 ResponseShop responseShop = ResponseShop.from(dbShop);
 
                 // Api Shop과 비교 후 저장
-                if (apiShop.getPlace_name().equals(responseShop.getPlace_name())
-                        && apiShop.getX().equals(responseShop.getX())
-                        && apiShop.getY().equals(responseShop.getY())) {
+                if (apiShop.getPlace_name().equals(responseShop.getName())
+                        && Double.parseDouble(apiShop.getX()) == responseShop.getLongitude()
+                        && Double.parseDouble(apiShop.getY()) == responseShop.getLatitude()) {
                     responseShop.setDistance(apiShop.getDistance());
                 }
 

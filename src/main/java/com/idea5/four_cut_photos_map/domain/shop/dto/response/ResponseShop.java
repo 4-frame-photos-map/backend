@@ -9,19 +9,19 @@ import lombok.*;
 @Builder
 public class ResponseShop {
 
-    private String place_name;// 장소명
+    private String name;// 장소명
 
-    private String road_address_name; // 전체 도로명 주소
-    private String x; // 위도
-    private String y; // 경도
+    private String address; // 전체 도로명 주소
+    private double latitude; // 위도
+    private double longitude; // 경도
     private String distance; // 중심좌표까지의 거리
 
     public static ResponseShop from(Shop shop){
         return ResponseShop.builder()
-                .place_name(shop.getName())
-                .road_address_name(shop.getAddress())
-                .x(String.valueOf(shop.getLatitude()))
-                .y(String.valueOf(shop.getLongitude()))
+                .name(shop.getName())
+                .address(shop.getAddress())
+                .latitude(shop.getLatitude())
+                .longitude(shop.getLongitude())
                 .build();
     }
     public void setDistance(String distance){
