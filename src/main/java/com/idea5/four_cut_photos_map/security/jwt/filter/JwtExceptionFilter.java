@@ -17,8 +17,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.idea5.four_cut_photos_map.security.jwt.dto.ErrorCode.EXPIRED_TOKEN;
-import static com.idea5.four_cut_photos_map.security.jwt.dto.ErrorCode.INVALID_TOKEN;
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.EXPIRED_TOKEN;
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_TOKEN;
+
 
 /**
  * JWT AuthorizationFilter 예외처리 필터
@@ -42,10 +43,10 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         }  catch(ExpiredJwtException e) {
             // 1. 만료된 토큰 예외처리
-            setErrorResponse(response, EXPIRED_TOKEN.getCode(), EXPIRED_TOKEN.getMessage());
+            setErrorResponse(response, EXPIRED_TOKEN.getErrorCode(), EXPIRED_TOKEN.getMessage());
         } catch (JwtException | IllegalStateException e) {
             // 2. 유효하지 않은 토큰 예외처리
-            setErrorResponse(response, INVALID_TOKEN.getCode(), INVALID_TOKEN.getMessage());
+            setErrorResponse(response, INVALID_TOKEN.getErrorCode(), INVALID_TOKEN.getMessage());
         }
     }
 
