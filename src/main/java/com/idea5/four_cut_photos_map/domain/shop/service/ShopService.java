@@ -22,13 +22,14 @@ public class ShopService {
     private final ShopRepository shopRepository;
 
     public List<ResponseShop> findShops(List<ShopDto> apiShops, String keyword) {
-
+        List<ResponseShop> resultShops = new ArrayList<>(); // 반환 리스트
+        List<ResponseShop> responseShops = new ArrayList<>(); // entity -> dto 변환 리스트
         // DB 조회 -> Dto 변환
         List<Shop> dbShops = shopRepository.findByBrand(keyword).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
         if(dbShops.isEmpty())
             throw new BusinessException(SHOP_NOT_FOUND);
 
-        List<ResponseShop> responseShops = new ArrayList<>();
+
         for (Shop dbShop : dbShops) {
             responseShops.add(ResponseShop.from(dbShop));
         }
@@ -38,11 +39,12 @@ public class ShopService {
             for (ResponseShop responseShop : responseShops) {
                 if(apiShop.getName().equals(responseShop.getName())){
                     responseShop.setDistance(apiShop.getDistance());
+                    resultShops.add(responseShop);
                 }
             }
         }
 
-        return responseShops;
+        return resultShops;
     }
 
     public Map<String, List<ResponseMarker>> findMaker(Map<String, List<ShopDto>> apiShopMaps) {

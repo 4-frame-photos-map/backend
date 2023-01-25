@@ -2,9 +2,12 @@ package com.idea5.four_cut_photos_map.domain.shop.service;
 
 import com.idea5.four_cut_photos_map.domain.like.entity.Like;
 import com.idea5.four_cut_photos_map.domain.like.repository.LikeRepository;
+import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
+import com.idea5.four_cut_photos_map.global.common.data.TempKaKaO;
 import com.idea5.four_cut_photos_map.member.entity.Member;
 import com.idea5.four_cut_photos_map.member.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +19,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 
 import javax.transaction.Transactional;
+
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -62,5 +67,7 @@ class ShopServiceTest {
                 ()->assertThat(shopDetail.getLongitude()).isEqualTo(100.2)
         );
     }
+
+
 
 }
