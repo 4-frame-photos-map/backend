@@ -106,11 +106,17 @@ public class JwtProvider {
         return ((Number) claims.get("id")).longValue();
     }
 
-    // Claims 에서 id 조회
+    // Claims 에서 TokenType 조회
     public String getTokenType(String accessToken) {
         Claims claims = parseClaims(accessToken);
-        // java.lang.Integer cannot be cast to java.lang.Long 오류해결
         return claims.get("token_type").toString();
+    }
+
+    // Claims 에서 남은 유효기간 조회
+    public Long getExpiration(String accessToken) {
+        Claims claims = parseClaims(accessToken);
+        // 남은 유효기간 = 만료일시 - 현재일시
+        return claims.getExpiration().getTime() - new Date().getTime();
     }
 
     // accessToken 재발급

@@ -1,13 +1,15 @@
 package com.idea5.four_cut_photos_map.member.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.member.dto.KakaoUserInfoParam;
 import com.idea5.four_cut_photos_map.member.dto.response.MemberInfoResp;
 import com.idea5.four_cut_photos_map.member.entity.Member;
-import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import com.idea5.four_cut_photos_map.member.service.KakaoService;
 import com.idea5.four_cut_photos_map.member.service.MemberService;
+import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
+import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.AccessToken;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.Token;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -26,6 +30,8 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
     private final MemberService memberService;
     private final KakaoService kakaoService;
+    private final RedisDao redisDao;
+    private final JwtProvider jwtProvider;
 
 
     /**
@@ -80,16 +86,49 @@ public class MemberController {
         return new ResponseEntity<>(body, headers, HttpStatus.OK);
     }
 
+    /**
+     * 서비스 로그아웃
+     * @param bearerToken accessToken
+     * @return
+     */
+    @GetMapping("/logout/oauth2/kakao")
+    public ResponseEntity<RsData> kakaoLogout(@RequestHeader("Authorization") String bearerToken) {
+        // 서비스 로그아웃
+        log.info("서비스 로그아웃");
+        String accessToken = bearerToken.substring("bearer ".length());
+        // redis 에 해당 accessToken 블랙리스트로 저장하기
+        Long expiration = jwtProvider.getExpiration(accessToken);
+        redisDao.setValues(accessToken, "logout", Duration.ofMillis(expiration));
+        RsData<Object> body = new RsData<>(
+                200,
+                "로그아웃 성공",
+                null
+        );
+        return new ResponseEntity<>(body, HttpStatus.OK);
+    }
+
+    // TODO: 카카오와 함께 로그아웃 요청시 state 에 accessToken 값을 넘겨 응답에
 //    /**
-//     * 카카오 로그아웃
+//     * 카카오와 함께 로그아웃
+//     * @param bearerToken accessToken
 //     * @return
 //     */
 //    @GetMapping("/logout/oauth2/kakao")
-//    public ResponseEntity<RsData> kakaoLogout(HttpSession session) {
+//    public ResponseEntity<RsData> kakaoLogout(@RequestParam("state") String bearerToken) {
 //        // 서비스 로그아웃
-//        log.info("서비스 로그아웃");
-//        session.invalidate();
-//        return new ResponseEntity<>(HttpStatus.OK);
+//        log.info("카카오와 함께 로그아웃");
+//        String accessToken = bearerToken.substring("bearer ".length());
+//        // redis 에 해당 accessToken 블랙리스트로 저장하기
+//        Long expiration = jwtProvider.getExpiration(accessToken);
+//        redisDao.setValues(accessToken, "logout", Duration.ofMillis(expiration));
+////        session.invalidate();
+//        // body 에 토큰 담기
+//        RsData<Object> body = new RsData<>(
+//                200,
+//                "로그아웃 성공",
+//                null
+//        );
+//        return new ResponseEntity<>(body, HttpStatus.OK);
 //    }
 
     // 회원 기본정보 조회
