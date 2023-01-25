@@ -133,4 +133,10 @@ public class JwtProvider {
                 .accessToken(newAccessToken)
                 .build();
     }
+
+    // 헤딩 accessToken 이 블랙리스트로 등록되었는지 검증
+    public Boolean isBlackList(String accessToken) {
+        String isLogout = redisDao.getValues(accessToken);
+        return isLogout == null ? false : true;
+    }
 }

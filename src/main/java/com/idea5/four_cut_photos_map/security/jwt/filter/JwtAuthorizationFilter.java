@@ -48,14 +48,20 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("JwtAuthorizationFilter doFilterInternal()");
         String token = getJwtToken(request);
-        // 1. 1차 체크(토큰이 유효한지 검증)
+        // 1. 토큰이 유효한지 검증
         if(StringUtils.hasText(token) && jwtProvider.verify(token)) {
             Long memberId = jwtProvider.getId(token);
             String tokenType = jwtProvider.getTokenType(token);
             String requestURI = request.getRequestURI();
-            // 2가지 경우에 대한 예외처리
+            // 2. 올바른 토큰 타입(ATK, RTK)으로 요청했는지 검증(아래 2가지 예외)
+            // 2-1. accessToken 재발급 요청에 accessToken 을 담아 요청한 경우
+            // 2-2. accessToken 재발급 외의 요청에 refreshToken 을 담아 요청한 경우
             if(tokenType.equals(ACCESS_TOKEN.getName()) && requestURI.equals("/member/refresh")
             || tokenType.equals(REFRESH_TOKEN.getName()) && !requestURI.equals("/member/refresh")) {
+                throw new JwtException("유효하지 않은 토큰입니다.");
+            }
+            // 3. 해당 accessToken 이 블랙리스트로 redis 에 등록되었는지 검증
+            if(tokenType.equals(ACCESS_TOKEN.getName()) && jwtProvider.isBlackList(token)) {
                 throw new JwtException("유효하지 않은 토큰입니다.");
             }
             // TODO: 매 요청마다 DB 조회하면 성능 문제(jwt 쓰는 이유가 없음) -> Redis 캐시로 해결
