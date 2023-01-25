@@ -84,8 +84,8 @@ class ShopControllerTest {
                 .andDo(print());
     }
     @Test
-    @DisplayName("글 상세보기")
-    void 글_상세보기() throws Exception{
+    @DisplayName("상점 상세보기")
+    void 상점_상세보기() throws Exception{
 
         // given
         Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 홍대점", "서울 ~", 12.123, 12.12345));
