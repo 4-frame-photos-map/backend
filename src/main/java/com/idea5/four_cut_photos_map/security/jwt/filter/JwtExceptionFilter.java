@@ -1,7 +1,7 @@
 package com.idea5.four_cut_photos_map.security.jwt.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.idea5.four_cut_photos_map.global.common.response.RsDataV2;
+import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.global.error.ErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -63,7 +63,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
                 .errorMessage(errorMessage)
                 .build();
 
-        RsDataV2 rsData = new RsDataV2(false, errorResponse);
+        RsData rsData = new RsData(false, errorResponse);
 
         response.getWriter().write(objectMapper.writeValueAsString(rsData));
     }
