@@ -24,6 +24,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -39,12 +40,9 @@ class ShopControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ShopService shopService;
-
-    @Autowired
     private ShopRepository shopRepository;
 
-    private final String[] keywords = {"인생네컷", "하루필름", "포토이즘", "포토그레이", "포토시그니처", "비룸", "포토드링크", "포토매틱", "셀픽스"};
+    private final String[] brands = {"인생네컷", "하루필름", "포토이즘", "포토그레이", "포토시그니처", "비룸", "포토드링크", "포토매틱", "셀픽스"};
 
 
     @DisplayName("키워드 검색")
@@ -53,20 +51,14 @@ class ShopControllerTest {
         // given
 
         String expectByBrand = "$.[?(@.brand == '%s')]";
-        String keyword = "인생네컷";
-        List<ShopDto> apiShops = TempKaKaO.tempDataBySearch(keyword); // 카카오 api에서 받아왔다고 가정. todo : restTeamplate 추가 후, 수정
+        String keyword = "포토이즘박스 성수점";
 
-        shopRepository.save(new Shop("인생네컷", "인생네컷 강남점", "서울 강남구~", 100.1, 100.1));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 홍대점", "서울 마포구~", 100.1, 100.1));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 신림점", "서울 강남구~", 100.1, 100.1));
-        shopRepository.save(new Shop("하루필름", "하루필름 홍대점", "서울 강남구~", 100.2, 100.2));
-        shopRepository.save(new Shop("포토이즘", "포토이즘 홍대점", "서울 강남구~", 100.3, 100.3));
-        shopRepository.save(new Shop("포토그레이", "포토그레이 홍대점", "서울 강남구~", 100.4, 100.4));
-        shopRepository.save(new Shop("포토시그니처", "포토시그니처 홍대점", "서울 강남구~", 100.5, 100.5));
-        shopRepository.save(new Shop("비룸", "비룸 홍대점", "서울 ~", 100.6, 100.6));
-        shopRepository.save(new Shop("포토드링크", "포토드링크 홍대점", "서울 강남구~", 100.7, 100.7));
-        shopRepository.save(new Shop("포토매틱", "포토매틱 홍대점", "서울 강남구~", 100.8, 100.8));
-        shopRepository.save(new Shop("셀픽스", "셀픽스 홍대점", "서울 강남구~", 100.9, 100.9));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48", 127.043851506853, 37.5461761379704));
+        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 성수점", "서울 성동구 서울숲2길 17-2", 127.04073790685483, 37.547177362006806));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 카페성수로드점", "서울 성동구 서울숲4길 13", 127.042449120263, 37.5475677927281));
+        shopRepository.save(new Shop("하루필름", "하루필름 서울숲점", "서울 성동구 서울숲2길 45", 127.043600450617, 37.5464465306291));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲점", "서울 성동구 서울숲4길 20", 127.043010183447, 37.547189170196));
+        shopRepository.save(new Shop("픽닷", "픽닷", "서울 성동구 서울숲4길 23-1", 127.043634812377, 37.5471565050697));
 
         // when
         ResultActions resultActions = mockMvc.perform(get("/shop/search")
@@ -77,11 +69,13 @@ class ShopControllerTest {
         // then
         resultActions
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath(expectByBrand, keywords).exists()) // jsonPath에 해당 키워드인 브랜드가 존재하는지
+//                .andExpect(jsonPath(expectByBrand, keyword).exists()) // jsonPath에 해당 키워드인 브랜드가 존재하는지
 //                .andExpect(jsonPath(expectByBrand,keywords).value(equalTo(keyword))) // jsonPath에 해당 키워드인 브랜드가 존재하는지
 //                .andExpect(jsonPath("$[0].brand").value(equalTo(keyword)))
-                .andExpect(jsonPath("$.length()").value(3)) // todo : apiResponse로 감싸면 jsonPath 수정해야 됨
+                .andExpect(jsonPath("$..address").value("서울 성동구 서울숲2길 17-2"))
+                .andExpect(jsonPath("$.result.length()").value(1)) // todo : apiResponse로 감싸면 jsonPath 수정해야 됨
                 .andDo(print());
+
     }
     @Test
     @DisplayName("상점 상세보기")

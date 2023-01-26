@@ -21,17 +21,19 @@ import static javax.persistence.GenerationType.IDENTITY;
 @SuperBuilder
 @ToString
 public class Shop extends BaseEntity {
+
     private String brand; // 브랜드명
+
     private String name; // 지점명
     private String address; // 주소
-    private double latitude; // 위도
-    private double longitude; // 경도
+    private double longitude; // 경도, x
+    private double latitude; // 위도, y
 
     @OneToMany
     @JoinColumn(name = "shop_id")
     private List<Like> likes = new ArrayList<>();
 
-    public Shop(String brand, String name, String address, double latitude, double longitude) {
+    public Shop(String brand, String name, String address, double longitude, double latitude) {
         this.brand = brand;
         this.name = name;
         this.address = address;
