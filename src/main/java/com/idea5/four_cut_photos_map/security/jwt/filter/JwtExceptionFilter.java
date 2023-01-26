@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.security.jwt.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.global.error.ErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -16,8 +17,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.idea5.four_cut_photos_map.security.jwt.dto.ErrorCode.EXPIRED_TOKEN;
-import static com.idea5.four_cut_photos_map.security.jwt.dto.ErrorCode.INVALID_TOKEN;
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.EXPIRED_TOKEN;
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_TOKEN;
+
 
 /**
  * JWT AuthorizationFilter 예외처리 필터
@@ -41,10 +43,10 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         }  catch(ExpiredJwtException e) {
             // 1. 만료된 토큰 예외처리
-            setErrorResponse(response, EXPIRED_TOKEN.getCode(), EXPIRED_TOKEN.getMessage());
+            setErrorResponse(response, EXPIRED_TOKEN.getErrorCode(), EXPIRED_TOKEN.getMessage());
         } catch (JwtException | IllegalStateException e) {
             // 2. 유효하지 않은 토큰 예외처리
-            setErrorResponse(response, INVALID_TOKEN.getCode(), INVALID_TOKEN.getMessage());
+            setErrorResponse(response, INVALID_TOKEN.getErrorCode(), INVALID_TOKEN.getMessage());
         }
     }
 
@@ -54,10 +56,15 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("utf-8"); // 한글 깨짐 문제
         // 응답 바디 설정
-        ErrorResponse body = ErrorResponse.builder()
+
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorCode(errorCode)
                 .errorMessage(errorMessage)
                 .build();
-        response.getWriter().write(objectMapper.writeValueAsString(body));
+
+        RsData rsData = new RsData(false, errorResponse);
+
+        response.getWriter().write(objectMapper.writeValueAsString(rsData));
     }
 }
