@@ -34,7 +34,7 @@ public class ShopController {
 
     /**
      * 키워드 검색 (리스트 조회)
-     * ex)
+     * ex)q
      * 하루필름, 인생네컷, 포토이즘, 포토그레이
      */
 
@@ -78,7 +78,7 @@ public class ShopController {
         // 3. db 데이터와 비교
         List<ResponseShop> shops = shopService.findShops(dtos, keyword);
 
-        return new RsData<List<ResponseShop>>(HttpStatus.OK.value(), "OK", shops);
+        return new RsData<List<ResponseShop>>(true, "Shop 조회 성공", shops);
     }
 
 
