@@ -15,6 +15,8 @@ public class ResponseShop {
     private double latitude; // 위도
     private double longitude; // 경도
 
+    private String distance;
+
     public static ResponseShop from(Shop shop){
         return ResponseShop.builder()
                 .name(shop.getName())
@@ -24,4 +26,7 @@ public class ResponseShop {
                 .build();
     }
 
+    public void setDistance(String distance) {
+        this.distance = distance;
+    }
 }

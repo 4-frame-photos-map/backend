@@ -70,6 +70,10 @@ public class ShopController {
 
             dtos.add(dto);
         }
+        for (KaKaoSearchResponseDto.Document dto : dtos) {
+            System.out.println("dto.getPlace_name() = " + dto.getPlace_name());
+            System.out.println("dto.getRoad_address_name() = " + dto.getRoad_address_name());
+        }
 
         // 3. db 데이터와 비교
         List<ResponseShop> shops = shopService.findShops(dtos, keyword);
