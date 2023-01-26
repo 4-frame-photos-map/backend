@@ -68,8 +68,8 @@ class ShopServiceTest {
         );
     }
 
-    // todo : apiResponse, db 비교
-    @DisplayName("사용자가 text로 Shop 검색")
+    // todo : apiResponse, db 비교 (팀원과 의논)
+    @DisplayName("text로 Shop 검색")
     @Test
     void findShopsByTextKeyword() {
         // given

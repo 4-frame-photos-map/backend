@@ -45,12 +45,10 @@ class ShopControllerTest {
     private final String[] brands = {"인생네컷", "하루필름", "포토이즘", "포토그레이", "포토시그니처", "비룸", "포토드링크", "포토매틱", "셀픽스"};
 
 
-    @DisplayName("키워드 검색")
+    @DisplayName("TEXT 검색")
     @Test
-    void 키워드_검색() throws Exception {
+    void searchByText() throws Exception {
         // given
-
-        String expectByBrand = "$.[?(@.brand == '%s')]";
         String keyword = "포토이즘박스 성수점";
 
         shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48", 127.043851506853, 37.5461761379704));
@@ -69,13 +67,31 @@ class ShopControllerTest {
         // then
         resultActions
                 .andExpect(status().is2xxSuccessful())
-//                .andExpect(jsonPath(expectByBrand, keyword).exists()) // jsonPath에 해당 키워드인 브랜드가 존재하는지
-//                .andExpect(jsonPath(expectByBrand,keywords).value(equalTo(keyword))) // jsonPath에 해당 키워드인 브랜드가 존재하는지
-//                .andExpect(jsonPath("$[0].brand").value(equalTo(keyword)))
+
                 .andExpect(jsonPath("$..address").value("서울 성동구 서울숲2길 17-2"))
                 .andExpect(jsonPath("$.result.length()").value(1)) // todo : apiResponse로 감싸면 jsonPath 수정해야 됨
                 .andDo(print());
 
+    }
+
+    // todo : 브랜드 검색 api TDD
+    @DisplayName("브랜드 검색")
+    @Test
+    void searchByBrand() {
+
+        /**
+         * 참고)
+         *   String expectByBrand = "$.[?(@.brand == '%s')]";
+         *  .andExpect(jsonPath(expectByBrand, keyword).exists()) // jsonPath에 해당 키워드인 브랜드가 존재하는지
+         *  .andExpect(jsonPath(expectByBrand,keywords).value(equalTo(keyword))) // jsonPath에 해당 키워드인 브랜드가 존재하는지
+         *  .andExpect(jsonPath("$[0].brand").value(equalTo(keyword)))
+         */
+        // given
+
+
+        // when
+
+        // then
     }
     @Test
     @DisplayName("상점 상세보기")
