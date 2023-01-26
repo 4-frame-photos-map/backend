@@ -50,6 +50,9 @@ dependencies {
     // redis 캐시 사용
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // jackson
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.4'
 }
 
 tasks.named('test') {
