@@ -102,6 +102,23 @@ public class MemberController {
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/withdrawl")
+    public ResponseEntity<RsData> deleteMember(
+            @RequestHeader("Authorization") String bearerToken,
+            @AuthenticationPrincipal MemberContext memberContext
+    ) {
+        String accessToken = bearerToken.substring("bearer ".length());
+        memberService.deleteMember(memberContext.getId(), accessToken);
+        RsData<Object> body = new RsData<>(
+                true,
+                "회원탈퇴 성공",
+                null
+        );
+        return new ResponseEntity<>(body, HttpStatus.OK);
+    }
+
 //    // TODO: 카카오와 함께 로그아웃 요청시 state 에 accessToken 값을 넘겨 응답에
 //    /**
 //     * 카카오와 함께 로그아웃

@@ -84,4 +84,18 @@ public class MemberService {
         Long expiration = jwtProvider.getExpiration(accessToken);
         redisDao.setValues(accessToken, "logout", Duration.ofMillis(expiration));
     }
+
+    // 회원 삭제
+    @Transactional
+    public void deleteMember(Long id, String accessToken) {
+        // 1. 회원의 refreshToken 이 있으면 삭제
+        if (redisDao.hasKey(id.toString())) {
+            redisDao.deleteValues(id.toString());
+        }
+        // 2. redis 에 해당 accessToken 블랙리스트로 등록
+        Long expiration = jwtProvider.getExpiration(accessToken);
+        redisDao.setValues(accessToken, "withdrawl", Duration.ofMillis(expiration));
+        // 3. DB 에서 회원 삭제
+        memberRepository.deleteById(id);
+    }
 }
