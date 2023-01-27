@@ -56,7 +56,7 @@ public class MemberController {
         headers.set("refreshToken", token.getRefreshToken());
         // body 에 토큰 담기
         RsData<Token> body = new RsData<>(
-                200,
+                true,
                 "카카오 로그인 성공, Access Token 발급",
                 token
         );
@@ -81,7 +81,7 @@ public class MemberController {
         headers.set("Authentication", accessToken.getAccessToken());
         // body 에 토큰 담기
         RsData<AccessToken> body = new RsData<>(
-                200,
+                true,
                 "Access Token 재발급 성공",
                 accessToken
         );
@@ -137,7 +137,7 @@ public class MemberController {
     public ResponseEntity<RsData> getProfile(@AuthenticationPrincipal MemberContext memberContext) {
         MemberInfoResp memberInfoResp = memberService.getMemberInfo(memberContext.getId());
         RsData<MemberInfoResp> body = new RsData<>(
-                200, "회원 정보 조회 성공", memberInfoResp
+                true, "회원 정보 조회 성공", memberInfoResp
         );
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
