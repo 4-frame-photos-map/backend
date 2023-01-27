@@ -1,14 +1,12 @@
 package com.idea5.four_cut_photos_map.member.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.member.dto.KakaoUserInfoParam;
 import com.idea5.four_cut_photos_map.member.dto.response.MemberInfoResp;
 import com.idea5.four_cut_photos_map.member.entity.Member;
 import com.idea5.four_cut_photos_map.member.service.KakaoService;
 import com.idea5.four_cut_photos_map.member.service.MemberService;
-import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.AccessToken;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.Token;
@@ -28,9 +26,6 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
     private final MemberService memberService;
     private final KakaoService kakaoService;
-    private final RedisDao redisDao;
-    private final JwtProvider jwtProvider;
-
 
     /**
      * 카카오 로그인
@@ -100,7 +95,7 @@ public class MemberController {
         // redis 에 해당 accessToken 블랙리스트로 저장하기
         memberService.logout(accessToken);
         RsData<Object> body = new RsData<>(
-                200,
+                true,
                 "로그아웃 성공",
                 null
         );
