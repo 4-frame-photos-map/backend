@@ -27,6 +27,8 @@ public class MemberController {
     private final MemberService memberService;
     private final KakaoService kakaoService;
 
+    private final String BEARER_TOKEN_PREFIX = "Bearer ";
+
     /**
      * 카카오 로그인
      * @param code 인가코드
@@ -69,7 +71,7 @@ public class MemberController {
             @AuthenticationPrincipal MemberContext memberContext
     ) {
         log.info("accessToken 재발급 요청");
-        String refreshToken = bearerToken.substring("Bearer ".length());
+        String refreshToken = bearerToken.substring(BEARER_TOKEN_PREFIX.length());
         AccessToken accessToken = memberService.reissueAccessToken(refreshToken, memberContext.getId(), memberContext.getAuthorities());
         // header 에 토큰 담기
         HttpHeaders headers = new HttpHeaders();
@@ -91,7 +93,7 @@ public class MemberController {
     public ResponseEntity<RsData> logout(@RequestHeader("Authorization") String bearerToken) {
         // 서비스 로그아웃
         log.info("서비스 로그아웃");
-        String accessToken = bearerToken.substring("bearer ".length());
+        String accessToken = bearerToken.substring(BEARER_TOKEN_PREFIX.length());
         // redis 에 해당 accessToken 블랙리스트로 저장하기
         memberService.logout(accessToken);
         RsData<Object> body = new RsData<>(
@@ -102,15 +104,24 @@ public class MemberController {
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
-
+    /**
+     * 회원탈퇴
+     * @param jwtToken 서비스에서 발급한 jwt accessToken
+     * @param kakaoToken kakao 에서 발급받은 accessToken
+     * @param memberContext
+     * @return
+     */
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/withdrawl")
     public ResponseEntity<RsData> deleteMember(
-            @RequestHeader("Authorization") String bearerToken,
+            @RequestHeader("Authorization") String jwtToken,
+            @RequestHeader("kakao-token") String kakaoToken,
             @AuthenticationPrincipal MemberContext memberContext
-    ) {
-        String accessToken = bearerToken.substring("bearer ".length());
-        memberService.deleteMember(memberContext.getId(), accessToken);
+    ) throws JsonProcessingException {
+        String jwtAccessToken = jwtToken.substring(BEARER_TOKEN_PREFIX.length());
+        String kakaoAccessToken = kakaoToken.substring(BEARER_TOKEN_PREFIX.length());
+        kakaoService.disconnect(kakaoAccessToken);
+        memberService.deleteMember(memberContext.getId(), jwtAccessToken);
         RsData<Object> body = new RsData<>(
                 true,
                 "회원탈퇴 성공",

@@ -7,10 +7,7 @@ import com.idea5.four_cut_photos_map.domain.member.dto.KakaoUserInfoParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -97,5 +94,35 @@ public class KakaoService {
                 .id(id)
                 .nickname(nickname)
                 .build();
+    }
+
+    /**
+     * 연결끊기
+     * @param accessToken Kakao AccessToken
+     */
+    public void disconnect(String accessToken) throws JsonProcessingException {
+        log.info("연결끊기 요청");
+        String url = "https://kapi.kakao.com/v1/user/unlink";
+        // header 생성
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setBearerAuth(accessToken);
+        // header + body 를 합쳐 request 생성
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
+        // post 요청, 응답
+        ResponseEntity<String> response = restTemplate.postForEntity(
+                url,
+                request,
+                String.class);
+        // 응답 정보 역직렬화
+        JsonNode jsonNode = objectMapper.readValue(response.getBody(), JsonNode.class);
+        if(response.getStatusCode().equals(HttpStatus.OK)) {
+            Long id = jsonNode.get("id").asLong();
+            log.info(id.toString());
+        } else {
+            // 에러 응답 예외처리
+            String msg = jsonNode.get("msg").asText();
+            throw new RuntimeException(msg);
+        }
     }
 }
