@@ -1,10 +1,10 @@
-package com.idea5.four_cut_photos_map.member.service;
+package com.idea5.four_cut_photos_map.domain.member.service;
 
+import com.idea5.four_cut_photos_map.domain.member.dto.KakaoUserInfoParam;
+import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberInfoResp;
+import com.idea5.four_cut_photos_map.domain.member.entity.Member;
+import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
-import com.idea5.four_cut_photos_map.member.dto.KakaoUserInfoParam;
-import com.idea5.four_cut_photos_map.member.dto.response.MemberInfoResp;
-import com.idea5.four_cut_photos_map.member.entity.Member;
-import com.idea5.four_cut_photos_map.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.AccessToken;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.Token;

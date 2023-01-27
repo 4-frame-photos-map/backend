@@ -1,4 +1,4 @@
-package com.idea5.four_cut_photos_map.member.entity;
+package com.idea5.four_cut_photos_map.domain.member.entity;
 
 import com.idea5.four_cut_photos_map.domain.like.entity.Like;
 import com.idea5.four_cut_photos_map.domain.titleLog.entity.TitleLog;

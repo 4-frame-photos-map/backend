@@ -1,6 +1,6 @@
 package com.idea5.four_cut_photos_map.security.jwt.dto;
 
-import com.idea5.four_cut_photos_map.member.entity.Member;
+import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
