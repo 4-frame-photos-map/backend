@@ -93,7 +93,7 @@ public class MemberController {
      * @param bearerToken accessToken
      */
     @GetMapping("/logout/oauth2/kakao")
-    public ResponseEntity<RsData> kakaoLogout(@RequestHeader("Authorization") String bearerToken) {
+    public ResponseEntity<RsData> logout(@RequestHeader("Authorization") String bearerToken) {
         // 서비스 로그아웃
         log.info("서비스 로그아웃");
         String accessToken = bearerToken.substring("bearer ".length());
@@ -107,7 +107,7 @@ public class MemberController {
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
-    // TODO: 카카오와 함께 로그아웃 요청시 state 에 accessToken 값을 넘겨 응답에
+//    // TODO: 카카오와 함께 로그아웃 요청시 state 에 accessToken 값을 넘겨 응답에
 //    /**
 //     * 카카오와 함께 로그아웃
 //     * @param bearerToken accessToken

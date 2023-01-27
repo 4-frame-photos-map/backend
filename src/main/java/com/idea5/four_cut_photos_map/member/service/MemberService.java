@@ -75,7 +75,12 @@ public class MemberService {
 
     // 서비스 로그아웃(accessToken 무효화)
     public void logout(String accessToken) {
-        // redis 에 해당 accessToken 블랙리스트로 등록
+        // 1. 회원의 refreshToken 이 있으면 삭제
+        Long memberId = jwtProvider.getId(accessToken);
+        if(redisDao.hasKey(memberId.toString())) {
+            redisDao.deleteValues(memberId.toString());
+        }
+        // 2. redis 에 해당 accessToken 블랙리스트로 등록
         Long expiration = jwtProvider.getExpiration(accessToken);
         redisDao.setValues(accessToken, "logout", Duration.ofMillis(expiration));
     }
