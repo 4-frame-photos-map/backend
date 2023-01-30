@@ -68,7 +68,7 @@ public class KakaoService {
 
     /**
      * 토큰으로 사용자 정보 가져오기
-     * @param kakaoTokenParam kakao 에서 발급한 accessToken, refreshToken
+     * @param kakaoTokenParam kakao 에서 발급한 accessToken,m
      * @return 사용자 정보
      */
     public KakaoUserInfoParam getKakaoUserInfo(KakaoTokenParam kakaoTokenParam) throws JsonProcessingException {
@@ -120,6 +120,39 @@ public class KakaoService {
         if(response.getStatusCode().equals(HttpStatus.OK)) {
             Long id = jsonNode.get("id").asLong();
             log.info(id.toString());
+        } else {
+            // 에러 응답 예외처리
+            String msg = jsonNode.get("msg").asText();
+            throw new RuntimeException(msg);
+        }
+    }
+
+    /**
+     * 해당 토큰이 만료되었는지 검사
+     * @param accessToken 카카오 access token
+     */
+    public Boolean isExpiredAccessToken(String accessToken) throws JsonProcessingException {
+        log.info("토큰 정보 보기 요청");
+        String url = "https://kapi.kakao.com/v1/user/access_token_info";
+        // header 생성
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
+        // get 요청, 응답
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                request,
+                String.class);
+        // 응답 정보 역직렬화
+        JsonNode jsonNode = objectMapper.readValue(response.getBody(), JsonNode.class);
+        if(response.getStatusCode().equals(HttpStatus.OK)) {
+            Integer expiresIn = jsonNode.get("expires_in").asInt();
+            log.info("expiresIn=" + expiresIn);
+            return false;
+        } else if(response.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+            // 토큰 만료
+            return true;
         } else {
             // 에러 응답 예외처리
             String msg = jsonNode.get("msg").asText();

@@ -15,6 +15,7 @@ import java.util.Collection;
 
 /**
  * redis 를 이용하는 jwt 서비스(토큰 발급/재발급, 블랙리스트 검사)
+ * //TODO: 이렇게 분리하는 것이 맞는지는 모르겠음 더 고민해봐야할 것 같음
  */
 @Service
 @Slf4j

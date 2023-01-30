@@ -22,6 +22,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
+
 /**
  * 인증 관련 컨트롤러
  */
@@ -42,7 +44,7 @@ public class AuthController {
      */
     @PreAuthorize("isAnonymous()")
     @GetMapping("/login/kakao")
-    public ResponseEntity<RsData> kakaoLogin(@RequestParam String code) throws JsonProcessingException {
+    public ResponseEntity<RsData> kakaoLogin(@RequestParam String code, HttpSession session) throws JsonProcessingException {
         log.info("카카오 로그인 콜백 요청");
         log.info("code = " + code);
         // 1. 인가 코드로 토큰 발급 요청
@@ -64,6 +66,8 @@ public class AuthController {
                 "카카오 로그인 성공(Kakao Token, Jwt Token 발급)",
                 new KakaoLoginResp(kakaoTokenParam, jwtToken)
         );
+        session.setAttribute("kakaoAccessToken", kakaoTokenParam.getAccessToken());
+        session.setAttribute("kakaoRefreshToken", kakaoTokenParam.getRefreshToken());
         return new ResponseEntity<>(body, headers, HttpStatus.OK);
     }
 
@@ -114,7 +118,7 @@ public class AuthController {
     /**
      * 회원탈퇴
      * @param jwtToken 서비스에서 발급한 jwt accessToken
-     * @param kakaoToken kakao 에서 발급받은 accessToken
+     * @param kakaoAccessToken kakao 에서 발급받은 accessToken
      * @param memberContext
      * @return
      */
@@ -122,11 +126,20 @@ public class AuthController {
     @GetMapping("/withdrawl")
     public ResponseEntity<RsData> deleteMember(
             @RequestHeader("Authorization") String jwtToken,
-            @RequestHeader("kakao-token") String kakaoToken,
-            @AuthenticationPrincipal MemberContext memberContext
+            @RequestHeader("kakao-atk") String kakaoAccessToken,
+            @RequestHeader("kakao-rtk") String kakaoRefreshToken,
+            @AuthenticationPrincipal MemberContext memberContext,
+             HttpSession session
     ) throws JsonProcessingException {
+        log.info("kakao-atk=" + session.getAttribute("kakaoAccessToken"));
+        log.info("kakao-rtk=" + session.getAttribute("kakaoRefreshToken"));
         String jwtAccessToken = jwtToken.substring(BEARER_TOKEN_PREFIX.length());
-        String kakaoAccessToken = kakaoToken.substring(BEARER_TOKEN_PREFIX.length());
+        kakaoAccessToken = kakaoAccessToken.substring(BEARER_TOKEN_PREFIX.length());
+        kakaoRefreshToken = kakaoRefreshToken.substring(BEARER_TOKEN_PREFIX.length());
+        // TODO: 카카오 토큰 만료 확인
+        if(kakaoService.isExpiredAccessToken(kakaoAccessToken)) {
+            log.info("kakao Token 갱신");
+        }
         kakaoService.disconnect(kakaoAccessToken);
         MemberWithdrawlResp memberWithdrawlResp = memberService.deleteMember(memberContext.getId(), jwtAccessToken);
         RsData<MemberWithdrawlResp> body = new RsData<>(
