@@ -1,15 +1,17 @@
 package com.idea5.four_cut_photos_map.domain.member.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.idea5.four_cut_photos_map.domain.member.dto.KakaoTokenParam;
 import com.idea5.four_cut_photos_map.domain.member.dto.KakaoUserInfoParam;
-import com.idea5.four_cut_photos_map.domain.member.entity.Member;
-import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberInfoResp;
+import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberWithdrawlResp;
+import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.service.KakaoService;
 import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
+import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.AccessToken;
-import com.idea5.four_cut_photos_map.security.jwt.dto.response.Token;
+import com.idea5.four_cut_photos_map.security.jwt.dto.response.JwtToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -18,6 +20,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -39,23 +44,26 @@ public class MemberController {
         log.info("카카오 로그인 콜백 요청");
         log.info("code = " + code);
         // 1. 인가 코드로 토큰 발급 요청
-        String kakaoAccessToken = kakaoService.getKakaoAccessToken(code);
+        KakaoTokenParam kakaoTokenParam = kakaoService.getKakaoAccessToken(code);
         // 2. 토큰으로 사용자 정보 가져오기 요청
-        KakaoUserInfoParam kakaoUserInfoParam = kakaoService.getKakaoUserInfo(kakaoAccessToken);
+        KakaoUserInfoParam kakaoUserInfoParam = kakaoService.getKakaoUserInfo(kakaoTokenParam);
         // 3. 제공받은 사용자 정보로 서비스 회원 여부 확인후 회원가입 처리
         Member member = memberService.getMember(kakaoUserInfoParam);
         // 4. 서비스 로그인
         // jwt accessToken, refreshToken 발급
-        Token token = memberService.generateTokens(member);
+        JwtToken jwtToken = memberService.generateTokens(member);
         // header 에 토큰 담기
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authentication", token.getAccessToken());
-        headers.set("refreshToken", token.getRefreshToken());
+        headers.set("Authentication", jwtToken.getAccessToken());
+        headers.set("refreshToken", jwtToken.getRefreshToken());
         // body 에 토큰 담기
-        RsData<Token> body = new RsData<>(
+        Map<String, Object> result = new HashMap<>();
+        result.put("jwtToken", jwtToken);
+        result.put("kakaoToken", kakaoTokenParam);
+        RsData<Map<String, Object>> body = new RsData<>(
                 true,
-                "카카오 로그인 성공, Access Token 발급",
-                token
+                "카카오 로그인 성공(Kakao Token, Jwt Token 발급)",
+                result
         );
         return new ResponseEntity<>(body, headers, HttpStatus.OK);
     }
@@ -121,11 +129,11 @@ public class MemberController {
         String jwtAccessToken = jwtToken.substring(BEARER_TOKEN_PREFIX.length());
         String kakaoAccessToken = kakaoToken.substring(BEARER_TOKEN_PREFIX.length());
         kakaoService.disconnect(kakaoAccessToken);
-        memberService.deleteMember(memberContext.getId(), jwtAccessToken);
-        RsData<Object> body = new RsData<>(
+        MemberWithdrawlResp memberWithdrawlResp = memberService.deleteMember(memberContext.getId(), jwtAccessToken);
+        RsData<MemberWithdrawlResp> body = new RsData<>(
                 true,
                 "회원탈퇴 성공",
-                null
+                memberWithdrawlResp
         );
         return new ResponseEntity<>(body, HttpStatus.OK);
     }

@@ -2,12 +2,13 @@ package com.idea5.four_cut_photos_map.domain.member.service;
 
 import com.idea5.four_cut_photos_map.domain.member.dto.KakaoUserInfoParam;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberInfoResp;
+import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberWithdrawlResp;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.AccessToken;
-import com.idea5.four_cut_photos_map.security.jwt.dto.response.Token;
+import com.idea5.four_cut_photos_map.security.jwt.dto.response.JwtToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
@@ -46,13 +47,13 @@ public class MemberService {
 
     // accessToken, refreshToken 발급
     @Transactional
-    public Token generateTokens(Member member) {
+    public JwtToken generateTokens(Member member) {
         String accessToken = jwtProvider.generateAccessToken(member.getId(), member.getAuthorities());
         String refreshToken = jwtProvider.generateRefreshToken(member.getId(), member.getAuthorities());
         // refreshToken redis 에 저장(key, value, 유효시간)
         redisDao.setValues(member.getId().toString(), refreshToken, Duration.ofMillis(60 * 60 * 24 * 30L));
 
-        return Token.builder()
+        return JwtToken.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
@@ -87,7 +88,7 @@ public class MemberService {
 
     // 회원 삭제
     @Transactional
-    public void deleteMember(Long id, String accessToken) {
+    public MemberWithdrawlResp deleteMember(Long id, String accessToken) {
         // 1. 회원의 refreshToken 이 있으면 삭제
         if (redisDao.hasKey(id.toString())) {
             redisDao.deleteValues(id.toString());
@@ -97,5 +98,6 @@ public class MemberService {
         redisDao.setValues(accessToken, "withdrawl", Duration.ofMillis(expiration));
         // 3. DB 에서 회원 삭제
         memberRepository.deleteById(id);
+        return new MemberWithdrawlResp(id);
     }
 }

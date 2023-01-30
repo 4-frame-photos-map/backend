@@ -3,6 +3,7 @@ package com.idea5.four_cut_photos_map.domain.member.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.idea5.four_cut_photos_map.domain.member.dto.KakaoTokenParam;
 import com.idea5.four_cut_photos_map.domain.member.dto.KakaoUserInfoParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,7 @@ public class KakaoService {
      * @param code 인가코드
      * @return kakao AccessToken
      */
-    public String getKakaoAccessToken(String code) throws JsonProcessingException {
+    public KakaoTokenParam getKakaoAccessToken(String code) throws JsonProcessingException {
         log.info("인가코드로 카카오 토큰 발급 요청");
         String url = "https://kauth.kakao.com/oauth/token";
         // header 생성
@@ -62,21 +63,21 @@ public class KakaoService {
         String refreshToken = jsonNode.get("refresh_token").asText();
         log.info("access-token = " + accessToken);
         log.info("refresh-token = " + refreshToken);
-        return accessToken;
+        return new KakaoTokenParam(accessToken, refreshToken);
     }
 
     /**
      * 토큰으로 사용자 정보 가져오기
-     * @param accessToken
+     * @param kakaoTokenParam kakao 에서 발급한 accessToken, refreshToken
      * @return 사용자 정보
      */
-    public KakaoUserInfoParam getKakaoUserInfo(String accessToken) throws JsonProcessingException {
+    public KakaoUserInfoParam getKakaoUserInfo(KakaoTokenParam kakaoTokenParam) throws JsonProcessingException {
         log.info("토큰으로 사용자 정보 가져오기 요청");
         String url = "https://kapi.kakao.com/v2/user/me";
         // header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.setBearerAuth(accessToken);
+        headers.setBearerAuth(kakaoTokenParam.getAccessToken());
         // header + body 를 합쳐 request 생성
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
         // post 요청, 응답
