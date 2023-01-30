@@ -3,6 +3,7 @@ package com.idea5.four_cut_photos_map.domain.member.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.idea5.four_cut_photos_map.domain.member.dto.KakaoTokenParam;
 import com.idea5.four_cut_photos_map.domain.member.dto.KakaoUserInfoParam;
+import com.idea5.four_cut_photos_map.domain.member.dto.response.KakaoLoginResp;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberInfoResp;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberWithdrawlResp;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
@@ -20,9 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -57,13 +55,10 @@ public class MemberController {
         headers.set("Authentication", jwtToken.getAccessToken());
         headers.set("refreshToken", jwtToken.getRefreshToken());
         // body 에 토큰 담기
-        Map<String, Object> result = new HashMap<>();
-        result.put("jwtToken", jwtToken);
-        result.put("kakaoToken", kakaoTokenParam);
-        RsData<Map<String, Object>> body = new RsData<>(
+        RsData<KakaoLoginResp> body = new RsData<>(
                 true,
                 "카카오 로그인 성공(Kakao Token, Jwt Token 발급)",
-                result
+                new KakaoLoginResp(kakaoTokenParam, jwtToken)
         );
         return new ResponseEntity<>(body, headers, HttpStatus.OK);
     }
