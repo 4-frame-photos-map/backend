@@ -1,4 +1,4 @@
-package com.idea5.four_cut_photos_map.domain.member.controller;
+package com.idea5.four_cut_photos_map.domain.auth.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.idea5.four_cut_photos_map.domain.member.dto.KakaoTokenParam;
@@ -6,7 +6,7 @@ import com.idea5.four_cut_photos_map.domain.member.dto.KakaoUserInfoParam;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.KakaoLoginResp;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberWithdrawlResp;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
-import com.idea5.four_cut_photos_map.domain.member.service.KakaoService;
+import com.idea5.four_cut_photos_map.domain.auth.service.KakaoService;
 import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;

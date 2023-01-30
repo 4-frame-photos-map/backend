@@ -1,4 +1,4 @@
-package com.idea5.four_cut_photos_map.domain.member.service;
+package com.idea5.four_cut_photos_map.domain.auth.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
