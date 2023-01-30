@@ -45,6 +45,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Value("${jwt.atk.header}")
     private String tokenHeader;
 
+    @Value("${jwt.atk.reissue-uri}")
+    private String atkReissueUri;
+
     // 토큰 유효성 검증 후 인증(로그인)처리
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -58,8 +61,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             // 2. 올바른 토큰 타입(ATK, RTK)으로 요청했는지 검증(아래 2가지 예외)
             // 2-1. accessToken 재발급 요청에 accessToken 을 담아 요청한 경우
             // 2-2. accessToken 재발급 외의 요청에 refreshToken 을 담아 요청한 경우
-            if(tokenType.equals(ACCESS_TOKEN.getName()) && requestURI.equals("/member/refresh")
-            || tokenType.equals(REFRESH_TOKEN.getName()) && !requestURI.equals("/member/refresh")) {
+            if(tokenType.equals(ACCESS_TOKEN.getName()) && requestURI.equals(atkReissueUri)
+            || tokenType.equals(REFRESH_TOKEN.getName()) && !requestURI.equals(atkReissueUri)) {
                 throw new JwtException("유효하지 않은 토큰입니다.");
             }
             // 3. 해당 accessToken 이 블랙리스트로 redis 에 등록되었는지 검증
