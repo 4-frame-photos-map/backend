@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.auth.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.idea5.four_cut_photos_map.security.jwt.JwtService;
 import com.idea5.four_cut_photos_map.domain.member.dto.KakaoTokenParam;
 import com.idea5.four_cut_photos_map.domain.member.dto.KakaoUserInfoParam;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.KakaoLoginResp;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 public class AuthController {
+    private final JwtService jwtService;
     private final MemberService memberService;
     private final KakaoService kakaoService;
 
@@ -51,7 +53,7 @@ public class AuthController {
         Member member = memberService.getMember(kakaoUserInfoParam);
         // 4. 서비스 로그인
         // jwt accessToken, refreshToken 발급
-        JwtToken jwtToken = memberService.generateTokens(member);
+        JwtToken jwtToken = jwtService.generateTokens(member);
         // header 에 토큰 담기
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authentication", jwtToken.getAccessToken());
@@ -77,7 +79,7 @@ public class AuthController {
     ) {
         log.info("accessToken 재발급 요청");
         String refreshToken = bearerToken.substring(BEARER_TOKEN_PREFIX.length());
-        AccessToken accessToken = memberService.reissueAccessToken(refreshToken, memberContext.getId(), memberContext.getAuthorities());
+        AccessToken accessToken = jwtService.reissueAccessToken(refreshToken, memberContext.getId(), memberContext.getAuthorities());
         // header 에 토큰 담기
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authentication", accessToken.getAccessToken());

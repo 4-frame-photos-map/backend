@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.security.jwt.filter;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
+import com.idea5.four_cut_photos_map.security.jwt.JwtService;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
@@ -37,6 +38,7 @@ import static com.idea5.four_cut_photos_map.security.jwt.dto.TokenType.REFRESH_T
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
+    private final JwtService jwtService;
     private final MemberService memberService;
     private final String BEARER_TOKEN_PREFIX = "Bearer ";
 
@@ -61,7 +63,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 throw new JwtException("유효하지 않은 토큰입니다.");
             }
             // 3. 해당 accessToken 이 블랙리스트로 redis 에 등록되었는지 검증
-            if(tokenType.equals(ACCESS_TOKEN.getName()) && jwtProvider.isBlackList(token)) {
+            if(tokenType.equals(ACCESS_TOKEN.getName()) && jwtService.isBlackList(token)) {
                 throw new JwtException("유효하지 않은 토큰입니다.");
             }
             // TODO: 매 요청마다 DB 조회하면 성능 문제(jwt 쓰는 이유가 없음) -> Redis 캐시로 해결

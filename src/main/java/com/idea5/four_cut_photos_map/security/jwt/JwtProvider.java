@@ -1,7 +1,5 @@
 package com.idea5.four_cut_photos_map.security.jwt;
 
-import com.idea5.four_cut_photos_map.global.common.RedisDao;
-import com.idea5.four_cut_photos_map.security.jwt.dto.response.AccessToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -36,14 +34,13 @@ public class JwtProvider {
     private long refreshTokenValidationSecond;    // accessToken 유효기간(1달)
 
     private final SecretKey jwtSecretKey;   // 비밀키
-    private final RedisDao redisDao;
 
     private SecretKey getSecretKey() {
         return jwtSecretKey;
     }
 
     /**
-     * JWT Access Token 발급
+     * JWT Access JwtToken 발급
      * @param memberId 회원 id
      * @param authorities 회원 Authority 리스트
      * @param tokenValid 토큰 유효기간
@@ -78,7 +75,7 @@ public class JwtProvider {
         return generateToken(memberId, authorities, REFRESH_TOKEN.getName(), refreshTokenValidationSecond);
     }
 
-    // JWT Access Token 검증
+    // JWT Access JwtToken 검증
     public boolean verify(String accessToken) {
         Jwts.parserBuilder()
                 .setSigningKey(getSecretKey())  // 비밀키
@@ -116,26 +113,5 @@ public class JwtProvider {
         Claims claims = parseClaims(accessToken);
         // 남은 유효기간 = 만료일시 - 현재일시
         return claims.getExpiration().getTime() - new Date().getTime();
-    }
-
-    // accessToken 재발급
-    public AccessToken reissueAccessToken(String refreshToken, Long memberId, Collection<? extends GrantedAuthority> authorities) {
-        // 1. redis 에서 memberId(key)로 refreshToken 조회
-        String redisRefreshToken = redisDao.getValues(memberId.toString());
-        // 2. redis 에 저장된 refreshToken 과 요청 헤더로 전달된 refreshToken 값이 일치하는지 확인
-        if(!refreshToken.equals(redisRefreshToken)) {
-            throw new RuntimeException("refreshToken 불일치");
-        }
-        // 3. accessToken 재발급
-        String newAccessToken = generateAccessToken(memberId, authorities);
-        return AccessToken.builder()
-                .accessToken(newAccessToken)
-                .build();
-    }
-
-    // 헤딩 accessToken 이 블랙리스트로 등록되었는지 검증
-    public Boolean isBlackList(String accessToken) {
-        String isLogout = redisDao.getValues(accessToken);
-        return isLogout == null ? false : true;
     }
 }
