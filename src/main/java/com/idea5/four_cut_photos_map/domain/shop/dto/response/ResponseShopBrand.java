@@ -18,6 +18,10 @@ public class ResponseShopBrand {
     private String y; // 위도
     private String distance; // 거리
 
+    public void setDistance(String distance){
+        this.distance = distance;
+    }
+
     static public ResponseShopBrand of(KakaoResponseDto dto){
         return ResponseShopBrand.builder()
                 .placeName(dto.getPlaceName())
@@ -25,6 +29,15 @@ public class ResponseShopBrand {
                 .x(dto.getX())
                 .y(dto.getY())
                 .distance(dto.getDistance())
+                .build();
+    }
+
+    public static ResponseShopBrand from(Shop shop){
+        return ResponseShopBrand.builder()
+                .placeName(shop.getName())
+                .roadAddressName(shop.getAddress())
+                .x(String.valueOf(shop.getLongitude()))
+                .y(String.valueOf(shop.getLatitude()))
                 .build();
     }
 }

@@ -34,10 +34,12 @@ public class ShopController {
      */
 
     @GetMapping("/brand/search")
-    public ResponseEntity<List<ResponseShop>> showBrandListBySearch(@ModelAttribute RequestBrandSearch requestBrandSearch) {
+    public RsData<List<ResponseShopBrand>> showBrandListBySearch(@ModelAttribute RequestBrandSearch requestBrandSearch) {
         // todo : 예외처리
         List<ResponseShopBrand> kakaoApiResponse = shopService.searchBrand(requestBrandSearch);
-        return null;
+        List<ResponseShopBrand> shopsByBrand = shopService.findShopsByBrand(kakaoApiResponse, requestBrandSearch.getBrand());
+
+        return new RsData<List<ResponseShopBrand>>(true, "brand 검색 성공", shopsByBrand);
 
     }
 

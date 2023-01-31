@@ -9,9 +9,9 @@ import lombok.*;
 @Builder
 public class ResponseShop {
 
-    private String name;// 장소명
+    private String placeName;// 장소명
 
-    private String address; // 전체 도로명 주소
+    private String roadAddressName; // 전체 도로명 주소
     private double latitude; // 위도
     private double longitude; // 경도
 
@@ -19,8 +19,8 @@ public class ResponseShop {
 
     public static ResponseShop from(Shop shop){
         return ResponseShop.builder()
-                .name(shop.getName())
-                .address(shop.getAddress())
+                .placeName(shop.getName())
+                .roadAddressName(shop.getAddress())
                 .latitude(shop.getLatitude())
                 .longitude(shop.getLongitude())
                 .build();

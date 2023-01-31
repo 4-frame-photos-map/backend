@@ -1,7 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.shop.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
@@ -25,32 +24,21 @@ public class ShopService {
     private final ObjectMapper objectMapper;
 
 
-    public List<ResponseShop> findShopsByBrand(List<ShopDto> apiShops, String keyword) {
-        System.out.println("apiShops.size() = " + apiShops.size());
-        List<ResponseShop> resultShops = new ArrayList<>(); // 반환 리스트
-        List<ResponseShop> responseShops = new ArrayList<>(); // entity -> dto 변환 리스트
+    public List<ResponseShopBrand> findShopsByBrand(List<ResponseShopBrand> apiShops, String keyword) {
+        List<ResponseShopBrand> resultShops = new ArrayList<>(); // 반환 리스트
+        List<ResponseShopBrand> responseShops = new ArrayList<>(); // entity -> dto 변환 리스트
         // DB 조회 -> Dto 변환
         List<Shop> dbShops = shopRepository.findByBrand(keyword).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
         if (dbShops.isEmpty())
             throw new BusinessException(SHOP_NOT_FOUND);
 
-
-        for (Shop dbShop : dbShops) {
-            responseShops.add(ResponseShop.from(dbShop));
-        }
-
-        for (ShopDto apiShop : apiShops) {
-            System.out.println("apiShop.getName() = " + apiShop.getName());
-        }
-        System.out.println("-------------------------");
-        for (ResponseShop responseShop : responseShops) {
-            System.out.println("responseShop.getName() = " + responseShop.getName());
-        }
+        for (Shop dbShop : dbShops)
+            responseShops.add(ResponseShopBrand.from(dbShop));
 
         // 카카오 맵 api로 부터 받아온 Shop 리스트와 db에 저장된 Shop 비교
-        for (ShopDto apiShop : apiShops) {
-            for (ResponseShop responseShop : responseShops) {
-                if (apiShop.getName().equals(responseShop.getName())) {
+        for (ResponseShopBrand apiShop : apiShops) {
+            for (ResponseShopBrand responseShop : responseShops) {
+                if (apiShop.getPlaceName().equals(responseShop.getPlaceName())) {
                     responseShop.setDistance(apiShop.getDistance());
                     resultShops.add(responseShop);
                 }
@@ -74,7 +62,7 @@ public class ShopService {
                 ResponseShop responseShop = ResponseShop.from(dbShop);
 
                 // Api Shop과 비교 후 저장
-                if (apiShop.getPlace_name().equals(responseShop.getName())
+                if (apiShop.getPlace_name().equals(responseShop.getPlaceName())
                         && Double.parseDouble(apiShop.getX()) == responseShop.getLongitude()
                         && Double.parseDouble(apiShop.getY()) == responseShop.getLatitude()) {
                     responseShops.add(responseShop);
