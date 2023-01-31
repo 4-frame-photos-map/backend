@@ -136,10 +136,11 @@ public class AuthController {
         String jwtAccessToken = jwtToken.substring(BEARER_TOKEN_PREFIX.length());
         kakaoAccessToken = kakaoAccessToken.substring(BEARER_TOKEN_PREFIX.length());
         kakaoRefreshToken = kakaoRefreshToken.substring(BEARER_TOKEN_PREFIX.length());
-        // TODO: 카카오 토큰 만료 확인
+        // 1. 카카오 토큰 만료시 토큰 갱신하기
         if(kakaoService.isExpiredAccessToken(kakaoAccessToken)) {
-            log.info("kakao Token 갱신");
+            kakaoAccessToken = kakaoService.refresh(kakaoRefreshToken);
         }
+        // 2. 연결 끊기
         kakaoService.disconnect(kakaoAccessToken);
         MemberWithdrawlResp memberWithdrawlResp = memberService.deleteMember(memberContext.getId(), jwtAccessToken);
         RsData<MemberWithdrawlResp> body = new RsData<>(

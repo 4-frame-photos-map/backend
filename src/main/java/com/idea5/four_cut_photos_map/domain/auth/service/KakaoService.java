@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * @See <a href="https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api">kakao rest api</a>
+ * @See <a href="https://juntcom.tistory.com/141">restTemplate 메서드</a>
  */
 @Service
 @Transactional(readOnly = true)
@@ -137,8 +138,8 @@ public class KakaoService {
         // header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
-        // get 요청, 응답
+        HttpEntity request = new HttpEntity<>(headers);
+        // get 요청에 header 를 포함하려면 무조건 exchange() 사용해야함!
         ResponseEntity<String> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
@@ -152,7 +153,43 @@ public class KakaoService {
             return false;
         } else if(response.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
             // 토큰 만료
+            log.info("만료된 토큰");
             return true;
+        } else {
+            // 에러 응답 예외처리
+            String msg = jsonNode.get("msg").asText();
+            throw new RuntimeException(msg);
+        }
+    }
+
+    /**
+     * 토큰 갱신하기
+     * @param refreshToken 카카오 refresh token
+     */
+    public String refresh(String refreshToken) throws JsonProcessingException {
+        log.info("토큰 갱신하기 요청");
+        String url = "https://kauth.kakao.com/oauth/token";
+        // header 생성
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        // body 생성
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "refresh_token");
+        params.add("client_id", clientId);
+        params.add("refresh_token", refreshToken);
+        // header + body 를 합쳐 request 생성
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+        // post 요청, 응답
+        ResponseEntity<String> response = restTemplate.postForEntity(
+                url,
+                request,
+                String.class);
+        // 응답 정보 역직렬화
+        JsonNode jsonNode = objectMapper.readValue(response.getBody(), JsonNode.class);
+        if(response.getStatusCode().equals(HttpStatus.OK)) {
+            String accessToken = jsonNode.get("access_token").asText();
+            log.info("atk=" + accessToken);
+            return accessToken;
         } else {
             // 에러 응답 예외처리
             String msg = jsonNode.get("msg").asText();
