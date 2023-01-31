@@ -66,6 +66,7 @@ public class AuthController {
                 "카카오 로그인 성공(Kakao Token, Jwt Token 발급)",
                 new KakaoLoginResp(kakaoTokenParam, jwtToken)
         );
+        // TODO: 세션 만료시간 설정하기
         session.setAttribute("kakaoAccessToken", kakaoTokenParam.getAccessToken());
         session.setAttribute("kakaoRefreshToken", kakaoTokenParam.getRefreshToken());
         return new ResponseEntity<>(body, headers, HttpStatus.OK);
@@ -131,6 +132,7 @@ public class AuthController {
             @AuthenticationPrincipal MemberContext memberContext,
              HttpSession session
     ) throws JsonProcessingException {
+        // TODO: 카카오 토큰을 세션에서 가져오는 것으로 변경하기, refreshToken null 일 경우 처리
         log.info("kakao-atk=" + session.getAttribute("kakaoAccessToken"));
         log.info("kakao-rtk=" + session.getAttribute("kakaoRefreshToken"));
         String jwtAccessToken = jwtToken.substring(BEARER_TOKEN_PREFIX.length());
