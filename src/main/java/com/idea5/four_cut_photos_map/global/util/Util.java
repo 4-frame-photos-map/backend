@@ -3,8 +3,12 @@ package com.idea5.four_cut_photos_map.global.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idea5.four_cut_photos_map.AppConfig;
+import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Util {
@@ -54,5 +58,38 @@ public class Util {
             map.put(key, value);
         }
         return map;
+    }
+
+
+
+
+    public static List<KakaoResponseDto> documentToObject(DocumentManagement body, String searchBrand){
+        List<KakaoResponseDto> dtos = new ArrayList<>();
+
+        for (int i = 0; i < body.getDocuments().length; i++) {
+            String brand = searchBrand;
+            String addressName = body.getDocuments()[i].getAddress_name();
+            String distance = body.getDocuments()[i].getDistance();
+            System.out.println("distance = " + distance);
+            String phone = body.getDocuments()[i].getPhone();
+            String placeName = body.getDocuments()[i].getPlace_name();
+            String roadAddressName = body.getDocuments()[i].getRoad_address_name();
+            String longitude = body.getDocuments()[i].getX();
+            String latitude = body.getDocuments()[i].getY();
+
+            KakaoResponseDto dto = KakaoResponseDto.builder()
+                    .brand(brand)
+                    .address_name(addressName)
+                    .distance(distance)
+                    .phone(phone)
+                    .placeName(placeName)
+                    .roadAddressName(roadAddressName)
+                    .x(longitude)
+                    .y(latitude)
+                    .build();
+
+            dtos.add(dto);
+        }
+        return dtos;
     }
 }

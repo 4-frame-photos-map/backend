@@ -1,5 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.shop.controller;
 
+import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
@@ -31,6 +32,14 @@ public class ShopController {
      * 2. DB와 응답값을 비교
      * 3. 클라이언트에게 응답.
      */
+
+    @GetMapping("/brand/search")
+    public ResponseEntity<List<ResponseShop>> showBrandListBySearch(@ModelAttribute RequestBrandSearch requestBrandSearch) {
+        // todo : 예외처리
+        List<ResponseShopBrand> kakaoApiResponse = shopService.searchBrand(requestBrandSearch);
+        return null;
+
+    }
 
     /**
      * 키워드 검색 (리스트 조회)

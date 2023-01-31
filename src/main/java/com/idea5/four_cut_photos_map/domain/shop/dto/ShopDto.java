@@ -1,6 +1,5 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto;
 
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

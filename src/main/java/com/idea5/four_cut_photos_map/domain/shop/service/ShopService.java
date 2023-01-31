@@ -2,6 +2,7 @@ package com.idea5.four_cut_photos_map.domain.shop.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
@@ -132,5 +133,10 @@ public class ShopService {
 
     public KaKaoSearchResponseDto searchByKeyword(String keyword) {
         return keywordSearchKakaoApi.searchByKeyword(keyword);
+    }
+
+    public List<ResponseShopBrand> searchBrand(RequestBrandSearch brandSearch) {
+        List<ResponseShopBrand> responseShopBrands = keywordSearchKakaoApi.searchByBrand(brandSearch);
+        return responseShopBrands;
     }
 }
