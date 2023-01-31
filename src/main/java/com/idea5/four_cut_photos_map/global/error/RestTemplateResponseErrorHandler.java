@@ -15,10 +15,12 @@ import java.io.IOException;
 @Component
 @Slf4j
 public class RestTemplateResponseErrorHandler extends DefaultResponseErrorHandler {
+    // 상태 코드가 오류인지 검사
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
         HttpStatus statusCode = response.getStatusCode();
         log.info("statusCode=" + statusCode);
+        // 5xx 만 오류로 간주
         return (statusCode.series() == HttpStatus.Series.SERVER_ERROR);
     }
 }
