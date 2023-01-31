@@ -192,7 +192,7 @@ public class KakaoService {
             return accessToken;
         } else {
             // 에러 응답 예외처리
-            String msg = jsonNode.get("msg").asText();
+            String msg = jsonNode.get("error").asText();
             throw new RuntimeException(msg);
         }
     }
