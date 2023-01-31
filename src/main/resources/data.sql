@@ -8,3 +8,10 @@ INSERT INTO SHOP(create_date, modify_date, address,longitude, latitude, name, br
 INSERT INTO SHOP(create_date, modify_date, address,longitude, latitude, name, brand) VALUES(NOW(), NOW(), '서울 성동구 서울숲2길 45',127.043600450617, 37.5464465306291, '하루필름 서울숲점', '하루필름');
 INSERT INTO SHOP(create_date, modify_date, address,longitude, latitude, name, brand) VALUES(NOW(), NOW(), '서울 성동구 서울숲4길 20',127.043010183447, 37.547189170196, '인생네컷 서울숲점', '인생네컷');
 INSERT INTO SHOP(create_date, modify_date, address,longitude, latitude, name, brand) VALUES(NOW(), NOW(), '서울 성동구 서울숲4길 23-1',127.043634812377, 37.5471565050697, '픽닷', '픽닷');
+
+-- 칭호
+INSERT INTO TITLE(create_date, modify_date, name) VALUES (NOW(), NOW(), '뉴비');
+INSERT INTO TITLE(create_date, modify_date, name) VALUES (NOW(), NOW(), '리뷰 첫 걸음');
+INSERT INTO TITLE(create_date, modify_date, name) VALUES (NOW(), NOW(), '리뷰 홀릭');
+INSERT INTO TITLE(create_date, modify_date, name) VALUES (NOW(), NOW(), '찜 첫 걸음');
+INSERT INTO TITLE(create_date, modify_date, name) VALUES (NOW(), NOW(), '찜 홀릭');
