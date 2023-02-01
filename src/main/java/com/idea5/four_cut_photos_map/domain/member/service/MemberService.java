@@ -5,6 +5,9 @@ import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberInfoResp;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberWithdrawlResp;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
+import com.idea5.four_cut_photos_map.domain.title.entity.Title;
+import com.idea5.four_cut_photos_map.domain.title.service.TitleService;
+import com.idea5.four_cut_photos_map.domain.titleLog.entity.TitleLog;
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -22,6 +26,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtProvider jwtProvider;
     private final RedisDao redisDao;
+    private final TitleService titleService;
 
     // 회원 가져오기
     @Transactional
@@ -30,15 +35,14 @@ public class MemberService {
         Member member = memberRepository.findByKakaoId(kakaoUserInfoParam.getId()).orElse(null);
         // 신규 사용자인 경우 회원가입
         if(member == null) {
-            member = join(kakaoUserInfoParam);
+            Member newMember = KakaoUserInfoParam.toEntity(kakaoUserInfoParam);
+            // 회원가입 기본 칭호 부여
+            List<TitleLog> titleLogs = newMember.getTitleLogs();
+            Title signUpTitle = titleService.findById(1L);
+            titleLogs.add(new TitleLog(newMember, signUpTitle));
+            return memberRepository.save(newMember);
         }
         return member;
-    }
-
-    // 회원가입
-    public Member join(KakaoUserInfoParam kakaoUserInfoParam) {
-        Member member = KakaoUserInfoParam.toEntity(kakaoUserInfoParam);
-        return memberRepository.save(member);
     }
 
     public Member findById(Long id) {

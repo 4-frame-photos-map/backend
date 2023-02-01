@@ -9,11 +9,11 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum TitleType {
-    NEWBIE(0),
-    FIRST_REVIEW(1),
-    MANY_REVIEW(2),
-    FIRST_HEART(3),
-    MANY_HEART(4);
+    NEWBIE(1),
+    FIRST_REVIEW(2),
+    MANY_REVIEW(3),
+    FIRST_HEART(4),
+    MANY_HEART(5);
 
     private Integer code;
 }
