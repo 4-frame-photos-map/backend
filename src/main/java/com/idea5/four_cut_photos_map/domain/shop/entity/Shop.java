@@ -27,8 +27,7 @@ public class Shop extends BaseEntity {
     private double longitude; // 경도, x
     private double latitude; // 위도, y
 
-    @OneToMany
-    @JoinColumn(name = "shop_id")
+    @OneToMany(mappedBy = "shop", cascade = CascadeType.REMOVE)
     private List<Favorite> favorites = new ArrayList<>();
 
     public Shop(String brand, String name, String address, double longitude, double latitude) {
