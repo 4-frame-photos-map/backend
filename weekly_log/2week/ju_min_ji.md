@@ -22,8 +22,8 @@
 - 테이블 명명 규칙 : 찜 테이블을 `Favorites(noun, 즐겨찾기, 복수)`가 아닌 `Favorite(noun, 특히 좋아하는 것, 단수)`으로 설정한 이유
   - [테이블 명명규칙 7가지](https://killu.tistory.com/52)
   - [테이블명을 단수로 설정해야 하는 이유](https://edunga1.gitbooks.io/catlogic/content/database/table-naming-convention.html)
-  - [JPA-Cascade(영속성전이)](https://hongchangsub.com/jpa-cascade-2/)
-  - [HTTP Status Code](https://developer.mozilla.org/ko/docs/Web/HTTP/Status/403)
+- [JPA-Cascade(영속성전이)](https://hongchangsub.com/jpa-cascade-2/)
+- [HTTP Status Code](https://developer.mozilla.org/ko/docs/Web/HTTP/Status/403)
 ### 궁금한점(선택)
 
 - Q1.사용자 인증 `Filter`에서 `인증되지 않은 사용자(찾을 수 없는 사용자)(토큰 만료 사용자)인지` 검사하는데도 `Controller`에서도 memberContext null 체크를 해야하는지? 
