@@ -9,3 +9,7 @@ INSERT INTO SHOP(create_date, modify_date, address,longitude, latitude, name, br
 INSERT INTO SHOP(create_date, modify_date, address,longitude, latitude, name, brand) VALUES(NOW(), NOW(), '서울 성동구 서울숲4길 20',127.043010183447, 37.547189170196, '인생네컷 서울숲점', '인생네컷');
 INSERT INTO SHOP(create_date, modify_date, address,longitude, latitude, name, brand) VALUES(NOW(), NOW(), '서울 성동구 서울숲4길 23-1',127.043634812377, 37.5471565050697, '픽닷', '픽닷');
 INSERT INTO SHOP(create_date, modify_date, address,longitude, latitude, name, brand) VALUES(NOW(), NOW(), '충남 천안시 서북구 원두정2길 21',127.135473811813, 36.8322023787607, '인생네컷 충남천안두정먹거리공원점', '인생네컷');
+INSERT INTO SHOP(create_date, modify_date, address,longitude, latitude, name, brand) VALUES(NOW(), NOW(), '충남 천안시 동남구 먹거리10길 14',127.155328, 36.817782, '하루필름 천안점', '하루필름');
+INSERT INTO SHOP(create_date, modify_date, address,longitude, latitude, name, brand) VALUES(NOW(), NOW(), '충남 천안시 서북구 원두정2길 21',127.135473811813, 36.8322023787607, '포토이즘박스 두정점', '포토이즘박스');
+INSERT INTO SHOP(create_date, modify_date, address,longitude, latitude, name, brand) VALUES(NOW(), NOW(), '충남 천안시 동남구 먹거리11길 28',127.155596175371, 36.8181132541858, '포토이즘컬러드 천안신부점', '포토이즘박스');
+
