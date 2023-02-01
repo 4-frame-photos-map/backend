@@ -1,5 +1,7 @@
 package com.idea5.four_cut_photos_map.global.common.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.idea5.four_cut_photos_map.global.error.ErrorResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,24 +13,24 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RsData<T> {
-    private int code;       // 처리 결과 상태
-    private String message; // 처리 결과 상태 메시지(개발자들과 서비스를 운영하는 자를 위한 메시지)
-    private T result;       // API 가 응답해야하는 리소스
+    private boolean success; // API 호출 실행 결과 (필수)
+    private String message;
 
-    public static <T> RsData<T> of(int code, String message, T result) {
-        return new RsData<>(code, message, result);
+    private ErrorResponse error;       // ErrorResponse 리소스 (선택)
+    private T result;       // API 가 응답해야하는 리소스 (선택)
+
+    // 성공 응답
+    public RsData(boolean success, String message, T result) {
+        this.success = success;
+        this.message = message;
+        this.result = result;
     }
 
-    public static <T> RsData<T> of(int code, String message) {
-        return of(code, message, null);
-    }
-
-    public boolean isSuccess() {
-        return code == 200;
-    }
-
-    public boolean isFail() {
-        return isSuccess() == false;
+    // 실패 응답
+    public RsData(boolean success, ErrorResponse error) {
+        this.success = success;
+        this.error = error;
     }
 }
