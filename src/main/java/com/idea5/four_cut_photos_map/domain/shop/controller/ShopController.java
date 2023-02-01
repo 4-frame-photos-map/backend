@@ -1,5 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.shop.controller;
 
+import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
@@ -14,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.*;
 
-import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DISTANCE_IS_EMPTY;
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.*;
 
 
 //@RestController
@@ -36,12 +38,18 @@ public class ShopController {
 
     @GetMapping("/brand/search")
     public RsData<List<ResponseShopBrand>> showBrandListBySearch(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch) {
-        // todo : 예외처리
-        List<ResponseShopBrand> kakaoApiResponse = shopService.searchBrand(requestBrandSearch);
-        List<ResponseShopBrand> shopsByBrand = shopService.findShopsByBrand(kakaoApiResponse, requestBrandSearch.getBrand());
+        // api 검색전, DB에서 먼저 있는지 확인하는게 더 효율적
+        List<ShopDto> shopDtos = shopService.findByBrand(requestBrandSearch.getBrand());
+        if(shopDtos.isEmpty())
+            throw new BusinessException(BRAND_NOT_FOUND);
+
+
+        List<KakaoResponseDto> kakaoApiResponse = shopService.searchBrand(requestBrandSearch);
+        List<ResponseShopBrand> shopsByBrand = shopService.findShopsByBrand(kakaoApiResponse, shopDtos, requestBrandSearch.getBrand());
+        if(shopsByBrand.isEmpty())
+            return new RsData<List<ResponseShopBrand>>(true, String.format("근처에 %s이(가) 없습니다.", requestBrandSearch.getBrand()), shopsByBrand);
 
         return new RsData<List<ResponseShopBrand>>(true, "brand 검색 성공", shopsByBrand);
-
     }
 
     /**

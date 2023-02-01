@@ -1,14 +1,12 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class KakaoResponseDto {
 
     private String brand;

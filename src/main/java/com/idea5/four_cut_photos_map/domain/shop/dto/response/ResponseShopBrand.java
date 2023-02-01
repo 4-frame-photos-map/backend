@@ -18,6 +18,8 @@ public class ResponseShopBrand {
     private String y; // 위도
     private String distance; // 거리
 
+    private String phone;
+
     public void setDistance(String distance){
         this.distance = distance;
     }
@@ -26,6 +28,7 @@ public class ResponseShopBrand {
         return ResponseShopBrand.builder()
                 .placeName(dto.getPlaceName())
                 .roadAddressName(dto.getRoadAddressName())
+                .phone(dto.getPhone())
                 .x(dto.getX())
                 .y(dto.getY())
                 .distance(dto.getDistance())
