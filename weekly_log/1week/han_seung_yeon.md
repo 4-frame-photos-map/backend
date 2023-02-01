@@ -21,7 +21,7 @@
 
 - `[카카오계정과 함께 로그아웃](https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#logout-of-service-and-kakaoaccount)` 으로 서비스 로그아웃을 구현할 경우, 콜백 요청이 들어올 때 `Authorization 헤더` 에 `accessToken` 이 들어있지않아 필터단에서 인증처리를 할 수 없는 문제가 생긴다. 이 방법으로 구현하려면 어떻게 인증처리를 해야하는가?
 위 방법에서는 Authorization 헤더가 아닌 `@requestParam(”state”)` 으로 accessToken 값에 접근할 수 있다. 현재는 붕어빵 서비스처럼 카카오계정과 함께 로그아웃은 구현하지 않고 서비스 로그아웃만 하도록 구현하였다.
-    1. 카카오계정과 함께 로그아웃 GET [https://kauth.kakao.com/oauth/logout?client_id=1ebf83c39629e96f29ffa4b207f476a8&logout_redirect_uri=http://localhost:8081/member/logout/oauth2/kakao&state=eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJmb3VyX2N1dF9waG90b3NfbWFwIiwiaWF0IjoxNjc0NjIyODk3LCJleHAiOjE2NzQ2MjMwMTcsInRva2VuX3R5cGUiOiJBVEsiLCJpZCI6MSwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6Ik1FTUJFUiJ9XX0.r9NrNhV3dlUmybZTJFLIBn8GntIPoRmob1gaNoef766SIfFeT2vbP62-2D9kk2y_deqZIscRlBl7RsKSN4NldA](https://kauth.kakao.com/oauth/logout?client_id=1ebf83c39629e96f29ffa4b207f476a8&logout_redirect_uri=http://localhost:8081/member/logout/oauth2/kakao&state=eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJmb3VyX2N1dF9waG90b3NfbWFwIiwiaWF0IjoxNjc0NjIyODk3LCJleHAiOjE2NzQ2MjMwMTcsInRva2VuX3R5cGUiOiJBVEsiLCJpZCI6MSwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6Ik1FTUJFUiJ9XX0.r9NrNhV3dlUmybZTJFLIBn8GntIPoRmob1gaNoef766SIfFeT2vbP62-2D9kk2y_deqZIscRlBl7RsKSN4NldA)  요청을 보낸다.
+    1. 카카오계정과 함께 로그아웃 GET 요청을 보낸다.
     2. 성공시 설정된 redirect URI `/member/logout/oauth2/kakao?state={accessToken값}` 로 서비스 로그아웃 요청이 들어온다. 
     3. 필터 단에서 Authorization 헤더의 accessToken 값을 검증하고 인증처리를 진행한다. → 문제 발생
 
