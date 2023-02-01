@@ -1,6 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.member.entity;
 
-import com.idea5.four_cut_photos_map.domain.like.entity.Like;
+import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.titleLog.entity.TitleLog;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -36,7 +36,7 @@ public class Member extends BaseEntity {
 
     @OneToMany
     @JoinColumn(name = "member_id")
-    private List<Like> likes = new ArrayList<>();
+    private List<Favorite> favorites = new ArrayList<>();
 
     @OneToMany
     @JoinColumn(name = "member_id")

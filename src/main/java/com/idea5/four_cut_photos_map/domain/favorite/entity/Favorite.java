@@ -1,4 +1,4 @@
-package com.idea5.four_cut_photos_map.domain.like.entity;
+package com.idea5.four_cut_photos_map.domain.favorite.entity;
 
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
@@ -12,13 +12,12 @@ import lombok.experimental.SuperBuilder;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "likes")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
 @ToString
-public class Like extends BaseEntity {
+public class Favorite extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "member_id")

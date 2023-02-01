@@ -1,6 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.shop.entity;
 
-import com.idea5.four_cut_photos_map.domain.like.entity.Like;
+import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,8 +11,6 @@ import lombok.experimental.SuperBuilder;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Getter
@@ -31,7 +29,7 @@ public class Shop extends BaseEntity {
 
     @OneToMany
     @JoinColumn(name = "shop_id")
-    private List<Like> likes = new ArrayList<>();
+    private List<Favorite> favorites = new ArrayList<>();
 
     public Shop(String brand, String name, String address, double longitude, double latitude) {
         this.brand = brand;
