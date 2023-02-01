@@ -10,6 +10,7 @@ import java.time.Duration;
  * RedisTemplate 를 쉽게 사용하기 위해 만든 DAO
  * - RedisTemplate: Redis Command 를 도와주는 Template
  * @See <a href="https://sol-devlog.tistory.com/22">RedisDao 참고</a>
+ * @See <a href="https://zkdlu.github.io/2020-12-29/redis02-spring-boot%EC%97%90%EC%84%9C-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/">redisTemplate</a>
  */
 @Component
 public class RedisDao {
@@ -20,22 +21,31 @@ public class RedisDao {
         this.redisTemplate = redisTemplate;
     }
 
+    // (key, value) 쌍 저장(만료기간 설정X)
     public void setValues(String key, String data) {
         ValueOperations<String, String> values = redisTemplate.opsForValue();
         values.set(key, data);
     }
 
+    // (key, value) 쌍 저장(만료기간 설정O)
     public void setValues(String key, String data, Duration duration) {
         ValueOperations<String, String> values = redisTemplate.opsForValue();
         values.set(key, data, duration);
     }
 
+    // key 로 value 조회
     public String getValues(String key) {
         ValueOperations<String, String> values = redisTemplate.opsForValue();
         return values.get(key);
     }
 
+    // key 삭제
     public void deleteValues(String key) {
         redisTemplate.delete(key);
+    }
+
+    // key 존재여부 확인
+    public Boolean hasKey(String key) {
+        return redisTemplate.hasKey(key);
     }
 }

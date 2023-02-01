@@ -1,6 +1,6 @@
-package com.idea5.four_cut_photos_map.member.dto.response;
+package com.idea5.four_cut_photos_map.domain.member.dto.response;
 
-import com.idea5.four_cut_photos_map.member.entity.Member;
+import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

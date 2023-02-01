@@ -1,5 +1,6 @@
 package com.idea5.four_cut_photos_map.global.config;
 
+import com.idea5.four_cut_photos_map.global.error.RestTemplateResponseErrorHandler;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +31,9 @@ public class RestTemplateConfig {
 
         factory.setHttpClient(httpClient);
 
-        return new RestTemplate(factory);
+        RestTemplate restTemplate = new RestTemplate(factory);
+        // 에러 핸들러 설정 추가
+        restTemplate.setErrorHandler(new RestTemplateResponseErrorHandler());
+        return restTemplate;
     }
 }

@@ -1,8 +1,9 @@
 package com.idea5.four_cut_photos_map.security.jwt.filter;
 
-import com.idea5.four_cut_photos_map.member.entity.Member;
+import com.idea5.four_cut_photos_map.domain.member.entity.Member;
+import com.idea5.four_cut_photos_map.security.jwt.JwtService;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
-import com.idea5.four_cut_photos_map.member.service.MemberService;
+import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
@@ -37,25 +38,35 @@ import static com.idea5.four_cut_photos_map.security.jwt.dto.TokenType.REFRESH_T
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
+    private final JwtService jwtService;
     private final MemberService memberService;
     private final String BEARER_TOKEN_PREFIX = "Bearer ";
 
     @Value("${jwt.atk.header}")
     private String tokenHeader;
 
+    @Value("${jwt.atk.reissue-uri}")
+    private String atkReissueUri;
+
     // 토큰 유효성 검증 후 인증(로그인)처리
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("JwtAuthorizationFilter doFilterInternal()");
         String token = getJwtToken(request);
-        // 1. 1차 체크(토큰이 유효한지 검증)
+        // 1. 토큰이 유효한지 검증
         if(StringUtils.hasText(token) && jwtProvider.verify(token)) {
             Long memberId = jwtProvider.getId(token);
             String tokenType = jwtProvider.getTokenType(token);
             String requestURI = request.getRequestURI();
-            // 2가지 경우에 대한 예외처리
-            if(tokenType.equals(ACCESS_TOKEN.getName()) && requestURI.equals("/member/refresh")
-            || tokenType.equals(REFRESH_TOKEN.getName()) && !requestURI.equals("/member/refresh")) {
+            // 2. 올바른 토큰 타입(ATK, RTK)으로 요청했는지 검증(아래 2가지 예외)
+            // 2-1. accessToken 재발급 요청에 accessToken 을 담아 요청한 경우
+            // 2-2. accessToken 재발급 외의 요청에 refreshToken 을 담아 요청한 경우
+            if(tokenType.equals(ACCESS_TOKEN.getName()) && requestURI.equals(atkReissueUri)
+            || tokenType.equals(REFRESH_TOKEN.getName()) && !requestURI.equals(atkReissueUri)) {
+                throw new JwtException("유효하지 않은 토큰입니다.");
+            }
+            // 3. 해당 accessToken 이 블랙리스트로 redis 에 등록되었는지 검증
+            if(tokenType.equals(ACCESS_TOKEN.getName()) && jwtService.isBlackList(token)) {
                 throw new JwtException("유효하지 않은 토큰입니다.");
             }
             // TODO: 매 요청마다 DB 조회하면 성능 문제(jwt 쓰는 이유가 없음) -> Redis 캐시로 해결

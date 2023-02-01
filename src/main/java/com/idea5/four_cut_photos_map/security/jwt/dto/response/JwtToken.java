@@ -5,11 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 서비스 jwt 토큰
+ */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Token {
+public class JwtToken {
     private String accessToken;
     private String refreshToken;
 }
