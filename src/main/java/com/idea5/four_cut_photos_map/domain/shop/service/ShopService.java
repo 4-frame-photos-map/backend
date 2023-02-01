@@ -152,8 +152,6 @@ public class ShopService {
     public List<ShopDto> findByBrand(String brandName){
         List<ShopDto> shopDtos = new ArrayList<>();
         List<Shop> shops = shopRepository.findByBrand(brandName).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
-        if (shops.isEmpty())
-            throw new BusinessException(SHOP_NOT_FOUND);
 
 
         for (Shop shop : shops)
