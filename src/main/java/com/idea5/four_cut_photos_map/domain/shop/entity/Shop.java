@@ -26,10 +26,10 @@ public class Shop extends BaseEntity {
     private double longitude; // 경도, x
     private double latitude; // 위도, y
 
-    @OneToMany(mappedBy = "shop", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "shop")
     @Builder.Default
     @ToString.Exclude
-    private List<Review> reviewList = new LinkedList<>();
+    private List<Review> reviews = new LinkedList<>();
 
     @OneToMany
     @JoinColumn(name = "shop_id")
@@ -45,7 +45,7 @@ public class Shop extends BaseEntity {
 
     public void addReview(Review review) {
         review.setShop(this);
-        this.reviewList.add(review);
+        this.reviews.add(review);
     }
 
 }

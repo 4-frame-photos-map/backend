@@ -42,10 +42,10 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "member_id")
     private List<TitleLog> titleLogs = new ArrayList<>();
 
-    @OneToMany(mappedBy = "writer", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "writer")
     @Builder.Default
     @ToString.Exclude
-    private List<Review> reviewList = new LinkedList<>();
+    private List<Review> reviews = new LinkedList<>();
 
     // TODO: 이후 활용
     // 현재 회원이 가지고 있는 권한들을 List<GrantedAuthority> 형태로 리턴
@@ -59,6 +59,6 @@ public class Member extends BaseEntity {
 
     public void addReview(Review review) {
         review.setWriter(this);
-        this.reviewList.add(review);
+        this.reviews.add(review);
     }
 }
