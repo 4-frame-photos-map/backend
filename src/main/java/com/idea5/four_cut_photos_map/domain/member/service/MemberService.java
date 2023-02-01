@@ -36,10 +36,10 @@ public class MemberService {
         // 신규 사용자인 경우 회원가입
         if(member == null) {
             Member newMember = KakaoUserInfoParam.toEntity(kakaoUserInfoParam);
-            // 회원가입 기본 칭호 부여
+            // 회원가입 기본 칭호 부여, 대표 칭호로 설정
             List<TitleLog> titleLogs = newMember.getTitleLogs();
             Title signUpTitle = titleService.findById(1L);
-            titleLogs.add(new TitleLog(newMember, signUpTitle));
+            titleLogs.add(new TitleLog(newMember, signUpTitle, true));
             return memberRepository.save(newMember);
         }
         return member;

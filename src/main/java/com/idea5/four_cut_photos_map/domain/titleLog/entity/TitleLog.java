@@ -28,4 +28,6 @@ public class TitleLog extends BaseEntity {
     @ManyToOne
     @JoinColumn(name ="title_id")
     private Title title;
+
+    private Boolean isMain; // 대표 칭호 여부
 }
