@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.*;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DISTANCE_IS_EMPTY;
@@ -34,7 +35,7 @@ public class ShopController {
      */
 
     @GetMapping("/brand/search")
-    public RsData<List<ResponseShopBrand>> showBrandListBySearch(@ModelAttribute RequestBrandSearch requestBrandSearch) {
+    public RsData<List<ResponseShopBrand>> showBrandListBySearch(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch) {
         // todo : 예외처리
         List<ResponseShopBrand> kakaoApiResponse = shopService.searchBrand(requestBrandSearch);
         List<ResponseShopBrand> shopsByBrand = shopService.findShopsByBrand(kakaoApiResponse, requestBrandSearch.getBrand());
