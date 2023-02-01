@@ -1,6 +1,6 @@
-insert into title (create_date, modify_date, name) values(NOW(), NOW(), '뉴비');
-insert into title (create_date, modify_date, name) values(NOW(), NOW(), '포토부스 리뷰어'); -- 리뷰
-insert into title (create_date, modify_date, name) values(NOW(), NOW(), '포토부스 전문가'); -- 방문횟수
+-- insert into title (create_date, modify_date, name) values(NOW(), NOW(), '뉴비');
+-- insert into title (create_date, modify_date, name) values(NOW(), NOW(), '포토부스 리뷰어'); -- 리뷰
+-- insert into title (create_date, modify_date, name) values(NOW(), NOW(), '포토부스 전문가'); -- 방문횟수
 
 INSERT INTO SHOP(create_date, modify_date, address,longitude, latitude, name, brand) VALUES(NOW(), NOW(), '서울 성동구 서울숲2길 48',127.043851506853, 37.5461761379704, '인생네컷 서울숲노가리마트로드점', '인생네컷');
 INSERT INTO SHOP(create_date, modify_date, address,longitude, latitude, name, brand) VALUES(NOW(), NOW(), '서울 성동구 서울숲2길 17-2',127.04073790685483, 37.547177362006806, '포토이즘박스 성수점', '포토이즘박스');
