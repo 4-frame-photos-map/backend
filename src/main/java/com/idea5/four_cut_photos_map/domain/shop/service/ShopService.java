@@ -1,7 +1,10 @@
 package com.idea5.four_cut_photos_map.domain.shop.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
+import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
@@ -24,20 +27,20 @@ public class ShopService {
     private final ObjectMapper objectMapper;
 
 
-    public List<ResponseShopBrand> findShopsByBrand(List<ResponseShopBrand> apiShops, String keyword) {
-        List<ResponseShopBrand> resultShops = new ArrayList<>(); // 반환 리스트
-        List<ResponseShopBrand> responseShops = new ArrayList<>(); // entity -> dto 변환 리스트
+    public List<ResponseShopV2> findShopsByBrand(List<ResponseShopV2> apiShops, String keyword) {
+        List<ResponseShopV2> resultShops = new ArrayList<>(); // 반환 리스트
+        List<ResponseShopV2> responseShops = new ArrayList<>(); // entity -> dto 변환 리스트
         // DB 조회 -> Dto 변환
         List<Shop> dbShops = shopRepository.findByBrand(keyword).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
         if (dbShops.isEmpty())
             throw new BusinessException(SHOP_NOT_FOUND);
 
         for (Shop dbShop : dbShops)
-            responseShops.add(ResponseShopBrand.from(dbShop));
+            responseShops.add(ResponseShopV2.of(dbShop));
 
         // 카카오 맵 api로 부터 받아온 Shop 리스트와 db에 저장된 Shop 비교
-        for (ResponseShopBrand apiShop : apiShops) {
-            for (ResponseShopBrand responseShop : responseShops) {
+        for (ResponseShopV2 apiShop : apiShops) {
+            for (ResponseShopV2 responseShop : responseShops) {
                 if (apiShop.getPlaceName().equals(responseShop.getPlaceName())) {
                     responseShop.setDistance(apiShop.getDistance());
                     resultShops.add(responseShop);
@@ -123,8 +126,38 @@ public class ShopService {
         return keywordSearchKakaoApi.searchByKeyword(keyword);
     }
 
-    public List<ResponseShopBrand> searchBrand(RequestBrandSearch brandSearch) {
-        List<ResponseShopBrand> responseShopBrands = keywordSearchKakaoApi.searchByBrand(brandSearch);
-        return responseShopBrands;
+    public List<ResponseShopV2> searchBrand(RequestBrandSearch brandSearch) {
+        List<ResponseShopV2> responseShopV2s = keywordSearchKakaoApi.searchByBrand(brandSearch);
+        return responseShopV2s;
+    }
+
+    public List<ResponseShopMarker> searchMarkers(RequestShop shop, String brandName) {
+        List<KakaoResponseDto> kakaoShops = keywordSearchKakaoApi.searchMarkers(shop, brandName);
+        List<ShopDto> dbShops = findByBrand(brandName);
+        List<ResponseShopMarker> resultShops = new ArrayList<>();
+
+        for (KakaoResponseDto kakaoShop : kakaoShops) {
+            for (ShopDto dbShop : dbShops) {
+                if (kakaoShop.getPlaceName().equals(dbShop.getPlaceName())) {
+                    ResponseShopMarker responseShopMarker = ResponseShopMarker.of(kakaoShop);
+                    responseShopMarker.setId(dbShop.getId());
+                    resultShops.add(responseShopMarker);
+                }
+            }
+        }
+        return resultShops;
+    }
+
+
+    public List<ShopDto> findByBrand(String brandName){
+        List<ShopDto> shopDtos = new ArrayList<>();
+        List<Shop> shops = shopRepository.findByBrand(brandName).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
+        if (shops.isEmpty())
+            throw new BusinessException(SHOP_NOT_FOUND);
+
+
+        for (Shop shop : shops)
+            shopDtos.add(ShopDto.of(shop));
+        return shopDtos;
     }
 }

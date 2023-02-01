@@ -2,8 +2,9 @@ package com.idea5.four_cut_photos_map.domain.shop.service.kakao;
 
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
+import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.KaKaoSearchResponseDto;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopBrand;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopV2;
 import com.idea5.four_cut_photos_map.global.util.DocumentManagement;
 import com.idea5.four_cut_photos_map.global.util.Util;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -46,7 +46,7 @@ public class KeywordSearchKakaoApi {
         return restTemplate.exchange(apiURL, HttpMethod.GET, entity,KaKaoSearchResponseDto.class).getBody();
     }
 
-    public List<ResponseShopBrand> searchByBrand(RequestBrandSearch request){
+    public List<ResponseShopV2> searchByBrand(RequestBrandSearch request){
         // 2. header 설정을 위해 HttpHeader 클래스 생성 후 HttpEntity 객체에 넣어준다.
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "KakaoAK " + kakao_apikey);
@@ -63,16 +63,37 @@ public class KeywordSearchKakaoApi {
         System.out.println("apiURL = " + apiURL);
 
         // 4. exchange 메서드로 api 호출
-        List<ResponseShopBrand> list = new ArrayList<>();
+        List<ResponseShopV2> list = new ArrayList<>();
         DocumentManagement body = restTemplate.exchange(apiURL, HttpMethod.GET, entity, DocumentManagement.class).getBody();
         List<KakaoResponseDto> kakaoResponseDtos = Util.documentToObject(body, request.getBrand());
 
         for (KakaoResponseDto kakaoResponseDto : kakaoResponseDtos) {
-            ResponseShopBrand dto = ResponseShopBrand.of(kakaoResponseDto);
+            ResponseShopV2 dto = ResponseShopV2.ofKakaoResponse(kakaoResponseDto);
             list.add(dto);
         }
         return list;
     }
 
 
+    public List<KakaoResponseDto> searchMarkers(RequestShop shop, String brandName) {
+        // 2. header 설정을 위해 HttpHeader 클래스 생성 후 HttpEntity 객체에 넣어준다.
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "KakaoAK " + kakao_apikey);
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        // 3. 파라미터를 사용하여 요청 URL 정의
+        // ex) https://dapi.kakao.com/v2/local/search/keyword?query=${}&x=${}&y=${}&sort=distance
+        String apiURL = "https://dapi.kakao.com/v2/local/search/keyword.JSON?"
+                + "query=" + brandName
+                + "&x="+shop.getLongitude()
+                + "&y="+shop.getLatitude()
+                + "&sort=distance" // 거리순
+                + "&radius=2000"; // 반경 2km이내
+        System.out.println("apiURL = " + apiURL);
+
+        DocumentManagement body = restTemplate.exchange(apiURL, HttpMethod.GET, entity, DocumentManagement.class).getBody();
+        List<KakaoResponseDto> kakaoResponseDtos = Util.documentToObject(body, brandName);
+        return kakaoResponseDtos;
+    }
 }

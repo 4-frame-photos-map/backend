@@ -1,16 +1,19 @@
 package com.idea5.four_cut_photos_map.domain.shop.controller;
 
+import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
+import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
+import com.idea5.four_cut_photos_map.global.common.data.Brand;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.*;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DISTANCE_IS_EMPTY;
@@ -34,12 +37,12 @@ public class ShopController {
      */
 
     @GetMapping("/brand/search")
-    public RsData<List<ResponseShopBrand>> showBrandListBySearch(@ModelAttribute RequestBrandSearch requestBrandSearch) {
+    public RsData<List<ResponseShopV2>> showBrandListBySearch(@ModelAttribute RequestBrandSearch requestBrandSearch) {
         // todo : 예외처리
-        List<ResponseShopBrand> kakaoApiResponse = shopService.searchBrand(requestBrandSearch);
-        List<ResponseShopBrand> shopsByBrand = shopService.findShopsByBrand(kakaoApiResponse, requestBrandSearch.getBrand());
+        List<ResponseShopV2> kakaoApiResponse = shopService.searchBrand(requestBrandSearch);
+        List<ResponseShopV2> shopsByBrand = shopService.findShopsByBrand(kakaoApiResponse, requestBrandSearch.getBrand());
 
-        return new RsData<List<ResponseShopBrand>>(true, "brand 검색 성공", shopsByBrand);
+        return new RsData<List<ResponseShopV2>>(true, "brand 검색 성공", shopsByBrand);
 
     }
 
@@ -93,27 +96,22 @@ public class ShopController {
     }
 
 
-    /*
     //현재 위치 기준, 반경 2km
     @GetMapping("/search/marker")
-    public ResponseEntity<Map<String, List<ResponseMarker>>> currentLocationSearch(@ModelAttribute @Valid RequestShop requestShop){
+    public RsData<Map<String, List<ResponseShopMarker>>> currentLocationSearch(@ModelAttribute @Valid RequestShop requestShop){
 
         String[] names = Brand.Names; // 브랜드명 ( 하루필름, 인생네컷 ... )
 
         // 카카오 api -> 필요한 변수 = {브랜드명, 위도, 경도, 반경}
         // 일단 샘플로 테스트
-        Map<String, List<ShopDto>> maps = new HashMap<>();
+        Map<String, List<ResponseShopMarker>> maps = new HashMap<>();
         for (String brandName : names) {
-            List<ShopDto> list = TempKaKaO.tempDataBySearch(brandName);
+            List<ResponseShopMarker> list = shopService.searchMarkers(requestShop, brandName);
             maps.put(brandName, list);
         }
 
-        Map<String, List<ResponseMarker>> maker = shopService.findMaker(maps);
-
-
-        return ResponseEntity.ok(maker);
+        return new RsData<Map<String, List<ResponseShopMarker>>>(true, "Shop 마커 성공", maps);
     }
-     */
 
     // todo : @Validated 유효성 검사 시, httpstatus code 전달하는 방법
     @GetMapping("/detail/{shopId}")
