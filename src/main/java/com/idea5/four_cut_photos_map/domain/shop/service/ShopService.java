@@ -58,7 +58,7 @@ public class ShopService {
         return resultShops;
     }
 
-    public List<ResponseShop> findShops(List<KaKaoSearchResponseDto.Document> apiShops, String keyword) {
+    public List<ResponseShop> findShops(List<KaKaoSearchResponseDto.Document> apiShops) {
         List<ResponseShop> responseShops = new ArrayList<>();
 
         // 카카오 맵 api로 부터 받아온 Shop과 db에 저장된 Shop 비교

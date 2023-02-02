@@ -14,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.*;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DISTANCE_IS_EMPTY;
@@ -81,7 +84,7 @@ public class ShopController {
         }
 
         // 3. db 데이터와 비교
-        List<ResponseShop> shops = shopService.findShops(dtos, keyword);
+        List<ResponseShop> shops = shopService.findShops(dtos);
 
         return new RsData<List<ResponseShop>>(true, "Shop 조회 성공", shops);
     }

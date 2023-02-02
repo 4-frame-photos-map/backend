@@ -37,13 +37,22 @@ public class FavoriteService {
                 .build();
 
         favoriteRepository.save(favorite);
+
+        // 찜 수 갱신
+        shop.setFavorite_cnt(shop.getFavorite_cnt() == null? 1 : shop.getFavorite_cnt()+1);
     }
 
     public Favorite findByShopIdAndMemberId(Long shopId, Long memberId) {
         return favoriteRepository.findByShopIdAndMemberId(shopId, memberId).orElse(null);
     }
 
+    @Transactional
     public void cancel(Long shopId, Long memberId) {
         favoriteRepository.deleteByShopIdAndMemberId(shopId, memberId);
+
+        // 찜 수 갱신
+        Shop shop = shopService.findById(shopId);
+        shop.setFavorite_cnt(shop.getFavorite_cnt() == null || shop.getFavorite_cnt() == 0?
+                0 : shop.getFavorite_cnt() - 1);
     }
 }
