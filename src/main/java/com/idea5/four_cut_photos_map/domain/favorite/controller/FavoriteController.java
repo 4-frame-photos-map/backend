@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,12 +30,11 @@ public class FavoriteController {
     private final MemberService memberService;
     private final FavoriteService favoriteService;
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "/{member-id}")
     public ResponseEntity<RsData> showFavoritesList(@PathVariable Long memberId,
                                                                @AuthenticationPrincipal MemberContext memberContext) {
         Member member = memberService.findById(memberId);
-
-        //Todo: memberContext null 검사 해야 하는지 질문
 
         if (memberContext.memberIsNot(member)) {
             throw new BusinessException(MEMBER_MISMATCH);
@@ -49,6 +49,8 @@ public class FavoriteController {
                 new RsData<>(true, "찜 리스트 조회 성공", favoriteResponseDtos),
                 HttpStatus.OK);
     }
+
+    @PreAuthorize("isAuthenticated()")
     @PostMapping(value = "/{shop-id}")
     public ResponseEntity<RsData> addShopToFavorites(@PathVariable Long shopId,
                                                      @AuthenticationPrincipal MemberContext memberContext){
@@ -62,6 +64,7 @@ public class FavoriteController {
     }
 
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping(value="/{shop-id}")
     public ResponseEntity<RsData> cancelShopFromFavorites(@PathVariable Long shopId,
                                                           @AuthenticationPrincipal MemberContext memberContext){
