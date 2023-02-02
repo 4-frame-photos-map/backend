@@ -1,6 +1,5 @@
 package com.idea5.four_cut_photos_map.domain.title.entity;
 
-import com.idea5.four_cut_photos_map.domain.titleLog.entity.TitleLog;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -2,7 +2,7 @@ package com.idea5.four_cut_photos_map.domain.member.entity;
 
 import com.idea5.four_cut_photos_map.domain.like.entity.Like;
 import com.idea5.four_cut_photos_map.domain.title.entity.Title;
-import com.idea5.four_cut_photos_map.domain.titleLog.entity.TitleLog;
+import com.idea5.four_cut_photos_map.domain.title.entity.TitleLog;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
