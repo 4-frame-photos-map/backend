@@ -20,8 +20,8 @@ import java.util.List;
 @SuperBuilder
 @ToString
 public class MemberTitle extends BaseEntity {
-
-    private String name; // 칭호명
+    private String name;    // 칭호명
+    private String content; // 칭호 획득 방법(기준)
 
     @OneToMany(mappedBy = "memberTitle", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberTitleLog> memberTitleLogs = new ArrayList<>();
