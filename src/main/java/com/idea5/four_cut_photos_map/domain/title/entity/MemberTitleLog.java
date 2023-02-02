@@ -18,7 +18,7 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor
 @SuperBuilder
 @ToString
-public class TitleLog extends BaseEntity {
+public class MemberTitleLog extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "member_id")

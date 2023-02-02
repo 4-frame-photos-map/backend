@@ -7,7 +7,7 @@ import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.domain.title.entity.MemberTitle;
 import com.idea5.four_cut_photos_map.domain.title.service.TitleService;
-import com.idea5.four_cut_photos_map.domain.title.entity.TitleLog;
+import com.idea5.four_cut_photos_map.domain.title.entity.MemberTitleLog;
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
@@ -37,9 +37,9 @@ public class MemberService {
         if(member == null) {
             Member newMember = KakaoUserInfoParam.toEntity(kakaoUserInfoParam);
             // 회원가입 기본 칭호 부여, 대표 칭호로 설정
-            List<TitleLog> titleLogs = newMember.getTitleLogs();
+            List<MemberTitleLog> memberTitleLogs = newMember.getMemberTitleLogs();
             MemberTitle signUpMemberTitle = titleService.findById(1L);
-            titleLogs.add(new TitleLog(newMember, signUpMemberTitle, true));
+            memberTitleLogs.add(new MemberTitleLog(newMember, signUpMemberTitle, true));
             return memberRepository.save(newMember);
         }
         return member;

@@ -2,7 +2,7 @@ package com.idea5.four_cut_photos_map.domain.member.entity;
 
 import com.idea5.four_cut_photos_map.domain.like.entity.Like;
 import com.idea5.four_cut_photos_map.domain.title.entity.MemberTitle;
-import com.idea5.four_cut_photos_map.domain.title.entity.TitleLog;
+import com.idea5.four_cut_photos_map.domain.title.entity.MemberTitleLog;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -32,7 +32,7 @@ public class Member extends BaseEntity {
 
     @Builder.Default    // 빌더 패턴으로 객체 생성시 속성 기본값 지정
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TitleLog> titleLogs = new ArrayList<>();
+    private List<MemberTitleLog> memberTitleLogs = new ArrayList<>();
 
     // TODO: 이후 활용
     // 현재 회원이 가지고 있는 권한들을 List<GrantedAuthority> 형태로 리턴
@@ -46,9 +46,9 @@ public class Member extends BaseEntity {
 
     // 대표 칭호
     public MemberTitle getMainTitle() {
-        for(TitleLog titleLog : getTitleLogs()) {
-            if(titleLog.getIsMain()) {
-                return titleLog.getMemberTitle();
+        for(MemberTitleLog memberTitleLog : getMemberTitleLogs()) {
+            if(memberTitleLog.getIsMain()) {
+                return memberTitleLog.getMemberTitle();
             }
         }
         return null;
