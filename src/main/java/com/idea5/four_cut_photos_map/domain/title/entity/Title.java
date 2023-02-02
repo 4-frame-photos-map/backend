@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +23,6 @@ public class Title extends BaseEntity {
 
     private String name; // 칭호명
 
-    @OneToMany
-    @JoinColumn(name = "title_id")
+    @OneToMany(mappedBy = "title", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TitleLog> titleLogs = new ArrayList<>();
-
-
 }
