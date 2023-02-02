@@ -1,13 +1,17 @@
 package com.idea5.four_cut_photos_map.domain.shop.controller;
 
+import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
+import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
+import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -23,6 +27,7 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DISTANCE_IS_E
 public class ShopController {
 
     private final ShopService shopService;
+    private final FavoriteService favoriteService;
 
     /**
      * todo : 카카오맵 api 완료시, 표시할 shop 조회
@@ -106,12 +111,28 @@ public class ShopController {
 
     // todo : @Validated 유효성 검사 시, httpstatus code 전달하는 방법
     @GetMapping("/detail/{shopId}")
-    public ResponseEntity<ResponseShopDetail> detail(@PathVariable(name = "shopId") Long id, @RequestParam(name = "distance", required = false, defaultValue = "") String distance) {
+    public ResponseEntity<ResponseShopDetail> detail(@PathVariable(name = "shopId") Long id,
+                                                     @RequestParam(name = "distance", required = false, defaultValue = "") String distance,
+                                                     @AuthenticationPrincipal MemberContext memberContext) {
         if (distance.isEmpty()){
             throw new BusinessException(DISTANCE_IS_EMPTY);
         }
         ResponseShopDetail shopDetailDto = shopService.findShopById(id, distance);
-        return ResponseEntity.ok(shopDetailDto);
 
+        // 비로그인 회원일 시
+        if(memberContext == null){
+            shopDetailDto.setCanBeAddedToFavorites(false);
+
+        // 로그인 회원일 시
+        } else {
+            Favorite favorite = favoriteService.findByShopIdAndMemberId(id, memberContext.getId());
+            if(favorite == null){
+                shopDetailDto.setCanBeAddedToFavorites(false);
+            } else {
+                shopDetailDto.setCanBeAddedToFavorites(true);
+            }
+        }
+
+        return ResponseEntity.ok(shopDetailDto);
     }
 }

@@ -3,6 +3,7 @@ package com.idea5.four_cut_photos_map.domain.favorite.controller;
 import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponseDto;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
+import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberInfoResp;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
@@ -10,6 +11,8 @@ import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +30,8 @@ public class FavoriteController {
     private final FavoriteService favoriteService;
 
     @GetMapping(value = "/{member-id}")
-    public RsData<List<FavoriteResponseDto>> showFavoritesList(@PathVariable Long memberId, @AuthenticationPrincipal MemberContext memberContext) {
+    public ResponseEntity<RsData> showFavoritesList(@PathVariable Long memberId,
+                                                               @AuthenticationPrincipal MemberContext memberContext) {
         Member member = memberService.findById(memberId);
 
         //Todo: memberContext null 검사 해야 하는지 질문
@@ -35,11 +39,26 @@ public class FavoriteController {
         if (memberContext.memberIsNot(member)) {
             throw new BusinessException(MEMBER_MISMATCH);
         }
+
         List<FavoriteResponseDto> favoriteResponseDtos = member.getFavorites()
                 .stream()
                 .map(favorite -> favoriteService.toDto(favorite))
                 .collect(Collectors.toList());
 
-        return new RsData<>(true, "즐겨찾기 리스트 조회 성공", favoriteResponseDtos);
+        return new ResponseEntity<>(
+                new RsData<>(true, "찜 리스트 조회 성공", favoriteResponseDtos),
+                HttpStatus.OK);
     }
+    @PostMapping(value = "/{shop-id}")
+    public ResponseEntity<RsData> addShopToFavorites(@PathVariable Long shopId,
+                                                     @AuthenticationPrincipal MemberContext memberContext){
+        Member member = memberContext.getMember();
+
+        favoriteService.save(shopId, member);
+
+        return new ResponseEntity<>(
+                new RsData<>(true, "찜 추가 성공"),
+                HttpStatus.OK);
+    }
+
 }

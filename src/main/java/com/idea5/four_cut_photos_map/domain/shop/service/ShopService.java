@@ -133,4 +133,8 @@ public class ShopService {
     public KaKaoSearchResponseDto searchByKeyword(String keyword) {
         return keywordSearchKakaoApi.searchByKeyword(keyword);
     }
+
+    public Shop findById(Long id) {
+        return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
+    }
 }
