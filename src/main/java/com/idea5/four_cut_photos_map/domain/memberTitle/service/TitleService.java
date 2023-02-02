@@ -1,7 +1,7 @@
-package com.idea5.four_cut_photos_map.domain.title.service;
+package com.idea5.four_cut_photos_map.domain.memberTitle.service;
 
-import com.idea5.four_cut_photos_map.domain.title.entity.MemberTitle;
-import com.idea5.four_cut_photos_map.domain.title.repository.TitleRepository;
+import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitle;
+import com.idea5.four_cut_photos_map.domain.memberTitle.repository.TitleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

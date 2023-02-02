@@ -1,4 +1,4 @@
-package com.idea5.four_cut_photos_map.domain.title.entity;
+package com.idea5.four_cut_photos_map.domain.memberTitle.entity;
 
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
 import lombok.AllArgsConstructor;
