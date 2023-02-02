@@ -15,10 +15,8 @@
     → Shop 에 평점이나 총점 등 관련한 필드를 추가해야하는지?
     
 - 테스트를 진행하기 위한 카카오 로그인 테스트 방법
-    
-    ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/0a48f16d-e289-464d-8218-9afed1f50ef7/Untitled.png)
-    
-    ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/c51b1e42-6157-4a95-9db5-66f0866df5bf/Untitled.png)
+    ![image](https://user-images.githubusercontent.com/77659341/216320348-3b7cbdf2-c1fd-47a6-a62e-0e4d6918c194.png)
+    ![image](https://user-images.githubusercontent.com/77659341/216320418-d67a0842-f33c-467f-940c-501b12d94fb1.png)
     - Redis 사용 관련한 이슈
 
 ### 다음주 계획
