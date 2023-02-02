@@ -61,4 +61,14 @@ public class FavoriteController {
                 HttpStatus.OK);
     }
 
+
+    @DeleteMapping(value="/{shop-id}")
+    public ResponseEntity<RsData> cancelShopFromFavorites(@PathVariable Long shopId,
+                                                          @AuthenticationPrincipal MemberContext memberContext){
+        favoriteService.cancel(shopId, memberContext.getId());
+
+        return new ResponseEntity<>(
+                new RsData<>(true, "찜 취소 성공"),
+                HttpStatus.OK);
+    }
 }

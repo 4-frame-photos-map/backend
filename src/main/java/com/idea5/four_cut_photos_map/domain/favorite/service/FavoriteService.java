@@ -42,4 +42,8 @@ public class FavoriteService {
     public Favorite findByShopIdAndMemberId(Long shopId, Long memberId) {
         return favoriteRepository.findByShopIdAndMemberId(shopId, memberId).orElse(null);
     }
+
+    public void cancel(Long shopId, Long memberId) {
+        favoriteRepository.deleteByShopIdAndMemberId(shopId, memberId);
+    }
 }
