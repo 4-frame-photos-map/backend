@@ -19,10 +19,10 @@ import java.util.List;
 @NoArgsConstructor
 @SuperBuilder
 @ToString
-public class Title extends BaseEntity {
+public class MemberTitle extends BaseEntity {
 
     private String name; // 칭호명
 
-    @OneToMany(mappedBy = "title", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "memberTitle", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TitleLog> titleLogs = new ArrayList<>();
 }

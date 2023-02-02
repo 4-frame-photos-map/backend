@@ -1,6 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.title.service;
 
-import com.idea5.four_cut_photos_map.domain.title.entity.Title;
+import com.idea5.four_cut_photos_map.domain.title.entity.MemberTitle;
 import com.idea5.four_cut_photos_map.domain.title.repository.TitleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,9 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class TitleService {
     private final TitleRepository titleRepository;
 
-    public Title findById(Long id) {
+    public MemberTitle findById(Long id) {
         return titleRepository.findById(id).orElseThrow(() -> {
-            throw new RuntimeException("title 없음");
+            throw new RuntimeException("memberTitle 없음");
         });
     }
 }

@@ -1,7 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.member.entity;
 
 import com.idea5.four_cut_photos_map.domain.like.entity.Like;
-import com.idea5.four_cut_photos_map.domain.title.entity.Title;
+import com.idea5.four_cut_photos_map.domain.title.entity.MemberTitle;
 import com.idea5.four_cut_photos_map.domain.title.entity.TitleLog;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
 import lombok.*;
@@ -45,10 +45,10 @@ public class Member extends BaseEntity {
     }
 
     // 대표 칭호
-    public Title getMainTitle() {
+    public MemberTitle getMainTitle() {
         for(TitleLog titleLog : getTitleLogs()) {
             if(titleLog.getIsMain()) {
-                return titleLog.getTitle();
+                return titleLog.getMemberTitle();
             }
         }
         return null;
