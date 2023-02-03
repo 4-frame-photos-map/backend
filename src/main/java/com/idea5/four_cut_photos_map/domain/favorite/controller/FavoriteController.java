@@ -38,14 +38,13 @@ public class FavoriteController {
         List<FavoriteResponseDto> favoriteResponseDtos;
 
         Member member = memberService.findById(memberId);
-
         if (memberContext.memberIsNot(member)) {
             throw new BusinessException(MEMBER_MISMATCH);
         }
 
         List<Favorite> favorites = favoriteService.findByMemberId(memberId);
 
-        if(favorites != null) {
+        if(favorites.isEmpty() == false) {
             favoriteResponseDtos = favorites
                     .stream()
                     .map(favorite -> favoriteService.toDto(favorite))
