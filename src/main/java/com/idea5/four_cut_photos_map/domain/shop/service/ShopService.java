@@ -1,6 +1,8 @@
 package com.idea5.four_cut_photos_map.domain.shop.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberFavoritesResp;
+import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
@@ -136,5 +138,15 @@ public class ShopService {
 
     public Shop findById(Long id) {
         return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
+    }
+
+    public ShopFavoritesResponseDto toShopFavoritesRespDto(Shop shop) {
+        return ShopFavoritesResponseDto.builder()
+                .id(shop.getId())
+                .brand(shop.getBrand())
+                .name(shop.getName())
+                .address(shop.getAddress())
+                .favorite_cnt(shop.getFavorite_cnt())
+                .build();
     }
 }

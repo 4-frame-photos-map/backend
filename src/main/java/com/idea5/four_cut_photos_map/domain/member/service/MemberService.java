@@ -1,6 +1,9 @@
 package com.idea5.four_cut_photos_map.domain.member.service;
 
+import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponseDto;
+import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.member.dto.KakaoUserInfoParam;
+import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberFavoritesResp;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberInfoResp;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberWithdrawlResp;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
@@ -76,5 +79,15 @@ public class MemberService {
         // 3. DB 에서 회원 삭제
         memberRepository.deleteById(id);
         return new MemberWithdrawlResp(id);
+    }
+
+    // 회원의 찜 리스트 응답용 DTO로 변환
+    public MemberFavoritesResp toMemberFavoritesRespDto(Member member) {
+        return MemberFavoritesResp.builder()
+                .id(member.getId())
+                .kakaoId(member.getKakaoId())
+                .nickname(member.getNickname())
+                .favorites(member.getFavorites())
+                .build();
     }
 }
