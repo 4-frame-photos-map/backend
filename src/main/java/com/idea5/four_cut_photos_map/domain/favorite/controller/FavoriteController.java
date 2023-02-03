@@ -32,7 +32,7 @@ public class FavoriteController {
     private final FavoriteService favoriteService;
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping(value = "/{member-id}")
+    @GetMapping(value = "/{memberId}")
     public ResponseEntity<RsData> showFavoritesList(@PathVariable Long memberId,
                                                                @AuthenticationPrincipal MemberContext memberContext) {
         List<FavoriteResponseDto> favoriteResponseDtos;
@@ -63,7 +63,7 @@ public class FavoriteController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping(value = "/{shop-id}")
+    @PostMapping(value = "/{shopId}")
     public ResponseEntity<RsData> addShopToFavorites(@PathVariable Long shopId,
                                                      @AuthenticationPrincipal MemberContext memberContext){
         Member member = memberContext.getMember();
@@ -77,7 +77,7 @@ public class FavoriteController {
 
 
     @PreAuthorize("isAuthenticated()")
-    @DeleteMapping(value="/{shop-id}")
+    @DeleteMapping(value="/{shopId}")
     public ResponseEntity<RsData> cancelShopFromFavorites(@PathVariable Long shopId,
                                                           @AuthenticationPrincipal MemberContext memberContext){
         favoriteService.cancel(shopId, memberContext.getId());
