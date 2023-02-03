@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.shop.controller;
 
 
+import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberInfoResp;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
@@ -12,6 +13,7 @@ import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,16 +32,9 @@ public class ShopController {
 
     private final ShopService shopService;
 
-    /**
-     * todo : 카카오맵 api 완료시, 표시할 shop 조회
-     * 순서)
-     * 1. 맵 api로부터, 현재 위치 기준으로 "브랜드별" 조회 및 응답값 받아오기
-     * 2. DB와 응답값을 비교
-     * 3. 클라이언트에게 응답.
-     */
-
     @GetMapping("/brand/search")
-    public RsData<List<ResponseShopBrand>> showBrandListBySearch(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch) {
+    public ResponseEntity<RsData<List<ResponseShopBrand>>> showBrandListBySearch(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch) {
+        RsData<List<ResponseShopBrand>> body;
         // api 검색전, DB에서 먼저 있는지 확인하는게 더 효율적
         List<ShopDto> shopDtos = shopService.findByBrand(requestBrandSearch.getBrand());
         if(shopDtos.isEmpty())
@@ -48,10 +43,19 @@ public class ShopController {
 
         List<KakaoResponseDto> kakaoApiResponse = shopService.searchBrand(requestBrandSearch);
         List<ResponseShopBrand> shopsByBrand = shopService.findShopsByBrand(kakaoApiResponse, shopDtos, requestBrandSearch.getBrand());
-        if(shopsByBrand.isEmpty())
-            return new RsData<List<ResponseShopBrand>>(true, String.format("근처에 %s이(가) 없습니다.", requestBrandSearch.getBrand()), shopsByBrand);
 
-        return new RsData<List<ResponseShopBrand>>(true, "brand 검색 성공", shopsByBrand);
+
+        // 검색 결과, 근처에 원하는 브랜드가 없을 때
+        if(shopsByBrand.isEmpty()){
+            return ResponseEntity.ok(
+                    new RsData<>(
+                            true, String.format("근처에 %s이(가) 없습니다.", requestBrandSearch.getBrand()), shopsByBrand
+                    ));
+        }
+
+        return ResponseEntity.ok(new RsData<>(
+                true, "brand 검색 성공", shopsByBrand
+        ));
     }
 
 
@@ -62,7 +66,7 @@ public class ShopController {
      */
 
     @GetMapping(value = "/search")
-    public RsData<List<ResponseShop>> showKeywordSearchList(@RequestParam(defaultValue = "즉석사진") String keyword){
+    public ResponseEntity<RsData<List<ResponseShop>>> showKeywordSearchList(@RequestParam(defaultValue = "즉석사진") String keyword){
         // 1. 카카오맵 api 응답 데이터 받아오기
         KaKaoSearchResponseDto apiShopJson = shopService.searchByKeyword(keyword);
 
@@ -93,21 +97,19 @@ public class ShopController {
 
             dtos.add(dto);
         }
-        for (KaKaoSearchResponseDto.Document dto : dtos) {
-            System.out.println("dto.getPlace_name() = " + dto.getPlace_name());
-            System.out.println("dto.getRoad_address_name() = " + dto.getRoad_address_name());
-        }
 
         // 3. db 데이터와 비교
         List<ResponseShop> shops = shopService.findShops(dtos, keyword);
 
-        return new RsData<List<ResponseShop>>(true, "Shop 조회 성공", shops);
+        return ResponseEntity.ok(
+                new RsData<List<ResponseShop>>(true, "Shop 조회 성공", shops)
+        );
     }
 
 
     //현재 위치 기준, 반경 2km
     @GetMapping("/search/marker")
-    public RsData<Map<String, List<ResponseShopMarker>>> currentLocationSearch(@ModelAttribute @Valid RequestShop requestShop){
+    public ResponseEntity<RsData<Map<String, List<ResponseShopMarker>>>> currentLocationSearch(@ModelAttribute @Valid RequestShop requestShop){
 
         String[] names = Brand.Names; // 브랜드명 ( 하루필름, 인생네컷 ... )
 
@@ -119,7 +121,9 @@ public class ShopController {
             maps.put(brandName, list);
         }
 
-        return new RsData<Map<String, List<ResponseShopMarker>>>(true, "Shop 마커 성공", maps);
+        return ResponseEntity.ok(
+                new RsData<Map<String, List<ResponseShopMarker>>>(true, "Shop 마커 성공", maps)
+        );
     }
 
     // todo : @Validated 유효성 검사 시, httpstatus code 전달하는 방법

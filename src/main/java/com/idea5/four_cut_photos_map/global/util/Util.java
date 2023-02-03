@@ -70,12 +70,13 @@ public class Util {
             String brand = searchBrand;
             String addressName = body.getDocuments()[i].getAddress_name();
             String distance = body.getDocuments()[i].getDistance();
-            System.out.println("distance = " + distance);
-            String phone = body.getDocuments()[i].getPhone();
             String placeName = body.getDocuments()[i].getPlace_name();
             String roadAddressName = body.getDocuments()[i].getRoad_address_name();
             String longitude = body.getDocuments()[i].getX();
             String latitude = body.getDocuments()[i].getY();
+            String phone = body.getDocuments()[i].getPhone();
+
+
 
             KakaoResponseDto dto = KakaoResponseDto.builder()
                     .brand(brand)
