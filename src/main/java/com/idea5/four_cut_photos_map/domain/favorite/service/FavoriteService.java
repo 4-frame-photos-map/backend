@@ -3,7 +3,6 @@ package com.idea5.four_cut_photos_map.domain.favorite.service;
 import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponseDto;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
-import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberFavoritesResp;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ShopFavoritesResponseDto;
@@ -13,22 +12,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.Arrays;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
 public class FavoriteService {
     private final ShopService shopService;
-    private final MemberService memberService;
     private final FavoriteRepository favoriteRepository;
 
     public FavoriteResponseDto toDto(Favorite favorite) {
-        MemberFavoritesResp memberDto = memberService.toMemberFavoritesRespDto(favorite.getMember());
         ShopFavoritesResponseDto shopDto = shopService.toShopFavoritesRespDto(favorite.getShop());
 
         return FavoriteResponseDto.builder()
                 .id(favorite.getId())
-                .member(memberDto)
+                .ownerId(favorite.getMember().getId())
+                .ownerNickname(favorite.getMember().getNickname())
                 .shop(shopDto)
                 .build();
     }
@@ -60,5 +59,9 @@ public class FavoriteService {
         Shop shop = shopService.findById(shopId);
         shop.setFavorite_cnt(shop.getFavorite_cnt() == null || shop.getFavorite_cnt() == 0?
                 0 : shop.getFavorite_cnt() - 1);
+    }
+
+    public List<Favorite> findByMemberId(Long memberId) {
+        return favoriteRepository.findByMemberId(memberId).orElse(null);
     }
 }

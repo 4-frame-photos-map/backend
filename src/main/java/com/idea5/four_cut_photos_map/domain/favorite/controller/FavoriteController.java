@@ -17,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,20 +35,31 @@ public class FavoriteController {
     @GetMapping(value = "/{member-id}")
     public ResponseEntity<RsData> showFavoritesList(@PathVariable Long memberId,
                                                                @AuthenticationPrincipal MemberContext memberContext) {
+        List<FavoriteResponseDto> favoriteResponseDtos;
+
         Member member = memberService.findById(memberId);
 
         if (memberContext.memberIsNot(member)) {
             throw new BusinessException(MEMBER_MISMATCH);
         }
 
-        List<FavoriteResponseDto> favoriteResponseDtos = member.getFavorites()
-                .stream()
-                .map(favorite -> favoriteService.toDto(favorite))
-                .collect(Collectors.toList());
+        List<Favorite> favorites = favoriteService.findByMemberId(memberId);
 
-        return new ResponseEntity<>(
-                new RsData<>(true, "찜 리스트 조회 성공", favoriteResponseDtos),
-                HttpStatus.OK);
+        if(favorites != null) {
+            favoriteResponseDtos = favorites
+                    .stream()
+                    .map(favorite -> favoriteService.toDto(favorite))
+                    .collect(Collectors.toList());
+
+            return new ResponseEntity<>(
+                    new RsData<>(true, "찜 리스트 조회 성공", favoriteResponseDtos),
+                    HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(
+                    new RsData<>(true, "찜 리스트 조회 성공, 찜 리스트가 없는 사용자"),
+                    HttpStatus.OK);
+        }
+
     }
 
     @PreAuthorize("isAuthenticated()")

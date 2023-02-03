@@ -31,9 +31,6 @@ public class Member extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String accessToken; // jwt access token
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private List<Favorite> favorites = new ArrayList<>();
-
     @OneToMany
     @JoinColumn(name = "member_id")
     private List<TitleLog> titleLogs = new ArrayList<>();

@@ -19,5 +19,4 @@ public class ShopFavoritesResponseDto {
     private String name;
     private String address;
     private Integer favorite_cnt;
-    //private List<Favorite> favorites;
 }
