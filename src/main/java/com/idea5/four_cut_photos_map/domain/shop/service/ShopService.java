@@ -1,7 +1,9 @@
 package com.idea5.four_cut_photos_map.domain.shop.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
@@ -24,38 +26,29 @@ public class ShopService {
     private final ObjectMapper objectMapper;
 
 
-    public List<ResponseShop> findShopsByBrand(List<ShopDto> apiShops, String keyword) {
-        System.out.println("apiShops.size() = " + apiShops.size());
-        List<ResponseShop> resultShops = new ArrayList<>(); // 반환 리스트
-        List<ResponseShop> responseShops = new ArrayList<>(); // entity -> dto 변환 리스트
-        // DB 조회 -> Dto 변환
-        List<Shop> dbShops = shopRepository.findByBrand(keyword).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
-        if (dbShops.isEmpty())
-            throw new BusinessException(SHOP_NOT_FOUND);
-
-
-        for (Shop dbShop : dbShops) {
-            responseShops.add(ResponseShop.from(dbShop));
-        }
-
-        for (ShopDto apiShop : apiShops) {
-            System.out.println("apiShop.getName() = " + apiShop.getName());
-        }
-        System.out.println("-------------------------");
-        for (ResponseShop responseShop : responseShops) {
-            System.out.println("responseShop.getName() = " + responseShop.getName());
-        }
+    public List<ResponseShopBrand> findShopsByBrand(List<KakaoResponseDto> apiShops, List<ShopDto> shopDtos, String brandName) {
+        List<ResponseShopBrand> resultShops = new ArrayList<>(); // 반환 리스트
 
         // 카카오 맵 api로 부터 받아온 Shop 리스트와 db에 저장된 Shop 비교
-        for (ShopDto apiShop : apiShops) {
-            for (ResponseShop responseShop : responseShops) {
-                if (apiShop.getName().equals(responseShop.getName())) {
-                    responseShop.setDistance(apiShop.getDistance());
-                    resultShops.add(responseShop);
+        for (KakaoResponseDto apiShop : apiShops) {
+            for (ShopDto shopDto : shopDtos) {
+                if (apiShop.getPlaceName().equals(shopDto.getName())) {
+                    resultShops.add(ResponseShopBrand.of(apiShop));
                 }
             }
         }
+        System.out.println("resultShops.size() = " + resultShops.size());
         return resultShops;
+    }
+
+
+    public List<ShopDto> findByBrand(String brandName){
+        List<Shop> shops = shopRepository.findByBrand(brandName).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
+        List<ShopDto> shopDtos = new ArrayList<>();
+        for (Shop shop : shops)
+            shopDtos.add(ShopDto.of(shop));
+        return shopDtos;
+
     }
 
     public List<ResponseShop> findShops(List<KaKaoSearchResponseDto.Document> apiShops) {
@@ -73,7 +66,7 @@ public class ShopService {
                 ResponseShop responseShop = ResponseShop.from(dbShop);
 
                 // Api Shop과 비교 후 저장
-                if (apiShop.getPlace_name().equals(responseShop.getName())
+                if (apiShop.getPlace_name().equals(responseShop.getPlaceName())
                         && Double.parseDouble(apiShop.getX()) == responseShop.getLongitude()
                         && Double.parseDouble(apiShop.getY()) == responseShop.getLatitude()) {
                     responseShops.add(responseShop);
@@ -146,5 +139,12 @@ public class ShopService {
                 .address(shop.getAddress())
                 .favorite_cnt(shop.getFavorite_cnt())
                 .build();
+    }
+        public List<KakaoResponseDto> searchBrand (RequestBrandSearch brandSearch){
+            List<KakaoResponseDto> list = new ArrayList<>();
+            for (int i = 1; i <= 3; i++) {
+                list.addAll(keywordSearchKakaoApi.searchByBrand(brandSearch, i));
+            }
+            return list;
     }
 }
