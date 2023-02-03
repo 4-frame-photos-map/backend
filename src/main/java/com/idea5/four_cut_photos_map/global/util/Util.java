@@ -61,7 +61,26 @@ public class Util {
     }
 
 
+    public static String distanceFormatting(String distance){
 
+        int length = distance.length();
+        if(length <= 3) // distance -> m
+            return distance+"m";
+        else if(length == 4) { // distance -> km
+            int num1 = distance.charAt(0) -'0'; // 첫째자리
+            int num2 = distance.charAt(1) -'0'; // 둘째자리
+            int num3 = distance.charAt(2) -'0'; // 셋째자리
+            if(num3 > 5) // 반올림
+                num2+=1;
+
+            if(num2 == 0) // 2000, 2020 -> 2km
+                return String.format("%dkm", num1);
+
+            return String.format("%d.%dkm", num1, num2);
+        }
+
+        return "error";
+    }
 
     public static List<KakaoResponseDto> documentToObject(DocumentManagement body, String searchBrand){
         List<KakaoResponseDto> dtos = new ArrayList<>();
@@ -76,7 +95,8 @@ public class Util {
             String latitude = body.getDocuments()[i].getY();
             String phone = body.getDocuments()[i].getPhone();
 
-
+            if (phone.equals(""))
+                phone = "미등록";
 
             KakaoResponseDto dto = KakaoResponseDto.builder()
                     .brand(brand)
