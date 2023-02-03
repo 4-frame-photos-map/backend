@@ -147,9 +147,9 @@ public class ShopController {
         } else {
             Favorite favorite = favoriteService.findByShopIdAndMemberId(id, memberContext.getId());
             if(favorite == null){
-                shopDetailDto.setCanBeAddedToFavorites(false);
-            } else {
                 shopDetailDto.setCanBeAddedToFavorites(true);
+            } else {
+                shopDetailDto.setCanBeAddedToFavorites(false);
             }
         }
 
