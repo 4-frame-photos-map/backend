@@ -20,6 +20,7 @@ public class ShopDto {
     private double longitude; // 경도
     private String distance; // 중심좌표까지의 거리
 
+
     public ShopDto(String brand, String placeName, String roadAddressName, double latitude, double longitude, String distance) {
         this.brand = brand;
         this.placeName = placeName;

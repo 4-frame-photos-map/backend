@@ -46,7 +46,8 @@ public class KeywordSearchKakaoApi {
         return restTemplate.exchange(apiURL, HttpMethod.GET, entity,KaKaoSearchResponseDto.class).getBody();
     }
 
-    public List<ResponseShopV2> searchByBrand(RequestBrandSearch request){
+
+    public List<KakaoResponseDto> searchByBrand(RequestBrandSearch request, int page){
         // 2. header 설정을 위해 HttpHeader 클래스 생성 후 HttpEntity 객체에 넣어준다.
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "KakaoAK " + kakao_apikey);
@@ -59,18 +60,15 @@ public class KeywordSearchKakaoApi {
                 + "query=" + request.getBrand()
                 + "&x="+request.getLongitude()
                 + "&y="+request.getLatitude()
+                + "&size=15"
+                + "&page="+page
                 + "&sort=distance"; // 거리순
         System.out.println("apiURL = " + apiURL);
 
         // 4. exchange 메서드로 api 호출
-        List<ResponseShopV2> list = new ArrayList<>();
-        DocumentManagement body = restTemplate.exchange(apiURL, HttpMethod.GET, entity, DocumentManagement.class).getBody();
-        List<KakaoResponseDto> kakaoResponseDtos = Util.documentToObject(body, request.getBrand());
 
-        for (KakaoResponseDto kakaoResponseDto : kakaoResponseDtos) {
-            ResponseShopV2 dto = ResponseShopV2.ofKakaoResponse(kakaoResponseDto);
-            list.add(dto);
-        }
+        DocumentManagement body = restTemplate.exchange(apiURL, HttpMethod.GET, entity, DocumentManagement.class).getBody();
+        List<KakaoResponseDto> list = Util.documentToObject(body, request.getBrand());
         return list;
     }
 

@@ -27,27 +27,28 @@ public class ShopService {
     private final ObjectMapper objectMapper;
 
 
-    public List<ResponseShopV2> findShopsByBrand(List<ResponseShopV2> apiShops, String keyword) {
-        List<ResponseShopV2> resultShops = new ArrayList<>(); // 반환 리스트
-        List<ResponseShopV2> responseShops = new ArrayList<>(); // entity -> dto 변환 리스트
-        // DB 조회 -> Dto 변환
-        List<Shop> dbShops = shopRepository.findByBrand(keyword).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
-        if (dbShops.isEmpty())
-            throw new BusinessException(SHOP_NOT_FOUND);
-
-        for (Shop dbShop : dbShops)
-            responseShops.add(ResponseShopV2.of(dbShop));
+    public List<ResponseShopBrand> findShopsByBrand(List<KakaoResponseDto> apiShops, List<ShopDto> shopDtos, String brandName) {
+        List<ResponseShopBrand> resultShops = new ArrayList<>(); // 반환 리스트
 
         // 카카오 맵 api로 부터 받아온 Shop 리스트와 db에 저장된 Shop 비교
-        for (ResponseShopV2 apiShop : apiShops) {
-            for (ResponseShopV2 responseShop : responseShops) {
-                if (apiShop.getPlaceName().equals(responseShop.getPlaceName())) {
-                    responseShop.setDistance(apiShop.getDistance());
-                    resultShops.add(responseShop);
+        for (KakaoResponseDto apiShop : apiShops) {
+            for (ShopDto shopDto : shopDtos) {
+                if (apiShop.getPlaceName().equals(shopDto.getPlaceName())) {
+                    resultShops.add(ResponseShopBrand.of(apiShop));
                 }
             }
         }
+        System.out.println("resultShops.size() = " + resultShops.size());
         return resultShops;
+    }
+
+    public List<ShopDto> findByBrand(String brandName){
+        List<Shop> shops = shopRepository.findByBrand(brandName).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
+        List<ShopDto> shopDtos = new ArrayList<>();
+        for (Shop shop : shops)
+            shopDtos.add(ShopDto.of(shop));
+        return shopDtos;
+
     }
 
     public List<ResponseShop> findShops(List<KaKaoSearchResponseDto.Document> apiShops, String keyword) {
@@ -79,40 +80,7 @@ public class ShopService {
 
         return responseShops;
     }
-/*
-    public Map<String, List<ResponseMarker>> findMaker(Map<String, List<ShopDto>> apiShopMaps) {
-        Map<String, List<ResponseMarker>> temp = new HashMap<>();
 
-        // 브랜드별로, 카카오 맵 api로 부터 받아온 Shop 리스트와 db에 저장된 Shop 비교
-        for (String name : apiShopMaps.keySet()) {
-
-            // 브랜드명으로 map에 저장된 shop List 얻기
-            List<ShopDto> apiShops = apiShopMaps.get(name);
-
-            // 브랜드명으로 실제 DB에 저장되어있는 shop List 얻기
-            List<Shop> dbShops = shopRepository.findByName(name).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
-            // entity -> dto
-            List<ResponseMarker> responseMarkers = new ArrayList<>();
-            for (Shop dbShop : dbShops) {
-                responseMarkers.add(ResponseMarker.of(dbShop));
-            }
-
-
-            List<ResponseMarker> list = new ArrayList<>();
-            for (ShopDto apiShop : apiShops) {
-                for (ResponseMarker responseMarker : responseMarkers) {
-                    if(apiShop.getName().equals(responseMarker.getName())){
-                        responseMarker.setDistance(apiShop.getDistance());
-                        list.add(responseMarker);
-                    }
-                }
-            }
-
-            temp.put(name, list);
-        }
-        return temp;
-    }
-*/
 
     // todo : Review, 찜 추가
     public ResponseShopDetail findShopById(Long id, String distance) {
@@ -124,11 +92,6 @@ public class ShopService {
 
     public KaKaoSearchResponseDto searchByKeyword(String keyword) {
         return keywordSearchKakaoApi.searchByKeyword(keyword);
-    }
-
-    public List<ResponseShopV2> searchBrand(RequestBrandSearch brandSearch) {
-        List<ResponseShopV2> responseShopV2s = keywordSearchKakaoApi.searchByBrand(brandSearch);
-        return responseShopV2s;
     }
 
     public List<ResponseShopMarker> searchMarkers(RequestShop shop, String brandName) {
@@ -149,13 +112,12 @@ public class ShopService {
     }
 
 
-    public List<ShopDto> findByBrand(String brandName){
-        List<ShopDto> shopDtos = new ArrayList<>();
-        List<Shop> shops = shopRepository.findByBrand(brandName).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
+    public List<KakaoResponseDto> searchBrand(RequestBrandSearch brandSearch) {
+        List<KakaoResponseDto> list = new ArrayList<>();
+        for (int i = 1; i <= 3; i++) {
+            list.addAll(keywordSearchKakaoApi.searchByBrand(brandSearch, i));
+        }
+        return list;
 
-
-        for (Shop shop : shops)
-            shopDtos.add(ShopDto.of(shop));
-        return shopDtos;
     }
 }
