@@ -64,6 +64,9 @@ public class Util {
     public static String distanceFormatting(String distance){
 
         int length = distance.length();
+        if(distance.equals("")) // 공백일 시, 알 수없음으로 반환
+            return "unknown";
+
         if(length <= 3) // distance -> m
             return distance+"m";
         else if(length == 4) { // distance -> km
@@ -79,7 +82,7 @@ public class Util {
             return String.format("%d.%dkm", num1, num2);
         }
 
-        return "error";
+        return "unknown";
     }
 
     public static List<KakaoResponseDto> documentToObject(DocumentManagement body, String searchBrand){
@@ -89,6 +92,7 @@ public class Util {
             String brand = searchBrand;
             String addressName = body.getDocuments()[i].getAddress_name();
             String distance = body.getDocuments()[i].getDistance();
+            distance = distanceFormatting(distance);
             String placeName = body.getDocuments()[i].getPlace_name();
             String roadAddressName = body.getDocuments()[i].getRoad_address_name();
             String longitude = body.getDocuments()[i].getX();
