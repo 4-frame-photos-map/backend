@@ -62,7 +62,6 @@ public class Util {
 
 
     public static String distanceFormatting(String distance){
-
         int length = distance.length();
         if(distance.equals("")) // 공백일 시, 알 수없음으로 반환
             return "unknown";
@@ -80,6 +79,10 @@ public class Util {
                 return String.format("%dkm", num1);
 
             return String.format("%d.%dkm", num1, num2);
+        }
+        else if (length > 4){
+            distance = distance.substring(0, distance.length() - 3); // 맨 뒤 3자리 m 없애기
+            return String.format("%skm", distance);
         }
 
         return "unknown";

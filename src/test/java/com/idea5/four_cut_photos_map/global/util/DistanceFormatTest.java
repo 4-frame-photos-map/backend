@@ -78,4 +78,21 @@ public class DistanceFormatTest {
                 ()->assertThat(test8).isEqualTo("0m")
         );
     }
+    @DisplayName("distance가 5자리 이상일 경우")
+    @Test
+    void distanceLength_is_greater_than_5() {
+        // given
+        String distance1 = "23200"; // 23km
+        String distance2 = "232000"; // 232km
+        // when
+
+        // 변수명 = Util.distanceFormatting(변수명)을 안하는 이유 : https://madplay.github.io/post/effectively-final-in-java
+        String firstDistance = Util.distanceFormatting(distance1);
+        String secondDistance = Util.distanceFormatting(distance2);
+        // then
+        assertAll(
+                () -> assertThat(firstDistance).isEqualTo("23km"),
+                () -> assertThat(secondDistance).isEqualTo("232km")
+                );
+    }
 }
