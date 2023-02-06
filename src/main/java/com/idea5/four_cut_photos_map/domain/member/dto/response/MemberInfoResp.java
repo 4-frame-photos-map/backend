@@ -11,13 +11,15 @@ import lombok.Setter;
 public class MemberInfoResp {
     private Long id;
     private String nickname;
-    private String mainTitle;   // 대표 칭호
+    private String mainMemberTitle; // 대표 회원칭호
+    private Integer memberTitleCnt; // 회원칭호 개수
 
     public static MemberInfoResp toDto(Member member) {
         return MemberInfoResp.builder()
                 .id(member.getId())
                 .nickname(member.getNickname())
-                .mainTitle(member.getMainTitle().getName())
+                .mainMemberTitle(member.getMainMemberTitle().getName())
+                .memberTitleCnt(member.getMemberTitleCnt())
                 .build();
     }
 }

@@ -45,12 +45,16 @@ public class Member extends BaseEntity {
     }
 
     // 대표 칭호
-    public MemberTitle getMainTitle() {
+    public MemberTitle getMainMemberTitle() {
         for(MemberTitleLog memberTitleLog : getMemberTitleLogs()) {
             if(memberTitleLog.getIsMain()) {
                 return memberTitleLog.getMemberTitle();
             }
         }
         return null;
+    }
+
+    public Integer getMemberTitleCnt() {
+        return memberTitleLogs.size();
     }
 }
