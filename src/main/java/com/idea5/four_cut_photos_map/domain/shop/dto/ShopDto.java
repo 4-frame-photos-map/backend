@@ -33,8 +33,8 @@ public class ShopDto {
     public static ShopDto of(Shop shop){
         return ShopDto.builder()
                 .id(shop.getId())
-                .placeName(shop.getName())
-                .roadAddressName(shop.getAddress())
+                .placeName(shop.getPlaceName())
+                .roadAddressName(shop.getRoadAddressName())
                 .latitude(shop.getLatitude())
                 .longitude(shop.getLongitude())
                 .build();

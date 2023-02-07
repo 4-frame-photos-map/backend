@@ -59,7 +59,7 @@ public class ShopService {
             //log.info("장소명="+apiShop.getPlace_name());
 
             // db에서 장소명으로 shop 조회
-            Shop dbShop = shopRepository.findByName(apiShop.getPlace_name()).orElse(null);
+            Shop dbShop = shopRepository.findByPlaceName(apiShop.getPlace_name()).orElse(null);
 
             // entity -> dto 변환
             if(dbShop != null) {

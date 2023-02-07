@@ -24,8 +24,8 @@ public class ResponseShopDetail {
     public static ResponseShopDetail of(Shop shop, String distance){
         return ResponseShopDetail.builder()
                 .id(shop.getId())
-                .name(shop.getName())
-                .address(shop.getAddress())
+                .name(shop.getPlaceName())
+                .address(shop.getRoadAddressName())
                 .latitude(shop.getLatitude())
                 .longitude(shop.getLongitude())
                 .distance(distance)

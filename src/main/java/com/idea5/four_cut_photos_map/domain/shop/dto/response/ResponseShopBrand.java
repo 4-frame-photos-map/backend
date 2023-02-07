@@ -4,8 +4,6 @@ import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.*;
 
-import javax.validation.constraints.NotNull;
-
 @Getter
 @Builder
 @AllArgsConstructor
@@ -37,8 +35,8 @@ public class ResponseShopBrand {
 
     public static ResponseShopBrand from(Shop shop){
         return ResponseShopBrand.builder()
-                .placeName(shop.getName())
-                .roadAddressName(shop.getAddress())
+                .placeName(shop.getPlaceName())
+                .roadAddressName(shop.getRoadAddressName())
                 .x(String.valueOf(shop.getLongitude()))
                 .y(String.valueOf(shop.getLatitude()))
                 .build();

@@ -1,11 +1,9 @@
 package com.idea5.four_cut_photos_map.domain.shop.controller;
 
-import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -130,8 +127,8 @@ class ShopControllerTest {
         resultActions
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("id").value(shop.getId()))
-                .andExpect(jsonPath("name").value(shop.getName()))
-                .andExpect(jsonPath("address").value(shop.getAddress()))
+                .andExpect(jsonPath("name").value(shop.getPlaceName()))
+                .andExpect(jsonPath("address").value(shop.getRoadAddressName()))
                 .andExpect(jsonPath("latitude").value(shop.getLatitude()))
                 .andExpect(jsonPath("longitude").value(shop.getLongitude()))
                 .andExpect(jsonPath("distance").value(distance))

@@ -34,8 +34,8 @@ public class ResponseShopV2 {
 
     public static ResponseShopV2 of(Shop shop){
         return ResponseShopV2.builder()
-                .placeName(shop.getName())
-                .roadAddressName(shop.getAddress())
+                .placeName(shop.getPlaceName())
+                .roadAddressName(shop.getRoadAddressName())
                 .x(String.valueOf(shop.getLongitude()))
                 .y(String.valueOf(shop.getLatitude()))
                 .build();

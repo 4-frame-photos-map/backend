@@ -22,7 +22,7 @@ public class ResponseMarker {
     public static ResponseMarker of(Shop shop){
         return ResponseMarker.builder()
                 .id(shop.getId())
-                .name(shop.getName())
+                .name(shop.getPlaceName())
                 .latitude(shop.getLatitude())
                 .longitude(shop.getLongitude())
                 .build();
