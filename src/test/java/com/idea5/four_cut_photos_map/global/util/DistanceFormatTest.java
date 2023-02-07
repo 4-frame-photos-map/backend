@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @ActiveProfiles("test")
 @SpringBootTest
 @Transactional
-@AutoConfigureMockMvc
 @Slf4j
 public class DistanceFormatTest {
 

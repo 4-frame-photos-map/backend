@@ -88,6 +88,7 @@ public class Util {
         return "unknown";
     }
 
+
     public static List<KakaoResponseDto> documentToObject(DocumentManagement body, String searchBrand){
         List<KakaoResponseDto> dtos = new ArrayList<>();
 
