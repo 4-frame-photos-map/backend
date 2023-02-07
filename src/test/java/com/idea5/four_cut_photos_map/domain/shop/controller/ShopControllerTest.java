@@ -62,7 +62,7 @@ class ShopControllerTest {
         resultActions
                 .andExpect(status().is2xxSuccessful())
 
-                .andExpect(jsonPath("$..address").value("서울 성동구 서울숲2길 17-2"))
+                .andExpect(jsonPath("$..roadAddressName").value("서울 성동구 서울숲2길 17-2"))
                 .andExpect(jsonPath("$.result.length()").value(1)) // todo : apiResponse로 감싸면 jsonPath 수정해야 됨
                 .andDo(print());
 
