@@ -26,22 +26,6 @@ public class ShopService {
     private final KeywordSearchKakaoApi keywordSearchKakaoApi;
     private final ObjectMapper objectMapper;
 
-
-    public List<ResponseShopBrand> findShopsByBrand(List<KakaoResponseDto> apiShops, List<ShopDto> shopDtos, String brandName) {
-        List<ResponseShopBrand> resultShops = new ArrayList<>(); // 반환 리스트
-
-        // 카카오 맵 api로 부터 받아온 Shop 리스트와 db에 저장된 Shop 비교
-        for (KakaoResponseDto apiShop : apiShops) {
-            for (ShopDto shopDto : shopDtos) {
-                if (apiShop.getPlaceName().equals(shopDto.getPlaceName())) {
-                    resultShops.add(ResponseShopBrand.of(apiShop));
-                }
-            }
-        }
-        System.out.println("resultShops.size() = " + resultShops.size());
-        return resultShops;
-    }
-
     public List<ShopDto> findByBrand(String brandName){
         List<Shop> shops = shopRepository.findByBrand(brandName).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
         List<ShopDto> shopDtos = new ArrayList<>();

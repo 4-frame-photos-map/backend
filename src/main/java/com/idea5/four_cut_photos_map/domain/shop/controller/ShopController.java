@@ -34,7 +34,6 @@ public class ShopController {
 
     @GetMapping("/brand/search")
     public ResponseEntity<RsData<List<ResponseShopBrand>>> showBrandListBySearch(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch) {
-        RsData<List<ResponseShopBrand>> body;
         // api 검색전, DB에서 먼저 있는지 확인하는게 더 효율적
         List<ShopDto> shopDtos = shopService.findByBrand(requestBrandSearch.getBrand());
         if(shopDtos.isEmpty())
@@ -42,19 +41,28 @@ public class ShopController {
 
 
         List<KakaoResponseDto> kakaoApiResponse = shopService.searchBrand(requestBrandSearch);
-        List<ResponseShopBrand> shopsByBrand = shopService.findShopsByBrand(kakaoApiResponse, shopDtos, requestBrandSearch.getBrand());
+
+        List<ResponseShopBrand> resultShops = new ArrayList<>(); // 응답값 리스트
+
+        // 카카오 맵 api로 부터 받아온 Shop 리스트와 db에 저장된 Shop 비교
+        for (KakaoResponseDto apiShop : kakaoApiResponse) {
+            for (ShopDto shopDto : shopDtos) {
+                if (apiShop.getPlaceName().equals(shopDto.getPlaceName())) {
+                    resultShops.add(ResponseShopBrand.of(apiShop));
+                }
+            }
+        }
 
 
         // 검색 결과, 근처에 원하는 브랜드가 없을 때
-        if(shopsByBrand.isEmpty()){
-            return ResponseEntity.ok(
-                    new RsData<>(
-                            true, String.format("근처에 %s이(가) 없습니다.", requestBrandSearch.getBrand()), shopsByBrand
+        if(resultShops.isEmpty()){
+            return ResponseEntity.ok(new RsData<>(
+                            true, String.format("근처에 %s이(가) 없습니다.", requestBrandSearch.getBrand()), resultShops
                     ));
         }
 
         return ResponseEntity.ok(new RsData<>(
-                true, "brand 검색 성공", shopsByBrand
+                true, "brand 검색 성공", resultShops
         ));
     }
 
@@ -113,8 +121,6 @@ public class ShopController {
 
         String[] names = Brand.Names; // 브랜드명 ( 하루필름, 인생네컷 ... )
 
-        // 카카오 api -> 필요한 변수 = {브랜드명, 위도, 경도, 반경}
-        // 일단 샘플로 테스트
         Map<String, List<ResponseShopMarker>> maps = new HashMap<>();
         for (String brandName : names) {
             List<ResponseShopMarker> list = shopService.searchMarkers(requestShop, brandName);
