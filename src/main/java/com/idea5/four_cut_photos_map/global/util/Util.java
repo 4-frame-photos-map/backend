@@ -1,17 +1,22 @@
 package com.idea5.four_cut_photos_map.global.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idea5.four_cut_photos_map.AppConfig;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class Util {
+
+    private final static ObjectMapper mapper = new ObjectMapper();
     private static ObjectMapper getObjectMapper() {
         return (ObjectMapper) AppConfig.getContext().getBean("objectMapper");
     }
@@ -89,6 +94,7 @@ public class Util {
     }
 
 
+
     public static List<KakaoResponseDto> documentToObject(DocumentManagement body, String searchBrand){
         List<KakaoResponseDto> dtos = new ArrayList<>();
 
@@ -120,5 +126,45 @@ public class Util {
             dtos.add(dto);
         }
         return dtos;
+    }
+
+    public static List<KakaoResponseDto> jackson(String body, String brandName) {
+
+        ArrayList<KakaoResponseDto> list = new ArrayList<>();
+        try{
+            JsonNode root = mapper.readTree(body);
+            ArrayList<Object> lists = mapper.treeToValue(root.path("documents"), ArrayList.class);
+            for (Object obj : lists) {
+                Map<String, String> map = mapper.convertValue(obj, Map.class);
+
+                String distance = distanceFormatting(map.get("distance"));
+                String addressName = map.get("address_name");
+                String phone = map.get("phone");
+                String placeName = map.get("place_name");
+                String roadAddressName = map.get("road_address_name");
+                String x = map.get("x");
+                String y = map.get("y");
+
+                if (phone.equals(""))
+                    phone = "미등록";
+
+                KakaoResponseDto dto = KakaoResponseDto.builder()
+                        .brand(brandName)
+                        .address_name(addressName)
+                        .distance(distance)
+                        .phone(phone)
+                        .placeName(placeName)
+                        .roadAddressName(roadAddressName)
+                        .x(x)
+                        .y(y)
+                        .build();
+
+                list.add(dto);
+            }
+
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
+        return list;
     }
 }
