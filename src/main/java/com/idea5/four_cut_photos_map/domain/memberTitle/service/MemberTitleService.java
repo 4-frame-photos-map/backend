@@ -1,5 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.memberTitle.service;
 
+import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleInfoResp;
 import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleResp;
@@ -40,14 +41,18 @@ public class MemberTitleService {
     // TODO : 로직 리팩토링
     public List<MemberTitleResp> getMemberTitles(Long memberId) {
         // 1. 전체 칭호
-        log.info("MemberTitle 전체 조회");
+        log.info("----Before memberTitleRepository.findAllByOrderByIdAsc()----");
         List<MemberTitle> memberTitles = memberTitleRepository.findAllByOrderByIdAsc();
         // 2. 회원이 갖고 있는 칭호
-        log.info("내 MemberTitleLog 조회");
-        List<MemberTitleLog> myMemberTitleLogs = memberTitleLogRepository.findAllByMemberIdOrderByIdAsc(memberId);
-//        Member member = memberRepository.findById(memberId).orElse(null);
-//        List<MemberTitleLog> myMemberTitleLogs = member.getMemberTitleLogs();
-        log.info("내 MemberTitle 조회");
+//        log.info("----Before memberTitleLogRepository.findAllByMemberIdOrderByIdAsc(memberId)----");
+//        List<MemberTitleLog> myMemberTitleLogs = memberTitleLogRepository.findAllByMemberIdOrderByIdAsc(memberId);
+        Member member = memberRepository.findById(memberId).orElse(null);
+        log.info("----Before member.getMemberTitleLogs()----");
+        List<MemberTitleLog> myMemberTitleLogs = member.getMemberTitleLogs();
+        log.info("----Before myMemberTitleLogs.get(0)----");
+        MemberTitleLog memberTitleLog1 = myMemberTitleLogs.get(0);
+        log.info("----Before myMemberTitleLogs.get(0)----");
+        MemberTitleLog memberTitleLog2 = myMemberTitleLogs.get(0);
         List<MemberTitle> myMemberTitles = myMemberTitleLogs.stream()
                 .map(memberTitleLog -> memberTitleLog.getMemberTitle())
                 .collect(Collectors.toList());
