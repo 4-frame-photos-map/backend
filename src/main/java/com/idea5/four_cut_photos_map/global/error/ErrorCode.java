@@ -15,7 +15,8 @@ public enum ErrorCode {
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED,"401", "만료된 토큰입니다."),
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "400,", "유효하지 않은 토큰입니다."),
     NON_TOKEN(HttpStatus.BAD_REQUEST, "400", "HTTP Authorization header 에 토큰을 담아 요청해주세요."),
-    REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "리뷰를 찾을 수 없습니다.");
+    REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "리뷰를 찾을 수 없습니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "회원을 찾을 수 없습니다.");
 
     private HttpStatus httpStatus;
     private String errorCode;

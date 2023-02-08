@@ -33,13 +33,13 @@ public class Review extends BaseEntity {
 
     private String content;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private PurityScore purity;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private RetouchScore retouch;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private ItemScore item;
 
 }

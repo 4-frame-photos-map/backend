@@ -130,7 +130,12 @@ public class ShopService {
 
     }
 
+    public Shop findShopById(Long id) {
+        return shopRepository.findById(id).orElse(null);
+    }
+
     public KaKaoSearchResponseDto searchByKeyword(String keyword) {
         return keywordSearchKakaoApi.searchByKeyword(keyword);
     }
+
 }
