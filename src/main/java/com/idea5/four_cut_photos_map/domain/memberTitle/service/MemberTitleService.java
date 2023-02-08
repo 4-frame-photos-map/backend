@@ -1,5 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.memberTitle.service;
 
+import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleInfoResp;
 import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleResp;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitle;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class MemberTitleService {
     private final MemberTitleRepository memberTitleRepository;
     private final MemberTitleLogRepository memberTitleLogRepository;
+    private final MemberRepository memberRepository;
 
     public MemberTitle findById(Long id) {
         return memberTitleRepository.findById(id).orElseThrow(() -> {
@@ -38,12 +40,14 @@ public class MemberTitleService {
     // TODO : 로직 리팩토링
     public List<MemberTitleResp> getMemberTitles(Long memberId) {
         // 1. 전체 칭호
-        log.info("회원 칭호 전체 조회");
+        log.info("MemberTitle 전체 조회");
         List<MemberTitle> memberTitles = memberTitleRepository.findAllByOrderByIdAsc();
         // 2. 회원이 갖고 있는 칭호
-        log.info("내 칭호 기록 조회");
+        log.info("내 MemberTitleLog 조회");
         List<MemberTitleLog> myMemberTitleLogs = memberTitleLogRepository.findAllByMemberIdOrderByIdAsc(memberId);
-        log.info("내 칭호 조회");
+//        Member member = memberRepository.findById(memberId).orElse(null);
+//        List<MemberTitleLog> myMemberTitleLogs = member.getMemberTitleLogs();
+        log.info("내 MemberTitle 조회");
         List<MemberTitle> myMemberTitles = myMemberTitleLogs.stream()
                 .map(memberTitleLog -> memberTitleLog.getMemberTitle())
                 .collect(Collectors.toList());
