@@ -4,6 +4,7 @@ import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.KaKaoSearchResponseDto;
+import com.idea5.four_cut_photos_map.global.util.DocumentManagement;
 import com.idea5.four_cut_photos_map.global.util.Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -63,9 +64,8 @@ public class KeywordSearchKakaoApi {
         System.out.println("apiURL = " + apiURL);
 
         // 4. exchange 메서드로 api 호출
-
         String body = restTemplate.exchange(apiURL, HttpMethod.GET, entity, String.class).getBody();
-        List<KakaoResponseDto> list = Util.jackson(body, request.getBrand());
+        List<KakaoResponseDto> list = Util.jackson2(body, request.getBrand());
         return list;
     }
 
@@ -88,7 +88,7 @@ public class KeywordSearchKakaoApi {
         System.out.println("apiURL = " + apiURL);
 
         String body = restTemplate.exchange(apiURL, HttpMethod.GET, entity, String.class).getBody();
-        List<KakaoResponseDto> kakaoResponseDtos = Util.jackson(body, brandName);
+        List<KakaoResponseDto> kakaoResponseDtos = Util.jackson2(body, brandName);
         return kakaoResponseDtos;
     }
 }

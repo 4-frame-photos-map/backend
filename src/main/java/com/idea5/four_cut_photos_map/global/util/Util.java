@@ -1,11 +1,12 @@
 package com.idea5.four_cut_photos_map.global.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idea5.four_cut_photos_map.AppConfig;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
-import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
+import com.idea5.four_cut_photos_map.global.util.DocumentManagement.Document;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -126,6 +127,30 @@ public class Util {
             dtos.add(dto);
         }
         return dtos;
+    }
+
+    public static List<KakaoResponseDto> jackson2(String body, String brandName){
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        ArrayList<KakaoResponseDto> list = new ArrayList<>();
+        try{
+
+            DocumentManagement documentManagement = mapper.readValue(body, DocumentManagement.class);
+            Document[] documents = documentManagement.getDocuments();
+            for (Document document : documents) {
+                String phone = document.getPhone();
+                if (phone.equals("")) {
+                    document.setPhone("미등록");
+                }
+                document.setDistance(distanceFormatting(document.getDistance()));
+
+                KakaoResponseDto dto = KakaoResponseDto.from(document, brandName);
+                list.add(dto);
+            }
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
+        return list;
+
     }
 
     public static List<KakaoResponseDto> jackson(String body, String brandName) {
