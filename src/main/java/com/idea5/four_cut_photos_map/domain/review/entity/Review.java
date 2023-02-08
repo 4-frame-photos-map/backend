@@ -1,16 +1,15 @@
 package com.idea5.four_cut_photos_map.domain.review.entity;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
+import com.idea5.four_cut_photos_map.domain.review.entity.score.ItemScore;
+import com.idea5.four_cut_photos_map.domain.review.entity.score.PurityScore;
+import com.idea5.four_cut_photos_map.domain.review.entity.score.RetouchScore;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.Fetch;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -34,10 +33,13 @@ public class Review extends BaseEntity {
 
     private String content;
 
-    private int purity;
+    @Enumerated(EnumType.ORDINAL)
+    private PurityScore purity;
 
-    private int retouch;
+    @Enumerated(EnumType.ORDINAL)
+    private RetouchScore retouch;
 
-    private int item;
+    @Enumerated(EnumType.ORDINAL)
+    private ItemScore item;
 
 }
