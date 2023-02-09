@@ -5,6 +5,8 @@ import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
+import com.idea5.four_cut_photos_map.global.error.ErrorCode;
+import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,10 +14,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DUPLICATE_FAVORITE;
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.FAVORITES_NOT_FOUND;
 
 @RequestMapping("/favorites")
 @RestController
@@ -27,25 +32,16 @@ public class FavoriteController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "/")
     public ResponseEntity<RsData> showFavoritesList(@AuthenticationPrincipal MemberContext memberContext) {
-        List<FavoriteResponseDto> favoriteResponseDtos;
 
-        List<Favorite> favorites = favoriteService.findByMemberId(memberContext.getId());
+        List<FavoriteResponseDto> favoriteResponseDtos = favoriteService.findByMemberId(memberContext.getId());
 
-        if(favorites.isEmpty() == false) {
-            favoriteResponseDtos = favorites
-                    .stream()
-                    .map(favorite -> favoriteService.toDto(favorite))
-                    .collect(Collectors.toList());
-
-            return new ResponseEntity<>(
-                    new RsData<>(true, "찜 리스트 조회 성공", favoriteResponseDtos),
-                    HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(
-                    new RsData<>(true, "찜 리스트 조회 성공, 찜 리스트가 없는 사용자"),
-                    HttpStatus.OK);
+        if(ObjectUtils.isEmpty(favoriteResponseDtos)) {
+            throw new BusinessException(FAVORITES_NOT_FOUND);
         }
 
+        return new ResponseEntity<>(
+                new RsData<>(true, "찜 리스트 조회 성공", favoriteResponseDtos),
+                HttpStatus.OK);
     }
 
     @PreAuthorize("isAuthenticated()")

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DELETED_FAVORITE;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DUPLICATE_FAVORITE;
@@ -71,9 +72,16 @@ public class FavoriteService {
                 0 : shop.getFavoriteCnt() - 1);
     }
 
-    public List<Favorite> findByMemberId(Long memberId) {
-        return favoriteRepository.findByMemberId(memberId).orElse(null);
-    }
+    public List<FavoriteResponseDto> findByMemberId(Long memberId) {
+        List<Favorite> favorites = favoriteRepository.findByMemberId(memberId).orElse(null);
+
+        if(favorites.isEmpty()) {return null;}
+
+        return  favorites
+                    .stream()
+                    .map(favorite -> toDto(favorite))
+                    .collect(Collectors.toList());
+        }
 
     public Favorite findByShopIdAndMemberId(Long shopId, Long memberId) {
         return favoriteRepository.findByShopIdAndMemberId(shopId, memberId).orElse(null);

@@ -33,7 +33,7 @@ public class ResponseShopDetail {
                 .latitude(shop.getLatitude())
                 .longitude(shop.getLongitude())
                 .distance(distance)
-                .favoriteCnt(shop.getFavorite_cnt() == null ? 0 : shop.getFavorite_cnt())
+                .favoriteCnt(shop.getFavoriteCnt() == null ? 0 : shop.getFavoriteCnt())
                 .build();
     }
 
