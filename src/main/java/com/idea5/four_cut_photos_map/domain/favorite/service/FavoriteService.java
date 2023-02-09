@@ -29,8 +29,6 @@ public class FavoriteService {
 
         return FavoriteResponseDto.builder()
                 .id(favorite.getId())
-                .ownerId(favorite.getMember().getId())
-                .ownerNickname(favorite.getMember().getNickname())
                 .shop(shopDto)
                 .build();
     }

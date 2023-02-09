@@ -12,7 +12,5 @@ import lombok.Setter;
 @Builder
 public class FavoriteResponseDto {
         private Long id;
-        private Long ownerId;
-        private String ownerNickname;
         private ShopFavoritesResponseDto shop;
 }
