@@ -18,8 +18,17 @@ public class MemberInfoResp {
         return MemberInfoResp.builder()
                 .id(member.getId())
                 .nickname(member.getNickname())
-                .mainMemberTitle(member.getMainMemberTitle().getName())
+                .mainMemberTitle(member.getMainMemberTitle())
                 .memberTitleCnt(member.getMemberTitleCnt())
                 .build();
     }
+
+//    public static MemberInfoResp toDto(Member member, String mainMemberTitle, Integer memberTitleCnt) {
+//        return MemberInfoResp.builder()
+//                .id(member.getId())
+//                .nickname(member.getNickname())
+//                .mainMemberTitle(mainMemberTitle)
+//                .memberTitleCnt(memberTitleCnt)
+//                .build();
+//    }
 }

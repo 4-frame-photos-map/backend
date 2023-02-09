@@ -1,11 +1,11 @@
 package com.idea5.four_cut_photos_map.domain.member.entity;
 
 import com.idea5.four_cut_photos_map.domain.like.entity.Like;
-import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitle;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleLog;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@Slf4j
 @Entity
 @Getter
 @Setter
@@ -45,10 +46,13 @@ public class Member extends BaseEntity {
     }
 
     // 대표 칭호
-    public MemberTitle getMainMemberTitle() {
+    public String getMainMemberTitle() {
+        log.info("----Before memberTitleLogs.get(?)----");
         for(MemberTitleLog memberTitleLog : getMemberTitleLogs()) {
+            log.info("----Before memberTitleLog.getIsMain()----");
             if(memberTitleLog.getIsMain()) {
-                return memberTitleLog.getMemberTitle();
+                log.info("----Before memberTitleLog.getMemberTitle().getName()----");
+                return memberTitleLog.getMemberTitle().getName();
             }
         }
         return null;
