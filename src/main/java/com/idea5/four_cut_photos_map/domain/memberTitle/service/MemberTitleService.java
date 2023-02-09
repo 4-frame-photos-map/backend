@@ -68,4 +68,8 @@ public class MemberTitleService {
         }
         return memberTitleResps;
     }
+
+    public List<MemberTitleLog> findByMember(Member member) {
+        return memberTitleLogRepository.findByMember(member);
+    }
 }

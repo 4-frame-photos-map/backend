@@ -44,21 +44,4 @@ public class Member extends BaseEntity {
 
         return authorities;
     }
-
-    // 대표 칭호
-    public String getMainMemberTitle() {
-        log.info("----Before memberTitleLogs.get(?)----");
-        for(MemberTitleLog memberTitleLog : getMemberTitleLogs()) {
-            log.info("----Before memberTitleLog.getIsMain()----");
-            if(memberTitleLog.getIsMain()) {
-                log.info("----Before memberTitleLog.getMemberTitle().getName()----");
-                return memberTitleLog.getMemberTitle().getName();
-            }
-        }
-        return null;
-    }
-
-    public Integer getMemberTitleCnt() {
-        return memberTitleLogs.size();
-    }
 }

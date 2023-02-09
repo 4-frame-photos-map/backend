@@ -14,21 +14,12 @@ public class MemberInfoResp {
     private String mainMemberTitle; // 대표 회원칭호
     private Integer memberTitleCnt; // 회원칭호 개수
 
-    public static MemberInfoResp toDto(Member member) {
+    public static MemberInfoResp toDto(Member member, String mainMemberTitle, Integer memberTitleCnt) {
         return MemberInfoResp.builder()
                 .id(member.getId())
                 .nickname(member.getNickname())
-                .mainMemberTitle(member.getMainMemberTitle())
-                .memberTitleCnt(member.getMemberTitleCnt())
+                .mainMemberTitle(mainMemberTitle)
+                .memberTitleCnt(memberTitleCnt)
                 .build();
     }
-
-//    public static MemberInfoResp toDto(Member member, String mainMemberTitle, Integer memberTitleCnt) {
-//        return MemberInfoResp.builder()
-//                .id(member.getId())
-//                .nickname(member.getNickname())
-//                .mainMemberTitle(mainMemberTitle)
-//                .memberTitleCnt(memberTitleCnt)
-//                .build();
-//    }
 }

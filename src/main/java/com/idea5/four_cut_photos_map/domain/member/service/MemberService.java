@@ -52,18 +52,17 @@ public class MemberService {
     // 회원 id 로 기본 정보 조회
     public MemberInfoResp getMemberInfo(Long id) {
         Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException());
-//        log.info("----Before memberTitleService.findByMember(member)----");
-//        List<MemberTitleLog> memberTitleLogs = memberTitleService.findByMember(member);
-//        // 대표 칭호 조회
-//        String mainMemberTitle = "";
-//        for(MemberTitleLog memberTitleLog : memberTitleLogs) {
-//            if(memberTitleLog.getIsMain()) {
-//                log.info("----Before memberTitleLog.getMemberTitle().getName()----");
-//                mainMemberTitle = memberTitleLog.getMemberTitle().getName();
-//            }
-//        }
-        return MemberInfoResp.toDto(member);
-//        return MemberInfoResp.toDto(member, mainMemberTitle, memberTitleLogs.size());
+        log.info("----Before memberTitleService.findByMember(member)----");
+        List<MemberTitleLog> memberTitleLogs = memberTitleService.findByMember(member);
+        // 대표 칭호 조회
+        String mainMemberTitle = "";
+        for(MemberTitleLog memberTitleLog : memberTitleLogs) {
+            if(memberTitleLog.getIsMain()) {
+                log.info("----Before memberTitleLog.getMemberTitle().getName()----");
+                mainMemberTitle = memberTitleLog.getMemberTitle().getName();
+            }
+        }
+        return MemberInfoResp.toDto(member, mainMemberTitle, memberTitleLogs.size());
     }
 
     // 서비스 로그아웃(accessToken 무효화)
