@@ -41,6 +41,7 @@ public class ShopService {
         return resultShops;
     }
 
+
     public List<ShopDto> findByBrand(String brandName){
         List<Shop> shops = shopRepository.findByBrand(brandName).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
         List<ShopDto> shopDtos = new ArrayList<>();
@@ -50,7 +51,7 @@ public class ShopService {
 
     }
 
-    public List<ResponseShop> findShops(List<KaKaoSearchResponseDto.Document> apiShops, String keyword) {
+    public List<ResponseShop> findShops(List<KaKaoSearchResponseDto.Document> apiShops) {
         List<ResponseShop> responseShops = new ArrayList<>();
 
         // 카카오 맵 api로 부터 받아온 Shop과 db에 저장된 Shop 비교
@@ -126,11 +127,24 @@ public class ShopService {
         return keywordSearchKakaoApi.searchByKeyword(keyword);
     }
 
-    public List<KakaoResponseDto> searchBrand(RequestBrandSearch brandSearch) {
-        List<KakaoResponseDto> list = new ArrayList<>();
-        for (int i = 1; i <= 3; i++) {
-            list.addAll(keywordSearchKakaoApi.searchByBrand(brandSearch, i));
-        }
-        return list;
+    public Shop findById(Long id) {
+        return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
+    }
+
+    public ShopFavoritesResponseDto toShopFavoritesRespDto(Shop shop) {
+        return ShopFavoritesResponseDto.builder()
+                .id(shop.getId())
+                .brand(shop.getBrand())
+                .name(shop.getName())
+                .address(shop.getAddress())
+                .favoriteCnt(shop.getFavoriteCnt())
+                .build();
+    }
+        public List<KakaoResponseDto> searchBrand (RequestBrandSearch brandSearch){
+            List<KakaoResponseDto> list = new ArrayList<>();
+            for (int i = 1; i <= 3; i++) {
+                list.addAll(keywordSearchKakaoApi.searchByBrand(brandSearch, i));
+            }
+            return list;
     }
 }

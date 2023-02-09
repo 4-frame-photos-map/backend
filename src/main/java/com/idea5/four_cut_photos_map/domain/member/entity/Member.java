@@ -1,6 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.member.entity;
 
-import com.idea5.four_cut_photos_map.domain.like.entity.Like;
+import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.titleLog.entity.TitleLog;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -11,10 +11,7 @@ import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -33,10 +30,6 @@ public class Member extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
     private String accessToken; // jwt access token
-
-    @OneToMany
-    @JoinColumn(name = "member_id")
-    private List<Like> likes = new ArrayList<>();
 
     @OneToMany
     @JoinColumn(name = "member_id")

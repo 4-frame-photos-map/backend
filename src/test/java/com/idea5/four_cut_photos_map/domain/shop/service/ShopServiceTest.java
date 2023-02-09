@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.shop.service;
 
-import com.idea5.four_cut_photos_map.domain.like.repository.LikeRepository;
+import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
+
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
@@ -30,7 +31,7 @@ class ShopServiceTest {
     private ShopRepository shopRepository;
 
     @Autowired
-    private LikeRepository likeRepository;
+    private FavoriteRepository favoriteRepository;
 
     @Autowired
     private MemberRepository memberRepository;
