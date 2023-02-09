@@ -1,12 +1,10 @@
 package com.idea5.four_cut_photos_map.domain.shop.entity;
 
-import com.idea5.four_cut_photos_map.domain.like.entity.Like;
+import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -14,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
@@ -24,12 +23,11 @@ public class Shop extends BaseEntity {
 
     private String placeName; // 지점명
     private String roadAddressName; // 주소
+
     private double longitude; // 경도, x
     private double latitude; // 위도, y
+    private Integer favoriteCnt; // 찜 수
 
-    @OneToMany
-    @JoinColumn(name = "shop_id")
-    private List<Like> likes = new ArrayList<>();
 
     public Shop(String brand, String placeName, String roadAddressName, double longitude, double latitude) {
         this.brand = brand;

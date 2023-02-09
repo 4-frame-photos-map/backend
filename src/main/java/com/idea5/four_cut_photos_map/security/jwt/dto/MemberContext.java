@@ -31,4 +31,14 @@ public class MemberContext extends User {
         this.nickname = member.getNickname();
         this.authorities = member.getAuthorities().stream().collect(Collectors.toSet());
     }
+
+    public Member getMember() {
+        return Member
+                .builder()
+                .id(id)
+                .createDate(createDate)
+                .modifyDate(modifyDate)
+                .nickname(nickname)
+                .build();
+    }
 }

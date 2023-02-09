@@ -24,7 +24,6 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUN
 public class ShopService {
     private final ShopRepository shopRepository;
     private final KeywordSearchKakaoApi keywordSearchKakaoApi;
-    private final ObjectMapper objectMapper;
 
     public List<ShopDto> findByBrand(String brandName){
         List<Shop> shops = shopRepository.findByBrand(brandName).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
@@ -35,7 +34,7 @@ public class ShopService {
 
     }
 
-    public List<ResponseShop> findShops(List<KaKaoSearchResponseDto.Document> apiShops, String keyword) {
+    public List<ResponseShop> findShops(List<KaKaoSearchResponseDto.Document> apiShops) {
         List<ResponseShop> responseShops = new ArrayList<>();
 
         // 카카오 맵 api로 부터 받아온 Shop과 db에 저장된 Shop 비교
@@ -102,6 +101,18 @@ public class ShopService {
             list.addAll(keywordSearchKakaoApi.searchByBrand(brandSearch, i));
         }
         return list;
+    }
+    public Shop findById(Long id) {
+        return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
+    }
 
+    public ShopFavoritesResponseDto toShopFavoritesRespDto(Shop shop) {
+        return ShopFavoritesResponseDto.builder()
+                .id(shop.getId())
+                .brand(shop.getBrand())
+                .name(shop.getPlaceName())
+                .address(shop.getRoadAddressName())
+                .favoriteCnt(shop.getFavoriteCnt())
+                .build();
     }
 }

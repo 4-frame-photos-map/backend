@@ -1,19 +1,16 @@
 package com.idea5.four_cut_photos_map.domain.shop.service;
 
-import com.idea5.four_cut_photos_map.domain.auth.service.KakaoService;
-import com.idea5.four_cut_photos_map.domain.like.repository.LikeRepository;
+import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
+import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.KaKaoSearchResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopBrand;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopMarker;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
-import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
-import com.idea5.four_cut_photos_map.domain.shop.service.kakao.KeywordSearchKakaoApi;
 import com.idea5.four_cut_photos_map.global.common.data.Brand;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -22,16 +19,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-
 import javax.transaction.Transactional;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 @SpringBootTest
 @Slf4j
 @Transactional
@@ -48,7 +43,7 @@ class ShopServiceTest {
 
 
     @Autowired
-    private LikeRepository likeRepository;
+    private FavoriteRepository favoriteRepository;
 
     @Autowired
     private MemberRepository memberRepository;

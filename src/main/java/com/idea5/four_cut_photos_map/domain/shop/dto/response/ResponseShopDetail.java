@@ -5,9 +5,11 @@ import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @AllArgsConstructor
 @Getter
+@Setter
 @Builder
 public class ResponseShopDetail {
 
@@ -17,6 +19,8 @@ public class ResponseShopDetail {
     private double latitude; // 위도
     private double longitude; // 경도
     private String distance; // 중심좌표까지의 거리
+    private boolean canBeAddedToFavorites; // 사용자의 찜 여부 // Entity에 추가 X(Entity Manager 관리 범위에 속하지 X)
+    private int favoriteCnt; // 찜 수
 
     // todo : Review, 찜 추가
 
@@ -29,6 +33,7 @@ public class ResponseShopDetail {
                 .latitude(shop.getLatitude())
                 .longitude(shop.getLongitude())
                 .distance(distance)
+                .favoriteCnt(shop.getFavoriteCnt() == null ? 0 : shop.getFavoriteCnt())
                 .build();
     }
 

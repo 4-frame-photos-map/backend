@@ -1,3 +1,4 @@
+
 insert into title (create_date, modify_date, name) values(NOW(), NOW(), '뉴비');
 insert into title (create_date, modify_date, name) values(NOW(), NOW(), '포토부스 리뷰어'); -- 리뷰
 insert into title (create_date, modify_date, name) values(NOW(), NOW(), '포토부스 전문가'); -- 방문횟수
