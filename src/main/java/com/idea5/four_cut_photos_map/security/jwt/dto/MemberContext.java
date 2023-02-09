@@ -41,12 +41,4 @@ public class MemberContext extends User {
                 .nickname(nickname)
                 .build();
     }
-
-    public boolean memberIs(Member member) {
-        return id.equals(member.getId());
-    }
-
-    public boolean memberIsNot(Member member) {
-        return memberIs(member) == false;
-    }
 }

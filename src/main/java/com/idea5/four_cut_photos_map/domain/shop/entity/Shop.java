@@ -24,7 +24,7 @@ public class Shop extends BaseEntity {
     private String address; // 주소
     private double longitude; // 경도, x
     private double latitude; // 위도, y
-    private Integer favorite_cnt; // 찜 수
+    private Integer favoriteCnt; // 찜 수
 
 
     public Shop(String brand, String name, String address, double longitude, double latitude) {

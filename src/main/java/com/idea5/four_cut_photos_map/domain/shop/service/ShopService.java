@@ -137,7 +137,7 @@ public class ShopService {
                 .brand(shop.getBrand())
                 .name(shop.getName())
                 .address(shop.getAddress())
-                .favorite_cnt(shop.getFavorite_cnt())
+                .favoriteCnt(shop.getFavoriteCnt())
                 .build();
     }
         public List<KakaoResponseDto> searchBrand (RequestBrandSearch brandSearch){

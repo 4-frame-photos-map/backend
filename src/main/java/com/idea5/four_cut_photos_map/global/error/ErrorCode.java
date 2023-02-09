@@ -16,7 +16,6 @@ public enum ErrorCode {
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED,"401", "만료된 토큰입니다."),
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "400,", "유효하지 않은 토큰입니다."),
     NON_TOKEN(HttpStatus.BAD_REQUEST, "400", "HTTP Authorization header 에 토큰을 담아 요청해주세요."),
-    MEMBER_MISMATCH(HttpStatus.FORBIDDEN, "403", "조회하려는 멤버 정보와 현재 로그인 유저 정보가 일치하지 않습니다. 다시 로그인을 해주세요."),
     DUPLICATE_FAVORITE(HttpStatus.CONFLICT, "409", "해당 상점은 이미 찜 되어있습니다."),
     DELETED_FAVORITE(HttpStatus.CONFLICT, "409", "해당 상점은 이미 찜 취소되었습니다");
 

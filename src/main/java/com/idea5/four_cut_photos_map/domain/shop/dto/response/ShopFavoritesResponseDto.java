@@ -18,5 +18,5 @@ public class ShopFavoritesResponseDto {
     private String brand;
     private String name;
     private String address;
-    private Integer favorite_cnt;
+    private Integer favoriteCnt;
 }

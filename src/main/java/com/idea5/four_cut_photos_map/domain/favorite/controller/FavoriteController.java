@@ -3,11 +3,8 @@ package com.idea5.four_cut_photos_map.domain.favorite.controller;
 import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponseDto;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
-import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberInfoResp;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
-import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
-import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,18 +14,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.idea5.four_cut_photos_map.global.error.ErrorCode.MEMBER_MISMATCH;
 
 @RequestMapping("/favorites")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
 public class FavoriteController {
-    private final MemberService memberService;
     private final FavoriteService favoriteService;
 
     @PreAuthorize("isAuthenticated()")
