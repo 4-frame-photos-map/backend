@@ -1,15 +1,20 @@
 package com.idea5.four_cut_photos_map.domain.member.entity;
 
 import com.idea5.four_cut_photos_map.domain.like.entity.Like;
-import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleLog;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -30,10 +35,6 @@ public class Member extends BaseEntity {
     @OneToMany
     @JoinColumn(name = "member_id")
     private List<Like> likes = new ArrayList<>();
-
-    @Builder.Default    // 빌더 패턴으로 객체 생성시 속성 기본값 지정
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberTitleLog> memberTitleLogs = new ArrayList<>();
 
     // TODO: 이후 활용
     // 현재 회원이 가지고 있는 권한들을 List<GrantedAuthority> 형태로 리턴
