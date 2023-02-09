@@ -30,7 +30,7 @@ public class FavoriteController {
     private final FavoriteService favoriteService;
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping(value = "/")
+    @GetMapping(value = "")
     public ResponseEntity<RsData> showFavoritesList(@AuthenticationPrincipal MemberContext memberContext) {
 
         List<FavoriteResponseDto> favoriteResponseDtos = favoriteService.findByMemberId(memberContext.getId());
