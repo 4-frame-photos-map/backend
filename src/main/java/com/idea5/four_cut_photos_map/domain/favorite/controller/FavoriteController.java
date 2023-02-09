@@ -32,17 +32,11 @@ public class FavoriteController {
     private final FavoriteService favoriteService;
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping(value = "/{memberId}")
-    public ResponseEntity<RsData> showFavoritesList(@PathVariable Long memberId,
-                                                               @AuthenticationPrincipal MemberContext memberContext) {
+    @GetMapping(value = "/")
+    public ResponseEntity<RsData> showFavoritesList(@AuthenticationPrincipal MemberContext memberContext) {
         List<FavoriteResponseDto> favoriteResponseDtos;
 
-        Member member = memberService.findById(memberId);
-        if (memberContext.memberIsNot(member)) {
-            throw new BusinessException(MEMBER_MISMATCH);
-        }
-
-        List<Favorite> favorites = favoriteService.findByMemberId(memberId);
+        List<Favorite> favorites = favoriteService.findByMemberId(memberContext.getId());
 
         if(favorites.isEmpty() == false) {
             favoriteResponseDtos = favorites
