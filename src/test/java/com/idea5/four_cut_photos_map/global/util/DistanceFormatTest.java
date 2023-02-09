@@ -26,7 +26,6 @@ public class DistanceFormatTest {
         String kmTest3 = "2320"; // 2.3km
         String kmTest4 = "2350"; // 2.3km
         String kmTest5 = "2480"; // 2.5km
-
         // when
         String test1 = Util.distanceFormatting(kmTest1);
         String test2 = Util.distanceFormatting(kmTest2);

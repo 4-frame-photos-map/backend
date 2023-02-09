@@ -74,6 +74,7 @@ public class Util {
 
         if(length <= 3) // distance -> m
             return distance+"m";
+
         else if(length == 4) { // distance -> km
             int num1 = distance.charAt(0) -'0'; // 첫째자리
             int num2 = distance.charAt(1) -'0'; // 둘째자리
@@ -86,6 +87,7 @@ public class Util {
 
             return String.format("%d.%dkm", num1, num2);
         }
+
         else if (length > 4){
             distance = distance.substring(0, distance.length() - 3); // 맨 뒤 3자리 m 없애기
             return String.format("%skm", distance);
