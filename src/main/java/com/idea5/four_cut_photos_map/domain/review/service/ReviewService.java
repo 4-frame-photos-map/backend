@@ -33,12 +33,21 @@ public class ReviewService {
     private final ShopService shopService;
     private final MemberService memberService;
 
-    public List<ResponseReviewDto> findAllByShopId(Long shopId) {
+    public List<Review> findAllByShopId(Long shopId) {
+
         List<Review> reviews = reviewRepository.findAllByShopIdOrderByCreateDateDesc(shopId);   // 최신 작성순
 
         if (reviews.isEmpty()){
             throw new BusinessException(ErrorCode.REVIEW_NOT_FOUND);
         }
+
+        return reviews;
+    }
+
+    public List<ResponseReviewDto> searchAllReviewsInTheStore(Long shopId) {
+        Shop shop = shopService.findShopById(shopId);
+
+        List<Review> reviews = findAllByShopId(shopId);
 
         return reviews.stream()
                 .map(review -> ResponseReviewDto.from(review))
@@ -46,45 +55,27 @@ public class ReviewService {
     }
 
     public ResponseReviewDto write(WriteReviewDto reviewDto, Long shopId, Long memberId) {
-
         Member writer = memberService.findById(memberId);
         if (writer == null) {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND);
         }
 
         Shop shop = shopService.findShopById(shopId);
-        if (shop == null) {
-            throw new BusinessException(ErrorCode.SHOP_NOT_FOUND);
-        }
-
-        String purity = reviewDto.getPurity();
-        if (purity == null || purity.equals("")) {
-            purity = "UNSELECTED";
-        }
-
-        String retouch = reviewDto.getRetouch();
-        if (retouch == null || retouch.equals("")) {
-            retouch = "UNSELECTED";
-        }
-
-        String item = reviewDto.getItem();
-        if (item == null || item.equals("")) {
-            item = "UNSELECTED";
-        }
 
         Review review = Review.builder()
                 .writer(writer)
                 .shop(shop)
                 .starRating(reviewDto.getStarRating())
                 .content(reviewDto.getContent())
-                .purity(PurityScore.valueOf(purity))
-                .retouch(RetouchScore.valueOf(retouch))
-                .item(ItemScore.valueOf(item))
+                .purity(reviewDto.getPurity() == null ? PurityScore.UNSELECTED : PurityScore.valueOf(reviewDto.getPurity()))
+                .retouch(reviewDto.getRetouch() == null ? RetouchScore.UNSELECTED : RetouchScore.valueOf(reviewDto.getRetouch()))
+                .item(reviewDto.getItem() == null ? ItemScore.UNSELECTED : ItemScore.valueOf(reviewDto.getItem()))
                 .build();
 
         reviewRepository.save(review);
 
-        return ResponseReviewDto.from(review);
+        return ResponseReviewDto.from(review, writer, shop);
     }
+
 
 }

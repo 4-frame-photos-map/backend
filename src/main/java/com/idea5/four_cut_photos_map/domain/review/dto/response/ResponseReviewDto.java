@@ -33,12 +33,11 @@ public class ResponseReviewDto {
     // Shop 관련 정보
     private ReviewShopDto reviewShopDto;
 
-
     public static ResponseReviewDto from(Review review) {
-        Member writer = review.getWriter();
-        Shop shop = review.getShop();
+        return ResponseReviewDto.from(review, review.getWriter(), review.getShop());
+    }
 
-
+    public static ResponseReviewDto from(Review review, Member writer, Shop shop) {
         ReviewMemberDto reviewMemberDto = ReviewMemberDto.builder()
                 .id(writer.getId())
                 .nickname(writer.getNickname())
@@ -50,7 +49,6 @@ public class ResponseReviewDto {
                 .name(shop.getName())
                 .address(shop.getAddress())
                 .build();
-
 
         return ResponseReviewDto.builder()
                 .id(review.getId())

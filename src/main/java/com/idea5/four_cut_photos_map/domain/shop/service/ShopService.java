@@ -131,7 +131,7 @@ public class ShopService {
     }
 
     public Shop findShopById(Long id) {
-        return shopRepository.findById(id).orElse(null);
+        return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
     }
 
     public KaKaoSearchResponseDto searchByKeyword(String keyword) {

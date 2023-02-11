@@ -19,16 +19,9 @@ public class WriteReviewDto {
     @NotBlank(message = "리뷰 내용을 작성해주세요.")
     private String content;
 
-    @ColumnDefault("")
     private String purity;
 
-    @ColumnDefault("")
     private String retouch;
 
-    @ColumnDefault("")
     private String item;
-
-    @ColumnDefault("")
-    private String distance;
-
 }

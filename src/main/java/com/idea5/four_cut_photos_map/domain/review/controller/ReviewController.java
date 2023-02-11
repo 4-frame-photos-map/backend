@@ -4,6 +4,7 @@ import com.idea5.four_cut_photos_map.domain.review.dto.request.WriteReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.service.ReviewService;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
+import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
@@ -29,7 +30,7 @@ public class ReviewController {
 
     @GetMapping("/{shopId}")
     public ResponseEntity<RsData> getShopReviews(@PathVariable Long shopId) {
-        List<ResponseReviewDto> reviews = reviewService.findAllByShopId(shopId);
+        List<ResponseReviewDto> reviews = reviewService.searchAllReviewsInTheStore(shopId);
 
         RsData<List<ResponseReviewDto>> body = new RsData<>(
                 true,
@@ -44,10 +45,7 @@ public class ReviewController {
     public ResponseEntity<RsData> writeReview(@PathVariable Long shopId,
                                          @AuthenticationPrincipal MemberContext memberContext,
                                          @Valid @RequestBody WriteReviewDto reviewDto) {
-
-        ResponseShopDetail shopDetail = shopService.findShopById(shopId, reviewDto.getDistance());
-
-        ResponseReviewDto responseReviewDto = reviewService.write(reviewDto, shopDetail.getId(), memberContext.getId());
+        ResponseReviewDto responseReviewDto = reviewService.write(reviewDto, shopId, memberContext.getId());
 
         RsData<ResponseReviewDto> body = new RsData<>(
                 true,
