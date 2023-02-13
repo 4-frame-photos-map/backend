@@ -52,6 +52,19 @@ public class MemberController {
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @PatchMapping("/main-title/{member-title-id}")
+    public ResponseEntity<RsData> updateMainMemberTitle(
+            @AuthenticationPrincipal MemberContext memberContext,
+            @PathVariable(value = "member-title-id") Long memberTitleId
+    ) {
+        memberService.updateMainMemberTitle(memberContext.getId(), memberTitleId);
+        RsData<?> body = new RsData<>(
+                true, "회원 대표 칭호 수정 성공", null
+        );
+        return new ResponseEntity<>(body, HttpStatus.OK);
+    }
+
     /**
      * 회원탈퇴
      * @param jwtToken 서비스에서 발급한 jwt accessToken

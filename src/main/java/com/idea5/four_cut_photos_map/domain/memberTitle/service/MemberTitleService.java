@@ -71,4 +71,20 @@ public class MemberTitleService {
         MemberTitle memberTitle = findById(memberTitleId);
         memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle, isMain));
     }
+
+    // 회원 대표 칭호 수정
+    @Transactional
+    public void updateMainMemberTitle(Long memberId, Long memberTitleId) {
+        // 1. 기존 회원의 대표 칭호 해제
+        log.info("----Before memberTitleLogRepository.findByMemberIdAndIsMainTrue()----");
+        MemberTitleLog memberTitleLog = memberTitleLogRepository.findByMemberIdAndIsMainTrue(memberId).orElse(null);
+        memberTitleLog.cancelMain();
+        // 2. 새로운 칭호로 대표 칭호 설정
+        log.info("----Before memberTitleLogRepository.findByMemberIdAndMemberTitleId()----");
+        MemberTitleLog newMemberTitleLog = memberTitleLogRepository.findByMemberIdAndMemberTitleId(memberId, memberTitleId)
+                .orElseThrow(() -> {
+                    throw new RuntimeException("해당 회원이 칭호를 소유하고 있지 않습니다.");
+                });
+        newMemberTitleLog.registerMain();
+    }
 }

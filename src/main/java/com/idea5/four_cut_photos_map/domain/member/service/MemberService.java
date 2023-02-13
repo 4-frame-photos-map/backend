@@ -98,4 +98,11 @@ public class MemberService {
         Member member = findById(id);
         member.updateNickname(memberUpdateReq);
     }
+
+    // 회원 대표칭호 수정
+    @Transactional
+    public void updateMainMemberTitle(Long memberId, Long memberTitleId) {
+//        Member member = findById(memberId);
+        memberTitleService.updateMainMemberTitle(memberId, memberTitleId);
+    }
 }
