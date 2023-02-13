@@ -56,4 +56,19 @@ public class ReviewController {
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
+    @PatchMapping("/{shopId}")
+    public ResponseEntity<RsData> modifyReview(@PathVariable Long shopId,
+                                               @AuthenticationPrincipal MemberContext memberContext,
+                                               @Valid @RequestBody WriteReviewDto reviewDto) {
+        ResponseReviewDto responseReviewDto = reviewService.modify(reviewDto, shopId, memberContext.getId());
+
+        RsData<ResponseReviewDto> body = new RsData<>(
+                true,
+                "상점 리뷰 수정 성공",
+                responseReviewDto
+        );
+
+        return new ResponseEntity<>(body, HttpStatus.OK);
+    }
+
 }

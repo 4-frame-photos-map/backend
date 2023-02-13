@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUND;
+
 @Slf4j
 @Service
 @Transactional
@@ -77,5 +79,26 @@ public class ReviewService {
         return ResponseReviewDto.from(review, writer, shop);
     }
 
+    public ResponseReviewDto modify(WriteReviewDto reviewDto, Long shopId, Long memberId) {
+        Shop shop = shopService.findShopById(shopId);
 
+        Member user = memberService.findById(memberId);
+        if (user == null) {
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        Review review = reviewRepository.findByWriterIdAndShopId(memberId, shopId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
+
+        // 입력된 데이터로 Review Entity 수정
+        review.setStarRating(reviewDto.getStarRating());
+        review.setContent(reviewDto.getContent());
+        review.setPurity(reviewDto.getPurity() == null ? PurityScore.UNSELECTED : PurityScore.valueOf(reviewDto.getPurity()));
+        review.setRetouch(reviewDto.getRetouch() == null ? RetouchScore.UNSELECTED : RetouchScore.valueOf(reviewDto.getRetouch()));
+        review.setItem(reviewDto.getItem() == null ? ItemScore.UNSELECTED : ItemScore.valueOf(reviewDto.getItem()));
+
+        reviewRepository.save(review);  // 병합
+
+        return ResponseReviewDto.from(review, user, shop);
+    }
 }
