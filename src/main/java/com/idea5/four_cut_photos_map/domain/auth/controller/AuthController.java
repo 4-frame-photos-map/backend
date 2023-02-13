@@ -76,7 +76,7 @@ public class AuthController {
      * @param bearerToken refreshToken
      * @param memberContext
      */
-    @PostMapping("/refresh")
+    @PostMapping("/token")
     public ResponseEntity<RsData> refreshToken(
             @RequestHeader("Authorization") String bearerToken,
             @AuthenticationPrincipal MemberContext memberContext
