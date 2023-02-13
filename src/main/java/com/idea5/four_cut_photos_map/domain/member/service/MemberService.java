@@ -86,6 +86,7 @@ public class MemberService {
         // 2. redis 에 해당 accessToken 블랙리스트로 등록
         Long expiration = jwtProvider.getExpiration(accessToken);
         redisDao.setValues(accessToken, "withdrawl", Duration.ofMillis(expiration));
+        // TODO: Member 삭제시 Member 를 참조하고 있는 MemberTitleLog 때문에 오류가 발생한다
         // 3. DB 에서 회원 삭제
         memberRepository.deleteById(id);
         return new MemberWithdrawlResp(id);
