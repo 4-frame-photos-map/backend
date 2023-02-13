@@ -8,6 +8,7 @@ INSERT INTO SHOP(create_date, modify_date, address,longitude, latitude, name, br
 INSERT INTO SHOP(create_date, modify_date, address,longitude, latitude, name, brand) VALUES(NOW(), NOW(), '서울 성동구 서울숲2길 45',127.043600450617, 37.5464465306291, '하루필름 서울숲점', '하루필름');
 INSERT INTO SHOP(create_date, modify_date, address,longitude, latitude, name, brand) VALUES(NOW(), NOW(), '서울 성동구 서울숲4길 20',127.043010183447, 37.547189170196, '인생네컷 서울숲점', '인생네컷');
 INSERT INTO SHOP(create_date, modify_date, address,longitude, latitude, name, brand) VALUES(NOW(), NOW(), '서울 성동구 서울숲4길 23-1',127.043634812377, 37.5471565050697, '픽닷', '픽닷');
+INSERT INTO SHOP(create_date, modify_date, address,longitude, latitude, name, brand) VALUES(NOW(), NOW(), '충남 천안시 서북구 원두정2길 21',127.135473811813, 36.8322023787607, '인생네컷 충남천안두정먹거리공원점', '인생네컷');
 
 -- 칭호
 INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(), NOW(), '뉴비', '네컷지도 가입');

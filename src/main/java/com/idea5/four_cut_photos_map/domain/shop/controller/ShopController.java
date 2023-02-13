@@ -1,21 +1,29 @@
 package com.idea5.four_cut_photos_map.domain.shop.controller;
 
+import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
+import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
+
+import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
+import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+
+import javax.validation.Valid;
 import java.util.*;
 
-import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DISTANCE_IS_EMPTY;
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.*;
 
 
-//@RestController
 @RequestMapping("/shop")
 @RestController
 @RequiredArgsConstructor
@@ -23,6 +31,7 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DISTANCE_IS_E
 public class ShopController {
 
     private final ShopService shopService;
+    private final FavoriteService favoriteService;
 
     /**
      * todo : 카카오맵 api 완료시, 표시할 shop 조회
@@ -31,6 +40,22 @@ public class ShopController {
      * 2. DB와 응답값을 비교
      * 3. 클라이언트에게 응답.
      */
+
+    @GetMapping("/brand/search")
+    public RsData<List<ResponseShopBrand>> showBrandListBySearch(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch) {
+        // api 검색전, DB에서 먼저 있는지 확인하는게 더 효율적
+        List<ShopDto> shopDtos = shopService.findByBrand(requestBrandSearch.getBrand());
+        if(shopDtos.isEmpty())
+            throw new BusinessException(BRAND_NOT_FOUND);
+
+
+        List<KakaoResponseDto> kakaoApiResponse = shopService.searchBrand(requestBrandSearch);
+        List<ResponseShopBrand> shopsByBrand = shopService.findShopsByBrand(kakaoApiResponse, shopDtos, requestBrandSearch.getBrand());
+        if(shopsByBrand.isEmpty())
+            return new RsData<List<ResponseShopBrand>>(true, String.format("근처에 %s이(가) 없습니다.", requestBrandSearch.getBrand()), shopsByBrand);
+
+        return new RsData<List<ResponseShopBrand>>(true, "brand 검색 성공", shopsByBrand);
+    }
 
     /**
      * 키워드 검색 (리스트 조회)
@@ -76,7 +101,7 @@ public class ShopController {
         }
 
         // 3. db 데이터와 비교
-        List<ResponseShop> shops = shopService.findShops(dtos, keyword);
+        List<ResponseShop> shops = shopService.findShops(dtos);
 
         return new RsData<List<ResponseShop>>(true, "Shop 조회 성공", shops);
     }
@@ -106,12 +131,28 @@ public class ShopController {
 
     // todo : @Validated 유효성 검사 시, httpstatus code 전달하는 방법
     @GetMapping("/detail/{shopId}")
-    public ResponseEntity<ResponseShopDetail> detail(@PathVariable(name = "shopId") Long id, @RequestParam(name = "distance", required = false, defaultValue = "") String distance) {
+    public ResponseEntity<ResponseShopDetail> detail(@PathVariable(name = "shopId") Long id,
+                                                     @RequestParam(name = "distance", required = false, defaultValue = "") String distance,
+                                                     @AuthenticationPrincipal MemberContext memberContext) {
         if (distance.isEmpty()){
             throw new BusinessException(DISTANCE_IS_EMPTY);
         }
         ResponseShopDetail shopDetailDto = shopService.findShopById(id, distance);
-        return ResponseEntity.ok(shopDetailDto);
 
+        // 비로그인 회원일 시
+        if(memberContext == null){
+            shopDetailDto.setCanBeAddedToFavorites(false);
+
+        // 로그인 회원일 시
+        } else {
+            Favorite favorite = favoriteService.findByShopIdAndMemberId(id, memberContext.getId());
+            if(favorite == null){
+                shopDetailDto.setCanBeAddedToFavorites(true);
+            } else {
+                shopDetailDto.setCanBeAddedToFavorites(false);
+            }
+        }
+
+        return ResponseEntity.ok(shopDetailDto);
     }
 }
