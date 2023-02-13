@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.member.entity;
 
 import com.idea5.four_cut_photos_map.domain.like.entity.Like;
+import com.idea5.four_cut_photos_map.domain.member.dto.request.MemberUpdateReq;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -44,5 +45,9 @@ public class Member extends BaseEntity {
         authorities.add(new SimpleGrantedAuthority("MEMBER"));
 
         return authorities;
+    }
+
+    public void updateNickname(MemberUpdateReq memberUpdateReq) {
+        this.nickname = memberUpdateReq.getNickname();
     }
 }

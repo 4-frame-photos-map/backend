@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.member.service;
 
 import com.idea5.four_cut_photos_map.domain.member.dto.KakaoUserInfoParam;
+import com.idea5.four_cut_photos_map.domain.member.dto.request.MemberUpdateReq;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberInfoResp;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberWithdrawlResp;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
@@ -36,6 +37,7 @@ public class MemberService {
         if(member == null) {
             Member newMember = KakaoUserInfoParam.toEntity(kakaoUserInfoParam);
             // 회원가입 기본 칭호 부여, 대표 칭호로 설정
+            log.info("----Before ----");
             memberTitleService.addMemberTitle(newMember, 1L, true);
             return memberRepository.save(newMember);
         }
@@ -87,5 +89,12 @@ public class MemberService {
         // 3. DB 에서 회원 삭제
         memberRepository.deleteById(id);
         return new MemberWithdrawlResp(id);
+    }
+
+    // 회원 닉네임 수정
+    @Transactional
+    public void updateNickname(Long id, MemberUpdateReq memberUpdateReq) {
+        Member member = findById(id);
+        member.updateNickname(memberUpdateReq);
     }
 }
