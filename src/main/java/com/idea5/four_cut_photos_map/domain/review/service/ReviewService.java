@@ -64,6 +64,10 @@ public class ReviewService {
 
         Shop shop = shopService.findShopById(shopId);
 
+        if (verifyExistedReview(memberId, shopId)) {
+            throw new BusinessException(ErrorCode.REVIEW_ALREADY_EXISTS);
+        }
+
         Review review = Review.builder()
                 .writer(writer)
                 .shop(shop)
@@ -100,5 +104,9 @@ public class ReviewService {
         reviewRepository.save(review);  // 병합
 
         return ResponseReviewDto.from(review, user, shop);
+    }
+
+    private boolean verifyExistedReview(Long memberId, Long shopId) {
+        return reviewRepository.findByWriterIdAndShopId(memberId, shopId).orElse(null) != null;
     }
 }
