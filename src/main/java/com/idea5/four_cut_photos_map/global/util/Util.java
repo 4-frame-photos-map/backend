@@ -71,29 +71,17 @@ public class Util {
         int length = distance.length();
         if(distance.equals("")) // 공백일 시, 알 수없음으로 반환
             return "unknown";
-
         if(length <= 3) // distance -> m
-            return distance+"m";
-
-        else if(length == 4) { // distance -> km
-            int num1 = distance.charAt(0) -'0'; // 첫째자리
-            int num2 = distance.charAt(1) -'0'; // 둘째자리
-            int num3 = distance.charAt(2) -'0'; // 셋째자리
-            if(num3 > 5) // 반올림
-                num2+=1;
-
-            if(num2 == 0) // 2000, 2020 -> 2km
-                return String.format("%dkm", num1);
-
-            return String.format("%d.%dkm", num1, num2);
+            return distance + "m";
+        double dkm = Integer.parseInt(distance) / 1000.0; // km 환산한 값
+        if(length == 4) { // distance -> km
+            if(dkm % 1 == 0)
+                return String.format("%.0fkm", dkm);
+            // 소수점 둘째 자리에서 반올림
+            return String.format("%.1fkm", dkm);
         }
-
-        else if (length > 4){
-            distance = distance.substring(0, distance.length() - 3); // 맨 뒤 3자리 m 없애기
-            return String.format("%skm", distance);
-        }
-
-        return "unknown";
+        // 소수점 첫째 자리에서 반올림
+        return String.format("%.0fkm", dkm);
     }
 
 

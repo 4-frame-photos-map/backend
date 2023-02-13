@@ -37,7 +37,7 @@ public class DistanceFormatTest {
                 ()->assertThat(test1).isEqualTo("2km"),
                 ()->assertThat(test2).isEqualTo("2.3km"),
                 ()->assertThat(test3).isEqualTo("2.3km"),
-                ()->assertThat(test4).isEqualTo("2.3km"),
+                ()->assertThat(test4).isEqualTo("2.4km"),
                 ()->assertThat(test5).isEqualTo("2.5km")
         );
     }
