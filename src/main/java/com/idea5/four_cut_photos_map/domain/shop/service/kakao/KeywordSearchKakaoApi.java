@@ -9,6 +9,7 @@ import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
 import com.idea5.four_cut_photos_map.global.util.Util;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -47,10 +48,9 @@ public class KeywordSearchKakaoApi {
         // TODO: body가 null일 경우 예외 처리
         String body = restTemplate.exchange(apiURL, HttpMethod.GET, entity, String.class).getBody();
         JsonNode node = objectMapper.readTree(body);
-        List<String> documents = node.findValuesAsText("documents");
-        System.out.println("----test"+documents.size());
+        List<String> countList = node.get("documents").findValuesAsText("place_name");
 
-        for(int i=0; i<documents.size(); i++) {
+        for(int i=0; i<countList.size(); i++) {
             KakaoKeywordResponseDto dto = KakaoKeywordResponseDto.builder()
                     .place_name(node.get("documents").get(i).get("place_name").textValue())
                     .road_address_name(node.get("documents").get(i).get("road_address_name").textValue())
