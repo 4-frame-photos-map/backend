@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.shop.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 
@@ -70,48 +71,13 @@ public class ShopController {
         ));
     }
 
-
-    /**
-     * 키워드 검색 (리스트 조회)
-     * ex)q
-     * 하루필름, 인생네컷, 포토이즘, 포토그레이
-     */
-
     @GetMapping(value = "/search")
-    public ResponseEntity<RsData<List<ResponseShop>>> showKeywordSearchList(@RequestParam(defaultValue = "즉석사진") String keyword){
+    public ResponseEntity<RsData<List<ResponseShop>>> showKeywordSearchList(@RequestParam(defaultValue = "즉석사진") String keyword) throws JsonProcessingException {
         // 1. 카카오맵 api 응답 데이터 받아오기
-        KaKaoSearchResponseDto apiShopJson = shopService.searchByKeyword(keyword);
+        List<KaKaoSearchResponseDto> apiShopJson = shopService.searchByKeyword(keyword);
 
-        // 2. 카카오 api 응답 DTO 에서 List<DTO.Document>로 변환
-        List<KaKaoSearchResponseDto.Document> dtos = new ArrayList<>();
-
-        for (int i = 0; i < apiShopJson.getDocuments().length; i++) {
-
-            //log.info("name="+apiShopJson.getDocuments()[i].getPlace_name());
-            //log.info("distance="+apiShopJson.getDocuments()[i].getDistance());
-
-            /** TODO:
-             - 1차: builder로 수정 [v]
-             - 2차: 현업에서 사용하는 방식(Jackson으로 처리)으로 수정 [ ]
-            */
-
-            String name = apiShopJson.getDocuments()[i].getPlace_name();
-            String address = apiShopJson.getDocuments()[i].getRoad_address_name();
-            String longitude = apiShopJson.getDocuments()[i].getX();
-            String latitude = apiShopJson.getDocuments()[i].getY();
-
-            KaKaoSearchResponseDto.Document dto = KaKaoSearchResponseDto.Document.builder()
-                    .place_name(name)
-                    .road_address_name(address)
-                    .x(longitude)
-                    .y(latitude)
-                    .build();
-
-            dtos.add(dto);
-        }
-
-        // 3. db 데이터와 비교
-        List<ResponseShop> shops = shopService.findShops(dtos);
+        // 2. db 데이터와 비교
+        List<ResponseShop> shops = shopService.findShops(apiShopJson);
 
         return ResponseEntity.ok(
                 new RsData<List<ResponseShop>>(true, "Shop 조회 성공", shops)
