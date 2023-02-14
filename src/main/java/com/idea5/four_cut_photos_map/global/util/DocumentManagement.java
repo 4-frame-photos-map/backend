@@ -3,6 +3,7 @@ package com.idea5.four_cut_photos_map.global.util;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class DocumentManagement {
@@ -10,6 +11,7 @@ public class DocumentManagement {
 
     @Builder
     @Getter
+    @Setter
     @AllArgsConstructor
     public static class Document{
         private String place_name; // 장소명

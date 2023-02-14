@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface ShopRepository extends JpaRepository<Shop, Long> {
 
-    Optional<Shop> findByName(String keyword);
+    Optional<Shop> findByPlaceName(String keyword);
 
     Optional<List<Shop>> findByBrand(String keyword);
 }

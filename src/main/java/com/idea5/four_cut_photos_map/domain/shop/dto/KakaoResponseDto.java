@@ -1,5 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto;
 
+import com.idea5.four_cut_photos_map.global.util.DocumentManagement;
+import com.idea5.four_cut_photos_map.global.util.DocumentManagement.Document;
 import lombok.*;
 
 @Builder
@@ -19,6 +21,18 @@ public class KakaoResponseDto {
     private String x;
 
     private String y;
+
+    public static KakaoResponseDto from (Document document, String brandName){
+        return KakaoResponseDto.builder()
+                .address_name(document.getAddress_name())
+                .placeName(document.getPlace_name())
+                .roadAddressName(document.getRoad_address_name())
+                .distance(document.getDistance())
+                .x(document.getX())
+                .y(document.getY())
+                .brand(brandName)
+                .phone(document.getPhone()).build();
+    }
 
 
 }
