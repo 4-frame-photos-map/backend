@@ -58,7 +58,7 @@ public class MemberController {
             @AuthenticationPrincipal MemberContext memberContext,
             @PathVariable(value = "member-title-id") Long memberTitleId
     ) {
-        memberService.updateMainMemberTitle(memberContext.getId(), memberTitleId);
+        memberService.updateMainMemberTitle(memberContext.getMember(), memberTitleId);
         RsData<?> body = new RsData<>(
                 true, "회원 대표 칭호 수정 성공", null
         );

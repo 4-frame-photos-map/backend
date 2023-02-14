@@ -15,4 +15,8 @@ public interface MemberTitleLogRepository extends JpaRepository<MemberTitleLog, 
     Optional<MemberTitleLog> findByMemberIdAndMemberTitleId(Long memberId, Long memberTitleId);
 
     Optional<MemberTitleLog> findByMemberIdAndIsMainTrue(Long memberId);
+
+    Optional<MemberTitleLog> findByMemberAndIsMainTrue(Member member);
+
+    Optional<MemberTitleLog> findByMemberAndMemberTitleId(Member member, Long memberTitleId);
 }

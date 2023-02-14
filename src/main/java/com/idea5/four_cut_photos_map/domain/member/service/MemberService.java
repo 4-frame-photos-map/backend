@@ -101,8 +101,8 @@ public class MemberService {
 
     // 회원 대표칭호 수정
     @Transactional
-    public void updateMainMemberTitle(Long memberId, Long memberTitleId) {
+    public void updateMainMemberTitle(Member member, Long memberTitleId) {
 //        Member member = findById(memberId);
-        memberTitleService.updateMainMemberTitle(memberId, memberTitleId);
+        memberTitleService.updateMainMemberTitle(member, memberTitleId);
     }
 }
