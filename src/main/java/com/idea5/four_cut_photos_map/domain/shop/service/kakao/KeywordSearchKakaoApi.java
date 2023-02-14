@@ -51,8 +51,8 @@ public class KeywordSearchKakaoApi {
 
         for(int i=0; i<countList.size(); i++) {
             KakaoKeywordResponseDto dto = KakaoKeywordResponseDto.builder()
-                    .place_name(node.get("documents").get(i).get("place_name").textValue())
-                    .road_address_name(node.get("documents").get(i).get("road_address_name").textValue())
+                    .placeName(node.get("documents").get(i).get("place_name").textValue())
+                    .roadAddressName(node.get("documents").get(i).get("road_address_name").textValue())
                     .x(node.get("documents").get(i).get("x").textValue())
                     .y(node.get("documents").get(i).get("y").textValue())
                     .build();

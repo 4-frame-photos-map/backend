@@ -43,14 +43,14 @@ public class ShopService {
             //log.info("장소명="+apiShop.getPlace_name());
 
             // db에서 장소명으로 shop 조회
-            Shop dbShop = shopRepository.findByPlaceName(apiShop.getPlace_name()).orElse(null);
+            Shop dbShop = shopRepository.findByPlaceName(apiShop.getPlaceName()).orElse(null);
 
             // entity -> dto 변환
             if(dbShop != null) {
                 ResponseShop responseShop = ResponseShop.from(dbShop);
 
                 // Api Shop과 비교 후 저장
-                if (apiShop.getPlace_name().equals(responseShop.getPlaceName())
+                if (apiShop.getPlaceName().equals(responseShop.getPlaceName())
                         && Double.parseDouble(apiShop.getX()) == responseShop.getLongitude()
                         && Double.parseDouble(apiShop.getY()) == responseShop.getLatitude()) {
                     responseShops.add(responseShop);
