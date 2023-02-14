@@ -71,4 +71,24 @@ public class ReviewController {
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
+    @DeleteMapping("/{shopId}")
+    public ResponseEntity<RsData> deleteReview(
+            @PathVariable Long shopId,
+            @AuthenticationPrincipal MemberContext memberContext) {
+
+        // 가게의 회원의 리뷰 삭제
+        reviewService.delete(shopId, memberContext.getId());
+
+        // 가게의 모든 리뷰 조회
+        List<ResponseReviewDto> responseReviews = reviewService.searchAllReviewsInTheStore(shopId);
+
+        RsData<List<ResponseReviewDto>> body = new RsData<>(
+            true,
+            "상점 리뷰를 삭제하였습니다.",
+                responseReviews
+        );
+
+        return new ResponseEntity<>(body, HttpStatus.OK);
+    }
+
 }

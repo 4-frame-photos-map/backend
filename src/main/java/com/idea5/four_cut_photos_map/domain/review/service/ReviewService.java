@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -108,5 +109,19 @@ public class ReviewService {
 
     private boolean verifyExistedReview(Long memberId, Long shopId) {
         return reviewRepository.findByWriterIdAndShopId(memberId, shopId).orElse(null) != null;
+    }
+
+    public void delete(Long shopId, Long memberId) {
+        Shop shop = shopService.findShopById(shopId);
+
+        Member member = memberService.findById(memberId);
+        if (member == null) {
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        Review review = reviewRepository.findByWriterIdAndShopId(memberId, shopId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
+
+        reviewRepository.delete(review);
     }
 }
