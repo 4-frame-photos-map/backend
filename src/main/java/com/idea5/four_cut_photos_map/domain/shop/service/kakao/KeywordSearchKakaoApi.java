@@ -45,7 +45,6 @@ public class KeywordSearchKakaoApi {
                 + "query=" + keyword; // request param (x, y, radius 등 검색 조건 추가 가능)
 
         // 4. exchange 메서드로 api 호출
-        // TODO: body가 null일 경우 예외 처리
         String body = restTemplate.exchange(apiURL, HttpMethod.GET, entity, String.class).getBody();
         JsonNode node = objectMapper.readTree(body);
         List<String> countList = node.get("documents").findValuesAsText("place_name");

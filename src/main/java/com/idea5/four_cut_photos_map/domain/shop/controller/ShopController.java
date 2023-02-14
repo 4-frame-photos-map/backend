@@ -29,7 +29,7 @@ import java.util.*;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.*;
 
 
-@RequestMapping("/shop")
+@RequestMapping("/shops")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -38,7 +38,20 @@ public class ShopController {
     private final ShopService shopService;
     private final FavoriteService favoriteService;
 
-    @GetMapping("/brand/search")
+    @GetMapping(value = "")
+    public ResponseEntity<RsData<List<ResponseShop>>> showKeywordSearchList(@RequestParam(defaultValue = "즉석사진") String keyword) throws JsonProcessingException {
+        // 1. 카카오맵 api 응답 데이터 받아오기
+        List<KakaoKeywordResponseDto> apiShopJson = shopService.searchByKeyword(keyword);
+
+        // 2. db 데이터와 비교
+        List<ResponseShop> shops = shopService.findShops(apiShopJson);
+
+        return ResponseEntity.ok(
+                new RsData<List<ResponseShop>>(true, "Shop 조회 성공", shops)
+        );
+    }
+
+    @GetMapping("/brand")
     public ResponseEntity<RsData<List<ResponseShopBrand>>> showBrandListBySearch(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch) {
         // api 검색전, DB에서 먼저 있는지 확인하는게 더 효율적
         List<ShopDto> shopDtos = shopService.findByBrand(requestBrandSearch.getBrand());
@@ -72,22 +85,9 @@ public class ShopController {
         ));
     }
 
-    @GetMapping(value = "/search")
-    public ResponseEntity<RsData<List<ResponseShop>>> showKeywordSearchList(@RequestParam(defaultValue = "즉석사진") String keyword) throws JsonProcessingException {
-        // 1. 카카오맵 api 응답 데이터 받아오기
-        List<KakaoKeywordResponseDto> apiShopJson = shopService.searchByKeyword(keyword);
-
-        // 2. db 데이터와 비교
-        List<ResponseShop> shops = shopService.findShops(apiShopJson);
-
-        return ResponseEntity.ok(
-                new RsData<List<ResponseShop>>(true, "Shop 조회 성공", shops)
-        );
-    }
-
 
     //현재 위치 기준, 반경 2km
-    @GetMapping("/search/marker")
+    @GetMapping("/marker")
     public ResponseEntity<RsData<Map<String, List<ResponseShopMarker>>>> currentLocationSearch(@ModelAttribute @Valid RequestShop requestShop){
 
         String[] names = Brand.Names; // 브랜드명 ( 하루필름, 인생네컷 ... )
@@ -104,7 +104,7 @@ public class ShopController {
     }
 
     // todo : @Validated 유효성 검사 시, httpstatus code 전달하는 방법
-    @GetMapping("/detail/{shopId}")
+    @GetMapping("/{shopId}")
     public ResponseEntity<ResponseShopDetail> detail(@PathVariable(name = "shopId") Long id,
                                                      @RequestParam(name = "distance", required = false, defaultValue = "") String distance,
                                                      @AuthenticationPrincipal MemberContext memberContext) {
