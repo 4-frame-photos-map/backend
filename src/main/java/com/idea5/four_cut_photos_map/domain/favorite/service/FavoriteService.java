@@ -4,7 +4,7 @@ import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteRespon
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ShopFavoritesResponseDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseFavoriteShop;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
@@ -26,7 +26,7 @@ public class FavoriteService {
 
     // DTO 변환
     public FavoriteResponseDto toDto(Favorite favorite) {
-        ShopFavoritesResponseDto shopDto = shopService.toShopFavoritesRespDto(favorite.getShop());
+        ResponseFavoriteShop shopDto = shopService.toFavoriteShopDto(favorite.getShop());
 
         return FavoriteResponseDto.builder()
                 .id(favorite.getId())

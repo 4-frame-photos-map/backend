@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.KaKaoSearchResponseDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
 import com.idea5.four_cut_photos_map.global.util.Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,9 +29,9 @@ public class KeywordSearchKakaoApi {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    public List<KaKaoSearchResponseDto> searchByKeyword(String keyword) throws JsonProcessingException {
+    public List<KakaoKeywordResponseDto> searchByKeyword(String keyword) throws JsonProcessingException {
         // 1. 결과값 담을 객체 생성
-        List<KaKaoSearchResponseDto> resultList = new ArrayList<>();
+        List<KakaoKeywordResponseDto> resultList = new ArrayList<>();
 
         // 2. header 설정을 위해 HttpHeader 클래스 생성 후 HttpEntity 객체에 넣어준다.
         HttpHeaders headers = new HttpHeaders();
@@ -48,9 +48,10 @@ public class KeywordSearchKakaoApi {
         String body = restTemplate.exchange(apiURL, HttpMethod.GET, entity, String.class).getBody();
         JsonNode node = objectMapper.readTree(body);
         List<String> documents = node.findValuesAsText("documents");
+        System.out.println("----test"+documents.size());
 
         for(int i=0; i<documents.size(); i++) {
-            KaKaoSearchResponseDto dto = KaKaoSearchResponseDto.builder()
+            KakaoKeywordResponseDto dto = KakaoKeywordResponseDto.builder()
                     .place_name(node.get("documents").get(i).get("place_name").textValue())
                     .road_address_name(node.get("documents").get(i).get("road_address_name").textValue())
                     .x(node.get("documents").get(i).get("x").textValue())

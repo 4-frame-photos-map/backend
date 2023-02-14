@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 
+import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
@@ -74,7 +75,7 @@ public class ShopController {
     @GetMapping(value = "/search")
     public ResponseEntity<RsData<List<ResponseShop>>> showKeywordSearchList(@RequestParam(defaultValue = "즉석사진") String keyword) throws JsonProcessingException {
         // 1. 카카오맵 api 응답 데이터 받아오기
-        List<KaKaoSearchResponseDto> apiShopJson = shopService.searchByKeyword(keyword);
+        List<KakaoKeywordResponseDto> apiShopJson = shopService.searchByKeyword(keyword);
 
         // 2. db 데이터와 비교
         List<ResponseShop> shops = shopService.findShops(apiShopJson);

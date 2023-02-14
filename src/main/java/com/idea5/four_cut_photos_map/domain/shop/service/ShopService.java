@@ -1,7 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.shop.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
@@ -35,11 +35,11 @@ public class ShopService {
 
     }
 
-    public List<ResponseShop> findShops(List<KaKaoSearchResponseDto> apiShops) {
+    public List<ResponseShop> findShops(List<KakaoKeywordResponseDto> apiShops) {
         List<ResponseShop> responseShops = new ArrayList<>();
 
         // 카카오 맵 api로 부터 받아온 Shop과 db에 저장된 Shop 비교
-        for (KaKaoSearchResponseDto apiShop: apiShops) {
+        for (KakaoKeywordResponseDto apiShop: apiShops) {
             //log.info("장소명="+apiShop.getPlace_name());
 
             // db에서 장소명으로 shop 조회
@@ -74,7 +74,7 @@ public class ShopService {
 
     }
 
-    public List<KaKaoSearchResponseDto> searchByKeyword(String keyword) throws JsonProcessingException {
+    public List<KakaoKeywordResponseDto> searchByKeyword(String keyword) throws JsonProcessingException {
         return keywordSearchKakaoApi.searchByKeyword(keyword);
     }
 
@@ -107,8 +107,8 @@ public class ShopService {
         return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
     }
 
-    public ShopFavoritesResponseDto toShopFavoritesRespDto(Shop shop) {
-        return ShopFavoritesResponseDto.builder()
+    public ResponseFavoriteShop toFavoriteShopDto(Shop shop) {
+        return ResponseFavoriteShop.builder()
                 .id(shop.getId())
                 .brand(shop.getBrand())
                 .name(shop.getPlaceName())
