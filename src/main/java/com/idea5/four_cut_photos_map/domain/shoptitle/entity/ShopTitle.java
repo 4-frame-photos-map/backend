@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 
 @Entity
@@ -16,8 +17,13 @@ import javax.persistence.Entity;
 @SuperBuilder
 @ToString
 public class ShopTitle extends BaseEntity {
+    @Column(unique=true)
     private String name; // 칭호명
-    private String content; // 칭호 얻는 조건
+//    @Column(name = "\"condition\"")
+    private String conditions; // 칭호 획득 조건
+    private String content; // 칭호 부연 설명
+
+
 
 
 }

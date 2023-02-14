@@ -14,3 +14,4 @@ INSERT INTO SHOP(create_date, modify_date, road_address_name,longitude, latitude
 INSERT INTO SHOP(create_date, modify_date, road_address_name,longitude, latitude, place_name, brand) VALUES(NOW(), NOW(), '충남 천안시 서북구 원두정2길 21',127.135473811813, 36.8322023787607, '포토이즘박스 두정점', '포토이즘박스');
 INSERT INTO SHOP(create_date, modify_date, road_address_name,longitude, latitude, place_name, brand) VALUES(NOW(), NOW(), '충남 천안시 동남구 먹거리11길 28',127.155596175371, 36.8181132541858, '포토이즘컬러드 천안신부점', '포토이즘박스');
 
+
