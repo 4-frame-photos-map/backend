@@ -58,6 +58,9 @@ public class MemberController {
             @AuthenticationPrincipal MemberContext memberContext,
             @PathVariable(value = "member-title-id") Long memberTitleId
     ) {
+        // TODO: 2가지 방식 고민중
+        // 1. 기존처럼 member 객체를 넘기는 방법
+        // 2. memberId 만 넘기고 실질적으로 조회쿼리가 날라가는 memberTitleService.updateMainMemberTitle() 내에서 member 객체를 만들어 사용하는 방식
         memberService.updateMainMemberTitle(memberContext.getMember(), memberTitleId);
         RsData<?> body = new RsData<>(
                 true, "회원 대표 칭호 수정 성공", null
