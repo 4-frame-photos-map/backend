@@ -20,7 +20,7 @@ import java.util.List;
 
 @SpringBootTest
 @ActiveProfiles("test")
-public class SearchShopByKeywordTests {
+public class KakaoServiceTests {
     @Autowired
     private ShopService shopService;
     @Autowired

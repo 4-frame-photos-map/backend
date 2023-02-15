@@ -14,8 +14,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
+
+import static net.bytebuddy.matcher.ElementMatchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -167,6 +172,38 @@ class ShopControllerTest {
                 .andExpect(jsonPath("$.result.포토이즘박스.length()").value(1)) // todo : apiResponse로 감싸면 jsonPath 수정해야 됨
                 .andExpect(jsonPath("$.result.하루필름.length()").value(0)) // todo : apiResponse로 감싸면 jsonPath 수정해야 됨
                 .andDo(print());
+    }
+
+    @DisplayName("키워드로 조회된 상점 리스트 보여주기, DB에 동일 데이터 존재")
+    @Test
+    void showKeywordSearch() throws Exception {
+        // Given
+        String keyword = "마포 즉석사진";
+        shopRepository.save(new Shop("인생네컷", "인생네컷 홍대동교점", "서울 마포구 홍익로6길 21", 126.922894949096, 37.555493447252));
+        shopRepository.save(new Shop("하루필름", "하루필름 연남점", "서울 마포구 동교로46길 40", 126.926725005048, 37.5621542536479));
+
+        // When
+        ResultActions resultActions = mockMvc
+                .perform(get("/shops")
+                        .param("keyword", keyword)
+                        .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8)))
+        // Then
+                //.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("showKeywordSearchList"))
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Shop 조회 성공"))
+                .andExpect(jsonPath("$.result.*", hasSize(2)))
+
+                .andExpect(jsonPath("$.result[0].placeName", containsString("인생네컷 홍대동교점")))
+                .andExpect(jsonPath("$.result[0].roadAddressName", containsString("서울 마포구 홍익로6길 21")))
+                .andExpect(jsonPath("$.result[0].longitude", equalTo(126.922894949096)))
+                .andExpect(jsonPath("$.result[0].latitude", equalTo(37.555493447252)))
+
+                .andExpect(jsonPath("$.result[1].placeName", containsString("하루필름 연남점")))
+                .andExpect(jsonPath("$.result[1].roadAddressName", containsString("서울 마포구 동교로46길 40")))
+                .andExpect(jsonPath("$.result[1].longitude", equalTo(126.926725005048)))
+                .andExpect(jsonPath("$.result[1].latitude", equalTo(37.5621542536479)));
     }
 
     static class Point{

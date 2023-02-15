@@ -46,6 +46,8 @@ public class KeywordSearchKakaoApi {
 
         // 4. exchange 메서드로 api 호출
         String body = restTemplate.exchange(apiURL, HttpMethod.GET, entity, String.class).getBody();
+
+        // 5. JSON -> KakaoKeywordResponseDto로 역직렬화
         JsonNode node = objectMapper.readTree(body);
         List<String> countList = node.get("documents").findValuesAsText("place_name");
 
@@ -58,6 +60,7 @@ public class KeywordSearchKakaoApi {
                     .build();
             resultList.add(dto);
         }
+
         return resultList;
     }
 
