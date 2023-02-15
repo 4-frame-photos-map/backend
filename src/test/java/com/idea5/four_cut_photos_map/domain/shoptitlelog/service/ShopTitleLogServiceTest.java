@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
@@ -22,6 +23,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 @SpringBootTest
 @Slf4j
+@Transactional
 @ActiveProfiles("test")
 class ShopTitleLogServiceTest {
 
@@ -40,9 +42,9 @@ class ShopTitleLogServiceTest {
     @Autowired
     private ShopTitleLogRepository shopTitleLogRepository;
 
-    @DisplayName("ShopTitleLog 조회")
+    @DisplayName("ShopTitleLog 조회, 성공한 경우")
     @Test
-    void findShopTitleLogs() {
+    void findShopTitleLogs_success() {
         // given
         Shop shop = new Shop("인생네컷", "인생네컷 천안안서점", "충남 천안시 동남구 상명대길 58", 127.17753106349, 36.831234198955);
         shopRepository.save(shop);
@@ -67,6 +69,35 @@ class ShopTitleLogServiceTest {
         // then
 
         assertThat(shopTitleDtos.size()).isEqualTo(4);
+    }
+
+    @DisplayName("ShopTitleLog 조회, 실패한 경우")
+    @Test
+    void findShopTitleLogs_fail() {
+        // given
+        Shop shop = new Shop("인생네컷", "인생네컷 천안안서점", "충남 천안시 동남구 상명대길 58", 127.17753106349, 36.831234198955);
+        shopRepository.save(shop);
+
+        ShopTitle shopTitle1 = new ShopTitle("핫 플레이스", "찜 수 5개 이상", "사람들이 주로 이용하는 포토부스에요.");
+        ShopTitle shopTitle2 = new ShopTitle("청결 양호", "청결 점수 4점 이상", "시설이 깔끔해요.'");
+        ShopTitle shopTitle3 = new ShopTitle("보정 양호", "보정 점수 4점 이상", "막 찍어도 잘 나와요.");
+        ShopTitle shopTitle4 = new ShopTitle("소품 양호", "소품 점수 4점 이상", "다양하게 연출하기 좋아요.");
+        shopTitleRepository.save(shopTitle1);
+        shopTitleRepository.save(shopTitle2);
+        shopTitleRepository.save(shopTitle3);
+        shopTitleRepository.save(shopTitle4);
+
+
+        // when
+        List<ShopTitleDto> shopTitleDtos = shopTitleLogService.findShopTitle(shop.getId());
+        if(shopTitleDtos == null)
+            System.out.println("테스트");
+        // then
+
+        assertAll(
+                () -> assertThat(shopTitleDtos.size()).isNotEqualTo(4),
+                () -> assertThat(shopTitleDtos == null)
+        );
     }
 
 }

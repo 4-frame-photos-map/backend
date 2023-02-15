@@ -31,9 +31,12 @@ public class ShopTitleLogService {
      *  orElse(null);
      */
     public List<ShopTitleDto> findShopTitle(Long shopId){
-        List<ShopTitleLog> shopTitleLogs = shopTitleLogRepository.findAllByShopId(shopId).orElseThrow(() -> new BusinessException(SHOP_TITLE_LOGS_NOT_FOUND));
-        if (shopTitleLogs == null)
-            return null;
+        List<ShopTitleLog> shopTitleLogs = shopTitleLogRepository.findAllByShopId(shopId);
+//        List<ShopTitleLog> shopTitleLogs = shopTitleLogRepository.findAllByShopId(shopId).orElseThrow(() -> new BusinessException(SHOP_TITLE_LOGS_NOT_FOUND));
+
+        // 조회 결과, 빈 컬렉션인 경우 예외 발생
+        if (shopTitleLogs.isEmpty())
+            throw new BusinessException(SHOP_TITLE_LOGS_NOT_FOUND);
 
         List<ShopTitleLogDto> shopTitleLogDtoList = shopTitleLogs.stream()
                 .map(shopTitlelog -> ShopTitleLogDto.of(shopTitlelog))
