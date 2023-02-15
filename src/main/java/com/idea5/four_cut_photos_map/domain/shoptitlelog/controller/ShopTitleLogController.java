@@ -1,5 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.shoptitlelog.controller;
 
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopBrand;
 import com.idea5.four_cut_photos_map.domain.shoptitle.dto.ShopTitleDto;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
@@ -19,12 +20,14 @@ import java.util.List;
 @Slf4j
 public class ShopTitleLogController {
 
-    private ShopTitleLogService shopTitleLogService;
+    private final ShopTitleLogService shopTitleLogService;
 
     @GetMapping("/{shopId}")
-    public ResponseEntity<RsData> getShopTitleLogs(@PathVariable Long shopId) {
+    public ResponseEntity<RsData<List<ShopTitleDto>>> getShopTitles(@PathVariable Long shopId) {
         List<ShopTitleDto> responseList = shopTitleLogService.findShopTitle(shopId);
 
-        return null;
+        return ResponseEntity.ok(new RsData<>(
+                true, "상점 타이틀 조회 성공", responseList
+        ));
     }
 }

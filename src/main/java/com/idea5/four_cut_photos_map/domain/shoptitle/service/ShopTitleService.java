@@ -16,7 +16,7 @@ import java.util.Optional;
 @Slf4j
 public class ShopTitleService {
 
-    private ShopTitleRepository shopTitleRepository;
+    private final ShopTitleRepository shopTitleRepository;
 
     public ShopTitleDto findShopTitle(Long id) {
         ShopTitle shopTitle = shopTitleRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.SHOP_TITLE_NOT_FOUND));
