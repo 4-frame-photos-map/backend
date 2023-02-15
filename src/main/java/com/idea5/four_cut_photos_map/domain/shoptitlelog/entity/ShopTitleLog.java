@@ -12,6 +12,7 @@ import lombok.experimental.SuperBuilder;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
@@ -23,7 +24,7 @@ import javax.persistence.ManyToOne;
 @ToString
 public class ShopTitleLog extends BaseEntity {
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_id")
     private Shop shop;
 
