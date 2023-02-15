@@ -27,5 +27,5 @@
 
 - **Test** : 찜 Test Case 구현
 - **Refactor** : `SpringBootTest` → `Mockito`로 수정
-  - 실제 운영 환경처럼 IOC Container 실행하여 테스트 실행시간 오래걸리는 `SpringBootTest` 대신, 가짜(Mock) 객체 지원하는 테스트 프레임워크 `Mockito`로 리팩토링 예쩡
+  - 실제 운영 환경처럼 IOC Container 실행하여 테스트 실행시간 오래 걸리는 `SpringBootTest` 대신, 가짜(Mock) 객체 지원하는 테스트 프레임워크 `Mockito`로 수정 예정
 - **Feat** : 소상공인 공공데이터 `CSV` 파일 읽고 파싱하여 `DB(Mysql)`에 저장 처리
