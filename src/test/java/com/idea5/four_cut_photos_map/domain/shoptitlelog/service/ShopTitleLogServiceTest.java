@@ -8,6 +8,7 @@ import com.idea5.four_cut_photos_map.domain.shoptitle.repository.ShopTitleReposi
 import com.idea5.four_cut_photos_map.domain.shoptitle.service.ShopTitleService;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.entity.ShopTitleLog;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.repository.ShopTitleLogRepository;
+import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,8 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 @SpringBootTest
 @Slf4j
 @Transactional
@@ -71,7 +74,7 @@ class ShopTitleLogServiceTest {
         assertThat(shopTitleDtos.size()).isEqualTo(4);
     }
 
-    @DisplayName("ShopTitleLog 조회, 실패한 경우")
+    @DisplayName("ShopTitleLog 조회 시, 실패한 경우 예외를 발생시킨다. ")
     @Test
     void findShopTitleLogs_fail() {
         // given
@@ -88,16 +91,12 @@ class ShopTitleLogServiceTest {
         shopTitleRepository.save(shopTitle4);
 
 
-        // when
-        List<ShopTitleDto> shopTitleDtos = shopTitleLogService.findShopTitle(shop.getId());
-        if(shopTitleDtos == null)
-            System.out.println("테스트");
-        // then
+        // when, then
+        assertThrows(BusinessException.class, () -> {
+            List<ShopTitleDto> shopTitleList = shopTitleLogService.findShopTitle(shop.getId());
+            assertThat(shopTitleList.size()).isEqualTo(0);
+        });
 
-        assertAll(
-                () -> assertThat(shopTitleDtos.size()).isNotEqualTo(4),
-                () -> assertThat(shopTitleDtos == null)
-        );
     }
 
 }
