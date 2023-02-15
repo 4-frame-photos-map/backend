@@ -22,4 +22,8 @@ public class ShopTitleService {
         ShopTitle shopTitle = shopTitleRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.SHOP_TITLE_NOT_FOUND));
         return ShopTitleDto.of(shopTitle);
     }
+
+    public ShopTitle findById(Long shopTitleId) {
+        return shopTitleRepository.findById(shopTitleId).orElseThrow(() -> new BusinessException(ErrorCode.SHOP_TITLE_NOT_FOUND));
+    }
 }
