@@ -176,7 +176,7 @@ class ShopControllerTest {
 
     @DisplayName("키워드로 조회된 상점 리스트 보여주기, DB에 동일 데이터 존재")
     @Test
-    void showKeywordSearch() throws Exception {
+    void showKeywordSearchList() throws Exception {
         // Given
         String keyword = "마포 즉석사진";
         shopRepository.save(new Shop("인생네컷", "인생네컷 홍대동교점", "서울 마포구 홍익로6길 21", 126.922894949096, 37.555493447252));
@@ -204,6 +204,25 @@ class ShopControllerTest {
                 .andExpect(jsonPath("$.result[1].roadAddressName", containsString("서울 마포구 동교로46길 40")))
                 .andExpect(jsonPath("$.result[1].longitude", equalTo(126.926725005048)))
                 .andExpect(jsonPath("$.result[1].latitude", equalTo(37.5621542536479)));
+    }
+
+    @DisplayName("키워드로 조회된 상점 리스트 보여주기, DB에 동일 데이터 존재하지 않음")
+    @Test
+    void showKeywordSearchListWithNoResults() throws Exception {
+        // Given
+        String keyword = "마포 즉석사진";
+
+        // When
+        ResultActions resultActions = mockMvc
+                .perform(get("/shops")
+                        .param("keyword", keyword)
+                        .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8)))
+        // Then
+                //.andDo(print())
+                .andExpect(handler().methodName("showKeywordSearchList"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error.errorMessage", containsString("상점을 찾을 수 없습니다.")));
     }
 
     static class Point{
