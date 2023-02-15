@@ -17,6 +17,6 @@ INSERT INTO SHOP(create_date, modify_date, road_address_name,longitude, latitude
 -- ShopTitle
 INSERT INTO shop_title(create_date, modify_date, name, conditions, content) VALUES (NOW(), NOW(), '핫 플레이스', '찜 수 5개 이상', '사람들이 주로 이용하는 포토부스에요.');
 INSERT INTO shop_title(create_date, modify_date, name, conditions, content) VALUES (NOW(), NOW(), '청결 양호', '청결 점수 4점 이상', '시설이 깔끔해요.');
-INSERT INTO shop_title(create_date, modify_date, name, conditions, content) VALUES (NOW(), NOW(), '보정 양호', '보정 점수 4점 이상', '막 찍어도 잘 나와요.');
+INSERT INTO shop_title(create_date, modify_date, name, conditions, content) VALUES (NOW(), NOW(), '보정 양호', '보정 점수 4점 이상', '사진이 잘 나와요.');
 INSERT INTO shop_title(create_date, modify_date, name, conditions, content) VALUES (NOW(), NOW(), '소품 양호', '소품 점수 4점 이상', '다양하게 연출하기 좋아요.');
 
