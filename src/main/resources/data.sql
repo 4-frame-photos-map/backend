@@ -1,7 +1,6 @@
-
-insert into title (create_date, modify_date, name) values(NOW(), NOW(), '뉴비');
-insert into title (create_date, modify_date, name) values(NOW(), NOW(), '포토부스 리뷰어'); -- 리뷰
-insert into title (create_date, modify_date, name) values(NOW(), NOW(), '포토부스 전문가'); -- 방문횟수
+-- insert into memberTitle (create_date, modify_date, name) values(NOW(), NOW(), '뉴비');
+-- insert into memberTitle (create_date, modify_date, name) values(NOW(), NOW(), '포토부스 리뷰어'); -- 리뷰
+-- insert into memberTitle (create_date, modify_date, name) values(NOW(), NOW(), '포토부스 전문가'); -- 방문횟수
 
 INSERT INTO SHOP(create_date, modify_date, road_address_name, longitude, latitude, place_name, brand)VALUES (NOW(), NOW(), '서울 성동구 서울숲2길 48', 127.043851506853, 37.5461761379704, '인생네컷 서울숲노가리마트로드점', '인생네컷');
 INSERT INTO SHOP(create_date, modify_date, road_address_name,longitude, latitude, place_name, brand) VALUES(NOW(), NOW(), '서울 성동구 서울숲2길 17-2',127.04073790685483, 37.547177362006806, '포토이즘박스 성수점', '포토이즘박스');
@@ -14,3 +13,10 @@ INSERT INTO SHOP(create_date, modify_date, road_address_name,longitude, latitude
 INSERT INTO SHOP(create_date, modify_date, road_address_name,longitude, latitude, place_name, brand) VALUES(NOW(), NOW(), '충남 천안시 서북구 원두정2길 21',127.135473811813, 36.8322023787607, '포토이즘박스 두정점', '포토이즘박스');
 INSERT INTO SHOP(create_date, modify_date, road_address_name,longitude, latitude, place_name, brand) VALUES(NOW(), NOW(), '충남 천안시 동남구 먹거리11길 28',127.155596175371, 36.8181132541858, '포토이즘컬러드 천안신부점', '포토이즘박스');
 
+
+-- 칭호
+INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(), NOW(), '뉴비', '네컷지도 가입');
+INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(), NOW(), '리뷰 첫 걸음', '리뷰 1회 누적');
+INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(), NOW(), '리뷰 홀릭', '리뷰 5회 누적');
+INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(), NOW(), '찜 첫 걸음', '찜 1회 누적');
+INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(), NOW(), '찜 홀릭', '찜 5회 누적');
