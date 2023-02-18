@@ -33,10 +33,9 @@ public class MemberController {
     @GetMapping("/info")
     public ResponseEntity<RsData> getProfile(@AuthenticationPrincipal MemberContext memberContext) {
         MemberInfoResp memberInfoResp = memberService.getMemberInfo(memberContext.getId());
-        RsData<MemberInfoResp> body = new RsData<>(
-                true, "회원 정보 조회 성공", memberInfoResp
-        );
-        return new ResponseEntity<>(body, HttpStatus.OK);
+        return new ResponseEntity<>(
+                new RsData<>(true, "회원 정보 조회 성공", memberInfoResp),
+                HttpStatus.OK);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -46,10 +45,9 @@ public class MemberController {
             @RequestBody @Valid MemberUpdateReq memberUpdateReq
     ) {
         memberService.updateNickname(memberContext.getId(), memberUpdateReq);
-        RsData<?> body = new RsData<>(
-                true, "회원 닉네임 수정 성공", null
-        );
-        return new ResponseEntity<>(body, HttpStatus.OK);
+        return new ResponseEntity<>(
+                new RsData(true, "회원 닉네임 수정 성공"),
+                HttpStatus.OK);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -62,10 +60,9 @@ public class MemberController {
         // 1. 기존처럼 member 객체를 넘기는 방법
         // 2. memberId 만 넘기고 실질적으로 조회쿼리가 날라가는 memberTitleService.updateMainMemberTitle() 내에서 member 객체를 만들어 사용하는 방식
         memberService.updateMainMemberTitle(memberContext.getMember(), memberTitleId);
-        RsData<?> body = new RsData<>(
-                true, "회원 대표 칭호 수정 성공", null
-        );
-        return new ResponseEntity<>(body, HttpStatus.OK);
+        return new ResponseEntity<>(
+                new RsData(true, "회원 대표 칭호 수정 성공"),
+                HttpStatus.OK);
     }
 
     /**
@@ -97,11 +94,8 @@ public class MemberController {
         // 2. 연결 끊기
         kakaoService.disconnect(kakaoAccessToken);
         MemberWithdrawlResp memberWithdrawlResp = memberService.deleteMember(memberContext.getId(), jwtAccessToken);
-        RsData<MemberWithdrawlResp> body = new RsData<>(
-                true,
-                "회원탈퇴 성공",
-                memberWithdrawlResp
-        );
-        return new ResponseEntity<>(body, HttpStatus.OK);
+        return new ResponseEntity<>(
+                new RsData<>(true, "회원탈퇴 성공", memberWithdrawlResp),
+                HttpStatus.OK);
     }
 }
