@@ -87,4 +87,15 @@ public class MemberTitleService {
                 });
         newMemberTitleLog.registerMain();
     }
+
+    // memberId 를 참조하고 있는 row 모두 삭제
+    @Transactional
+    public void deleteByMemberId(Long memberId) {
+        log.info("----Before memberTitleLogRepository.findByMember()----");
+        List<MemberTitleLog> memberTitleLogs = memberTitleLogRepository.findByMember(Member.builder().id(memberId).build());
+        log.info("----Before memberTitleLogRepository.delete()----");
+        for(MemberTitleLog memberTitleLog : memberTitleLogs) {
+            memberTitleLogRepository.delete(memberTitleLog);
+        }
+    }
 }
