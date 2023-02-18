@@ -47,7 +47,7 @@ public class AuthController {
         log.info("카카오 로그인 콜백 요청");
         log.info("code = " + code);
         // 1. 인가 코드로 토큰 발급 요청
-        KakaoTokenParam kakaoTokenParam = kakaoService.getKakaoAccessToken(code);
+        KakaoTokenParam kakaoTokenParam = kakaoService.getKakaoTokens(code);
         // 2. 토큰으로 사용자 정보 가져오기 요청
         KakaoUserInfoParam kakaoUserInfoParam = kakaoService.getKakaoUserInfo(kakaoTokenParam);
         // 3. 제공받은 사용자 정보로 서비스 회원 여부 확인후 회원가입 처리

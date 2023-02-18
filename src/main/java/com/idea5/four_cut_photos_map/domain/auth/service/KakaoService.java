@@ -38,7 +38,7 @@ public class KakaoService {
      * @param code 인가코드
      * @return kakao AccessToken
      */
-    public KakaoTokenParam getKakaoAccessToken(String code) throws JsonProcessingException {
+    public KakaoTokenParam getKakaoTokens(String code) throws JsonProcessingException {
         log.info("인가코드로 카카오 토큰 발급 요청");
         String url = "https://kauth.kakao.com/oauth/token";
         // header 생성
