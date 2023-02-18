@@ -4,11 +4,12 @@ import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.*;
 
 @Getter
+@Setter
 @AllArgsConstructor
 @ToString
 @Builder
 public class ResponseShop {
-
+    private long id;
     private String placeName;// 장소명
     private String roadAddressName; // 전체 도로명 주소
     private double latitude; // 위도

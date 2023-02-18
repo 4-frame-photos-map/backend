@@ -38,24 +38,20 @@ public class ShopService {
     public List<ResponseShop> findShops(List<KakaoKeywordResponseDto> apiShops) {
         List<ResponseShop> responseShops = new ArrayList<>();
 
-        // 카카오 맵 api로 부터 받아온 Shop과 db에 저장된 Shop 비교
+        // 카카오 맵 API로 부터 받아온 데이터와 일치하는 DB Shop 가져오기
         for (KakaoKeywordResponseDto apiShop: apiShops) {
-            //log.info("장소명="+apiShop.getPlace_name());
 
-            // db에서 장소명으로 shop 조회
+            // DB에서 장소명으로 Shop 조회(비교)
             Shop dbShop = shopRepository.findByPlaceName(apiShop.getPlaceName()).orElse(null);
 
-            // entity -> dto 변환
             if(dbShop != null) {
+                // Entity -> DTO 변환
                 ResponseShop responseShop = ResponseShop.from(dbShop);
 
-                // Api Shop과 비교 후 저장
-                if (apiShop.getPlaceName().equals(responseShop.getPlaceName())
-                        && Double.parseDouble(apiShop.getX()) == responseShop.getLongitude()
-                        && Double.parseDouble(apiShop.getY()) == responseShop.getLatitude()) {
-                    responseShops.add(responseShop);
-                }
-
+                // 위도, 경도 responseShop(응답 DTO 객체)에 저장
+               responseShop.setLongitude(Double.parseDouble(apiShop.getX()));
+               responseShop.setLatitude(Double.parseDouble(apiShop.getY()));
+               responseShops.add(responseShop);
             }
         }
 
