@@ -28,6 +28,11 @@ public class MemberTitleLog extends BaseEntity {
 
     private Boolean isMain; // 대표 칭호 여부
 
+    // 칭호명 조회
+    public String getMemberTitleName() {
+        return getMemberTitle().getName();
+    }
+
     // 대표 칭호 설정
     public void registerMain() {
         this.isMain = true;

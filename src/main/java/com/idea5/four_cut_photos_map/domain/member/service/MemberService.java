@@ -58,14 +58,13 @@ public class MemberService {
         log.info("----Before memberTitleService.findByMember(member)----");
         List<MemberTitleLog> memberTitleLogs = memberTitleService.findByMember(member);
         // 대표 칭호 조회
-        String mainMemberTitle = "";
         for(MemberTitleLog memberTitleLog : memberTitleLogs) {
             if(memberTitleLog.getIsMain()) {
-                log.info("----Before memberTitleLog.getMemberTitle().getName()----");
-                mainMemberTitle = memberTitleLog.getMemberTitle().getName();
+                log.info("----Before memberTitleLog.getMemberTitleName()----");
+                return MemberInfoResp.toDto(member, memberTitleLog.getMemberTitleName(), memberTitleLogs.size());
             }
         }
-        return MemberInfoResp.toDto(member, mainMemberTitle, memberTitleLogs.size());
+        return null;
     }
 
     // 서비스 로그아웃(accessToken 무효화)
