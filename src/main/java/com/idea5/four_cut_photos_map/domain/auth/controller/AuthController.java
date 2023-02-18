@@ -59,16 +59,15 @@ public class AuthController {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authentication", jwtToken.getAccessToken());
         headers.set("refreshToken", jwtToken.getRefreshToken());
-        // body 에 토큰 담기
-        RsData<KakaoLoginResp> body = new RsData<>(
-                true,
-                "카카오 로그인 성공(Kakao Token, Jwt Token 발급)",
-                new KakaoLoginResp(kakaoTokenParam, jwtToken)
-        );
-        // TODO: 세션 만료시간 설정하기
+        // TODO: 세션 대신 레디스 사용 고민
         session.setAttribute("kakaoAccessToken", kakaoTokenParam.getAccessToken());
         session.setAttribute("kakaoRefreshToken", kakaoTokenParam.getRefreshToken());
-        return new ResponseEntity<>(body, headers, HttpStatus.OK);
+        return new ResponseEntity<>(
+                new RsData<>(true,
+                        "카카오 로그인 성공(Kakao Token, Jwt Token 발급)",
+                        new KakaoLoginResp(kakaoTokenParam, jwtToken))
+                , headers,
+                HttpStatus.OK);
     }
 
     /**
@@ -87,13 +86,10 @@ public class AuthController {
         // header 에 토큰 담기
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authentication", accessToken.getAccessToken());
-        // body 에 토큰 담기
-        RsData<AccessToken> body = new RsData<>(
-                true,
-                "Access Token 재발급 성공",
-                accessToken
-        );
-        return new ResponseEntity<>(body, headers, HttpStatus.OK);
+        return new ResponseEntity<>(
+                new RsData<>(true, "Access Token 재발급 성공", accessToken),
+                headers,
+                HttpStatus.OK);
     }
 
     /**
@@ -107,12 +103,9 @@ public class AuthController {
         String accessToken = bearerToken.substring(BEARER_TOKEN_PREFIX.length());
         // redis 에 해당 accessToken 블랙리스트로 저장하기
         memberService.logout(accessToken);
-        RsData<Object> body = new RsData<>(
-                true,
-                "로그아웃 성공",
-                null
-        );
-        return new ResponseEntity<>(body, HttpStatus.OK);
+        return new ResponseEntity<>(
+                new RsData<>(true, "로그아웃 성공"),
+                HttpStatus.OK);
     }
 
 //    // TODO: 카카오와 함께 로그아웃 요청시 state 에 accessToken 값을 넘겨 응답에
