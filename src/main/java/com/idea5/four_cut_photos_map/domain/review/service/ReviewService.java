@@ -2,14 +2,13 @@ package com.idea5.four_cut_photos_map.domain.review.service;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
-import com.idea5.four_cut_photos_map.domain.review.dto.request.WriteReviewDto;
+import com.idea5.four_cut_photos_map.domain.review.dto.request.RequestReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.entity.Review;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.ItemScore;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.PurityScore;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.RetouchScore;
 import com.idea5.four_cut_photos_map.domain.review.repository.ReviewRepository;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.global.error.ErrorCode;
@@ -19,13 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUND;
 
 @Slf4j
 @Service
@@ -36,7 +31,14 @@ public class ReviewService {
     private final ShopService shopService;
     private final MemberService memberService;
 
-    public List<Review> findAllByShopId(Long shopId) {
+    private boolean actorCanModify(Member member, Review review) {
+        return member.getId() == review.getWriter().getId();
+    }
+
+    private boolean actorCanDelete(Member member, Review review) {
+        return actorCanModify(member, review);
+    }
+    private List<Review> findAllByShopId(Long shopId) {
 
         List<Review> reviews = reviewRepository.findAllByShopIdOrderByCreateDateDesc(shopId);   // 최신 작성순
 
@@ -47,7 +49,14 @@ public class ReviewService {
         return reviews;
     }
 
-    public List<ResponseReviewDto> searchAllReviewsInTheStore(Long shopId) {
+    public ResponseReviewDto getReviewById(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
+
+        return ResponseReviewDto.from(review);
+    }
+
+    public List<ResponseReviewDto> getAllShopReviews(Long shopId) {
         Shop shop = shopService.findShopById(shopId);
 
         List<Review> reviews = findAllByShopId(shopId);
@@ -57,21 +66,15 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    public ResponseReviewDto write(WriteReviewDto reviewDto, Long shopId, Long memberId) {
-        Member writer = memberService.findById(memberId);
-        if (writer == null) {
+    public ResponseReviewDto write(Long memberId, Long shopId, RequestReviewDto reviewDto) {
+        Member user = memberService.findById(memberId);
+        if (user == null) {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND);
         }
 
         Shop shop = shopService.findShopById(shopId);
 
-        if (verifyExistedReview(memberId, shopId)) {
-            throw new BusinessException(ErrorCode.REVIEW_ALREADY_EXISTS);
-        }
-
         Review review = Review.builder()
-                .writer(writer)
-                .shop(shop)
                 .starRating(reviewDto.getStarRating())
                 .content(reviewDto.getContent())
                 .purity(reviewDto.getPurity() == null ? PurityScore.UNSELECTED : PurityScore.valueOf(reviewDto.getPurity()))
@@ -79,23 +82,28 @@ public class ReviewService {
                 .item(reviewDto.getItem() == null ? ItemScore.UNSELECTED : ItemScore.valueOf(reviewDto.getItem()))
                 .build();
 
+        user.addReview(review);
+        shop.addReview(review);
+
         reviewRepository.save(review);
 
-        return ResponseReviewDto.from(review, writer, shop);
+        return ResponseReviewDto.from(review, user, shop);
     }
 
-    public ResponseReviewDto modify(WriteReviewDto reviewDto, Long shopId, Long memberId) {
-        Shop shop = shopService.findShopById(shopId);
-
+    public ResponseReviewDto modify(Long memberId, Long reviewId, RequestReviewDto reviewDto) {
         Member user = memberService.findById(memberId);
-        if (user == null) {
+        if(user == null) {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND);
         }
 
-        Review review = reviewRepository.findByWriterIdAndShopId(memberId, shopId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
+        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
 
-        // 입력된 데이터로 Review Entity 수정
+        // 수정 권한 확인
+        if(!actorCanModify(user, review)) {
+            throw new BusinessException(ErrorCode.WRITER_DOES_NOT_MATCH);
+        }
+
+        // Review Entity 수정
         review.setStarRating(reviewDto.getStarRating());
         review.setContent(reviewDto.getContent());
         review.setPurity(reviewDto.getPurity() == null ? PurityScore.UNSELECTED : PurityScore.valueOf(reviewDto.getPurity()));
@@ -104,24 +112,26 @@ public class ReviewService {
 
         reviewRepository.save(review);  // 병합
 
-        return ResponseReviewDto.from(review, user, shop);
+        return ResponseReviewDto.from(review);
     }
 
-    private boolean verifyExistedReview(Long memberId, Long shopId) {
-        return reviewRepository.findByWriterIdAndShopId(memberId, shopId).orElse(null) != null;
-    }
-
-    public void delete(Long shopId, Long memberId) {
-        Shop shop = shopService.findShopById(shopId);
-
-        Member member = memberService.findById(memberId);
-        if (member == null) {
+    public void delete(Long memberId, Long reviewId) {
+        Member user = memberService.findById(memberId);
+        if (user == null) {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND);
         }
 
-        Review review = reviewRepository.findByWriterIdAndShopId(memberId, shopId)
+        Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
-
+        
+        if(actorCanDelete(user, review)) {
+            throw new BusinessException(ErrorCode.WRITER_DOES_NOT_MATCH);
+        }
+        
+        // 연관관계 끊기
+        user.removeReview(review);
+        review.getShop().removeReview(review);
+        
         reviewRepository.delete(review);
     }
 }

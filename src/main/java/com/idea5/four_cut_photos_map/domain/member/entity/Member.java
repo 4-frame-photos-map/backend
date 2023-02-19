@@ -58,7 +58,12 @@ public class Member extends BaseEntity {
     }
 
     public void addReview(Review review) {
-        review.setWriter(this);
         this.reviews.add(review);
+        review.setWriter(this);
+    }
+
+    public void removeReview(Review review) {
+        this.reviews.remove(review);
+        review.setWriter(null);
     }
 }

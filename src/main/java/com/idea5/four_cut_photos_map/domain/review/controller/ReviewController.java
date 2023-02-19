@@ -1,16 +1,15 @@
 package com.idea5.four_cut_photos_map.domain.review.controller;
 
-import com.idea5.four_cut_photos_map.domain.review.dto.request.WriteReviewDto;
+import com.idea5.four_cut_photos_map.domain.review.dto.request.RequestReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.service.ReviewService;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
-import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
+import com.idea5.four_cut_photos_map.global.error.ErrorCode;
+import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,69 +22,48 @@ import java.util.List;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/review")
+@RequestMapping("/reviews")
 public class ReviewController {
     private final ReviewService reviewService;
-    private final ShopService shopService;
 
-    @GetMapping("/{shopId}")
-    public ResponseEntity<RsData> getShopReviews(@PathVariable Long shopId) {
-        List<ResponseReviewDto> reviews = reviewService.searchAllReviewsInTheStore(shopId);
-
-        RsData<List<ResponseReviewDto>> body = new RsData<>(
-                true,
-                "상점 리뷰 정보 조회 성공",
-                reviews
-        );
-
-        return new ResponseEntity<>(body, HttpStatus.OK);
-    }
-
-    @PostMapping("/{shopId}")
-    public ResponseEntity<RsData> writeReview(@PathVariable Long shopId,
-                                         @AuthenticationPrincipal MemberContext memberContext,
-                                         @Valid @RequestBody WriteReviewDto reviewDto) {
-        ResponseReviewDto responseReviewDto = reviewService.write(reviewDto, shopId, memberContext.getId());
+    @GetMapping("/{reviewId}")
+    public ResponseEntity<RsData> getReview(@PathVariable Long reviewId) {
+        ResponseReviewDto responseReviewDto = reviewService.getReviewById(reviewId);
 
         RsData<ResponseReviewDto> body = new RsData<>(
                 true,
-                "상점 리뷰 작성 성공",
+                "리뷰 조회 완료",
                 responseReviewDto
         );
-
-        return new ResponseEntity<>(body, HttpStatus.OK);
+        return new ResponseEntity<> (body, HttpStatus.OK);
     }
 
-    @PatchMapping("/{shopId}")
-    public ResponseEntity<RsData> modifyReview(@PathVariable Long shopId,
+    @PatchMapping("/{reviewId}")
+    public ResponseEntity<RsData> modifyReview(@PathVariable Long reviewId,
                                                @AuthenticationPrincipal MemberContext memberContext,
-                                               @Valid @RequestBody WriteReviewDto reviewDto) {
-        ResponseReviewDto responseReviewDto = reviewService.modify(reviewDto, shopId, memberContext.getId());
+                                               @Valid @RequestBody RequestReviewDto reviewDto) {
+        ResponseReviewDto responseReviewDto = reviewService.modify(memberContext.getId(), reviewId, reviewDto);
 
-        RsData<ResponseReviewDto> body = new RsData<>(
+        log.debug("responseReviewDto = {}", responseReviewDto);
+
+        RsData<Object> body = new RsData<>(
                 true,
-                "상점 리뷰 수정 성공",
-                responseReviewDto
+                "리뷰 수정 완료",
+                null
         );
 
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{shopId}")
-    public ResponseEntity<RsData> deleteReview(
-            @PathVariable Long shopId,
-            @AuthenticationPrincipal MemberContext memberContext) {
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<RsData> deleteReview(@PathVariable Long reviewId,
+                                               @AuthenticationPrincipal MemberContext memberContext) {
+        reviewService.delete(memberContext.getId(), reviewId);
 
-        // 가게의 회원의 리뷰 삭제
-        reviewService.delete(shopId, memberContext.getId());
-
-        // 가게의 모든 리뷰 조회
-        List<ResponseReviewDto> responseReviews = reviewService.searchAllReviewsInTheStore(shopId);
-
-        RsData<List<ResponseReviewDto>> body = new RsData<>(
-            true,
-            "상점 리뷰를 삭제하였습니다.",
-                responseReviews
+        RsData<Object> body = new RsData<>(
+                true,
+                "리뷰 삭제 완료",
+                null
         );
 
         return new ResponseEntity<>(body, HttpStatus.OK);

@@ -44,8 +44,13 @@ public class Shop extends BaseEntity {
     }
 
     public void addReview(Review review) {
-        review.setShop(this);
         this.reviews.add(review);
+        review.setShop(this);
+    }
+
+    public void removeReview(Review review) {
+        this.reviews.remove(review);
+        review.setShop(null);
     }
 
 }
