@@ -3,8 +3,10 @@ package com.idea5.four_cut_photos_map.domain.auth.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoTokenResp;
 import com.idea5.four_cut_photos_map.domain.member.dto.KakaoTokenParam;
 import com.idea5.four_cut_photos_map.domain.member.dto.KakaoUserInfoParam;
+import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +28,7 @@ import org.springframework.web.client.RestTemplate;
 public class KakaoService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+    private final RedisDao redisDao;
 
     @Value("${oauth2.kakao.client-id}")
     private String clientId;
@@ -53,18 +56,12 @@ public class KakaoService {
         // header + body 를 합쳐 request 생성
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
         // post 요청, 응답
-        ResponseEntity<String> response = restTemplate.postForEntity(
+        KakaoTokenResp kakaoTokenResp = restTemplate.postForObject(
                 url,
                 request,
-                String.class);
-
-        // 응답 정보 역직렬화
-        JsonNode jsonNode = objectMapper.readValue(response.getBody(), JsonNode.class);
-        String accessToken = jsonNode.get("access_token").asText();
-        String refreshToken = jsonNode.get("refresh_token").asText();
-        log.info("access-token = " + accessToken);
-        log.info("refresh-token = " + refreshToken);
-        return new KakaoTokenParam(accessToken, refreshToken);
+                KakaoTokenResp.class);
+        log.info(kakaoTokenResp.toString());
+        return new KakaoTokenParam(kakaoTokenResp.getAccessToken(), kakaoTokenResp.getRefreshToken());
     }
 
     /**
