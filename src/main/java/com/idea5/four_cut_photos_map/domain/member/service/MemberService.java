@@ -1,5 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.member.service;
 
+import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoTokenResp;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoUserInfoParam;
 import com.idea5.four_cut_photos_map.domain.member.dto.request.MemberUpdateReq;
@@ -33,18 +34,23 @@ public class MemberService {
 
     // 회원 가져오기
     @Transactional
-    public Member getMember(KakaoUserInfoParam kakaoUserInfoParam) {
+    public Member getMember(KakaoUserInfoParam kakaoUserInfoParam, KakaoTokenResp kakaoTokenResp) {
         // Unique 한 값인 kakaoId 로 조회
         Member member = memberRepository.findByKakaoId(kakaoUserInfoParam.getId()).orElse(null);
-        // 신규 사용자인 경우 회원가입
-        if(member == null) {
-            Member newMember = KakaoUserInfoParam.toEntity(kakaoUserInfoParam);
+        if(member != null) {
+            // DB 에 Refresh Token 갱신
+        } else {
+            // 신규 사용자인 경우 회원가입
+            member = KakaoUserInfoParam.toEntity(kakaoUserInfoParam);
             // 회원가입 기본 칭호 부여, 대표 칭호로 설정
             log.info("----Before ----");
-            memberRepository.save(newMember);
-            memberTitleService.addMemberTitle(newMember, MemberTitleType.NEWBIE.getCode(), true);
-            return newMember;
+            memberRepository.save(member);
+            memberTitleService.addMemberTitle(member, MemberTitleType.NEWBIE.getCode(), true);
         }
+        // redis 에 Access Token 저장 및 갱신
+        String key = "member:" + member.getId() + ":kakao_access_token";
+        redisDao.setValues(key, kakaoTokenResp.getAccessToken(), Duration.ofSeconds(kakaoTokenResp.getExpiresIn()));
+
         return member;
     }
 

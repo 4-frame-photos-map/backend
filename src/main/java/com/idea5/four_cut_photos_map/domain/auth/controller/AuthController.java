@@ -51,7 +51,7 @@ public class AuthController {
         // 2. 토큰으로 사용자 정보 가져오기 요청
         KakaoUserInfoParam kakaoUserInfoParam = kakaoService.getKakaoUserInfo(kakaoTokenResp);
         // 3. 제공받은 사용자 정보로 서비스 회원 여부 확인후 회원가입 처리
-        Member member = memberService.getMember(kakaoUserInfoParam);
+        Member member = memberService.getMember(kakaoUserInfoParam, kakaoTokenResp);
         // 4. 서비스 로그인
         // jwt accessToken, refreshToken 발급
         JwtToken jwtToken = jwtService.generateTokens(member);
