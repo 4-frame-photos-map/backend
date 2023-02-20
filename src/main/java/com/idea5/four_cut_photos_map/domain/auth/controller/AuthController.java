@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoTokenResp;
 import com.idea5.four_cut_photos_map.domain.auth.service.KakaoService;
 import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoUserInfoParam;
-import com.idea5.four_cut_photos_map.domain.member.dto.response.KakaoLoginResp;
+import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoLoginResp;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
@@ -60,9 +60,7 @@ public class AuthController {
         headers.set("Authentication", jwtToken.getAccessToken());
         headers.set("refreshToken", jwtToken.getRefreshToken());
         return new ResponseEntity<>(
-                new RsData<>(true,
-                        "카카오 로그인 성공(Kakao Token, Jwt Token 발급)",
-                        new KakaoLoginResp(null, jwtToken))
+                new RsData<>(true, "카카오 로그인 성공(JWT Token 발급)", new KakaoLoginResp(jwtToken))
                 , headers,
                 HttpStatus.OK);
     }
