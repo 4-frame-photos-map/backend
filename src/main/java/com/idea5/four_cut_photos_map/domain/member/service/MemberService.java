@@ -39,9 +39,11 @@ public class MemberService {
         Member member = memberRepository.findByKakaoId(kakaoUserInfoParam.getId()).orElse(null);
         if(member != null) {
             // DB 에 Refresh Token 갱신
+            member.updateKakaoRefreshToken(kakaoTokenResp.getRefreshToken());
         } else {
             // 신규 사용자인 경우 회원가입
             member = KakaoUserInfoParam.toEntity(kakaoUserInfoParam);
+            member.updateKakaoRefreshToken(kakaoTokenResp.getRefreshToken());
             // 회원가입 기본 칭호 부여, 대표 칭호로 설정
             log.info("----Before ----");
             memberRepository.save(member);

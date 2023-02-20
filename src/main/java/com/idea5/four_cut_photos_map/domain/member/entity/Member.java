@@ -30,6 +30,9 @@ public class Member extends BaseEntity {
 
     private String nickname;    // 닉네임(default kakao nickname)
 
+    // TODO: 임시 추가
+    private String kakaoRefreshToken;   // 카카오 리프레쉬 토큰
+
     // TODO: 이후 활용
     // 현재 회원이 가지고 있는 권한들을 List<GrantedAuthority> 형태로 리턴
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -42,5 +45,9 @@ public class Member extends BaseEntity {
 
     public void updateNickname(MemberUpdateReq memberUpdateReq) {
         this.nickname = memberUpdateReq.getNickname();
+    }
+
+    public void updateKakaoRefreshToken(String kakaoRefreshToken) {
+        this.kakaoRefreshToken = kakaoRefreshToken;
     }
 }
