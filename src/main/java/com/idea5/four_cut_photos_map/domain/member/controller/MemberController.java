@@ -16,7 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 @Slf4j
@@ -65,30 +64,20 @@ public class MemberController {
                 HttpStatus.OK);
     }
 
-    /**
-     * 회원탈퇴
-     * @param jwtToken 서비스에서 발급한 jwt accessToken
-     * @param kakaoAccessToken kakao 에서 발급받은 accessToken
-     * @param memberContext
-     * @return
-     */
+    // 회원탈퇴
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("")
     public ResponseEntity<RsData> deleteMember(
             @RequestHeader("Authorization") String jwtToken,
-            @RequestHeader("kakao-atk") String kakaoAccessToken,
-            @RequestHeader("kakao-rtk") String kakaoRefreshToken,
-            @AuthenticationPrincipal MemberContext memberContext,
-            HttpSession session
+            @AuthenticationPrincipal MemberContext memberContext
     ) throws JsonProcessingException {
-        // TODO: 카카오 토큰을 세션에서 가져오는 것으로 변경하기, refreshToken null 일 경우 처리
-        log.info("kakao-atk=" + session.getAttribute("kakaoAccessToken"));
-        log.info("kakao-rtk=" + session.getAttribute("kakaoRefreshToken"));
         String jwtAccessToken = jwtToken.substring(BEARER_TOKEN_PREFIX.length());
-        kakaoAccessToken = kakaoAccessToken.substring(BEARER_TOKEN_PREFIX.length());
-        kakaoRefreshToken = kakaoRefreshToken.substring(BEARER_TOKEN_PREFIX.length());
+        // Kakao Access Token 은 Redis 에서 가져오기
+        String kakaoAccessToken = memberService.getKakaoAccessToken(memberContext.getId());
         // 1. 카카오 토큰 만료시 토큰 갱신하기
-        if(kakaoService.isExpiredAccessToken(kakaoAccessToken)) {
+        if(kakaoAccessToken == null || kakaoService.isExpiredAccessToken(kakaoAccessToken)) {
+            // Kakao Refresh Token 은 DB 에서 가져오기
+            String kakaoRefreshToken = memberService.getKakaoRefreshToken(memberContext.getId());
             kakaoAccessToken = kakaoService.refresh(kakaoRefreshToken);
         }
         // 2. 연결 끊기

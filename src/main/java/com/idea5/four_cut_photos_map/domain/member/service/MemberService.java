@@ -119,4 +119,14 @@ public class MemberService {
 //        Member member = findById(memberId);
         memberTitleService.updateMainMemberTitle(member, memberTitleId);
     }
+
+    // 회원 Kakao Access Token 조회
+    public String getKakaoAccessToken(Long id) {
+        return redisDao.getValues("member:" + id + ":kakao_access_token");
+    }
+
+    // 회원 Kakao Refresh Token 조회
+    public String getKakaoRefreshToken(Long id) {
+        return findById(id).getKakaoRefreshToken();
+    }
 }
