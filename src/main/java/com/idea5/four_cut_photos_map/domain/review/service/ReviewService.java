@@ -38,11 +38,22 @@ public class ReviewService {
     private boolean actorCanDelete(Member member, Review review) {
         return actorCanModify(member, review);
     }
+
     private List<Review> findAllByShopId(Long shopId) {
 
         List<Review> reviews = reviewRepository.findAllByShopIdOrderByCreateDateDesc(shopId);   // 최신 작성순
 
         if (reviews.isEmpty()){
+            throw new BusinessException(ErrorCode.REVIEW_NOT_FOUND);
+        }
+
+        return reviews;
+    }
+
+    private List<Review> findAllByWriterId(Long writerId) {
+        List<Review> reviews = reviewRepository.findAllByWriterIdOrderByCreateDateDesc(writerId);
+
+        if (reviews.isEmpty()) {
             throw new BusinessException(ErrorCode.REVIEW_NOT_FOUND);
         }
 
@@ -60,6 +71,19 @@ public class ReviewService {
         Shop shop = shopService.findShopById(shopId);
 
         List<Review> reviews = findAllByShopId(shopId);
+
+        return reviews.stream()
+                .map(review -> ResponseReviewDto.from(review))
+                .collect(Collectors.toList());
+    }
+
+    public List<ResponseReviewDto> getAllMemberReviews(Long memberId) {
+        Member user = memberService.findById(memberId);
+        if (user == null) {
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        List<Review> reviews = findAllByWriterId(memberId);
 
         return reviews.stream()
                 .map(review -> ResponseReviewDto.from(review))
@@ -124,7 +148,7 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
         
-        if(actorCanDelete(user, review)) {
+        if(!actorCanDelete(user, review)) {
             throw new BusinessException(ErrorCode.WRITER_DOES_NOT_MATCH);
         }
         

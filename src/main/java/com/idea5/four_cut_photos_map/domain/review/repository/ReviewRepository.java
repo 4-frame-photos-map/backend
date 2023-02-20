@@ -13,4 +13,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Optional<Review> findByWriterIdAndShopId(Long writerId, Long shopId);
 
+    List<Review> findAllByWriterIdOrderByCreateDateDesc(Long writerId);
 }
