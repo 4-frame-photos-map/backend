@@ -4,8 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoTokenResp;
-import com.idea5.four_cut_photos_map.domain.member.dto.KakaoTokenParam;
-import com.idea5.four_cut_photos_map.domain.member.dto.KakaoUserInfoParam;
+import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoUserInfoParam;
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +40,7 @@ public class KakaoService {
      * @param code 인가코드
      * @return kakao AccessToken
      */
-    public KakaoTokenParam getKakaoTokens(String code) throws JsonProcessingException {
+    public KakaoTokenResp getKakaoTokens(String code) throws JsonProcessingException {
         log.info("인가코드로 카카오 토큰 발급 요청");
         String url = "https://kauth.kakao.com/oauth/token";
         // header 생성
@@ -61,21 +60,21 @@ public class KakaoService {
                 request,
                 KakaoTokenResp.class);
         log.info(kakaoTokenResp.toString());
-        return new KakaoTokenParam(kakaoTokenResp.getAccessToken(), kakaoTokenResp.getRefreshToken());
+        return kakaoTokenResp;
     }
 
     /**
      * 토큰으로 사용자 정보 가져오기
-     * @param kakaoTokenParam kakao 에서 발급한 accessToken,m
+     * @param kakaoTokenResp kakao 에서 발급한 accessToken
      * @return 사용자 정보
      */
-    public KakaoUserInfoParam getKakaoUserInfo(KakaoTokenParam kakaoTokenParam) throws JsonProcessingException {
+    public KakaoUserInfoParam getKakaoUserInfo(KakaoTokenResp kakaoTokenResp) throws JsonProcessingException {
         log.info("토큰으로 사용자 정보 가져오기 요청");
         String url = "https://kapi.kakao.com/v2/user/me";
         // header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.setBearerAuth(kakaoTokenParam.getAccessToken());
+        headers.setBearerAuth(kakaoTokenResp.getAccessToken());
         // header + body 를 합쳐 request 생성
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
         // post 요청, 응답

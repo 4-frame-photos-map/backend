@@ -1,9 +1,9 @@
 package com.idea5.four_cut_photos_map.domain.auth.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoTokenResp;
 import com.idea5.four_cut_photos_map.domain.auth.service.KakaoService;
-import com.idea5.four_cut_photos_map.domain.member.dto.KakaoTokenParam;
-import com.idea5.four_cut_photos_map.domain.member.dto.KakaoUserInfoParam;
+import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoUserInfoParam;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.KakaoLoginResp;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
@@ -47,9 +47,9 @@ public class AuthController {
         log.info("카카오 로그인 콜백 요청");
         log.info("code = " + code);
         // 1. 인가 코드로 토큰 발급 요청
-        KakaoTokenParam kakaoTokenParam = kakaoService.getKakaoTokens(code);
+        KakaoTokenResp kakaoTokenResp = kakaoService.getKakaoTokens(code);
         // 2. 토큰으로 사용자 정보 가져오기 요청
-        KakaoUserInfoParam kakaoUserInfoParam = kakaoService.getKakaoUserInfo(kakaoTokenParam);
+        KakaoUserInfoParam kakaoUserInfoParam = kakaoService.getKakaoUserInfo(kakaoTokenResp);
         // 3. 제공받은 사용자 정보로 서비스 회원 여부 확인후 회원가입 처리
         Member member = memberService.getMember(kakaoUserInfoParam);
         // 4. 서비스 로그인
@@ -59,13 +59,10 @@ public class AuthController {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authentication", jwtToken.getAccessToken());
         headers.set("refreshToken", jwtToken.getRefreshToken());
-        // TODO: 세션 대신 레디스 사용 고민
-        session.setAttribute("kakaoAccessToken", kakaoTokenParam.getAccessToken());
-        session.setAttribute("kakaoRefreshToken", kakaoTokenParam.getRefreshToken());
         return new ResponseEntity<>(
                 new RsData<>(true,
                         "카카오 로그인 성공(Kakao Token, Jwt Token 발급)",
-                        new KakaoLoginResp(kakaoTokenParam, jwtToken))
+                        new KakaoLoginResp(null, jwtToken))
                 , headers,
                 HttpStatus.OK);
     }
