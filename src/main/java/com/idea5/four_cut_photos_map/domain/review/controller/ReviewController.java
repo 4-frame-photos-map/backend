@@ -31,12 +31,9 @@ public class ReviewController {
     public ResponseEntity<RsData> getReview(@PathVariable Long reviewId) {
         ResponseReviewDto responseReviewDto = reviewService.getReviewById(reviewId);
 
-        RsData<ResponseReviewDto> body = new RsData<>(
-                true,
-                "리뷰 조회 완료",
-                responseReviewDto
-        );
-        return new ResponseEntity<> (body, HttpStatus.OK);
+        return new ResponseEntity<> (
+                new RsData<>(true, "리뷰 조회 완료", responseReviewDto),
+                HttpStatus.OK);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -46,15 +43,9 @@ public class ReviewController {
                                                @Valid @RequestBody RequestReviewDto reviewDto) {
         ResponseReviewDto responseReviewDto = reviewService.modify(memberContext.getId(), reviewId, reviewDto);
 
-        log.debug("responseReviewDto = {}", responseReviewDto);
-
-        RsData<Object> body = new RsData<>(
-                true,
-                "리뷰 수정 완료",
-                null
-        );
-
-        return new ResponseEntity<>(body, HttpStatus.OK);
+        return new ResponseEntity<>(
+                new RsData<>(true, "리뷰 수정 완료"),
+                HttpStatus.OK);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -63,13 +54,9 @@ public class ReviewController {
                                                @AuthenticationPrincipal MemberContext memberContext) {
         reviewService.delete(memberContext.getId(), reviewId);
 
-        RsData<Object> body = new RsData<>(
-                true,
-                "리뷰 삭제 완료",
-                null
-        );
-
-        return new ResponseEntity<>(body, HttpStatus.OK);
+        return new ResponseEntity<>(
+                new RsData<>(true, "리뷰 삭제 완료"),
+                HttpStatus.OK);
     }
 
 }

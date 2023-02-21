@@ -28,12 +28,8 @@ public class MemberReviewController {
     public ResponseEntity<RsData> getMemberReviews(@AuthenticationPrincipal MemberContext memberContext) {
         List<ResponseReviewDto> reviews = reviewService.getAllMemberReviews(memberContext.getId());
 
-        RsData<List<ResponseReviewDto>> body = new RsData<>(
-                true,
-                "회원의 모든 리뷰 조회 완료",
-                reviews
-        );
-
-        return new ResponseEntity<>(body, HttpStatus.OK);
+        return new ResponseEntity<>(
+                new RsData<>(true, "회원의 모든 리뷰 조회 완료", reviews),
+                HttpStatus.OK);
     }
 }

@@ -27,13 +27,9 @@ public class ShopReviewController {
     public ResponseEntity<RsData> getShopReviews(@PathVariable Long shopId) {
         List<ResponseReviewDto> reviews = reviewService.getAllShopReviews(shopId);
 
-        RsData<List<ResponseReviewDto>> body = new RsData<>(
-                true,
-                "상점의 모든 리뷰 조회 완료",
-                reviews
-        );
-
-        return new ResponseEntity<>(body, HttpStatus.OK);
+        return new ResponseEntity<>(
+                new RsData<>(true, "상점의 모든 리뷰 조회 완료", reviews),
+                HttpStatus.OK);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -43,14 +39,8 @@ public class ShopReviewController {
                                               @Valid @RequestBody RequestReviewDto reviewDto) {
         ResponseReviewDto responseReviewDto = reviewService.write(memberContext.getId(), shopId, reviewDto);
 
-        log.debug("responseReviewDto = {}", responseReviewDto);
-
-        RsData<ResponseReviewDto> body = new RsData<>(
-                true,
-                "상점 리뷰 작성 성공",
-                responseReviewDto
-        );
-
-        return new ResponseEntity<>(body, HttpStatus.OK);
+        return new ResponseEntity<>(
+                new RsData<>(true, "상점 리뷰 작성 성공"),
+                HttpStatus.OK);
     }
 }

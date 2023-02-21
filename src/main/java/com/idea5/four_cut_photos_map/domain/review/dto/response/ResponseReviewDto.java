@@ -46,8 +46,8 @@ public class ResponseReviewDto {
         ReviewShopDto reviewShopDto = ReviewShopDto.builder()
                 .id(shop.getId())
                 .brand(shop.getBrand())
-                .name(shop.getName())
-                .address(shop.getAddress())
+                .placeName(shop.getPlaceName())
+                .roadAddressName(shop.getRoadAddressName())
                 .build();
 
         return ResponseReviewDto.builder()

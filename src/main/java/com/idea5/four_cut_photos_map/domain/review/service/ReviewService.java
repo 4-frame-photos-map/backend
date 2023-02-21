@@ -99,15 +99,14 @@ public class ReviewService {
         Shop shop = shopService.findShopById(shopId);
 
         Review review = Review.builder()
+                .writer(user)
+                .shop(shop)
                 .starRating(reviewDto.getStarRating())
                 .content(reviewDto.getContent())
                 .purity(reviewDto.getPurity() == null ? PurityScore.UNSELECTED : PurityScore.valueOf(reviewDto.getPurity()))
                 .retouch(reviewDto.getRetouch() == null ? RetouchScore.UNSELECTED : RetouchScore.valueOf(reviewDto.getRetouch()))
                 .item(reviewDto.getItem() == null ? ItemScore.UNSELECTED : ItemScore.valueOf(reviewDto.getItem()))
                 .build();
-
-        user.addReview(review);
-        shop.addReview(review);
 
         reviewRepository.save(review);
 
@@ -151,11 +150,7 @@ public class ReviewService {
         if(!actorCanDelete(user, review)) {
             throw new BusinessException(ErrorCode.WRITER_DOES_NOT_MATCH);
         }
-        
-        // 연관관계 끊기
-        user.removeReview(review);
-        review.getShop().removeReview(review);
-        
+
         reviewRepository.delete(review);
     }
 }
