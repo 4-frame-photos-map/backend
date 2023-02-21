@@ -1,10 +1,14 @@
 package com.idea5.four_cut_photos_map.domain.member.service;
 
 import com.idea5.four_cut_photos_map.domain.member.dto.KakaoUserInfoParam;
+import com.idea5.four_cut_photos_map.domain.member.dto.request.MemberUpdateReq;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberInfoResp;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberWithdrawlResp;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
+import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleLog;
+import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleType;
+import com.idea5.four_cut_photos_map.domain.memberTitle.service.MemberTitleService;
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -22,6 +27,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtProvider jwtProvider;
     private final RedisDao redisDao;
+    private final MemberTitleService memberTitleService;
 
     // 회원 가져오기
     @Transactional
@@ -30,15 +36,14 @@ public class MemberService {
         Member member = memberRepository.findByKakaoId(kakaoUserInfoParam.getId()).orElse(null);
         // 신규 사용자인 경우 회원가입
         if(member == null) {
-            member = join(kakaoUserInfoParam);
+            Member newMember = KakaoUserInfoParam.toEntity(kakaoUserInfoParam);
+            // 회원가입 기본 칭호 부여, 대표 칭호로 설정
+            log.info("----Before ----");
+            memberRepository.save(newMember);
+            memberTitleService.addMemberTitle(newMember, MemberTitleType.NEWBIE.getCode(), true);
+            return newMember;
         }
         return member;
-    }
-
-    // 회원가입
-    public Member join(KakaoUserInfoParam kakaoUserInfoParam) {
-        Member member = KakaoUserInfoParam.toEntity(kakaoUserInfoParam);
-        return memberRepository.save(member);
     }
 
     public Member findById(Long id) {
@@ -48,7 +53,17 @@ public class MemberService {
     // 회원 id 로 기본 정보 조회
     public MemberInfoResp getMemberInfo(Long id) {
         Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException());
-        return MemberInfoResp.toDto(member);
+        log.info("----Before memberTitleService.findByMember(member)----");
+        List<MemberTitleLog> memberTitleLogs = memberTitleService.findByMember(member);
+        // 대표 칭호 조회
+        String mainMemberTitle = "";
+        for(MemberTitleLog memberTitleLog : memberTitleLogs) {
+            if(memberTitleLog.getIsMain()) {
+                log.info("----Before memberTitleLog.getMemberTitle().getName()----");
+                mainMemberTitle = memberTitleLog.getMemberTitle().getName();
+            }
+        }
+        return MemberInfoResp.toDto(member, mainMemberTitle, memberTitleLogs.size());
     }
 
     // 서비스 로그아웃(accessToken 무효화)
@@ -73,8 +88,23 @@ public class MemberService {
         // 2. redis 에 해당 accessToken 블랙리스트로 등록
         Long expiration = jwtProvider.getExpiration(accessToken);
         redisDao.setValues(accessToken, "withdrawl", Duration.ofMillis(expiration));
+        // TODO: Member 삭제시 Member 를 참조하고 있는 MemberTitleLog 때문에 오류가 발생한다
         // 3. DB 에서 회원 삭제
         memberRepository.deleteById(id);
         return new MemberWithdrawlResp(id);
+    }
+
+    // 회원 닉네임 수정
+    @Transactional
+    public void updateNickname(Long id, MemberUpdateReq memberUpdateReq) {
+        Member member = findById(id);
+        member.updateNickname(memberUpdateReq);
+    }
+
+    // 회원 대표칭호 수정
+    @Transactional
+    public void updateMainMemberTitle(Member member, Long memberTitleId) {
+//        Member member = findById(memberId);
+        memberTitleService.updateMainMemberTitle(member, memberTitleId);
     }
 }

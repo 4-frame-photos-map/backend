@@ -1,10 +1,11 @@
 package com.idea5.four_cut_photos_map.domain.member.entity;
 
-import com.idea5.four_cut_photos_map.domain.like.entity.Like;
-import com.idea5.four_cut_photos_map.domain.titleLog.entity.TitleLog;
+import com.idea5.four_cut_photos_map.domain.member.dto.request.MemberUpdateReq;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
-import com.idea5.four_cut_photos_map.domain.review.entity.Review;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,8 +17,6 @@ import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.persistence.FetchType;
-import java.util.*;
 
 @Entity
 @Getter
@@ -31,22 +30,6 @@ public class Member extends BaseEntity {
 
     private String nickname;    // 닉네임(default kakao nickname)
 
-    @Column(columnDefinition = "TEXT")
-    private String accessToken; // jwt access token
-
-    @OneToMany
-    @JoinColumn(name = "member_id")
-    private List<Like> likes = new ArrayList<>();
-
-    @OneToMany
-    @JoinColumn(name = "member_id")
-    private List<TitleLog> titleLogs = new ArrayList<>();
-
-    @OneToMany(mappedBy = "writer")
-    @Builder.Default
-    @ToString.Exclude
-    private List<Review> reviews = new LinkedList<>();
-
     // TODO: 이후 활용
     // 현재 회원이 가지고 있는 권한들을 List<GrantedAuthority> 형태로 리턴
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -57,13 +40,7 @@ public class Member extends BaseEntity {
         return authorities;
     }
 
-    public void addReview(Review review) {
-        this.reviews.add(review);
-        review.setWriter(this);
-    }
-
-    public void removeReview(Review review) {
-        this.reviews.remove(review);
-        review.setWriter(null);
+    public void updateNickname(MemberUpdateReq memberUpdateReq) {
+        this.nickname = memberUpdateReq.getNickname();
     }
 }
