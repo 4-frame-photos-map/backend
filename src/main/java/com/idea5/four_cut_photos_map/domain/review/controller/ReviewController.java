@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +39,7 @@ public class ReviewController {
         return new ResponseEntity<> (body, HttpStatus.OK);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("/{reviewId}")
     public ResponseEntity<RsData> modifyReview(@PathVariable Long reviewId,
                                                @AuthenticationPrincipal MemberContext memberContext,
@@ -55,6 +57,7 @@ public class ReviewController {
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<RsData> deleteReview(@PathVariable Long reviewId,
                                                @AuthenticationPrincipal MemberContext memberContext) {
