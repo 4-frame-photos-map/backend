@@ -90,6 +90,18 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
+    public List<ResponseReviewDto> getTop3ShopReviews(Long shopId) {
+        List<Review> reviews = reviewRepository.findTop3ByShopIdOrderByCreateDateDesc(shopId);
+
+        if (reviews.isEmpty()) {
+            throw new BusinessException(ErrorCode.REVIEW_NOT_FOUND);
+        }
+
+        return reviews.stream()
+                .map(review -> ResponseReviewDto.from(review))
+                .collect(Collectors.toList());
+    }
+
     public ResponseReviewDto write(Long memberId, Long shopId, RequestReviewDto reviewDto) {
         Member user = memberService.findById(memberId);
         if (user == null) {
