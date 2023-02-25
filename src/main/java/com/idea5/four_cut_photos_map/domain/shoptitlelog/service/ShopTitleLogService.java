@@ -33,9 +33,21 @@ public class ShopTitleLogService {
 
     /**
      * 칭호가 없을 때)
-     *  orElseThrow;
-     *  orElse(null);
+     * orElseThrow;
+     * orElse(null);
      */
+
+    public List<String> getShopTitles(Long shopId) {
+        // 상점이 보유한 칭호조회
+        List<ShopTitleDto> shopTitleByShopId = findShopTitleByShopId(shopId);
+
+        // 상점 이름만 get
+        List<String> resultList = shopTitleByShopId.stream()
+                .map(shopTitle -> shopTitle.getName())
+                .collect(Collectors.toList());
+
+        return resultList;
+    }
     public List<ShopTitleDto> findShopTitleByShopId(Long shopId){
         List<ShopTitleDto> responseList = new ArrayList<>();
 

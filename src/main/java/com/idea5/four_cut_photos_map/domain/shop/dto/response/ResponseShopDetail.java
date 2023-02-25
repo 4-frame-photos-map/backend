@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @AllArgsConstructor
 @Getter
 @Setter
@@ -22,9 +25,9 @@ public class ResponseShopDetail {
     private boolean canBeAddedToFavorites; // 사용자의 찜 여부 // Entity에 추가 X(Entity Manager 관리 범위에 속하지 X)
     private int favoriteCnt; // 찜 수
 
-    // todo : Review, 찜 추가
+    private List<String> shopTitles = new ArrayList<>();
 
-
+        // todo : Review 추가;
     public static ResponseShopDetail of(Shop shop, String distance){
         return ResponseShopDetail.builder()
                 .id(shop.getId())
@@ -41,6 +44,9 @@ public class ResponseShopDetail {
         this.distance = distance;
     }
 
+    public void setShopTitles(List<String> shopTitles) {
+        this.shopTitles = shopTitles;
+    }
 
-    // todo : Review 추가;
+
 }

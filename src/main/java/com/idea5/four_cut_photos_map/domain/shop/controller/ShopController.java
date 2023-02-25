@@ -10,6 +10,7 @@ import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
+import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
 import com.idea5.four_cut_photos_map.global.common.data.Brand;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
@@ -35,6 +36,7 @@ public class ShopController {
 
     private final ShopService shopService;
     private final FavoriteService favoriteService;
+    private final ShopTitleLogService shopTitleLogService;
 
     @GetMapping("/brand/search")
     public ResponseEntity<RsData<List<ResponseShopBrand>>> showBrandListBySearch(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch) {
@@ -159,6 +161,10 @@ public class ShopController {
                 shopDetailDto.setCanBeAddedToFavorites(false);
             }
         }
+
+        List<String> shopTitles = shopTitleLogService.getShopTitles(id);
+        shopDetailDto.setShopTitles(shopTitles);
+
 
         return ResponseEntity.ok(shopDetailDto);
     }
