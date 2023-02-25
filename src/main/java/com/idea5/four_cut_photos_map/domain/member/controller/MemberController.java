@@ -16,7 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 @Slf4j
@@ -33,10 +32,9 @@ public class MemberController {
     @GetMapping("/info")
     public ResponseEntity<RsData> getProfile(@AuthenticationPrincipal MemberContext memberContext) {
         MemberInfoResp memberInfoResp = memberService.getMemberInfo(memberContext.getId());
-        RsData<MemberInfoResp> body = new RsData<>(
-                true, "회원 정보 조회 성공", memberInfoResp
-        );
-        return new ResponseEntity<>(body, HttpStatus.OK);
+        return new ResponseEntity<>(
+                new RsData<>(true, "회원 정보 조회 성공", memberInfoResp),
+                HttpStatus.OK);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -46,10 +44,9 @@ public class MemberController {
             @RequestBody @Valid MemberUpdateReq memberUpdateReq
     ) {
         memberService.updateNickname(memberContext.getId(), memberUpdateReq);
-        RsData<?> body = new RsData<>(
-                true, "회원 닉네임 수정 성공", null
-        );
-        return new ResponseEntity<>(body, HttpStatus.OK);
+        return new ResponseEntity<>(
+                new RsData(true, "회원 닉네임 수정 성공"),
+                HttpStatus.OK);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -62,46 +59,32 @@ public class MemberController {
         // 1. 기존처럼 member 객체를 넘기는 방법
         // 2. memberId 만 넘기고 실질적으로 조회쿼리가 날라가는 memberTitleService.updateMainMemberTitle() 내에서 member 객체를 만들어 사용하는 방식
         memberService.updateMainMemberTitle(memberContext.getMember(), memberTitleId);
-        RsData<?> body = new RsData<>(
-                true, "회원 대표 칭호 수정 성공", null
-        );
-        return new ResponseEntity<>(body, HttpStatus.OK);
+        return new ResponseEntity<>(
+                new RsData(true, "회원 대표 칭호 수정 성공"),
+                HttpStatus.OK);
     }
 
-    /**
-     * 회원탈퇴
-     * @param jwtToken 서비스에서 발급한 jwt accessToken
-     * @param kakaoAccessToken kakao 에서 발급받은 accessToken
-     * @param memberContext
-     * @return
-     */
+    // 회원탈퇴
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("")
     public ResponseEntity<RsData> deleteMember(
             @RequestHeader("Authorization") String jwtToken,
-            @RequestHeader("kakao-atk") String kakaoAccessToken,
-            @RequestHeader("kakao-rtk") String kakaoRefreshToken,
-            @AuthenticationPrincipal MemberContext memberContext,
-            HttpSession session
+            @AuthenticationPrincipal MemberContext memberContext
     ) throws JsonProcessingException {
-        // TODO: 카카오 토큰을 세션에서 가져오는 것으로 변경하기, refreshToken null 일 경우 처리
-        log.info("kakao-atk=" + session.getAttribute("kakaoAccessToken"));
-        log.info("kakao-rtk=" + session.getAttribute("kakaoRefreshToken"));
         String jwtAccessToken = jwtToken.substring(BEARER_TOKEN_PREFIX.length());
-        kakaoAccessToken = kakaoAccessToken.substring(BEARER_TOKEN_PREFIX.length());
-        kakaoRefreshToken = kakaoRefreshToken.substring(BEARER_TOKEN_PREFIX.length());
+        // Kakao Access Token 은 Redis 에서 가져오기
+        String kakaoAccessToken = memberService.getKakaoAccessToken(memberContext.getId());
         // 1. 카카오 토큰 만료시 토큰 갱신하기
-        if(kakaoService.isExpiredAccessToken(kakaoAccessToken)) {
+        if(kakaoAccessToken == null || kakaoService.isExpiredAccessToken(kakaoAccessToken)) {
+            // Kakao Refresh Token 은 DB 에서 가져오기
+            String kakaoRefreshToken = memberService.getKakaoRefreshToken(memberContext.getId());
             kakaoAccessToken = kakaoService.refresh(kakaoRefreshToken);
         }
         // 2. 연결 끊기
         kakaoService.disconnect(kakaoAccessToken);
         MemberWithdrawlResp memberWithdrawlResp = memberService.deleteMember(memberContext.getId(), jwtAccessToken);
-        RsData<MemberWithdrawlResp> body = new RsData<>(
-                true,
-                "회원탈퇴 성공",
-                memberWithdrawlResp
-        );
-        return new ResponseEntity<>(body, HttpStatus.OK);
+        return new ResponseEntity<>(
+                new RsData<>(true, "회원탈퇴 성공", memberWithdrawlResp),
+                HttpStatus.OK);
     }
 }
