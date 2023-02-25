@@ -28,7 +28,7 @@ public class ShopTitleLogController {
                     true, "상점이 보유한 칭호는 없습니다."
             ));
         }
-        List<ShopTitleDto> responseList = shopTitleLogService.findShopTitles(shopId);
+        List<ShopTitleDto> responseList = shopTitleLogService.findShopTitlesByShopId(shopId);
 
         return ResponseEntity.ok(new RsData<>(
                 true, "상점 타이틀 조회 성공", responseList

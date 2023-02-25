@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +43,7 @@ public class ShopTitleLogService {
     // 상점이 보유한 칭호 조회
     public List<String> getShopTitles(Long shopId) {
         // 상점이 보유한 칭호 엔티티 조회
-        List<ShopTitleDto> shopTitleByShopId = findShopTitles(shopId);
+        List<ShopTitleDto> shopTitleByShopId = findShopTitlesByShopId(shopId);
 
         // 칭호 이름만 get
         List<String> resultList = shopTitleByShopId.stream()
@@ -53,7 +52,7 @@ public class ShopTitleLogService {
 
         return resultList;
     }
-    public List<ShopTitleDto> findShopTitles(Long shopId){
+    public List<ShopTitleDto> findShopTitlesByShopId(Long shopId){
         List<ShopTitleDto> responseList = new ArrayList<>();
 
 
@@ -80,7 +79,7 @@ public class ShopTitleLogService {
 
 //        // 조회 결과, 빈 컬렉션인 경우 -> 보유한 칭호가 없음.
         if (shopTitleLogs.isEmpty())
-            return null;
+            throw new BusinessException(SHOP_TITLE_NOT_FOUND);
 
         List<ShopTitleLogDto> shopTitleLogDtoList = shopTitleLogs.stream()
                 .map(shopTitlelog -> ShopTitleLogDto.of(shopTitlelog))
