@@ -1,10 +1,12 @@
 package com.idea5.four_cut_photos_map.domain.memberTitle.service;
 
+import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleInfoResp;
 import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleResp;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitle;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleLog;
+import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleType;
 import com.idea5.four_cut_photos_map.domain.memberTitle.repository.MemberTitleLogRepository;
 import com.idea5.four_cut_photos_map.domain.memberTitle.repository.MemberTitleRepository;
 import com.idea5.four_cut_photos_map.global.error.ErrorCode;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 public class MemberTitleService {
     private final MemberTitleRepository memberTitleRepository;
     private final MemberTitleLogRepository memberTitleLogRepository;
+    private final FavoriteService favoriteService;
 
     public MemberTitle findById(Long id) {
         return memberTitleRepository.findById(id).orElseThrow(() -> {
@@ -72,6 +75,11 @@ public class MemberTitleService {
         memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle, isMain));
     }
 
+    @Transactional
+    public void addMemberTitle(Member member, MemberTitle memberTitle, Boolean isMain) {
+        memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle, isMain));
+    }
+
     // 회원 대표 칭호 수정
     @Transactional
     public void updateMainMemberTitle(Member member, Long memberTitleId) {
@@ -97,5 +105,29 @@ public class MemberTitleService {
         for(MemberTitleLog memberTitleLog : memberTitleLogs) {
             memberTitleLogRepository.delete(memberTitleLog);
         }
+    }
+
+    public List<MemberTitle> findAllMemberTitle() {
+        return memberTitleRepository.findAllByOrderByIdAsc();
+    }
+
+    public List<MemberTitle> findMemberTitleByMember(Member member) {
+        return memberTitleLogRepository.findByMember(member)
+                .stream().map(memberTitleLog -> memberTitleLog.getMemberTitle())
+                .collect(Collectors.toList());
+    }
+
+    // 회원에게 해당 회원칭호를 부여할 수 있는지 여부
+    public boolean canGiveMemberTitle(Member member, MemberTitle memberTitle) {
+        if (memberTitle.getId() == MemberTitleType.FIRST_HEART.getCode()) {
+            if(favoriteService.countByMember(member) >= 1) {
+                return true;
+            }
+        } else if(memberTitle.getId() == MemberTitleType.MANY_HEART.getCode()) {
+            if(favoriteService.countByMember(member) >= 3) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -94,4 +94,9 @@ public class FavoriteService {
             favoriteRepository.delete(favorite);
         }
     }
+
+    // 해당 회원의 찜 개수
+    public Long countByMember(Member member) {
+        return favoriteRepository.countByMember(member);
+    }
 }

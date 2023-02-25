@@ -129,4 +129,8 @@ public class MemberService {
     public String getKakaoRefreshToken(Long id) {
         return findById(id).getKakaoRefreshToken();
     }
+
+    public List<Member> findAll() {
+        return memberRepository.findAllByOrderByIdAsc();
+    }
 }

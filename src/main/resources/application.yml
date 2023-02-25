@@ -32,7 +32,7 @@ spring:
     generate-ddl: true
     show-sql: true # 콘솔창에 sql 출력
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true # sql문 이쁘게 출력
