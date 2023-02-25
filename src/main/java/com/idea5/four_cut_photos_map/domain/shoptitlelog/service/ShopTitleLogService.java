@@ -19,8 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DUPLICATE_SHOP_TITLE;
-import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_TITLE_LOGS_NOT_FOUND;
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -100,8 +99,10 @@ public class ShopTitleLogService {
 
     }
     @Transactional
-    public void delete(Long shopTitleLogId) {
-        shopTitleLogRepository.deleteById(shopTitleLogId);
+    public void delete(Long id) {
+        // 제거 전, DB에 존재하는지 체크
+        ShopTitleLog entity = shopTitleLogRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_TITLE_NOT_FOUND));
+        shopTitleLogRepository.delete(entity);
     }
 
     public boolean validateDuplicate(Long shopId, Long shopTitleId){
