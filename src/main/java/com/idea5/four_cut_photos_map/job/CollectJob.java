@@ -20,7 +20,8 @@ public class CollectJob {
     private final MemberTitleService memberTitleService;
 
     // 초 분 시 일 월 요일
-    @Scheduled(cron = "0 0 0 * * *")    // 매일 0시 실행
+    @Scheduled(cron = "0 * * * * *")      // TODO: 테스트용 매분마다 실행
+//    @Scheduled(cron = "0 0 0 * * *")    // 매일 0시 실행
     public void add() {
         // 회원, 회원칭호 전체조회
         List<MemberTitle> memberTitles = memberTitleService.findAllMemberTitle();
