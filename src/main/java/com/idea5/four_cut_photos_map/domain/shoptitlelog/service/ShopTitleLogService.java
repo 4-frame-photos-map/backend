@@ -1,18 +1,20 @@
 package com.idea5.four_cut_photos_map.domain.shoptitlelog.service;
 
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
-import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
+import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.domain.shoptitle.dto.ShopTitleDto;
 import com.idea5.four_cut_photos_map.domain.shoptitle.entity.ShopTitle;
-import com.idea5.four_cut_photos_map.domain.shoptitle.service.ShopTitleService;
+import com.idea5.four_cut_photos_map.domain.shoptitle.repository.ShopTitleRepository;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.dto.ShopTitleLogDto;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.entity.ShopTitleLog;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.repository.ShopTitleLogRepository;
+import com.idea5.four_cut_photos_map.global.error.ErrorCode;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +30,10 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.*;
 public class ShopTitleLogService {
 
     private final ShopTitleLogRepository shopTitleLogRepository;
-    private final ShopTitleService shopTitleService;
-    private final ShopService shopService;
+
+    private final ShopTitleRepository shopTitleRepository;
+
+    private final ShopRepository shopRepository;
 
     /**
      * 칭호가 없을 때)
@@ -37,18 +41,19 @@ public class ShopTitleLogService {
      * orElse(null);
      */
 
+    // 상점이 보유한 칭호 조회
     public List<String> getShopTitles(Long shopId) {
-        // 상점이 보유한 칭호조회
-        List<ShopTitleDto> shopTitleByShopId = findShopTitleByShopId(shopId);
+        // 상점이 보유한 칭호 엔티티 조회
+        List<ShopTitleDto> shopTitleByShopId = findShopTitles(shopId);
 
-        // 상점 이름만 get
+        // 칭호 이름만 get
         List<String> resultList = shopTitleByShopId.stream()
                 .map(shopTitle -> shopTitle.getName())
                 .collect(Collectors.toList());
 
         return resultList;
     }
-    public List<ShopTitleDto> findShopTitleByShopId(Long shopId){
+    public List<ShopTitleDto> findShopTitles(Long shopId){
         List<ShopTitleDto> responseList = new ArrayList<>();
 
 
@@ -65,12 +70,17 @@ public class ShopTitleLogService {
         return responseList;
     }
 
+    // 상점이
+    public boolean existShopTitles(Long shopId){
+        return shopTitleLogRepository.existsByShopId(shopId);
+    }
+
     public List<ShopTitleLogDto> findShopTitleLogsByShopId(Long shopId){
         List<ShopTitleLog> shopTitleLogs = shopTitleLogRepository.findAllByShopId(shopId);
 
-        // 조회 결과, 빈 컬렉션인 경우 예외 발생
+//        // 조회 결과, 빈 컬렉션인 경우 -> 보유한 칭호가 없음.
         if (shopTitleLogs.isEmpty())
-            throw new BusinessException(SHOP_TITLE_LOGS_NOT_FOUND);
+            return null;
 
         List<ShopTitleLogDto> shopTitleLogDtoList = shopTitleLogs.stream()
                 .map(shopTitlelog -> ShopTitleLogDto.of(shopTitlelog))
@@ -86,8 +96,8 @@ public class ShopTitleLogService {
         if (validateDuplicate(shopId, shopTitleId)) {
 
             // 엔티티 조회
-            Shop shop = shopService.findById(shopId);
-            ShopTitle shopTitle = shopTitleService.findById(shopTitleId);
+            Shop shop = shopRepository.findById(shopId).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
+            ShopTitle shopTitle = shopTitleRepository.findById(shopTitleId).orElseThrow(() -> new BusinessException(ErrorCode.SHOP_TITLE_NOT_FOUND));
 
             ShopTitleLog shopTitleLog = ShopTitleLog.builder()
                     .shop(shop)

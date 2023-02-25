@@ -68,7 +68,7 @@ class ShopTitleLogServiceTest {
 
 
         // when
-        List<ShopTitleDto> shopTitleDtos = shopTitleLogService.findShopTitleByShopId(shop.getId());
+        List<ShopTitleDto> shopTitleDtos = shopTitleLogService.findShopTitles(shop.getId());
         // then
 
         assertThat(shopTitleDtos.size()).isEqualTo(4);
@@ -93,7 +93,7 @@ class ShopTitleLogServiceTest {
 
         // when, then
         assertThrows(BusinessException.class, () -> {
-            List<ShopTitleDto> shopTitleList = shopTitleLogService.findShopTitleByShopId(shop.getId());
+            List<ShopTitleDto> shopTitleList = shopTitleLogService.findShopTitles(shop.getId());
             assertThat(shopTitleList.size()).isEqualTo(0);
         });
 
@@ -123,7 +123,7 @@ class ShopTitleLogServiceTest {
 
 
         // then
-        List<ShopTitleDto> list = shopTitleLogService.findShopTitleByShopId(shop.getId());
+        List<ShopTitleDto> list = shopTitleLogService.findShopTitles(shop.getId());
         assertThat(list.size()).isEqualTo(4);
 
 

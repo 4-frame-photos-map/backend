@@ -20,7 +20,15 @@ public class ShopTitleLogController {
 
     @GetMapping("/{shopId}")
     public ResponseEntity<RsData<List<ShopTitleDto>>> getShopTitles(@PathVariable Long shopId) {
-        List<ShopTitleDto> responseList = shopTitleLogService.findShopTitleByShopId(shopId);
+
+        // 상점 칭호 보유 여부 체크
+        boolean existShopTitles = shopTitleLogService.existShopTitles(shopId);
+        if (!existShopTitles) {
+            return ResponseEntity.ok(new RsData<>(
+                    true, "상점이 보유한 칭호는 없습니다."
+            ));
+        }
+        List<ShopTitleDto> responseList = shopTitleLogService.findShopTitles(shopId);
 
         return ResponseEntity.ok(new RsData<>(
                 true, "상점 타이틀 조회 성공", responseList

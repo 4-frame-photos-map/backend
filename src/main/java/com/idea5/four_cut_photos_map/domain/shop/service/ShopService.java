@@ -9,6 +9,8 @@ import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.domain.shop.service.kakao.KeywordSearchKakaoApi;
+import com.idea5.four_cut_photos_map.domain.shoptitle.service.ShopTitleService;
+import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,8 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUN
 public class ShopService {
     private final ShopRepository shopRepository;
     private final KeywordSearchKakaoApi keywordSearchKakaoApi;
+
+    private final ShopTitleLogService shopTitleLogService;
 
     public List<ShopDto> findByBrand(String brandName){
         List<Shop> shops = shopRepository.findByBrand(brandName).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
@@ -65,7 +69,6 @@ public class ShopService {
     }
 
 
-    // todo : Review, 찜 추가
     public ResponseShopDetail findShopById(Long id, String distance) {
         Shop shop = shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
         ResponseShopDetail shopDto = ResponseShopDetail.of(shop, distance);
@@ -87,6 +90,10 @@ public class ShopService {
                 if (kakaoShop.getPlaceName().equals(dbShop.getPlaceName())) {
                     ResponseShopMarker responseShopMarker = ResponseShopMarker.of(kakaoShop);
                     responseShopMarker.setId(dbShop.getId());
+                    // 상점이 칭호를 보유했으면 추가
+                    if(shopTitleLogService.existShopTitles(dbShop.getId())){
+                        responseShopMarker.setShopTitles(shopTitleLogService.getShopTitles(dbShop.getId()));
+                    }
                     resultShops.add(responseShopMarker);
                 }
             }
