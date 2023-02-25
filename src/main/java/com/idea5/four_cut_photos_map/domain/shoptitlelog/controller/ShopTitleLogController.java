@@ -31,6 +31,8 @@ public class ShopTitleLogController {
     public ResponseEntity<RsData> addShopTitleLog(@PathVariable Long shopId, @PathVariable Long shopTitleId) {
         shopTitleLogService.save(shopId, shopTitleId);
 
-        return null;
+        return ResponseEntity.ok(new RsData<>(
+                true, "해당 상점 타이틀 추가 성공"
+        ));
     }
 }
