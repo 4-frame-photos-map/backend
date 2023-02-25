@@ -16,13 +16,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DUPLICATE_SHOP_TITLE;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_TITLE_LOGS_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class ShopTitleLogService {
 
     private final ShopTitleLogRepository shopTitleLogRepository;
@@ -67,15 +70,23 @@ public class ShopTitleLogService {
 
     @Transactional
     public void save(Long shopId, Long shopTitleId) {
-        Shop shop = shopService.findById(shopId);
-        ShopTitle shopTitle = shopTitleService.findById(shopTitleId);
 
-        ShopTitleLog shopTitleLog = ShopTitleLog.builder()
-                .shop(shop)
-                .shopTitle(shopTitle)
-                .build();
+        // 상점에 칭호 부여전, 중복된 데이터가 있는지 체크
+        if (validateDuplicate(shopId, shopTitleId)) {
 
-        shopTitleLogRepository.save(shopTitleLog);
+            // 엔티티 조회
+            Shop shop = shopService.findById(shopId);
+            ShopTitle shopTitle = shopTitleService.findById(shopTitleId);
+
+            ShopTitleLog shopTitleLog = ShopTitleLog.builder()
+                    .shop(shop)
+                    .shopTitle(shopTitle)
+                    .build();
+
+            // 저장
+            shopTitleLogRepository.save(shopTitleLog);
+        }
+
     }
 
     public List<ShopTitleLogDto> findAllShopTitleLogs(){
@@ -87,5 +98,21 @@ public class ShopTitleLogService {
 
         return responseList;
 
+    }
+    @Transactional
+    public void delete(Long shopTitleLogId) {
+        shopTitleLogRepository.deleteById(shopTitleLogId);
+    }
+
+    public boolean validateDuplicate(Long shopId, Long shopTitleId){
+
+        Optional<ShopTitleLog> shopTitleLog = shopTitleLogRepository.findByShopIdAndShopTitleId(shopId, shopTitleId);
+        // 널값이 아니면 값이 있다는 의미 -> 중복
+        if (shopTitleLog.isPresent()) {
+            throw new BusinessException(DUPLICATE_SHOP_TITLE);
+        }
+
+        // 널값이면 save 가능
+        return true;
     }
 }

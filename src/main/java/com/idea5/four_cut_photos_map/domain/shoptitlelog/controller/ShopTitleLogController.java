@@ -35,4 +35,13 @@ public class ShopTitleLogController {
                 true, "해당 상점 타이틀 추가 성공"
         ));
     }
+
+    @DeleteMapping("/{shopTitleLogId}")
+    public ResponseEntity<RsData> deleteShopTitleLog(@PathVariable Long shopTitleLogId) {
+        shopTitleLogService.delete(shopTitleLogId);
+
+        return ResponseEntity.ok(new RsData<>(
+                true, "해당 상점 타이틀 삭제 성공"
+        ));
+    }
 }

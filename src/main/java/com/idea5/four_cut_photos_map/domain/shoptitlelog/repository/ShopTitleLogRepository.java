@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface ShopTitleLogRepository extends JpaRepository<ShopTitleLog, Long> {
 
     List<ShopTitleLog> findAllByShopId(Long shopId);
+
+    Optional<ShopTitleLog> findByShopIdAndShopTitleId(Long shopId, Long shopTitleId);
 }
