@@ -33,9 +33,9 @@ public class KakaoServiceTests {
     }
 
     public void createSampleData(){
-        shopRepository.save(new Shop("인생네컷", "인생네컷 홍대동교점", "서울 마포구 홍익로6길 21", 126.922894949096, 37.555493447252));
-        shopRepository.save(new Shop("하루필름", "하루필름 연남점", "서울 마포구 동교로46길 40", 126.926725005048, 37.5621542536479));
-        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 망원점", "서울 마포구 포은로 88", 126.905387792703, 37.5548860583225));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 홍대동교점", "서울 마포구 홍익로6길 21"));
+        shopRepository.save(new Shop("하루필름", "하루필름 연남점", "서울 마포구 동교로46길 40"));
+        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 망원점", "서울 마포구 포은로 88"));
     }
 
     public void clearData(){
@@ -58,8 +58,8 @@ public class KakaoServiceTests {
         assertThat(apiShopJson.size()).isEqualTo(15);
         assertThat(apiShopJson.get(0).getPlaceName()).isEqualTo("인생네컷 홍대동교점");
         assertThat(apiShopJson.get(0).getRoadAddressName()).isEqualTo("서울 마포구 홍익로6길 21");
-        assertThat(apiShopJson.get(0).getX()).isEqualTo("126.922894949096");
-        assertThat(apiShopJson.get(0).getY()).isEqualTo("37.555493447252");
+        assertThat(apiShopJson.get(0).getLongitude()).isEqualTo("126.922894949096");
+        assertThat(apiShopJson.get(0).getLatitude()).isEqualTo("37.555493447252");
     }
 
     @Test
@@ -77,8 +77,8 @@ public class KakaoServiceTests {
         assertThat(apiShopJson.size()).isEqualTo(1);
         assertThat(apiShopJson.get(0).getPlaceName()).isEqualTo("인생네컷 홍대동교점");
         assertThat(apiShopJson.get(0).getRoadAddressName()).isEqualTo("서울 마포구 홍익로6길 21");
-        assertThat(apiShopJson.get(0).getX()).isEqualTo("126.922894949096");
-        assertThat(apiShopJson.get(0).getY()).isEqualTo("37.555493447252");
+        assertThat(apiShopJson.get(0).getLongitude()).isEqualTo("126.922894949096");
+        assertThat(apiShopJson.get(0).getLatitude()).isEqualTo("37.555493447252");
     }
 
     @Test
@@ -90,8 +90,8 @@ public class KakaoServiceTests {
         KakaoKeywordResponseDto kakaoKeywordResponseDto = KakaoKeywordResponseDto.builder()
                 .placeName("인생네컷 홍대동교점")
                 .roadAddressName("서울 마포구 홍익로6길 21")
-                .x("126.922894949096")
-                .y("37.555493447252")
+                .longitude("126.922894949096")
+                .latitude("37.555493447252")
                 .build();
 
         apiShopJson.add(kakaoKeywordResponseDto);
