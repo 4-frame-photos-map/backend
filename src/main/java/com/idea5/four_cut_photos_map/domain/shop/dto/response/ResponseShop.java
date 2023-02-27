@@ -1,10 +1,10 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
+import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.*;
 
 @Getter
-@Setter
 @AllArgsConstructor
 @ToString
 @Builder
@@ -15,10 +15,13 @@ public class ResponseShop {
     private double latitude; // 위도
     private double longitude; // 경도
 
-    public static ResponseShop from(Shop shop){
+    public static ResponseShop from(Shop shop, KakaoKeywordResponseDto apiShop){
         return ResponseShop.builder()
+                .id(shop.getId())
                 .placeName(shop.getPlaceName())
                 .roadAddressName(shop.getRoadAddressName())
+                .longitude(Double.parseDouble(apiShop.getLongitude()))
+                .latitude(Double.parseDouble(apiShop.getLatitude()))
                 .build();
     }
 }

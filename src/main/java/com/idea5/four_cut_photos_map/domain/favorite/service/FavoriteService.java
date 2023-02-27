@@ -26,7 +26,7 @@ public class FavoriteService {
 
     // DTO 변환
     public FavoriteResponseDto toDto(Favorite favorite) {
-        ResponseFavoriteShop shopDto = shopService.toFavoriteShopDto(favorite.getShop());
+        ResponseFavoriteShop shopDto = FavoriteResponseDto.from(favorite.getShop());
 
         return FavoriteResponseDto.builder()
                 .id(favorite.getId())

@@ -12,6 +12,7 @@ import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.domain.shop.service.kakao.KeywordSearchKakaoApi;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -44,11 +45,10 @@ public class ShopService {
             Shop dbShop = shopRepository.findByPlaceName(apiShop.getPlaceName()).orElse(null);
 
             if(dbShop != null) {
-                // dbShop(Entity) -> responseShop(DTO) 변환
-                ResponseShop responseShop = ResponseShop.from(dbShop);
-                // apiShop(카카오 맵 API 응답 객체)의 위도, 경도 responseShop(응답 DTO 객체)에 저장
-                responseShop.setLongitude(Double.parseDouble(apiShop.getLongitude()));
-                responseShop.setLatitude(Double.parseDouble(apiShop.getLatitude()));
+                // dbShop, apiSop -> responseShop 변환
+                // 위도, 경도는 카카오맵 API로부터, 나머지는 DB Shop으로부터
+                ResponseShop responseShop = ResponseShop.from(dbShop, apiShop);
+
                 responseShops.add(responseShop);
             }
         }
@@ -88,7 +88,6 @@ public class ShopService {
         return resultShops;
     }
 
-
     public List<KakaoResponseDto> searchBrand(RequestBrandSearch brandSearch) {
         List<KakaoResponseDto> list = new ArrayList<>();
         for (int i = 1; i <= 3; i++) {
@@ -96,17 +95,8 @@ public class ShopService {
         }
         return list;
     }
+
     public Shop findById(Long id) {
         return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
-    }
-
-    public ResponseFavoriteShop toFavoriteShopDto(Shop shop) {
-        return ResponseFavoriteShop.builder()
-                .id(shop.getId())
-                .brand(shop.getBrand())
-                .placeName(shop.getPlaceName())
-                .roadAddressName(shop.getRoadAddressName())
-                .favoriteCnt(shop.getFavoriteCnt())
-                .build();
     }
 }
