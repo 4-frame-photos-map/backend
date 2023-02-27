@@ -1,4 +1,4 @@
-package com.idea5.four_cut_photos_map.domain.member.dto;
+package com.idea5.four_cut_photos_map.domain.auth.dto.response;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import lombok.Builder;

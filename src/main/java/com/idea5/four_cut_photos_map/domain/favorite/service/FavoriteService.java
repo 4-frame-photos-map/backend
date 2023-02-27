@@ -86,4 +86,12 @@ public class FavoriteService {
     public Favorite findByShopIdAndMemberId(Long shopId, Long memberId) {
         return favoriteRepository.findByShopIdAndMemberId(shopId, memberId).orElse(null);
     }
+
+    @Transactional
+    public void deleteByMemberId(Long memberId) {
+        List<Favorite> favorites = favoriteRepository.findByMember(Member.builder().id(memberId).build());
+        for(Favorite favorite : favorites) {
+            favoriteRepository.delete(favorite);
+        }
+    }
 }
