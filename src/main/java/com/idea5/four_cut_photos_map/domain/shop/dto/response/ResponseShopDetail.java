@@ -30,8 +30,6 @@ public class ResponseShopDetail {
                 .id(shop.getId())
                 .name(shop.getPlaceName())
                 .address(shop.getRoadAddressName())
-                .latitude(shop.getLatitude())
-                .longitude(shop.getLongitude())
                 .distance(distance)
                 .favoriteCnt(shop.getFavoriteCnt() == null ? 0 : shop.getFavoriteCnt())
                 .build();

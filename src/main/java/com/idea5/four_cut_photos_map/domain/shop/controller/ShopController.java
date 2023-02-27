@@ -47,7 +47,7 @@ public class ShopController {
         List<ResponseShop> shops = shopService.findShops(apiShopJson);
 
         return ResponseEntity.ok(
-                new RsData<List<ResponseShop>>(true, "Shop 조회 성공", shops)
+                new RsData<List<ResponseShop>>(true, "키워드로 Shop 조회 성공", shops)
         );
     }
 

@@ -12,7 +12,7 @@ import lombok.Setter;
 public class ResponseFavoriteShop {
     private Long id;
     private String brand;
-    private String name;
-    private String address;
+    private String placeName;
+    private String roadAddressName;
     private Integer favoriteCnt;
 }

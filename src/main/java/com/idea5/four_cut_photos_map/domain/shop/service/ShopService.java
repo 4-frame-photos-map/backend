@@ -40,23 +40,20 @@ public class ShopService {
 
         // 카카오 맵 API로 부터 받아온 데이터와 일치하는 DB Shop 가져오기
         for (KakaoKeywordResponseDto apiShop: apiShops) {
-
             // DB에서 장소명으로 Shop 조회(비교)
             Shop dbShop = shopRepository.findByPlaceName(apiShop.getPlaceName()).orElse(null);
 
             if(dbShop != null) {
-                // Entity -> DTO 변환
+                // dbShop(Entity) -> responseShop(DTO) 변환
                 ResponseShop responseShop = ResponseShop.from(dbShop);
-
-                // 위도, 경도 responseShop(응답 DTO 객체)에 저장
-               responseShop.setLongitude(Double.parseDouble(apiShop.getX()));
-               responseShop.setLatitude(Double.parseDouble(apiShop.getY()));
-               responseShops.add(responseShop);
+                // apiShop(카카오 맵 API 응답 객체)의 위도, 경도 responseShop(응답 DTO 객체)에 저장
+                responseShop.setLongitude(Double.parseDouble(apiShop.getLongitude()));
+                responseShop.setLatitude(Double.parseDouble(apiShop.getLatitude()));
+                responseShops.add(responseShop);
             }
         }
 
-        if(responseShops.isEmpty())
-            throw new BusinessException(SHOP_NOT_FOUND);
+        if(responseShops.isEmpty()) {throw new BusinessException(SHOP_NOT_FOUND);}
 
         return responseShops;
     }
@@ -107,8 +104,8 @@ public class ShopService {
         return ResponseFavoriteShop.builder()
                 .id(shop.getId())
                 .brand(shop.getBrand())
-                .name(shop.getPlaceName())
-                .address(shop.getRoadAddressName())
+                .placeName(shop.getPlaceName())
+                .roadAddressName(shop.getRoadAddressName())
                 .favoriteCnt(shop.getFavoriteCnt())
                 .build();
     }

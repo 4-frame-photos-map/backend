@@ -19,8 +19,6 @@ public class ResponseShop {
         return ResponseShop.builder()
                 .placeName(shop.getPlaceName())
                 .roadAddressName(shop.getRoadAddressName())
-                .latitude(shop.getLatitude())
-                .longitude(shop.getLongitude())
                 .build();
     }
 }

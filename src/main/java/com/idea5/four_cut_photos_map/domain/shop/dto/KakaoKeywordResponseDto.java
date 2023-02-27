@@ -10,6 +10,6 @@ import lombok.*;
 public class KakaoKeywordResponseDto {
         public String placeName; // 장소명
         public String roadAddressName; // 도로명 주소
-        public String x; // 경도
-        public String y; // 위도
+        public String longitude; // 경도
+        public String latitude; // 위도
 }
