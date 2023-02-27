@@ -1,6 +1,8 @@
 package com.idea5.four_cut_photos_map.domain.shop.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
+import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
@@ -11,6 +13,7 @@ import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.domain.shop.service.kakao.KeywordSearchKakaoApi;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
+import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
@@ -67,6 +70,10 @@ public class ShopService {
 
     }
 
+    public Shop findById(Long id) {
+        return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
+    }
+
     public List<KakaoKeywordResponseDto> searchByKeyword(String keyword) throws JsonProcessingException {
         return keywordSearchKakaoApi.searchByKeyword(keyword);
     }
@@ -94,9 +101,5 @@ public class ShopService {
             list.addAll(keywordSearchKakaoApi.searchByBrand(brandSearch, i));
         }
         return list;
-    }
-
-    public Shop findById(Long id) {
-        return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
     }
 }

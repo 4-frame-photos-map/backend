@@ -113,14 +113,10 @@ public class ShopController {
         }
         ResponseShopDetail shopDetailDto = shopService.findShopById(id, distance);
 
-        // 비로그인 회원일 시
-        if(memberContext == null){
-            shopDetailDto.setCanBeAddedToFavorites(false);
+        if(memberContext != null) {
+            Favorite favorite = favoriteService.findByShopIdAndMemberId(shopDetailDto.getId(), memberContext.getId());
 
-        // 로그인 회원일 시
-        } else {
-            Favorite favorite = favoriteService.findByShopIdAndMemberId(id, memberContext.getId());
-            if(favorite == null){
+            if (favorite == null) {
                 shopDetailDto.setCanBeAddedToFavorites(true);
             } else {
                 shopDetailDto.setCanBeAddedToFavorites(false);
