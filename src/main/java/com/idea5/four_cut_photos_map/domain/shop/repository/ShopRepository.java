@@ -16,9 +16,4 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
     Optional<Shop> findByPlaceName(String placeName);
 
     Optional<List<Shop>> findByBrand(String keyword);
-
-    @Transactional
-    @Modifying
-    @Query(value = "ALTER TABLE shop AUTO_INCREMENT = 1", nativeQuery = true)
-    void truncate(); // for test
 }
