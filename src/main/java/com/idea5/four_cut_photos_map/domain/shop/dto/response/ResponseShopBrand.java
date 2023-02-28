@@ -37,8 +37,6 @@ public class ResponseShopBrand {
         return ResponseShopBrand.builder()
                 .placeName(shop.getPlaceName())
                 .roadAddressName(shop.getRoadAddressName())
-                .x(String.valueOf(shop.getLongitude()))
-                .y(String.valueOf(shop.getLatitude()))
                 .build();
     }
 }

@@ -1,5 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
+import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.*;
 
@@ -8,25 +9,19 @@ import lombok.*;
 @ToString
 @Builder
 public class ResponseShop {
-
+    private long id;
     private String placeName;// 장소명
-
     private String roadAddressName; // 전체 도로명 주소
     private double latitude; // 위도
     private double longitude; // 경도
 
-    private String distance;
-
-    public static ResponseShop from(Shop shop){
+    public static ResponseShop from(Shop shop, KakaoKeywordResponseDto apiShop){
         return ResponseShop.builder()
+                .id(shop.getId())
                 .placeName(shop.getPlaceName())
                 .roadAddressName(shop.getRoadAddressName())
-                .latitude(shop.getLatitude())
-                .longitude(shop.getLongitude())
+                .longitude(Double.parseDouble(apiShop.getLongitude()))
+                .latitude(Double.parseDouble(apiShop.getLatitude()))
                 .build();
-    }
-
-    public void setDistance(String distance) {
-        this.distance = distance;
     }
 }

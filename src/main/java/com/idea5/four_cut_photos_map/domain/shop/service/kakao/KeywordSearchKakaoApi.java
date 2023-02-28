@@ -1,12 +1,15 @@
 package com.idea5.four_cut_photos_map.domain.shop.service.kakao;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.KaKaoSearchResponseDto;
-import com.idea5.four_cut_photos_map.global.util.DocumentManagement;
+import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
 import com.idea5.four_cut_photos_map.global.util.Util;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -14,7 +17,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -25,10 +28,11 @@ public class KeywordSearchKakaoApi {
     @Value("${REST_API_KEY}")
     private String kakao_apikey;
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
 
-    public KaKaoSearchResponseDto searchByKeyword(String keyword) {
+    public List<KakaoKeywordResponseDto> searchByKeyword(String keyword) throws JsonProcessingException {
         // 1. 결과값 담을 객체 생성
-        HashMap<String, Object> resultMap = new HashMap<String, Object>();
+        List<KakaoKeywordResponseDto> resultList = new ArrayList<>();
 
         // 2. header 설정을 위해 HttpHeader 클래스 생성 후 HttpEntity 객체에 넣어준다.
         HttpHeaders headers = new HttpHeaders();
@@ -41,7 +45,26 @@ public class KeywordSearchKakaoApi {
                 + "query=" + keyword; // request param (x, y, radius 등 검색 조건 추가 가능)
 
         // 4. exchange 메서드로 api 호출
-        return restTemplate.exchange(apiURL, HttpMethod.GET, entity,KaKaoSearchResponseDto.class).getBody();
+        String body = restTemplate.exchange(apiURL, HttpMethod.GET, entity, String.class).getBody();
+
+        // 5. JSON -> KakaoKeywordResponseDto로 역직렬화
+        JsonNode node = objectMapper.readTree(body);
+        List<String> countList = node.get("documents").findValuesAsText("place_name");
+
+        for(int i=0; i<countList.size(); i++) {
+            JsonNode documents = node.get("documents").get(i);
+
+            KakaoKeywordResponseDto dto = KakaoKeywordResponseDto.builder()
+                    .placeName(documents.get("place_name").textValue())
+                    .roadAddressName(documents.get("road_address_name").textValue())
+                    .longitude(documents.get("x").textValue())
+                    .latitude(documents.get("y").textValue())
+                    .build();
+
+            resultList.add(dto);
+        }
+
+        return resultList;
     }
 
 
