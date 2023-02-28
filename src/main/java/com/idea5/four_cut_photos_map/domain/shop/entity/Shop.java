@@ -4,6 +4,7 @@ import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.DynamicInsert;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import javax.persistence.*;
@@ -22,7 +23,7 @@ public class Shop extends BaseEntity {
     private String brand; // 브랜드명
     private String placeName; // 지점명
     private String roadAddressName; // 주소
-    private Integer favoriteCnt; // 찜 수
+    private Integer favoriteCnt; // 찜 수 // MySQL Integer == MySQL int
 
 
     // TODO: 상점 상세페이지뿐만 아니라 상점 리스트 페이지에도 favoriteCnt(찜 수)를 전송해야 할 지? 논의

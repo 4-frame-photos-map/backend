@@ -29,7 +29,7 @@ public class ResponseShopDetail {
                 .name(shop.getPlaceName())
                 .address(shop.getRoadAddressName())
                 .distance(distance)
-                .favoriteCnt(shop.getFavoriteCnt() == null ? 0 : shop.getFavoriteCnt())
+                .favoriteCnt(shop.getFavoriteCnt())
                 .canBeAddedToFavorites(false)
                 .build();
     }

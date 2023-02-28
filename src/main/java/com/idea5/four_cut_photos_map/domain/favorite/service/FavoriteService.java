@@ -41,7 +41,7 @@ public class FavoriteService {
         favoriteRepository.save(favorite);
 
         // 3. shop 찜 수 갱신
-        shop.setFavoriteCnt(shop.getFavoriteCnt() == null? 1 : shop.getFavoriteCnt()+1);
+        shop.setFavoriteCnt(shop.getFavoriteCnt()+1);
     }
 
     // 찜 취소
@@ -58,8 +58,7 @@ public class FavoriteService {
 
         // 3. shop 찜 수 갱신
         Shop shop = shopService.findById(shopId);
-        shop.setFavoriteCnt(shop.getFavoriteCnt() == null || shop.getFavoriteCnt() == 0?
-                0 : shop.getFavoriteCnt() - 1);
+        shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0? 0 : shop.getFavoriteCnt() - 1);
     }
 
     public List<FavoriteResponseDto> findByMemberId(Long memberId) {
