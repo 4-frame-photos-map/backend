@@ -7,6 +7,9 @@ import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ShopFavoritesResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
+import com.idea5.four_cut_photos_map.domain.shoptitle.entity.ShopTitle;
+import com.idea5.four_cut_photos_map.domain.shoptitle.service.ShopTitleService;
+import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.idea5.four_cut_photos_map.domain.shoptitle.entity.ShopTitleType.HOT_PLACE;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DELETED_FAVORITE;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DUPLICATE_FAVORITE;
 
@@ -23,6 +27,9 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DUPLICATE_FAV
 public class FavoriteService {
     private final ShopService shopService;
     private final FavoriteRepository favoriteRepository;
+
+    private final ShopTitleLogService shopTitleLogService;
+    private final ShopTitleService shopTitleService;
 
     // DTO 변환
     public FavoriteResponseDto toDto(Favorite favorite) {
@@ -85,5 +92,19 @@ public class FavoriteService {
 
     public Favorite findByShopIdAndMemberId(Long shopId, Long memberId) {
         return favoriteRepository.findByShopIdAndMemberId(shopId, memberId).orElse(null);
+    }
+
+    @Transactional
+    public boolean isHotPlace(Long shopId) {
+        // Favorite DB에 저장된 Shop 찾기
+        List<Favorite> list = favoriteRepository.findByShopId(shopId);
+
+        // 찜수가 5개 이상이면 칭호부여
+        if (list.size() >= 5){
+            shopTitleLogService.save(shopId, HOT_PLACE.getId());
+            return true;
+        }
+
+        return false;
     }
 }

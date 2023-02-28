@@ -1,5 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.shoptitlelog.service;
 
+import com.idea5.four_cut_photos_map.domain.member.entity.Member;
+import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.domain.shoptitle.dto.ShopTitleDto;
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +47,9 @@ class ShopTitleLogServiceTest {
 
     @Autowired
     private ShopTitleLogRepository shopTitleLogRepository;
+
+    @Autowired
+    private MemberRepository memberRepository;
 
     @DisplayName("ShopTitleLog 조회, 성공한 경우")
     @Test
@@ -128,7 +134,7 @@ class ShopTitleLogServiceTest {
 
 
     }
-    // assertJ 참고 사이트 : https://umanking.github.io/2021/06/26/assertj-iteration/ㅁㄴ
+    // assertJ 참고 사이트 : https://umanking.github.io/2021/06/26/assertj-iteration/
     @DisplayName("상점이 보유한 타이틀 제거")
     @Test
     void deleteShopTitle() {
@@ -182,5 +188,7 @@ class ShopTitleLogServiceTest {
         );
 
     }
+
+
 
 }
