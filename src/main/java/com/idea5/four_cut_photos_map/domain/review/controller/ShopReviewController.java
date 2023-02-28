@@ -23,8 +23,8 @@ import java.util.List;
 public class ShopReviewController {
     private final ReviewService reviewService;
 
-    @GetMapping("/{shopId}/reviews")
-    public ResponseEntity<RsData> getShopReviews(@PathVariable Long shopId) {
+    @GetMapping("/{shop-id}/reviews")
+    public ResponseEntity<RsData> getShopReviews(@PathVariable("shop-id") Long shopId) {
         List<ResponseReviewDto> reviews = reviewService.getAllShopReviews(shopId);
 
         return new ResponseEntity<>(
@@ -33,8 +33,8 @@ public class ShopReviewController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/{shopId}/reviews")
-    public ResponseEntity<RsData> writeReview(@PathVariable Long shopId,
+    @PostMapping("/{shop-id}/reviews")
+    public ResponseEntity<RsData> writeReview(@PathVariable("shop-id") Long shopId,
                                               @AuthenticationPrincipal MemberContext memberContext,
                                               @Valid @RequestBody RequestReviewDto reviewDto) {
         ResponseReviewDto responseReviewDto = reviewService.write(memberContext.getId(), shopId, reviewDto);

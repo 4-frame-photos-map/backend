@@ -27,8 +27,8 @@ import java.util.List;
 public class ReviewController {
     private final ReviewService reviewService;
 
-    @GetMapping("/{reviewId}")
-    public ResponseEntity<RsData> getReview(@PathVariable Long reviewId) {
+    @GetMapping("/{review-id}")
+    public ResponseEntity<RsData> getReview(@PathVariable("review-id") Long reviewId) {
         ResponseReviewDto responseReviewDto = reviewService.getReviewById(reviewId);
 
         return new ResponseEntity<> (
@@ -37,8 +37,8 @@ public class ReviewController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PatchMapping("/{reviewId}")
-    public ResponseEntity<RsData> modifyReview(@PathVariable Long reviewId,
+    @PatchMapping("/{review-id}")
+    public ResponseEntity<RsData> modifyReview(@PathVariable("review-id") Long reviewId,
                                                @AuthenticationPrincipal MemberContext memberContext,
                                                @Valid @RequestBody RequestReviewDto reviewDto) {
         ResponseReviewDto responseReviewDto = reviewService.modify(memberContext.getId(), reviewId, reviewDto);
@@ -49,8 +49,8 @@ public class ReviewController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @DeleteMapping("/{reviewId}")
-    public ResponseEntity<RsData> deleteReview(@PathVariable Long reviewId,
+    @DeleteMapping("/{review-id}")
+    public ResponseEntity<RsData> deleteReview(@PathVariable("review-id") Long reviewId,
                                                @AuthenticationPrincipal MemberContext memberContext) {
         reviewService.delete(memberContext.getId(), reviewId);
 

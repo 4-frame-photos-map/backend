@@ -1,5 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.review.dto.response;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.review.entity.Review;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.ItemScore;
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @ToString
 @Builder
+@JsonNaming(value = PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class ResponseReviewDto {
 
     // Review 관련 정보
@@ -28,10 +31,10 @@ public class ResponseReviewDto {
     private ItemScore item;             // 소품
 
     // Member 관련 정보
-    private ReviewMemberDto reviewMemberDto;
+    private ReviewMemberDto memberInfo;
 
     // Shop 관련 정보
-    private ReviewShopDto reviewShopDto;
+    private ReviewShopDto shopInfo;
 
     public static ResponseReviewDto from(Review review) {
         return ResponseReviewDto.from(review, review.getWriter(), review.getShop());
@@ -59,8 +62,8 @@ public class ResponseReviewDto {
                 .purity(review.getPurity())
                 .retouch(review.getRetouch())
                 .item(review.getItem())
-                .reviewMemberDto(reviewMemberDto)
-                .reviewShopDto(reviewShopDto)
+                .memberInfo(reviewMemberDto)
+                .shopInfo(reviewShopDto)
                 .build();
     }
 }
