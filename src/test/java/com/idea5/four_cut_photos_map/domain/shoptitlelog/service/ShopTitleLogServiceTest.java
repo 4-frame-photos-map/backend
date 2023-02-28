@@ -1,5 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.shoptitlelog.service;
 
+import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.idea5.four_cut_photos_map.domain.shoptitle.entity.ShopTitleType.HOT_PLACE;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -50,6 +52,9 @@ class ShopTitleLogServiceTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private FavoriteService favoriteService;
 
     @DisplayName("ShopTitleLog 조회, 성공한 경우")
     @Test
@@ -142,17 +147,17 @@ class ShopTitleLogServiceTest {
         Shop shop = new Shop("인생네컷", "인생네컷 천안안서점", "충남 천안시 동남구 상명대길 58", 127.17753106349, 36.831234198955);
         shopRepository.save(shop);
 
-        ShopTitle shopTItle1 = new ShopTitle("핫 플레이스", "찜 수 5개 이상", "사람들이 주로 이용하는 포토부스에요.");
+        ShopTitle shopTitle1 = new ShopTitle("핫 플레이스", "찜 수 5개 이상", "사람들이 주로 이용하는 포토부스에요.");
         ShopTitle shopTitle2 = new ShopTitle("청결 양호", "청결 점수 4점 이상", "시설이 깔끔해요.'");
         ShopTitle shopTitle3 = new ShopTitle("보정 양호", "보정 점수 4점 이상", "막 찍어도 잘 나와요.");
         ShopTitle shopTitle4 = new ShopTitle("소품 양호", "소품 점수 4점 이상", "다양하게 연출하기 좋아요.");
-        shopTitleRepository.save(shopTItle1);
+        shopTitleRepository.save(shopTitle1);
         shopTitleRepository.save(shopTitle2);
         shopTitleRepository.save(shopTitle3);
         shopTitleRepository.save(shopTitle4);
 
         //  저장 후, 삭제될 칭호
-        ShopTitleLog removeShopTileLog = new ShopTitleLog(shop, shopTItle1);
+        ShopTitleLog removeShopTileLog = new ShopTitleLog(shop, shopTitle1);
         // 영구 저장될 칭호
         ShopTitleLog shopTitleLog2 = new ShopTitleLog(shop, shopTitle2);
         ShopTitleLog shopTitleLog3 = new ShopTitleLog(shop, shopTitle3);
@@ -175,7 +180,7 @@ class ShopTitleLogServiceTest {
 
                 // list 조회시, 삭제된 칭호는 조회될 수 없다. ( doesNotContain )
                 () -> assertThat(list).extracting("name", "conditions", "content")
-                      .doesNotContain(tuple(shopTItle1.getName(), shopTItle1.getConditions(), shopTItle1.getContent())),
+                      .doesNotContain(tuple(shopTitle1.getName(), shopTitle1.getConditions(), shopTitle1.getContent())),
 
                 // list 조회시, 기존에 있던 칭호들은 모두 조회된다. ( contains )
                 () -> assertThat(list).extracting("name", "conditions", "content")
@@ -189,6 +194,51 @@ class ShopTitleLogServiceTest {
 
     }
 
+    @DisplayName("좋아요 수가 5개 이상이면 핫플레이 칭호를 부여한다.")
+    @Test
+    @Rollback(value = false)
+    void testHotPlaceTitle() {
+        // given
 
+        // 핫 플레이스 칭호 DB저장
+        ShopTitle shopTitle = new ShopTitle(HOT_PLACE.getName(), HOT_PLACE.getConditions(), HOT_PLACE.getContent());
+        shopTitleRepository.save(shopTitle);
+
+        // 테스트용 멤버 5명 저장
+        Member memberA = new Member();
+        Member memberB = new Member();
+        Member memberC = new Member();
+        Member memberD = new Member();
+        Member memberE = new Member();
+        memberRepository.save(memberA);
+        memberRepository.save(memberB);
+        memberRepository.save(memberC);
+        memberRepository.save(memberD);
+        memberRepository.save(memberE);
+
+        // 좋아요 대상 Shop 저장
+        Shop shop = new Shop("인생네컷", "인생네컷 천안안서점", "충남 천안시 동남구 상명대길 58", 127.17753106349, 36.831234198955);
+        shopRepository.save(shop);
+
+        // when
+
+        favoriteService.save(shop.getId(), memberA);
+        favoriteService.save(shop.getId(), memberB);
+        favoriteService.save(shop.getId(), memberC);
+        favoriteService.save(shop.getId(), memberD);
+        favoriteService.save(shop.getId(), memberE);
+
+        // then
+
+        // 좋아요 수가 5개 이상인지 체크
+        boolean isHotPlace = favoriteService.isHotPlace(shop.getId()); // todo : FavoriteServiceTest에서 수행해야 됨
+        ShopTitleLog shopTitleLog = shopTitleLogService.findShopTitleLog(shop.getId(), HOT_PLACE.getId());
+
+        assertAll(
+                () -> assertThat(isHotPlace).isTrue(), // 핫플레이스 조건 부합 체크
+                () -> assertThat(shopTitleLog).isNotNull(), // 해당 ShopTitle DB 저장 유무 체크
+                () -> assertThat(shopTitleLog.getShopTitleName()).isEqualTo(HOT_PLACE.getName()) // 해당 ShopTitle이 핫 플레이스인지 체크
+        );
+    }
 
 }

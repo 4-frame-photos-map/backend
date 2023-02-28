@@ -126,6 +126,10 @@ public class ShopTitleLogService {
         shopTitleLogRepository.delete(entity);
     }
 
+    public ShopTitleLog findShopTitleLog(Long shopId, Long shopTitleId){
+
+        return shopTitleLogRepository.findByShopIdAndShopTitleId(shopId, shopTitleId).orElse(null);
+    }
     public boolean validateDuplicate(Long shopId, Long shopTitleId){
 
         Optional<ShopTitleLog> shopTitleLog = shopTitleLogRepository.findByShopIdAndShopTitleId(shopId, shopTitleId);

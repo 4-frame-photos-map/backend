@@ -31,4 +31,8 @@ public class ShopTitleLog extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "shop_title_id")
     private ShopTitle shopTitle;
+
+    public String getShopTitleName(){
+        return shopTitle.getName();
+    }
 }
