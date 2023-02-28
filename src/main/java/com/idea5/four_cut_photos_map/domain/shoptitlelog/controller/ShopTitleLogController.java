@@ -18,6 +18,7 @@ public class ShopTitleLogController {
 
     private final ShopTitleLogService shopTitleLogService;
 
+    // Shop이 보유한 칭호 조회
     @GetMapping("/{shopId}")
     public ResponseEntity<RsData<List<ShopTitleDto>>> getShopTitles(@PathVariable Long shopId) {
 
@@ -35,6 +36,7 @@ public class ShopTitleLogController {
         ));
     }
 
+    // Shop 칭호 추가 (포스트맨용 임시 api)
     @PostMapping("/{shopId}/{shopTitleId}")
     public ResponseEntity<RsData> addShopTitleLog(@PathVariable Long shopId, @PathVariable Long shopTitleId) {
         shopTitleLogService.save(shopId, shopTitleId);
@@ -44,6 +46,7 @@ public class ShopTitleLogController {
         ));
     }
 
+    // Shop 칭호 삭제 (포스트맨용 임시 api)
     @DeleteMapping("/{shopTitleLogId}")
     public ResponseEntity<RsData> deleteShopTitleLog(@PathVariable Long shopTitleLogId) {
         shopTitleLogService.delete(shopTitleLogId);
