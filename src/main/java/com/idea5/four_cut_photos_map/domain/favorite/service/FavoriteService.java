@@ -24,16 +24,6 @@ public class FavoriteService {
     private final ShopService shopService;
     private final FavoriteRepository favoriteRepository;
 
-    // DTO 변환
-    public FavoriteResponseDto toDto(Favorite favorite) {
-        ResponseFavoriteShop shopDto = FavoriteResponseDto.from(favorite.getShop());
-
-        return FavoriteResponseDto.builder()
-                .id(favorite.getId())
-                .shop(shopDto)
-                .build();
-    }
-
     // 찜하기
     @Transactional
     public void save(Long shopId, Member member) {
@@ -79,7 +69,7 @@ public class FavoriteService {
 
         return  favorites
                     .stream()
-                    .map(favorite -> toDto(favorite))
+                    .map(favorite -> FavoriteResponseDto.from(favorite))
                     .collect(Collectors.toList());
         }
 
