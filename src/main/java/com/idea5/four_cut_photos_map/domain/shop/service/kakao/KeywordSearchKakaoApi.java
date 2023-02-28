@@ -52,12 +52,15 @@ public class KeywordSearchKakaoApi {
         List<String> countList = node.get("documents").findValuesAsText("place_name");
 
         for(int i=0; i<countList.size(); i++) {
+            JsonNode documents = node.get("documents").get(i);
+
             KakaoKeywordResponseDto dto = KakaoKeywordResponseDto.builder()
-                    .placeName(node.get("documents").get(i).get("place_name").textValue())
-                    .roadAddressName(node.get("documents").get(i).get("road_address_name").textValue())
-                    .longitude(node.get("documents").get(i).get("x").textValue())
-                    .latitude(node.get("documents").get(i).get("y").textValue())
+                    .placeName(documents.get("place_name").textValue())
+                    .roadAddressName(documents.get("road_address_name").textValue())
+                    .longitude(documents.get("x").textValue())
+                    .latitude(documents.get("y").textValue())
                     .build();
+
             resultList.add(dto);
         }
 
