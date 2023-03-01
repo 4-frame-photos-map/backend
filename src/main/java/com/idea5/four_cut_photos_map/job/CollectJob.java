@@ -23,6 +23,8 @@ public class CollectJob {
     @Scheduled(cron = "0 * * * * *")      // TODO: 테스트용 매분마다 실행
 //    @Scheduled(cron = "0 0 0 * * *")    // 매일 0시 실행
     public void add() {
+        // 인증된 API 요청 -> 로그 남기자
+        // TODO: 전체 회원 말고 오늘 요청보낸 회원만
         // 회원, 회원칭호 전체조회
         List<MemberTitle> memberTitles = memberTitleService.findAllMemberTitle();
         List<Member> members = memberService.findAll();

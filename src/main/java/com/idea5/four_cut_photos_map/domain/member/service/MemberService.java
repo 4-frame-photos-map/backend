@@ -84,7 +84,8 @@ public class MemberService {
         }
         // 2. redis 에 해당 accessToken 블랙리스트로 등록
         Long expiration = jwtProvider.getExpiration(accessToken);
-        redisDao.setValues(accessToken, "logout", Duration.ofMillis(expiration));
+        String key = "jwt_black_list:" + accessToken;
+        redisDao.setValues(key, "logout", Duration.ofMillis(expiration));
     }
 
     // 회원 삭제
@@ -96,7 +97,8 @@ public class MemberService {
         }
         // 2. redis 에 해당 accessToken 블랙리스트로 등록
         Long expiration = jwtProvider.getExpiration(accessToken);
-        redisDao.setValues(accessToken, "withdrawl", Duration.ofMillis(expiration));
+        String key = "jwt_black_list:" + accessToken;
+        redisDao.setValues(key, "withdrawl", Duration.ofMillis(expiration));
         // TODO: 양방향 매핑으로 변경할지 고민중
         // TODO: Member 삭제하기 전 Member 를 참조하고 있는 엔티티(MemberTitleLog, Favorite) 먼저 삭제하기
         memberTitleService.deleteByMemberId(id);
