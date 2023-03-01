@@ -6,6 +6,7 @@ import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitle;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleType;
 import com.idea5.four_cut_photos_map.domain.memberTitle.service.MemberTitleService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +17,7 @@ import java.util.List;
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class CollectJob {
     private final MemberService memberService;
     private final MemberTitleService memberTitleService;
@@ -27,17 +29,19 @@ public class CollectJob {
         // 인증된 API 요청 -> 로그 남기자
         // TODO: 전체 회원 말고 오늘 요청보낸 회원만
         // 회원, 회원칭호 전체조회
+        log.info("---Before memberTitleService.findAllMemberTitle()---");
         List<MemberTitle> memberTitles = memberTitleService.findAllMemberTitle();
+        log.info("---Before memberService.findAll()---");
         List<Member> members = memberService.findAll();
         // 회원별로 각 칭호 부여하기
         for(Member member : members) {
             // 회원이 보유한 회원칭호 전체조회
-            List<MemberTitle> collectedMemberTitles = memberTitleService.findMemberTitleByMember(member);
+            log.info("---Before memberTitleService.findMemberTitleByMember(member)---");
+            List<Long> collectedMemberTitles = memberTitleService.findMemberTitleByMember(member);
             for(MemberTitle memberTitle : memberTitles) {
                 // 1. 회원이 보유한 회원칭호는 패스
-                if(collectedMemberTitles.contains(memberTitle)) {
+                if(collectedMemberTitles.contains(memberTitle.getId()))
                     continue;
-                }
                 // 2. 회원이 보유하지 않은 회원칭호는 부여기준 검사 -> 부여
                 if(memberTitleService.canGiveMemberTitle(member, memberTitle)) {
                     // 회원가입 칭호와 다른 칭호를 같은 날에 부여 받는 경우 회원가입 칭호를 대표 칭호로 설정

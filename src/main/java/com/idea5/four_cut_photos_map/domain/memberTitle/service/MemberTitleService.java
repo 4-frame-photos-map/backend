@@ -111,9 +111,10 @@ public class MemberTitleService {
         return memberTitleRepository.findAllByOrderByIdAsc();
     }
 
-    public List<MemberTitle> findMemberTitleByMember(Member member) {
+    // 회원이 보유한 MemberTitle id 리스트 조회
+    public List<Long> findMemberTitleByMember(Member member) {
         return memberTitleLogRepository.findByMember(member)
-                .stream().map(memberTitleLog -> memberTitleLog.getMemberTitle())
+                .stream().map(memberTitleLog -> memberTitleLog.getMemberTitle().getId())
                 .collect(Collectors.toList());
     }
 
