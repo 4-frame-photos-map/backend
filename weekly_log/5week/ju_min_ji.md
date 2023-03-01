@@ -54,12 +54,12 @@ Relying upon circular references is discouraged and they are prohibited by defau
 
 ### 궁금한 점(선택)
 개인적으로 궁금했던 점 외에 코드 관련하여 받았던 질문 답변 보충하여 정리해놓았습니다.
-- Q. `Shop Entity`에서 `favoriteCnt` 컬럼 `int`가 아닌 `Integer`로 설정한 이유가 있나요?
-  - A. 나중에 **MySQL**의 `INT`타입을 **JAVA**의 `int`타입과 헷갈릴 것을 대비하여 구분지었습니다. 
-  - 표준 SQL에서 정의된 것은 Integer이라는 키워드 뿐이고, MySQL에서 INT는 INTEGER를 가리키는 또 다른 명칭일 뿐 둘은 결국 같은 속성이었습니다.
-  - 테스트 결과 **int**로 선언하여 데이터를 INSERT해도 디폴트값은 0이 아닌 **null**로 추가되었습니다
-  - 만일 디폴트값을 null이 아닌 0으로 설정하고 싶다면 DB 테이블 설정에서 디폴트값을 변경해주어야 했습니다.
-  - [INTEGER, INT 참고자료](https://spiderwebcoding.tistory.com/5)
+- Q. Shop `Entity`에서 favoriteCnt 컬럼 `int`가 아닌 `Integer`로 설정한 이유가 있나요?
+  - A. 나중에 **MySQL의 `INT`타입을 JAVA의 `int`타입과 헷갈릴 것을 대비하여 명확하게 `Integer`로 설정**했습니다. 
+    - 표준 SQL에서 정의된 것은 Integer이라는 키워드 뿐이고, MySQL에서 INT는 INTEGER를 가리키는 또 다른 명칭일 뿐 둘은 결국 같은 속성이었습니다.
+      - 테스트 결과 **int**로 선언하여 데이터를 INSERT해도 디폴트값은 0이 아닌 **null**로 추가되었습니다
+      - 만일 디폴트값을 null이 아닌 0으로 설정하고 싶다면 DB 테이블 설정에서 디폴트값을 변경해주어야 했습니다.
+    - [INTEGER, INT 참고자료](https://spiderwebcoding.tistory.com/5)
 
 ### 다음주 계획(선택)
 
