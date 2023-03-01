@@ -119,12 +119,18 @@ public class MemberTitleService {
 
     // 회원에게 해당 회원칭호를 부여할 수 있는지 여부
     public boolean canGiveMemberTitle(Member member, MemberTitle memberTitle) {
-        if (memberTitle.getId() == MemberTitleType.FIRST_HEART.getCode()) {
+        // TODO: 첫번째 리뷰, 리뷰 5개 이상 기준 추가
+        if(memberTitle.getId() == MemberTitleType.NEWBIE.getCode()) {
+            // 1. 회원가입
+            return true;
+        } else if(memberTitle.getId() == MemberTitleType.FIRST_HEART.getCode()) {
             if(favoriteService.countByMember(member) >= 1) {
+                // 4. 첫번째 찜
                 return true;
             }
         } else if(memberTitle.getId() == MemberTitleType.MANY_HEART.getCode()) {
             if(favoriteService.countByMember(member) >= 3) {
+                // 5. 찜 5개 이상
                 return true;
             }
         }

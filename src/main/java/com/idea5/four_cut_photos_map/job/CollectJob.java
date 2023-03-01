@@ -3,6 +3,7 @@ package com.idea5.four_cut_photos_map.job;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitle;
+import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleType;
 import com.idea5.four_cut_photos_map.domain.memberTitle.service.MemberTitleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -39,7 +40,9 @@ public class CollectJob {
                 }
                 // 2. 회원이 보유하지 않은 회원칭호는 부여기준 검사 -> 부여
                 if(memberTitleService.canGiveMemberTitle(member, memberTitle)) {
-                    memberTitleService.addMemberTitle(member, memberTitle, false);
+                    // 회원가입 칭호와 다른 칭호를 같은 날에 부여 받는 경우 회원가입 칭호를 대표 칭호로 설정
+                    boolean isMain = memberTitle.getId() == MemberTitleType.NEWBIE.getCode() ? true : false;
+                    memberTitleService.addMemberTitle(member, memberTitle, isMain);
                 }
             }
         }

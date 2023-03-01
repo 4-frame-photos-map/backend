@@ -1,15 +1,14 @@
 package com.idea5.four_cut_photos_map.domain.member.service;
 
 import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoTokenResp;
-import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoUserInfoParam;
+import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.member.dto.request.MemberUpdateReq;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberInfoResp;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberWithdrawlResp;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleLog;
-import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleType;
 import com.idea5.four_cut_photos_map.domain.memberTitle.service.MemberTitleService;
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
@@ -44,10 +43,7 @@ public class MemberService {
             // 신규 사용자인 경우 회원가입
             member = KakaoUserInfoParam.toEntity(kakaoUserInfoParam);
             member.updateKakaoRefreshToken(kakaoTokenResp.getRefreshToken());
-            // 회원가입 기본 칭호 부여, 대표 칭호로 설정
-            log.info("----Before ----");
             memberRepository.save(member);
-            memberTitleService.addMemberTitle(member, MemberTitleType.NEWBIE.getCode(), true);
         }
         // redis 에 Access Token 저장 및 갱신
         String key = "member:" + member.getId() + ":kakao_access_token";
