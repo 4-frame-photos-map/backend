@@ -48,7 +48,9 @@ public class MemberService {
         // redis 에 Access Token 저장 및 갱신
         String key = "member:" + member.getId() + ":kakao_access_token";
         redisDao.setValues(key, kakaoTokenResp.getAccessToken(), Duration.ofSeconds(kakaoTokenResp.getExpiresIn()));
-
+        // redis 에 nickname 저장
+        String key2 = "member:" + member.getId() + ":nickname";
+        redisDao.setValues(key2, member.getNickname());
         return member;
     }
 

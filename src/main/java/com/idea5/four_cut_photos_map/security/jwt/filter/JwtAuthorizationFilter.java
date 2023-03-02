@@ -1,10 +1,10 @@
 package com.idea5.four_cut_photos_map.security.jwt.filter;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
+import com.idea5.four_cut_photos_map.global.common.RedisDao;
+import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import com.idea5.four_cut_photos_map.security.jwt.JwtService;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
-import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
-import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ import static com.idea5.four_cut_photos_map.security.jwt.dto.TokenType.REFRESH_T
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
     private final JwtService jwtService;
-    private final MemberService memberService;
+    private final RedisDao redisDao;
     private final String BEARER_TOKEN_PREFIX = "Bearer ";
 
     @Value("${jwt.atk.header}")
@@ -69,9 +69,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             if(tokenType.equals(ACCESS_TOKEN.getName()) && jwtService.isBlackList(token)) {
                 throw new JwtException("유효하지 않은 토큰입니다.");
             }
-            // TODO: 매 요청마다 DB 조회하면 성능 문제(jwt 쓰는 이유가 없음) -> Redis 캐시로 해결
-            Member member = memberService.findById(memberId);
+            // Redis 에서 nickname 을 가져와 Member 를 빌더로 만들어쓰도록 변경
+//            Member member = memberService.findById(memberId);
 //            CachedMemberParam cachedMember = memberService.findCachedById(memberId);
+            Member member = Member.builder()
+                    .id(memberId)
+                    .nickname(redisDao.getValues("member:" + memberId + ":nickname"))
+                    .build();
 //            log.info(cachedMember.getId().toString());
 //            log.info(cachedMember.getNickname());
             // 2. 2차 체크(해당 엑세스 토큰이 화이트 리스트에 포함되는지 검증) -> 탈취된 토큰 무효화
