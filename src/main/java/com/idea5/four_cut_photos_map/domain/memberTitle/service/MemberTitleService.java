@@ -75,7 +75,6 @@ public class MemberTitleService {
         memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle, isMain));
     }
 
-    @Transactional
     public void addMemberTitle(Member member, MemberTitle memberTitle, Boolean isMain) {
         memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle, isMain));
     }

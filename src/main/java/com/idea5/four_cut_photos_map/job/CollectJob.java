@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class CollectJob {
     // 초 분 시 일 월 요일
     @Scheduled(cron = "0 * * * * *")      // TODO: 테스트용 매분마다 실행
 //    @Scheduled(cron = "0 0 0 * * *")    // 매일 0시 실행
-//    @Transactional
+    @Transactional
     public void add() {
         // 인증된 API 요청 -> 로그 남기자
         // TODO: 전체 회원 말고 오늘 요청보낸 회원만
