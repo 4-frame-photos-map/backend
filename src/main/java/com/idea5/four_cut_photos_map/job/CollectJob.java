@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class CollectJob {
     // 초 분 시 일 월 요일
     @Scheduled(cron = "0 * * * * *")      // TODO: 테스트용 매분마다 실행
 //    @Scheduled(cron = "0 0 0 * * *")    // 매일 0시 실행
+//    @Transactional
     public void add() {
         // 인증된 API 요청 -> 로그 남기자
         // TODO: 전체 회원 말고 오늘 요청보낸 회원만
@@ -33,6 +35,10 @@ public class CollectJob {
         List<MemberTitle> memberTitles = memberTitleService.findAllMemberTitle();
         log.info("---Before memberService.findAll()---");
         List<Member> members = memberService.findAll();
+
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
         // 회원별로 각 칭호 부여하기
         for(Member member : members) {
             // 회원이 보유한 회원칭호 전체조회
@@ -50,5 +56,8 @@ public class CollectJob {
                 }
             }
         }
+        stopWatch.stop();
+        log.info(stopWatch.prettyPrint());
+        log.info(String.valueOf(stopWatch.getTotalTimeSeconds()));
     }
 }
