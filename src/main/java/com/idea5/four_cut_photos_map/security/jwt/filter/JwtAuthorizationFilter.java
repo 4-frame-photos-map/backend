@@ -32,6 +32,7 @@ import static com.idea5.four_cut_photos_map.security.jwt.dto.TokenType.REFRESH_T
  * @See <a href="https://velog.io/@shinmj1207/Spring-Spring-Security-JWT-%EB%A1%9C%EA%B7%B8%EC%9D%B8">Spring Security + JWT 로그인</a>
  * @See <a href="https://alkhwa-113.tistory.com/entry/TIL-JWT-%EC%99%80-%EB%B3%B4%EC%95%88-CORS">JWT 토큰 무효화 참고1</a>
  * @See <a href="https://mellowp-dev.tistory.com/8">JWT 토큰 무효화 참고2</a>
+ * @See <a href="https://flyburi.com/584">인증 관련 클래스</a>
  */
 @Slf4j
 @Component
@@ -70,17 +71,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 throw new JwtException("유효하지 않은 토큰입니다.");
             }
             // Redis 에서 nickname 을 가져와 Member 를 빌더로 만들어쓰도록 변경
-//            Member member = memberService.findById(memberId);
 //            CachedMemberParam cachedMember = memberService.findCachedById(memberId);
             Member member = Member.builder()
                     .id(memberId)
                     .nickname(redisDao.getValues("member:" + memberId + ":nickname"))
                     .build();
-//            log.info(cachedMember.getId().toString());
-//            log.info(cachedMember.getNickname());
             // 2. 2차 체크(해당 엑세스 토큰이 화이트 리스트에 포함되는지 검증) -> 탈취된 토큰 무효화
             if(member != null) {
-                log.info("JwtAuthorizationFilter 인증처리");
+                log.info("---Before forceAuthentication()---");
                 forceAuthentication(member);
             }
         }
@@ -96,20 +94,22 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         return null;
     }
 
-    // 강제 로그인 처리
+    // Spring Security 에 유저의 인증 정보 등록(컨트롤러 단에서 @AuthenticationPrincipal 로 인증 객체를 얻기 위함)
     private void forceAuthentication(Member member) {
         log.info(member.getId().toString());
-        // Member 를 기반으로 User 를 상속한 MemberContext 객체 생성
+        // 1. Member 를 기반으로 User 를 상속한 MemberContext 객체 생성
         MemberContext memberContext = new MemberContext(member);
+        // 2. Authentication 객체 생성
         UsernamePasswordAuthenticationToken authentication =
                 UsernamePasswordAuthenticationToken.authenticated(
                         memberContext,
                         null,
                         member.getAuthorities()
                 );
-        // 이후 컨트롤러 단에서 MemberContext 객체 사용O
+        // 3. Authentication 을 SecurityContext 에 담기
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
+        // 4. SecurityContext 를 SecurityContextHolder 에 담기
         SecurityContextHolder.setContext(context);
     }
 }
