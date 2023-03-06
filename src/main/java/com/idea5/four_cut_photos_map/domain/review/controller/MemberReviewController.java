@@ -26,7 +26,8 @@ public class MemberReviewController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("")
     public ResponseEntity<RsData> getMemberReviews(@AuthenticationPrincipal MemberContext memberContext) {
-        List<ResponseReviewDto> reviews = reviewService.getAllMemberReviews(memberContext.getId());
+        List<ResponseReviewDto> reviews = reviewService.
+                getAllMemberReviews(memberContext.getId());
 
         return new ResponseEntity<>(
                 new RsData<>(true, "회원의 모든 리뷰 조회 완료", reviews),

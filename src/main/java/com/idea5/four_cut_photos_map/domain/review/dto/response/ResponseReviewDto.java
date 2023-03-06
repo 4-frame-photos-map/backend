@@ -24,7 +24,7 @@ public class ResponseReviewDto {
     private Long id;                    // 리뷰 번호
     private LocalDateTime createDate;   // 리뷰 생성 일자
     private LocalDateTime modifyDate;   // 리뷰 수정 일자
-    private int startRating;            // 별점
+    private int starRating;            // 별점
     private String content;             // 내용
     private PurityScore purity;         // 청결도
     private RetouchScore retouch;       // 보정
@@ -57,7 +57,7 @@ public class ResponseReviewDto {
                 .id(review.getId())
                 .createDate(review.getCreateDate())
                 .modifyDate(review.getModifyDate())
-                .startRating(review.getStarRating())
+                .starRating(review.getStarRating())
                 .content(review.getContent())
                 .purity(review.getPurity())
                 .retouch(review.getRetouch())

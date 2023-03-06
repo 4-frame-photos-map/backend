@@ -54,6 +54,9 @@ dependencies {
 
     // jackson
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.4'
+
+    // google guava
+    implementation 'com.google.guava:guava:r05'
 }
 
 tasks.named('test') {
