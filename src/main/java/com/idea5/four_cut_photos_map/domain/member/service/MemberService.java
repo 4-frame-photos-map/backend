@@ -63,14 +63,16 @@ public class MemberService {
         Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException());
         log.info("----Before memberTitleService.findByMember(member)----");
         List<MemberTitleLog> memberTitleLogs = memberTitleService.findByMember(member);
-        // 대표 칭호 조회
+        // 대표 칭호 조회(회원가입 후 바로 칭호가 부여되지 않기 때문에 회원가입 당일에는 대표 칭호가 없을 수 있음)
+        String mainMemberTitle = null;
         for(MemberTitleLog memberTitleLog : memberTitleLogs) {
             if(memberTitleLog.getIsMain()) {
                 log.info("----Before memberTitleLog.getMemberTitleName()----");
-                return MemberInfoResp.toDto(member, memberTitleLog.getMemberTitleName(), memberTitleLogs.size());
+                mainMemberTitle = memberTitleLog.getMemberTitleName();
+                break;
             }
         }
-        return null;
+        return MemberInfoResp.toDto(member, mainMemberTitle, memberTitleLogs.size());
     }
 
     // 서비스 로그아웃(accessToken 무효화)
