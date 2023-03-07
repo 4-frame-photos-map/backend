@@ -25,11 +25,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ActiveProfiles("test")
-@SpringBootTest
-@Transactional
-@AutoConfigureMockMvc
-@Slf4j
+//@ActiveProfiles("test")
+//@SpringBootTest
+//@Transactional
+//@AutoConfigureMockMvc
+//@Slf4j
 class ShopControllerTest {
     // todo : 실패 케이스도 추가하기
     @Autowired

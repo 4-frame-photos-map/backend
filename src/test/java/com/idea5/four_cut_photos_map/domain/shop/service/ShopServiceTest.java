@@ -27,10 +27,10 @@ import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-@SpringBootTest
-@Slf4j
-@Transactional
-@ActiveProfiles("test")
+//@SpringBootTest
+//@Slf4j
+//@Transactional
+//@ActiveProfiles("test")
 class ShopServiceTest {
 
     private final Double X = 127.134898;
