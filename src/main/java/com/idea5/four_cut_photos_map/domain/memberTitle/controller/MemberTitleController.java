@@ -21,6 +21,7 @@ public class MemberTitleController {
     private final MemberTitleService memberTitleService;
 
     // 회원 칭호 정보 조회
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<RsData> getMemberTitleInfo(@PathVariable Long id) {
         MemberTitleInfoResp memberTitleInfo = memberTitleService.getMemberTitleInfo(id);

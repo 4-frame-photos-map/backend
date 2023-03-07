@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.favorite.repository;
 
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
+import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +15,5 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     Optional<List<Favorite>> findByMemberId(Long memberId);
 
     List<Favorite> findByShopId(Long shopId);
+    List<Favorite> findByMember(Member member);
 }

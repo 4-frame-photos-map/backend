@@ -23,8 +23,6 @@ public class ResponseMarker {
         return ResponseMarker.builder()
                 .id(shop.getId())
                 .name(shop.getPlaceName())
-                .latitude(shop.getLatitude())
-                .longitude(shop.getLongitude())
                 .build();
     }
 

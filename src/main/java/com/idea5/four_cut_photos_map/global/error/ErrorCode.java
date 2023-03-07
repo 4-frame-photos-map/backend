@@ -21,7 +21,8 @@ public enum ErrorCode {
     DUPLICATE_FAVORITE(HttpStatus.CONFLICT, "409", "해당 상점은 이미 찜 되어있습니다."),
     DELETED_FAVORITE(HttpStatus.CONFLICT, "409", "해당 상점은 이미 찜 취소되었습니다."),
     FAVORITES_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "찜 목록이 존재하지 않는 사용자입니다."),
-
+    MEMBER_TITLE_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "해당 회원 칭호가 존재하지 않습니다."),
+    MEMBER_TITLE_NOT_HAD(HttpStatus.NOT_FOUND, "404", "해당 회원이 칭호를 소유하고 있지 않습니다."),
     SHOP_TITLE_LOGS_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "해당 상점은 칭호가 없습니다."),
     SHOP_TITLE_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "칭호가 없습니다."),
     DUPLICATE_SHOP_TITLE(HttpStatus.CONFLICT, "409", "해당 상점은 이미 타이틀을 보유하고 있습니다.");

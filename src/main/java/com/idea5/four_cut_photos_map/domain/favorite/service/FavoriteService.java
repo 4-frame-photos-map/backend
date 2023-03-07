@@ -4,7 +4,7 @@ import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteRespon
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ShopFavoritesResponseDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseFavoriteShop;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.domain.shoptitle.entity.ShopTitle;
@@ -31,15 +31,6 @@ public class FavoriteService {
     private final ShopTitleLogService shopTitleLogService;
     private final ShopTitleService shopTitleService;
 
-    // DTO 변환
-    public FavoriteResponseDto toDto(Favorite favorite) {
-        ShopFavoritesResponseDto shopDto = shopService.toShopFavoritesRespDto(favorite.getShop());
-
-        return FavoriteResponseDto.builder()
-                .id(favorite.getId())
-                .shop(shopDto)
-                .build();
-    }
 
     // 찜하기
     @Transactional
@@ -58,7 +49,7 @@ public class FavoriteService {
         favoriteRepository.save(favorite);
 
         // 3. shop 찜 수 갱신
-        shop.setFavoriteCnt(shop.getFavoriteCnt() == null? 1 : shop.getFavoriteCnt()+1);
+        shop.setFavoriteCnt(shop.getFavoriteCnt()+1);
     }
 
     // 찜 취소
@@ -75,8 +66,7 @@ public class FavoriteService {
 
         // 3. shop 찜 수 갱신
         Shop shop = shopService.findById(shopId);
-        shop.setFavoriteCnt(shop.getFavoriteCnt() == null || shop.getFavoriteCnt() == 0?
-                0 : shop.getFavoriteCnt() - 1);
+        shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0? 0 : shop.getFavoriteCnt() - 1);
     }
 
     public List<FavoriteResponseDto> findByMemberId(Long memberId) {
@@ -86,7 +76,7 @@ public class FavoriteService {
 
         return  favorites
                     .stream()
-                    .map(favorite -> toDto(favorite))
+                    .map(favorite -> FavoriteResponseDto.from(favorite))
                     .collect(Collectors.toList());
         }
 
@@ -100,11 +90,18 @@ public class FavoriteService {
         List<Favorite> list = favoriteRepository.findByShopId(shopId);
 
         // 찜수가 5개 이상이면 칭호부여
-        if (list.size() >= 5){
+        if (list.size() >= 5) {
             shopTitleLogService.save(shopId, HOT_PLACE.getId());
             return true;
         }
 
         return false;
     }
+    public void deleteByMemberId(Long memberId) {
+        List<Favorite> favorites = favoriteRepository.findByMember(Member.builder().id(memberId).build());
+        for(Favorite favorite : favorites) {
+            favoriteRepository.delete(favorite);
+        }
+    }
 }
+

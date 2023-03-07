@@ -1,13 +1,14 @@
 package com.idea5.four_cut_photos_map.domain.memberTitle.service;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
-import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleInfoResp;
 import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleResp;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitle;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleLog;
 import com.idea5.four_cut_photos_map.domain.memberTitle.repository.MemberTitleLogRepository;
 import com.idea5.four_cut_photos_map.domain.memberTitle.repository.MemberTitleRepository;
+import com.idea5.four_cut_photos_map.global.error.ErrorCode;
+import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,11 +25,10 @@ import java.util.stream.Collectors;
 public class MemberTitleService {
     private final MemberTitleRepository memberTitleRepository;
     private final MemberTitleLogRepository memberTitleLogRepository;
-    private final MemberRepository memberRepository;
 
     public MemberTitle findById(Long id) {
         return memberTitleRepository.findById(id).orElseThrow(() -> {
-            throw new RuntimeException("memberTitle 없음");
+            throw new BusinessException(ErrorCode.MEMBER_TITLE_NOT_FOUND);
         });
     }
 
@@ -83,8 +83,19 @@ public class MemberTitleService {
         log.info("----Before memberTitleLogRepository.findByMemberIdAndMemberTitleId()----");
         MemberTitleLog newMemberTitleLog = memberTitleLogRepository.findByMemberAndMemberTitleId(member, memberTitleId)
                 .orElseThrow(() -> {
-                    throw new RuntimeException("해당 회원이 칭호를 소유하고 있지 않습니다.");
+                    throw new BusinessException(ErrorCode.MEMBER_TITLE_NOT_HAD);
                 });
         newMemberTitleLog.registerMain();
+    }
+
+    // memberId 를 참조하고 있는 row 모두 삭제
+    @Transactional
+    public void deleteByMemberId(Long memberId) {
+        log.info("----Before memberTitleLogRepository.findByMember()----");
+        List<MemberTitleLog> memberTitleLogs = memberTitleLogRepository.findByMember(Member.builder().id(memberId).build());
+        log.info("----Before memberTitleLogRepository.delete()----");
+        for(MemberTitleLog memberTitleLog : memberTitleLogs) {
+            memberTitleLogRepository.delete(memberTitleLog);
+        }
     }
 }
