@@ -4,14 +4,17 @@ package com.idea5.four_cut_photos_map.domain.shop.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
-
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopBrand;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopMarker;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
+import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
 import com.idea5.four_cut_photos_map.global.common.data.Brand;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
@@ -22,11 +25,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-
 import javax.validation.Valid;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static com.idea5.four_cut_photos_map.global.error.ErrorCode.*;
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.BRAND_NOT_FOUND;
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DISTANCE_IS_EMPTY;
 
 
 @RequestMapping("/shops")
@@ -37,6 +43,9 @@ public class ShopController {
 
     private final ShopService shopService;
     private final FavoriteService favoriteService;
+
+    private final ShopTitleLogService shopTitleLogService;
+
 
     @GetMapping(value = "")
     public ResponseEntity<RsData<List<ResponseShop>>> showKeywordSearchList(@RequestParam(defaultValue = "즉석사진") String keyword) throws JsonProcessingException {
@@ -55,7 +64,7 @@ public class ShopController {
     public ResponseEntity<RsData<List<ResponseShopBrand>>> showBrandListBySearch(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch) {
         // api 검색전, DB에서 먼저 있는지 확인하는게 더 효율적
         List<ShopDto> shopDtos = shopService.findByBrand(requestBrandSearch.getBrand());
-        if(shopDtos.isEmpty())
+        if (shopDtos.isEmpty())
             throw new BusinessException(BRAND_NOT_FOUND);
 
 
@@ -74,10 +83,10 @@ public class ShopController {
 
 
         // 검색 결과, 근처에 원하는 브랜드가 없을 때
-        if(resultShops.isEmpty()){
+        if (resultShops.isEmpty()) {
             return ResponseEntity.ok(new RsData<>(
-                            true, String.format("근처에 %s이(가) 없습니다.", requestBrandSearch.getBrand()), resultShops
-                    ));
+                    true, String.format("근처에 %s이(가) 없습니다.", requestBrandSearch.getBrand()), resultShops
+            ));
         }
 
         return ResponseEntity.ok(new RsData<>(
@@ -88,7 +97,7 @@ public class ShopController {
 
     //현재 위치 기준, 반경 2km
     @GetMapping("/marker")
-    public ResponseEntity<RsData<Map<String, List<ResponseShopMarker>>>> currentLocationSearch(@ModelAttribute @Valid RequestShop requestShop){
+    public ResponseEntity<RsData<Map<String, List<ResponseShopMarker>>>> currentLocationSearch(@ModelAttribute @Valid RequestShop requestShop) {
 
         String[] names = Brand.Names; // 브랜드명 ( 하루필름, 인생네컷 ... )
 
@@ -108,12 +117,12 @@ public class ShopController {
     public ResponseEntity<ResponseShopDetail> detail(@PathVariable(name = "shopId") Long id,
                                                      @RequestParam(name = "distance", required = false, defaultValue = "") String distance,
                                                      @AuthenticationPrincipal MemberContext memberContext) {
-        if (distance.isEmpty()){
+        if (distance.isEmpty()) {
             throw new BusinessException(DISTANCE_IS_EMPTY);
         }
         ResponseShopDetail shopDetailDto = shopService.findShopById(id, distance);
 
-        if(memberContext != null) {
+        if (memberContext != null) {
             Favorite favorite = favoriteService.findByShopIdAndMemberId(shopDetailDto.getId(), memberContext.getId());
 
             if (favorite == null) {
@@ -121,6 +130,11 @@ public class ShopController {
             } else {
                 shopDetailDto.setCanBeAddedToFavorites(false);
             }
+        }
+
+        if (shopTitleLogService.existShopTitles(id)) {
+            List<String> shopTitles = shopTitleLogService.getShopTitles(id);
+            shopDetailDto.setShopTitles(shopTitles);
         }
 
         return ResponseEntity.ok(shopDetailDto);
