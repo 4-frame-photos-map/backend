@@ -113,6 +113,9 @@ public class MemberService {
     public void updateNickname(Long id, MemberUpdateReq memberUpdateReq) {
         Member member = findById(id);
         member.updateNickname(memberUpdateReq);
+        // redis 에 저장된 nickname 수정
+        String key = "member:" + member.getId() + ":nickname";
+        redisDao.setValues(key, memberUpdateReq.getNickname());
     }
 
     // 회원 대표칭호 수정
