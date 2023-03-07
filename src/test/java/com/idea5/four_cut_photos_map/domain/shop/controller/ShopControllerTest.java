@@ -14,8 +14,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
+
+import static net.bytebuddy.matcher.ElementMatchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -45,15 +50,15 @@ class ShopControllerTest {
         // given
         String keyword = "포토이즘박스 성수점";
 
-        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48", 127.043851506853, 37.5461761379704));
-        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 성수점", "서울 성동구 서울숲2길 17-2", 127.04073790685483, 37.547177362006806));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 카페성수로드점", "서울 성동구 서울숲4길 13", 127.042449120263, 37.5475677927281));
-        shopRepository.save(new Shop("하루필름", "하루필름 서울숲점", "서울 성동구 서울숲2길 45", 127.043600450617, 37.5464465306291));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲점", "서울 성동구 서울숲4길 20", 127.043010183447, 37.547189170196));
-        shopRepository.save(new Shop("픽닷", "픽닷", "서울 성동구 서울숲4길 23-1", 127.043634812377, 37.5471565050697));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48"));
+        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 성수점", "서울 성동구 서울숲2길 17-2"));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 카페성수로드점", "서울 성동구 서울숲4길 13"));
+        shopRepository.save(new Shop("하루필름", "하루필름 서울숲점", "서울 성동구 서울숲2길 45"));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲점", "서울 성동구 서울숲4길 20"));
+        shopRepository.save(new Shop("픽닷", "픽닷", "서울 성동구 서울숲4길 23-1"));
 
         // when
-        ResultActions resultActions = mockMvc.perform(get("/shop/search")
+        ResultActions resultActions = mockMvc.perform(get("/shops")
                 .param("keyword", keyword)
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -89,15 +94,15 @@ class ShopControllerTest {
         RequestBrandSearch requestBrandSearch = new RequestBrandSearch(searchBrand, x, y);
 
         shopService.searchByKeyword(searchBrand);
-        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48", 127.043851506853, 37.5461761379704));
-        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 성수점", "서울 성동구 서울숲2길 17-2", 127.04073790685483, 37.547177362006806));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 카페성수로드점", "서울 성동구 서울숲4길 13", 127.042449120263, 37.5475677927281));
-        shopRepository.save(new Shop("하루필름", "하루필름 서울숲점", "서울 성동구 서울숲2길 45", 127.043600450617, 37.5464465306291));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲점", "서울 성동구 서울숲4길 20", 127.043010183447, 37.547189170196));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 충남천안두정먹거리공원점", "충남 천안시 서북구 원두정2길 21", 127.135473811813, 36.8322023787607));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48"));
+        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 성수점", "서울 성동구 서울숲2길 17-2"));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 카페성수로드점", "서울 성동구 서울숲4길 13"));
+        shopRepository.save(new Shop("하루필름", "하루필름 서울숲점", "서울 성동구 서울숲2길 45"));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲점", "서울 성동구 서울숲4길 20"));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 충남천안두정먹거리공원점", "충남 천안시 서북구 원두정2길 21"));
 
         // when
-        ResultActions resultActions = mockMvc.perform(get("/shop/brand/search")
+        ResultActions resultActions = mockMvc.perform(get("/shops/brand")
                 .param("brand", searchBrand)
                 .param("longitude", String.valueOf(x))
                 .param("latitude", String.valueOf(y))
@@ -115,11 +120,11 @@ class ShopControllerTest {
     void 상점_상세보기() throws Exception{
 
         // given
-        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 홍대점", "서울 ~", 12.123, 12.12345));
+        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 홍대점", "서울 ~"));
         String distance = "3km";
 
         // when
-        ResultActions resultActions = mockMvc.perform(get("/shop/detail/%s".formatted(shop.getId()))
+        ResultActions resultActions = mockMvc.perform(get("/shops/%s".formatted(shop.getId()))
                 .param("distance", distance)
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -129,8 +134,6 @@ class ShopControllerTest {
                 .andExpect(jsonPath("id").value(shop.getId()))
                 .andExpect(jsonPath("name").value(shop.getPlaceName()))
                 .andExpect(jsonPath("address").value(shop.getRoadAddressName()))
-                .andExpect(jsonPath("latitude").value(shop.getLatitude()))
-                .andExpect(jsonPath("longitude").value(shop.getLongitude()))
                 .andExpect(jsonPath("distance").value(distance))
                 .andDo(print());
 
@@ -147,13 +150,13 @@ class ShopControllerTest {
         Point point = new Point(127.134898, 36.833922); // 두정동 위치
 
 
-        shopRepository.save(new Shop("인생네컷", "인생네컷 충남천안두정먹거리공원점", "충남 천안시 서북구 원두정2길 21", 127.135473811813, 36.8322023787607));
-        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 두정점", "충남 천안시 서북구 두정동 886-1", 127.135473811813, 36.8322023787607));
-        shopRepository.save(new Shop("하루필름", "하루필름 천안점", "충남 천안시 동남구 신부동 459-1", 127.135473811813, 36.8322023787607));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 충남천안두정먹거리공원점", "충남 천안시 서북구 원두정2길 21"));
+        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 두정점", "충남 천안시 서북구 두정동 886-1"));
+        shopRepository.save(new Shop("하루필름", "하루필름 천안점", "충남 천안시 동남구 신부동 459-1"));
 
 
         // when
-        ResultActions resultActions = mockMvc.perform(get("/shop/search/marker")
+        ResultActions resultActions = mockMvc.perform(get("/shops/marker")
                         .param("longitude", String.valueOf(point.getX()))
                         .param("latitude", String.valueOf(point.getY()))
                 .contentType(MediaType.APPLICATION_JSON));
@@ -167,6 +170,57 @@ class ShopControllerTest {
                 .andExpect(jsonPath("$.result.포토이즘박스.length()").value(1)) // todo : apiResponse로 감싸면 jsonPath 수정해야 됨
                 .andExpect(jsonPath("$.result.하루필름.length()").value(0)) // todo : apiResponse로 감싸면 jsonPath 수정해야 됨
                 .andDo(print());
+    }
+
+    @DisplayName("키워드로 조회된 상점 리스트 보여주기, DB에 동일 데이터 존재")
+    @Test
+    void showKeywordSearchList() throws Exception {
+        // Given
+        String keyword = "마포 즉석사진";
+        shopRepository.save(new Shop("인생네컷", "인생네컷 홍대동교점", "서울 마포구 홍익로6길 21"));
+        shopRepository.save(new Shop("하루필름", "하루필름 연남점", "서울 마포구 동교로46길 40"));
+
+        // When
+        ResultActions resultActions = mockMvc
+                .perform(get("/shops")
+                        .param("keyword", keyword)
+                        .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8)))
+        // Then
+                //.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("showKeywordSearchList"))
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("키워드로 Shop 조회 성공"))
+                .andExpect(jsonPath("$.result.*", hasSize(2)))
+
+                .andExpect(jsonPath("$.result[0].placeName", containsString("인생네컷 홍대동교점")))
+                .andExpect(jsonPath("$.result[0].roadAddressName", containsString("서울 마포구 홍익로6길 21")))
+                .andExpect(jsonPath("$.result[0].longitude", equalTo(126.922894949096)))
+                .andExpect(jsonPath("$.result[0].latitude", equalTo(37.555493447252)))
+
+                .andExpect(jsonPath("$.result[1].placeName", containsString("하루필름 연남점")))
+                .andExpect(jsonPath("$.result[1].roadAddressName", containsString("서울 마포구 동교로46길 40")))
+                .andExpect(jsonPath("$.result[1].longitude", equalTo(126.926725005048)))
+                .andExpect(jsonPath("$.result[1].latitude", equalTo(37.5621542536479)));
+    }
+
+    @DisplayName("키워드로 조회된 상점 리스트 보여주기, DB에 동일 데이터 존재하지 않음")
+    @Test
+    void showKeywordSearchListWithNoResults() throws Exception {
+        // Given
+        String keyword = "마포 즉석사진";
+
+        // When
+        ResultActions resultActions = mockMvc
+                .perform(get("/shops")
+                        .param("keyword", keyword)
+                        .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8)))
+        // Then
+                //.andDo(print())
+                .andExpect(handler().methodName("showKeywordSearchList"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error.errorMessage", containsString("상점을 찾을 수 없습니다.")));
     }
 
     static class Point{
