@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.security.jwt.filter;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
+import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import com.idea5.four_cut_photos_map.security.jwt.JwtService;
@@ -13,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -42,6 +44,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final RedisDao redisDao;
     private final String BEARER_TOKEN_PREFIX = "Bearer ";
+    private final MemberService memberService;
 
     @Value("${jwt.atk.header}")
     private String tokenHeader;
@@ -72,10 +75,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             }
             // Redis 에서 nickname 을 가져와 Member 를 빌더로 만들어쓰도록 변경
 //            CachedMemberParam cachedMember = memberService.findCachedById(memberId);
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             Member member = Member.builder()
                     .id(memberId)
                     .nickname(redisDao.getValues("member:" + memberId + ":nickname"))
                     .build();
+//            Member member = memberService.findById(memberId);
+            stopWatch.stop();
+            log.info(stopWatch.prettyPrint());
+            log.info(String.valueOf(stopWatch.getTotalTimeSeconds()));
             // 2. 2차 체크(해당 엑세스 토큰이 화이트 리스트에 포함되는지 검증) -> 탈취된 토큰 무효화
             if(member != null) {
                 log.info("---Before forceAuthentication()---");
