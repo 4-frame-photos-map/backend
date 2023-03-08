@@ -68,7 +68,7 @@ public class ReviewService {
     }
 
     public List<ResponseReviewDto> getAllShopReviews(Long shopId) {
-        Shop shop = shopService.findShopById(shopId);
+        Shop shop = shopService.findById(shopId);
 
         List<Review> reviews = findAllByShopId(shopId);
 
@@ -108,7 +108,7 @@ public class ReviewService {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND);
         }
 
-        Shop shop = shopService.findShopById(shopId);
+        Shop shop = shopService.findById(shopId);
 
         Review review = Review.builder()
                 .writer(user)

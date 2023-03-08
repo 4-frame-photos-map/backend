@@ -66,7 +66,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
 
         MemberTitleLog memberTitleLog = memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle, true));
 
-        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48", 127.043851506853, 37.5461761379704));
+        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48"));
 
         JwtToken jwtToken = jwtService.generateTokens(member);
 
@@ -111,7 +111,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
 
         MemberTitleLog memberTitleLog = memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle, true));
 
-        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48", 127.043851506853, 37.5461761379704));
+        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48"));
 
         JwtToken jwtToken = jwtService.generateTokens(member);
 
@@ -143,7 +143,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
 
         MemberTitleLog memberTitleLog = memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle, true));
 
-        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48", 127.043851506853, 37.5461761379704));
+        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48"));
 
         JwtToken jwtToken = jwtService.generateTokens(member);
 
@@ -182,7 +182,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
         memberTitleLogRepository.save(new MemberTitleLog(user, memberTitle, true));
         memberTitleLogRepository.save(new MemberTitleLog(anotherUser, memberTitle, true));
 
-        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48", 127.043851506853, 37.5461761379704));
+        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48"));
 
         JwtToken jwtToken = jwtService.generateTokens(user);
 
@@ -219,7 +219,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
 
         MemberTitleLog memberTitleLog = memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle, true));
 
-        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48", 127.043851506853, 37.5461761379704));
+        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48"));
 
         JwtToken jwtToken = jwtService.generateTokens(member);
 
@@ -254,7 +254,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
         MemberTitleLog memberTitleLog1 = memberTitleLogRepository.save(new MemberTitleLog(user, memberTitle, true));
         MemberTitleLog memberTitleLog2 = memberTitleLogRepository.save(new MemberTitleLog(anotherUser, memberTitle, true));
 
-        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48", 127.043851506853, 37.5461761379704));
+        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48"));
 
         JwtToken jwtToken = jwtService.generateTokens(user);
 
@@ -291,7 +291,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
 
         JwtToken jwtToken = jwtService.generateTokens(member1);
 
-        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48", 127.043851506853, 37.5461761379704));
+        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48"));
         long shopId = shop.getId();
 
         reviewRepository.save(Review.builder().writer(member1).shop(shop).starRating(3).content("소품이 많고 깔끔하게 잘 나옵니다.").purity(PurityScore.UNSELECTED).retouch(RetouchScore.GOOD).item(ItemScore.GOOD).build());
@@ -329,7 +329,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
 
         JwtToken jwtToken = jwtService.generateTokens(member);
 
-        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48", 127.043851506853, 37.5461761379704));
+        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48"));
         long shopId = shop.getId();
 
         // when
@@ -360,7 +360,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
 
         JwtToken jwtToken = jwtService.generateTokens(user);
 
-        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48", 127.043851506853, 37.5461761379704));
+        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48"));
         Long shopId = shop.getId();
 
         RequestReviewDto requestReviewDto = RequestReviewDto.builder().starRating(3).content("가격도 합리적이고 소품이 진짜 다양해서 좋았어요").build();
@@ -432,8 +432,8 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
 
         JwtToken jwtToken = jwtService.generateTokens(member);
 
-        Shop shop1 = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48", 127.043851506853, 37.5461761379704));
-        Shop shop2 = shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 성수점", "서울 성동구 서울숲2길 17-2", 127.04073790685483, 37.547177362006806));
+        Shop shop1 = shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48"));
+        Shop shop2 = shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 성수점", "서울 성동구 서울숲2길 17-2"));
 
         reviewRepository.save(Review.builder().writer(member).shop(shop1).starRating(3).content("소품이 많고 깔끔하게 잘 나옵니다.").purity(PurityScore.UNSELECTED).retouch(RetouchScore.GOOD).item(ItemScore.GOOD).build());
         reviewRepository.save(Review.builder().writer(member).shop(shop1).starRating(4).content("사진이 깔끔하게 나와 자주 찾습니다.").purity(PurityScore.UNSELECTED).retouch(RetouchScore.GOOD).item(ItemScore.GOOD).build());
