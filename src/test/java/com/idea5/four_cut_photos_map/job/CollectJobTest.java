@@ -177,4 +177,27 @@ class CollectJobTest {
         assertThat(memberTitleLog3.getMemberTitle().getName()).isEqualTo("찜 홀릭");
         assertThat(memberTitleLog3.getMemberTitle().getContent()).isEqualTo("찜 3개 이상 추가");
     }
+
+    @DisplayName("회원이 이미 보유한 칭호는 다시 부여하지 않는다")
+    @Test
+    void t4() {
+        // given
+        memberRepository.save(new Member());
+
+        // when
+        collectJob.add();
+        collectJob.add();
+
+        // then
+        // 칭호 부여 총 1건
+        List<MemberTitleLog> memberTitleLogs = memberTitleLogRepository.findAll();
+        assertThat(memberTitleLogs.size()).isEqualTo(1);
+
+        // 1번 회원 -> 뉴비 칭호 부여
+        MemberTitleLog memberTitleLog1 = memberTitleLogs.get(0);
+        assertThat(memberTitleLog1.getMember().getId()).isEqualTo(1);
+        assertThat(memberTitleLog1.getIsMain()).isTrue();
+        assertThat(memberTitleLog1.getMemberTitle().getName()).isEqualTo("뉴비");
+        assertThat(memberTitleLog1.getMemberTitle().getContent()).isEqualTo("회원가입");
+    }
 }
