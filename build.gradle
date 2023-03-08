@@ -54,6 +54,9 @@ dependencies {
 
     // jackson
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.4'
+
+    // https://mvnrepository.com/artifact/com.google.guava/guava, CaseFormat 사용
+    implementation group: 'com.google.guava', name: 'guava', version: 'r05'
 }
 
 tasks.named('test') {
