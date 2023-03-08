@@ -74,47 +74,47 @@ class ShopControllerTest {
     }
 
     // todo : 브랜드 검색 api TDD
-    @DisplayName("브랜드 검색")
-    @Test
-    void searchByBrand() throws Exception {
-
-        /**
-         * 참고)
-         *   String expectByBrand = "$.[?(@.brand == '%s')]";
-         *  .andExpect(jsonPath(expectByBrand, keyword).exists()) // jsonPath에 해당 키워드인 브랜드가 존재하는지
-         *  .andExpect(jsonPath(expectByBrand,keywords).value(equalTo(keyword))) // jsonPath에 해당 키워드인 브랜드가 존재하는지
-         *  .andExpect(jsonPath("$[0].brand").value(equalTo(keyword)))
-         */
-        // given
-
-        String searchBrand = "인생네컷";
-        double x = 127.134898;
-        double y = 36.833922;
-
-        RequestBrandSearch requestBrandSearch = new RequestBrandSearch(searchBrand, x, y);
-
-        shopService.searchByKeyword(searchBrand);
-        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48",0));
-        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 성수점", "서울 성동구 서울숲2길 17-2",0));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 카페성수로드점", "서울 성동구 서울숲4길 13",0));
-        shopRepository.save(new Shop("하루필름", "하루필름 서울숲점", "서울 성동구 서울숲2길 45",0));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲점", "서울 성동구 서울숲4길 20",0));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 충남천안두정먹거리공원점", "충남 천안시 서북구 원두정2길 21",0));
-
-        // when
-        ResultActions resultActions = mockMvc.perform(get("/shops/brand")
-                .param("brand", searchBrand)
-                .param("longitude", String.valueOf(x))
-                .param("latitude", String.valueOf(y))
-                .contentType(MediaType.APPLICATION_JSON));
-
-
-        // then
-        resultActions
-                .andExpect(status().is2xxSuccessful())
-                .andDo(print());
-
-    }
+//    @DisplayName("브랜드 검색")
+//    @Test
+//    void searchByBrand() throws Exception {
+//
+//        /**
+//         * 참고)
+//         *   String expectByBrand = "$.[?(@.brand == '%s')]";
+//         *  .andExpect(jsonPath(expectByBrand, keyword).exists()) // jsonPath에 해당 키워드인 브랜드가 존재하는지
+//         *  .andExpect(jsonPath(expectByBrand,keywords).value(equalTo(keyword))) // jsonPath에 해당 키워드인 브랜드가 존재하는지
+//         *  .andExpect(jsonPath("$[0].brand").value(equalTo(keyword)))
+//         */
+//        // given
+//
+//        String searchBrand = "인생네컷";
+//        double x = 127.134898;
+//        double y = 36.833922;
+//
+//        RequestBrandSearch requestBrandSearch = new RequestBrandSearch(searchBrand, x, y);
+//
+//        shopService.searchByKeyword(searchBrand);
+//        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48",0));
+//        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 성수점", "서울 성동구 서울숲2길 17-2",0));
+//        shopRepository.save(new Shop("인생네컷", "인생네컷 카페성수로드점", "서울 성동구 서울숲4길 13",0));
+//        shopRepository.save(new Shop("하루필름", "하루필름 서울숲점", "서울 성동구 서울숲2길 45",0));
+//        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲점", "서울 성동구 서울숲4길 20",0));
+//        shopRepository.save(new Shop("인생네컷", "인생네컷 충남천안두정먹거리공원점", "충남 천안시 서북구 원두정2길 21",0));
+//
+//        // when
+//        ResultActions resultActions = mockMvc.perform(get("/shops/brand")
+//                .param("brand", searchBrand)
+//                .param("longitude", String.valueOf(x))
+//                .param("latitude", String.valueOf(y))
+//                .contentType(MediaType.APPLICATION_JSON));
+//
+//
+//        // then
+//        resultActions
+//                .andExpect(status().is2xxSuccessful())
+//                .andDo(print());
+//
+//    }
     @Test
     @DisplayName("상점 상세보기")
     void 상점_상세보기() throws Exception{

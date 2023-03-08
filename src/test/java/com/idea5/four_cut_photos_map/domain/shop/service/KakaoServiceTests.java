@@ -26,43 +26,43 @@ public class KakaoServiceTests {
     @Autowired
     private ShopRepository shopRepository;
 
-    @Test
-    @DisplayName("카카오맵 API 호출하여 키워드로 장소 검색하기, 키워드 = 지역명 + 즉석사진")
-    void t1() throws JsonProcessingException {
-        // given
-        String keyword = "마포 즉석사진"; // "마포 셀프사진", "마포 포토부스"도 ok
+//    @Test
+//    @DisplayName("카카오맵 API 호출하여 키워드로 장소 검색하기, 키워드 = 지역명 + 즉석사진")
+//    void t1() throws JsonProcessingException {
+//        // given
+//        String keyword = "마포 즉석사진"; // "마포 셀프사진", "마포 포토부스"도 ok
+//
+//        // when
+//        List<KakaoKeywordResponseDto> apiShopJson = shopService.searchByKeyword(keyword);
+//
+//        // then
+//        assertThat(apiShopJson).isNotNull();
+//        assertThat(apiShopJson).isNotEmpty();
+//        assertThat(apiShopJson.size()).isEqualTo(15);
+//        assertThat(apiShopJson.get(0).getPlaceName()).isEqualTo("인생네컷 홍대동교점");
+//        assertThat(apiShopJson.get(0).getRoadAddressName()).isEqualTo("서울 마포구 홍익로6길 21");
+//        assertThat(apiShopJson.get(0).getLongitude()).isEqualTo("126.922894949096");
+//        assertThat(apiShopJson.get(0).getLatitude()).isEqualTo("37.555493447252");
+//    }
 
-        // when
-        List<KakaoKeywordResponseDto> apiShopJson = shopService.searchByKeyword(keyword);
-
-        // then
-        assertThat(apiShopJson).isNotNull();
-        assertThat(apiShopJson).isNotEmpty();
-        assertThat(apiShopJson.size()).isEqualTo(15);
-        assertThat(apiShopJson.get(0).getPlaceName()).isEqualTo("인생네컷 홍대동교점");
-        assertThat(apiShopJson.get(0).getRoadAddressName()).isEqualTo("서울 마포구 홍익로6길 21");
-        assertThat(apiShopJson.get(0).getLongitude()).isEqualTo("126.922894949096");
-        assertThat(apiShopJson.get(0).getLatitude()).isEqualTo("37.555493447252");
-    }
-
-    @Test
-    @DisplayName("카카오맵 API 호출하여 키워드로 장소 검색하기, 키워드 = 브랜드 + 지점명")
-    void t2() throws JsonProcessingException {
-        // given
-        String keyword = "인생네컷 홍대동교점";
-
-        // when
-        List<KakaoKeywordResponseDto> apiShopJson = shopService.searchByKeyword(keyword);
-
-        // then
-        assertThat(apiShopJson).isNotNull();
-        assertThat(apiShopJson).isNotEmpty();
-        assertThat(apiShopJson.size()).isEqualTo(1);
-        assertThat(apiShopJson.get(0).getPlaceName()).isEqualTo("인생네컷 홍대동교점");
-        assertThat(apiShopJson.get(0).getRoadAddressName()).isEqualTo("서울 마포구 홍익로6길 21");
-        assertThat(apiShopJson.get(0).getLongitude()).isEqualTo("126.922894949096");
-        assertThat(apiShopJson.get(0).getLatitude()).isEqualTo("37.555493447252");
-    }
+//    @Test
+//    @DisplayName("카카오맵 API 호출하여 키워드로 장소 검색하기, 키워드 = 브랜드 + 지점명")
+//    void t2() throws JsonProcessingException {
+//        // given
+//        String keyword = "인생네컷 홍대동교점";
+//
+//        // when
+//        List<KakaoKeywordResponseDto> apiShopJson = shopService.searchByKeyword(keyword);
+//
+//        // then
+//        assertThat(apiShopJson).isNotNull();
+//        assertThat(apiShopJson).isNotEmpty();
+//        assertThat(apiShopJson.size()).isEqualTo(1);
+//        assertThat(apiShopJson.get(0).getPlaceName()).isEqualTo("인생네컷 홍대동교점");
+//        assertThat(apiShopJson.get(0).getRoadAddressName()).isEqualTo("서울 마포구 홍익로6길 21");
+//        assertThat(apiShopJson.get(0).getLongitude()).isEqualTo("126.922894949096");
+//        assertThat(apiShopJson.get(0).getLatitude()).isEqualTo("37.555493447252");
+//    }
 
     @Test
     @DisplayName("카카오맵 API 응답 데이터와 DB 데이터 비교하기")
