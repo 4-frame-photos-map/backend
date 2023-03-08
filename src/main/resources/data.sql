@@ -3,6 +3,9 @@ UPDATE shop SET create_date = Now() WHERE create_date IS NULL;
 UPDATE shop SET modify_date = Now() WHERE modify_date IS NULL;
 UPDATE shop SET favorite_cnt = 0 WHERE favorite_cnt IS NULL;
 
+-- Shop import 데이터에서 '서울특별시'를 '서울'로 변경
+UPDATE shop SET road_address_name= REPLACE(road_address_name,'서울특별시','서울');
+
 /*
 INSERT INTO SHOP(create_date, modify_date, road_address_name, place_name, brand, favorite_cnt)VALUES (NOW(), NOW(), '서울 성동구 서울숲2길 48', '인생네컷 서울숲노가리마트로드점', '인생네컷', 0);
 INSERT INTO SHOP(create_date, modify_date, road_address_name, place_name, brand, favorite_cnt) VALUES(NOW(), NOW(), '서울 성동구 서울숲2길 17-2', '포토이즘박스 성수점', '포토이즘박스', 0);
