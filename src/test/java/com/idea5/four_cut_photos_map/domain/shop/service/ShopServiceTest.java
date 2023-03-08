@@ -57,6 +57,7 @@ class ShopServiceTest {
                 .brand("인생네컷")
                 .placeName("인생네컷 강남점")
                 .roadAddressName("서울 강남구~")
+                .favoriteCnt(0)
                 //.latitude(100.1)
                 //.longitude(100.2)
                 .build();
@@ -91,20 +92,20 @@ class ShopServiceTest {
 //        // given
         String keyword = "인생네컷";
         RequestBrandSearch requestBrandSearch = new RequestBrandSearch("인생네컷", X, Y);
-        shopRepository.save(new Shop("인생네컷", "인생네컷 충남천안두정먹거리공원점", "충남 천안시 섭구구 원두정2길 21"));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 천안불당로드점", "충남 천안시 서북점 불당33길 26"));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 천안안서점", "충남 천안시 동남구 상명대길 58"));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 test1점", "test"));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 test2점", "test1"));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 충남천안두정먹거리공원점", "충남 천안시 섭구구 원두정2길 21",0));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 천안불당로드점", "충남 천안시 서북점 불당33길 26",0));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 천안안서점", "충남 천안시 동남구 상명대길 58",0));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 test1점", "test",0));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 test2점", "test1",0));
 
-        shopRepository.save(new Shop("하루필름", "하루필름 홍대점", "서울 강남구~"));
-        shopRepository.save(new Shop("포토이즘", "포토이즘 홍대점", "서울 강남구~"));
-        shopRepository.save(new Shop("포토그레이", "포토그레이 홍대점", "서울 강남구~"));
-        shopRepository.save(new Shop("포토시그니처", "포토시그니처 홍대점", "서울 강남구~"));
-        shopRepository.save(new Shop("비룸", "비룸 홍대점", "서울 ~"));
-        shopRepository.save(new Shop("포토드링크", "포토드링크 홍대점", "서울 강남구~"));
-        shopRepository.save(new Shop("포토매틱", "포토매틱 홍대점", "서울 강남구~"));
-        shopRepository.save(new Shop("셀픽스", "셀픽스 홍대점", "서울 강남구~"));
+        shopRepository.save(new Shop("하루필름", "하루필름 홍대점", "서울 강남구~",0));
+        shopRepository.save(new Shop("포토이즘", "포토이즘 홍대점", "서울 강남구~",0));
+        shopRepository.save(new Shop("포토그레이", "포토그레이 홍대점", "서울 강남구~",0));
+        shopRepository.save(new Shop("포토시그니처", "포토시그니처 홍대점", "서울 강남구~",0));
+        shopRepository.save(new Shop("비룸", "비룸 홍대점", "서울 ~",0));
+        shopRepository.save(new Shop("포토드링크", "포토드링크 홍대점", "서울 강남구~",0));
+        shopRepository.save(new Shop("포토매틱", "포토매틱 홍대점", "서울 강남구~",0));
+        shopRepository.save(new Shop("셀픽스", "셀픽스 홍대점", "서울 강남구~",0));
 
 
 
@@ -138,21 +139,21 @@ class ShopServiceTest {
         String[] brandNames = Brand.Names;
         RequestShop requestShop = new RequestShop(X,Y);
         // 2km 이내 데이터(true)
-        shopRepository.save(new Shop("인생네컷", "인생네컷 충남천안두정먹거리공원점", "충남 천안시 섭구구 원두정2길 21"));
-        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 두정점", "충남 천안시 서북구 원두정2길 21"));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 충남천안두정먹거리공원점", "충남 천안시 섭구구 원두정2길 21",0));
+        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 두정점", "충남 천안시 서북구 원두정2길 21",0));
         // 2km 밖 데이터(false)
-        shopRepository.save(new Shop("인생네컷", "인생네컷 천안안서점", "충남 천안시 동남구 상명대길 58"));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 천안불당로드점", "충남 천안시 서북점 불당33길 26"));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 test1점", "test"));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 test2점", "test1"));
-        shopRepository.save(new Shop("하루필름", "하루필름 홍대점", "서울 강남구~"));
-        shopRepository.save(new Shop("포토이즘", "포토이즘 홍대점", "서울 강남구~"));
-        shopRepository.save(new Shop("포토그레이", "포토그레이 홍대점", "서울 강남구~"));
-        shopRepository.save(new Shop("포토시그니처", "포토시그니처 홍대점", "서울 강남구~"));
-        shopRepository.save(new Shop("비룸", "비룸 홍대점", "서울 ~"));
-        shopRepository.save(new Shop("포토드링크", "포토드링크 홍대점", "서울 강남구~"));
-        shopRepository.save(new Shop("포토매틱", "포토매틱 홍대점", "서울 강남구~"));
-        shopRepository.save(new Shop("셀픽스", "셀픽스 홍대점", "서울 강남구~"));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 천안안서점", "충남 천안시 동남구 상명대길 58",0));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 천안불당로드점", "충남 천안시 서북점 불당33길 26",0));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 test1점", "test",0));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 test2점", "test1",0));
+        shopRepository.save(new Shop("하루필름", "하루필름 홍대점", "서울 강남구~",0));
+        shopRepository.save(new Shop("포토이즘", "포토이즘 홍대점", "서울 강남구~",0));
+        shopRepository.save(new Shop("포토그레이", "포토그레이 홍대점", "서울 강남구~",0));
+        shopRepository.save(new Shop("포토시그니처", "포토시그니처 홍대점", "서울 강남구~",0));
+        shopRepository.save(new Shop("비룸", "비룸 홍대점", "서울 ~",0));
+        shopRepository.save(new Shop("포토드링크", "포토드링크 홍대점", "서울 강남구~",0));
+        shopRepository.save(new Shop("포토매틱", "포토매틱 홍대점", "서울 강남구~",0));
+        shopRepository.save(new Shop("셀픽스", "셀픽스 홍대점", "서울 강남구~",0));
 
 
         // when

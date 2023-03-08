@@ -50,12 +50,12 @@ class ShopControllerTest {
         // given
         String keyword = "포토이즘박스 성수점";
 
-        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48"));
-        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 성수점", "서울 성동구 서울숲2길 17-2"));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 카페성수로드점", "서울 성동구 서울숲4길 13"));
-        shopRepository.save(new Shop("하루필름", "하루필름 서울숲점", "서울 성동구 서울숲2길 45"));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲점", "서울 성동구 서울숲4길 20"));
-        shopRepository.save(new Shop("픽닷", "픽닷", "서울 성동구 서울숲4길 23-1"));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48",0));
+        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 성수점", "서울 성동구 서울숲2길 17-2",0));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 카페성수로드점", "서울 성동구 서울숲4길 13",0));
+        shopRepository.save(new Shop("하루필름", "하루필름 서울숲점", "서울 성동구 서울숲2길 45",0));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲점", "서울 성동구 서울숲4길 20",0));
+        shopRepository.save(new Shop("픽닷", "픽닷", "서울 성동구 서울숲4길 23-1",0));
 
         // when
         ResultActions resultActions = mockMvc.perform(get("/shops")
@@ -94,12 +94,12 @@ class ShopControllerTest {
         RequestBrandSearch requestBrandSearch = new RequestBrandSearch(searchBrand, x, y);
 
         shopService.searchByKeyword(searchBrand);
-        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48"));
-        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 성수점", "서울 성동구 서울숲2길 17-2"));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 카페성수로드점", "서울 성동구 서울숲4길 13"));
-        shopRepository.save(new Shop("하루필름", "하루필름 서울숲점", "서울 성동구 서울숲2길 45"));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲점", "서울 성동구 서울숲4길 20"));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 충남천안두정먹거리공원점", "충남 천안시 서북구 원두정2길 21"));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48",0));
+        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 성수점", "서울 성동구 서울숲2길 17-2",0));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 카페성수로드점", "서울 성동구 서울숲4길 13",0));
+        shopRepository.save(new Shop("하루필름", "하루필름 서울숲점", "서울 성동구 서울숲2길 45",0));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 서울숲점", "서울 성동구 서울숲4길 20",0));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 충남천안두정먹거리공원점", "충남 천안시 서북구 원두정2길 21",0));
 
         // when
         ResultActions resultActions = mockMvc.perform(get("/shops/brand")
@@ -120,7 +120,7 @@ class ShopControllerTest {
     void 상점_상세보기() throws Exception{
 
         // given
-        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 홍대점", "서울 ~"));
+        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 홍대점", "서울 ~",0));
         String distance = "3km";
 
         // when
@@ -150,9 +150,9 @@ class ShopControllerTest {
         Point point = new Point(127.134898, 36.833922); // 두정동 위치
 
 
-        shopRepository.save(new Shop("인생네컷", "인생네컷 충남천안두정먹거리공원점", "충남 천안시 서북구 원두정2길 21"));
-        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 두정점", "충남 천안시 서북구 두정동 886-1"));
-        shopRepository.save(new Shop("하루필름", "하루필름 천안점", "충남 천안시 동남구 신부동 459-1"));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 충남천안두정먹거리공원점", "충남 천안시 서북구 원두정2길 21",0));
+        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 두정점", "충남 천안시 서북구 두정동 886-1",0));
+        shopRepository.save(new Shop("하루필름", "하루필름 천안점", "충남 천안시 동남구 신부동 459-1",0));
 
 
         // when
@@ -177,8 +177,8 @@ class ShopControllerTest {
     void showKeywordSearchList() throws Exception {
         // Given
         String keyword = "마포 즉석사진";
-        shopRepository.save(new Shop("인생네컷", "인생네컷 홍대동교점", "서울 마포구 홍익로6길 21"));
-        shopRepository.save(new Shop("하루필름", "하루필름 연남점", "서울 마포구 동교로46길 40"));
+        shopRepository.save(new Shop("인생네컷", "인생네컷 홍대동교점", "서울 마포구 홍익로6길 21",0));
+        shopRepository.save(new Shop("하루필름", "하루필름 연남점", "서울 마포구 동교로46길 40",0));
 
         // When
         ResultActions resultActions = mockMvc
