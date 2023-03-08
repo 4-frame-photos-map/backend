@@ -1,6 +1,7 @@
-package com.idea5.four_cut_photos_map.domain.member.dto.response;
+package com.idea5.four_cut_photos_map.domain.auth.dto.response;
 
-import com.idea5.four_cut_photos_map.domain.member.dto.KakaoTokenParam;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.JwtToken;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class KakaoLoginResp {
-    private KakaoTokenParam kakaoToken;
     private JwtToken jwtToken;
 }

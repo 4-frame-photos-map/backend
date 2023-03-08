@@ -35,8 +35,6 @@ public class ShopDto {
                 .id(shop.getId())
                 .placeName(shop.getPlaceName())
                 .roadAddressName(shop.getRoadAddressName())
-                .latitude(shop.getLatitude())
-                .longitude(shop.getLongitude())
                 .build();
     }
 

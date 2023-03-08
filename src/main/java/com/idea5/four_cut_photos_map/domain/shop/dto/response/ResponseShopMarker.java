@@ -1,7 +1,11 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Builder
@@ -18,10 +22,15 @@ public class ResponseShopMarker {
     private String phone; // 번호
     private String distance; // 거리
 
+    @JsonIgnore // 상점이 보유한 칭호가 없다면 null 보다는 응답 데이터에서 제외되는게 더 낫다고 생각
+    private List<String> shopTitles = new ArrayList<>();
+
     public void setDistance(String distance){
         this.distance = distance;
     }
     public void setId(Long id){this.id = id;}
+
+    public void setShopTitles(List<String> shopTitles){ this.shopTitles = shopTitles;}
 
     static public ResponseShopMarker of(KakaoResponseDto dto){
         return ResponseShopMarker.builder()

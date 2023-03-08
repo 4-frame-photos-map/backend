@@ -1,6 +1,8 @@
 package com.idea5.four_cut_photos_map.domain.member.service;
 
-import com.idea5.four_cut_photos_map.domain.member.dto.KakaoUserInfoParam;
+import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoTokenResp;
+import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
+import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoUserInfoParam;
 import com.idea5.four_cut_photos_map.domain.member.dto.request.MemberUpdateReq;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberInfoResp;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberWithdrawlResp;
@@ -28,21 +30,29 @@ public class MemberService {
     private final JwtProvider jwtProvider;
     private final RedisDao redisDao;
     private final MemberTitleService memberTitleService;
+    private final FavoriteService favoriteService;
 
     // 회원 가져오기
     @Transactional
-    public Member getMember(KakaoUserInfoParam kakaoUserInfoParam) {
+    public Member getMember(KakaoUserInfoParam kakaoUserInfoParam, KakaoTokenResp kakaoTokenResp) {
         // Unique 한 값인 kakaoId 로 조회
         Member member = memberRepository.findByKakaoId(kakaoUserInfoParam.getId()).orElse(null);
-        // 신규 사용자인 경우 회원가입
-        if(member == null) {
-            Member newMember = KakaoUserInfoParam.toEntity(kakaoUserInfoParam);
+        if(member != null) {
+            // DB 에 Refresh Token 갱신
+            member.updateKakaoRefreshToken(kakaoTokenResp.getRefreshToken());
+        } else {
+            // 신규 사용자인 경우 회원가입
+            member = KakaoUserInfoParam.toEntity(kakaoUserInfoParam);
+            member.updateKakaoRefreshToken(kakaoTokenResp.getRefreshToken());
             // 회원가입 기본 칭호 부여, 대표 칭호로 설정
             log.info("----Before ----");
-            memberRepository.save(newMember);
-            memberTitleService.addMemberTitle(newMember, MemberTitleType.NEWBIE.getCode(), true);
-            return newMember;
+            memberRepository.save(member);
+            memberTitleService.addMemberTitle(member, MemberTitleType.NEWBIE.getCode(), true);
         }
+        // redis 에 Access Token 저장 및 갱신
+        String key = "member:" + member.getId() + ":kakao_access_token";
+        redisDao.setValues(key, kakaoTokenResp.getAccessToken(), Duration.ofSeconds(kakaoTokenResp.getExpiresIn()));
+
         return member;
     }
 
@@ -56,14 +66,13 @@ public class MemberService {
         log.info("----Before memberTitleService.findByMember(member)----");
         List<MemberTitleLog> memberTitleLogs = memberTitleService.findByMember(member);
         // 대표 칭호 조회
-        String mainMemberTitle = "";
         for(MemberTitleLog memberTitleLog : memberTitleLogs) {
             if(memberTitleLog.getIsMain()) {
-                log.info("----Before memberTitleLog.getMemberTitle().getName()----");
-                mainMemberTitle = memberTitleLog.getMemberTitle().getName();
+                log.info("----Before memberTitleLog.getMemberTitleName()----");
+                return MemberInfoResp.toDto(member, memberTitleLog.getMemberTitleName(), memberTitleLogs.size());
             }
         }
-        return MemberInfoResp.toDto(member, mainMemberTitle, memberTitleLogs.size());
+        return null;
     }
 
     // 서비스 로그아웃(accessToken 무효화)
@@ -88,7 +97,10 @@ public class MemberService {
         // 2. redis 에 해당 accessToken 블랙리스트로 등록
         Long expiration = jwtProvider.getExpiration(accessToken);
         redisDao.setValues(accessToken, "withdrawl", Duration.ofMillis(expiration));
-        // TODO: Member 삭제시 Member 를 참조하고 있는 MemberTitleLog 때문에 오류가 발생한다
+        // TODO: 양방향 매핑으로 변경할지 고민중
+        // TODO: Member 삭제하기 전 Member 를 참조하고 있는 엔티티(MemberTitleLog, Favorite) 먼저 삭제하기
+        memberTitleService.deleteByMemberId(id);
+        favoriteService.deleteByMemberId(id);
         // 3. DB 에서 회원 삭제
         memberRepository.deleteById(id);
         return new MemberWithdrawlResp(id);
@@ -106,5 +118,15 @@ public class MemberService {
     public void updateMainMemberTitle(Member member, Long memberTitleId) {
 //        Member member = findById(memberId);
         memberTitleService.updateMainMemberTitle(member, memberTitleId);
+    }
+
+    // 회원 Kakao Access Token 조회
+    public String getKakaoAccessToken(Long id) {
+        return redisDao.getValues("member:" + id + ":kakao_access_token");
+    }
+
+    // 회원 Kakao Refresh Token 조회
+    public String getKakaoRefreshToken(Long id) {
+        return findById(id).getKakaoRefreshToken();
     }
 }
