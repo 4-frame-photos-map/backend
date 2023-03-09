@@ -92,8 +92,8 @@ public class MemberService {
     @Transactional
     public MemberWithdrawlResp deleteMember(Long id, String accessToken) {
         // 1. 회원의 refreshToken 이 있으면 삭제
-        if (redisDao.hasKey(id.toString())) {
-            redisDao.deleteValues(id.toString());
+        if (redisDao.hasKey("member:" + id + ":jwt_refresh_token")) {
+            redisDao.deleteValues("member:" + id + ":jwt_refresh_token");
         }
         // 2. redis 에 해당 accessToken 블랙리스트로 등록
         Long expiration = jwtProvider.getExpiration(accessToken);
