@@ -2,6 +2,7 @@ package com.idea5.four_cut_photos_map.domain.member.service;
 
 import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoTokenResp;
 import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoUserInfoParam;
+import com.idea5.four_cut_photos_map.domain.member.dto.request.MemberUpdateReq;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
@@ -110,8 +111,8 @@ class MemberServiceTest {
                 new KakaoUserInfoParam(1111L, "딸기"),
                 new KakaoTokenResp("bearer", "kakao_access_token", 60, "kakao_refresh_token", 86400));
         JwtToken jwtToken = jwtService.generateTokens(member);
-        String key3 = "member:" + member.getId() + ":jwt_refresh_token";
-        assertThat(redisDao.getValues(key3)).isEqualTo(jwtToken.getRefreshToken());
+        assertThat(redisDao.getValues("member:" + member.getId() + ":jwt_refresh_token"))
+                .isEqualTo(jwtToken.getRefreshToken());
 
         // when
         memberService.deleteMember(member.getId(), jwtToken.getAccessToken());
@@ -119,9 +120,27 @@ class MemberServiceTest {
         // then
         // 1. DB Member 삭제
         assertThat(memberRepository.count()).isEqualTo(0);
-
         // 2. Redis jwtAccessToken 블랙리스트 등록, jwtRefreshToken 삭제
         assertThat(redisDao.getValues("jwt_black_list:" + jwtToken.getAccessToken())).isEqualTo("withdrawl");
         assertThat(redisDao.getValues("member:" + member.getId() + ":jwt_refresh_token")).isNull();
+    }
+
+    @Test
+    @DisplayName("회원 닉네임 수정시 DB 의 Member nickname, Redis 의 nickname 수정")
+    void t4() {
+        // given
+        Member member = memberService.getMember(
+                new KakaoUserInfoParam(1111L, "딸기"),
+                new KakaoTokenResp("bearer", "kakao_access_token", 60, "kakao_refresh_token", 86400));
+
+        // when
+        memberService.updateNickname(member.getId(), new MemberUpdateReq("수박"));
+
+        // then
+        // 1. DB Member nickname 수정 검증
+        Member updateMember = memberRepository.findById(member.getId()).orElse(null);
+        assertThat(updateMember.getNickname()).isEqualTo("수박");
+        // 2. Redis nickname 수정 검증
+        assertThat(redisDao.getValues("member:" + member.getId() + ":nickname")).isEqualTo("수박");
     }
 }
