@@ -98,4 +98,4 @@ UPDATE shop SET road_address_name= REPLACE(road_address_name,'서울특별시','
 
 - **feat** : 키워드 검색 Map Marker 기능 추가
 - **refactor** : DB brand 컬럼 제거 후 브랜드 검색 로직 수정
-- **refactor** : 응답 DTO 모두 Camel Case로 
+- **refactor** : 응답 DTO 모두 Snake Case로 수정
