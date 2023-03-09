@@ -200,4 +200,79 @@ class CollectJobTest {
         assertThat(memberTitleLog1.getMemberTitle().getName()).isEqualTo("뉴비");
         assertThat(memberTitleLog1.getMemberTitle().getContent()).isEqualTo("회원가입");
     }
+
+    @DisplayName("첫번째 리뷰 작성한 회원에게 리뷰 첫 걸음 칭호 부여")
+    @Test
+    void t5() {
+        // given
+        Member member = new Member();
+        memberRepository.save(member);
+
+        Shop shop = shopRepository.findById(1L).orElse(null);
+        // TODO: 리뷰 1개 작성
+
+        // when
+        collectJob.add();
+
+        // then
+        // 칭호 부여 총 2건
+        List<MemberTitleLog> memberTitleLogs = memberTitleLogRepository.findAll();
+        assertThat(memberTitleLogs.size()).isEqualTo(2);
+
+        // 1번 회원 -> 뉴비 칭호 부여, 대표 칭호 자동 설정
+        MemberTitleLog memberTitleLog1 = memberTitleLogs.get(0);
+        assertThat(memberTitleLog1.getMember().getId()).isEqualTo(1);
+        assertThat(memberTitleLog1.getIsMain()).isTrue();
+        assertThat(memberTitleLog1.getMemberTitle().getName()).isEqualTo("뉴비");
+        assertThat(memberTitleLog1.getMemberTitle().getContent()).isEqualTo("회원가입");
+
+        // 1번 회원 -> 찜 첫 걸음 칭호 부여
+        MemberTitleLog memberTitleLog2 = memberTitleLogs.get(1);
+        assertThat(memberTitleLog2.getMember().getId()).isEqualTo(1);
+        assertThat(memberTitleLog2.getIsMain()).isFalse();
+        assertThat(memberTitleLog2.getMemberTitle().getName()).isEqualTo("리뷰 첫 걸음");
+        assertThat(memberTitleLog2.getMemberTitle().getContent()).isEqualTo("첫번째 리뷰 작성");
+    }
+
+    @DisplayName("찜 3개 이상 추가한 회원에게 찜 홀릭 칭호 부여")
+    @Test
+    void t6() {
+        // given
+        Member member = new Member();
+        memberRepository.save(member);
+
+        Shop shop1 = shopRepository.findById(1L).orElse(null);
+        Shop shop2 = shopRepository.findById(2L).orElse(null);
+        Shop shop3 = shopRepository.findById(3L).orElse(null);
+        // TODO: 리뷰 3개 작성
+
+        // when
+        collectJob.add();
+
+        // then
+        // 칭호 부여 총 3건
+        List<MemberTitleLog> memberTitleLogs = memberTitleLogRepository.findAll();
+        assertThat(memberTitleLogs.size()).isEqualTo(3);
+
+        // 1번 회원 -> 뉴비 칭호 부여, 대표 칭호 자동 설정
+        MemberTitleLog memberTitleLog1 = memberTitleLogs.get(0);
+        assertThat(memberTitleLog1.getMember().getId()).isEqualTo(1);
+        assertThat(memberTitleLog1.getIsMain()).isTrue();
+        assertThat(memberTitleLog1.getMemberTitle().getName()).isEqualTo("뉴비");
+        assertThat(memberTitleLog1.getMemberTitle().getContent()).isEqualTo("회원가입");
+
+        // 1번 회원 -> 리뷰 첫 걸음 칭호 부여
+        MemberTitleLog memberTitleLog2 = memberTitleLogs.get(1);
+        assertThat(memberTitleLog2.getMember().getId()).isEqualTo(1);
+        assertThat(memberTitleLog2.getIsMain()).isFalse();
+        assertThat(memberTitleLog2.getMemberTitle().getName()).isEqualTo("리뷰 첫 걸음");
+        assertThat(memberTitleLog2.getMemberTitle().getContent()).isEqualTo("첫번째 리뷰 작성");
+
+        // 1번 회원 -> 리뷰 홀릭 칭호 부여
+        MemberTitleLog memberTitleLog3 = memberTitleLogs.get(2);
+        assertThat(memberTitleLog3.getMember().getId()).isEqualTo(1);
+        assertThat(memberTitleLog3.getIsMain()).isFalse();
+        assertThat(memberTitleLog3.getMemberTitle().getName()).isEqualTo("리뷰 홀릭");
+        assertThat(memberTitleLog3.getMemberTitle().getContent()).isEqualTo("리뷰 3개 이상 작성");
+    }
 }
