@@ -6,6 +6,8 @@ import com.idea5.four_cut_photos_map.domain.member.dto.request.MemberUpdateReq;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
+import com.idea5.four_cut_photos_map.global.error.ErrorCode;
+import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.global.util.DatabaseCleaner;
 import com.idea5.four_cut_photos_map.security.jwt.JwtService;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.JwtToken;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
@@ -142,5 +145,20 @@ class MemberServiceTest {
         assertThat(updateMember.getNickname()).isEqualTo("수박");
         // 2. Redis nickname 수정 검증
         assertThat(redisDao.getValues("member:" + member.getId() + ":nickname")).isEqualTo("수박");
+    }
+
+    @Test
+    @DisplayName("기존 닉네임과 동일한 닉네임으로 닉네임 수정 불가")
+    void t5() {
+        // given
+        Member member = memberService.getMember(
+                new KakaoUserInfoParam(1111L, "딸기"),
+                new KakaoTokenResp("bearer", "kakao_access_token", 60, "kakao_refresh_token", 86400));
+
+        // when, then
+        BusinessException exception = assertThrows(BusinessException.class, () ->
+                memberService.updateNickname(member.getId(), new MemberUpdateReq("딸기"))
+        );
+        assertThat(exception.getMessage()).isEqualTo(ErrorCode.DUPLICATE_MEMBER_NICKNAME.getMessage());
     }
 }
