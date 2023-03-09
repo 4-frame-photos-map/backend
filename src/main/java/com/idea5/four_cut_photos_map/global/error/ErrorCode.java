@@ -1,7 +1,5 @@
 package com.idea5.four_cut_photos_map.global.error;
 
-import com.idea5.four_cut_photos_map.domain.shoptitle.entity.ShopTitle;
-import com.idea5.four_cut_photos_map.domain.shoptitlelog.entity.ShopTitleLog;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +23,8 @@ public enum ErrorCode {
     MEMBER_TITLE_NOT_HAD(HttpStatus.NOT_FOUND, "404", "해당 회원이 칭호를 소유하고 있지 않습니다."),
     SHOP_TITLE_LOGS_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "해당 상점은 칭호가 없습니다."),
     SHOP_TITLE_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "칭호가 없습니다."),
-    DUPLICATE_SHOP_TITLE(HttpStatus.CONFLICT, "409", "해당 상점은 이미 타이틀을 보유하고 있습니다.");
+    DUPLICATE_SHOP_TITLE(HttpStatus.CONFLICT, "409", "해당 상점은 이미 타이틀을 보유하고 있습니다."),
+    DUPLICATE_MEMBER_NICKNAME(HttpStatus.CONFLICT, "409", "현재 닉네임과 동일합니다.");
     private HttpStatus httpStatus;
     private String errorCode;
     private String message;

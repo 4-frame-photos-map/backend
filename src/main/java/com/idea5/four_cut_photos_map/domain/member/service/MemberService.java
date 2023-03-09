@@ -11,6 +11,8 @@ import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleLog;
 import com.idea5.four_cut_photos_map.domain.memberTitle.service.MemberTitleService;
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
+import com.idea5.four_cut_photos_map.global.error.ErrorCode;
+import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -112,6 +114,9 @@ public class MemberService {
     @Transactional
     public void updateNickname(Long id, MemberUpdateReq memberUpdateReq) {
         Member member = findById(id);
+        // 기존 닉네임과 같으면 변경 불가
+        if(memberUpdateReq.getNickname().equals(member.getNickname()))
+            throw new BusinessException(ErrorCode.DUPLICATE_MEMBER_NICKNAME);
         member.updateNickname(memberUpdateReq);
         // redis 에 저장된 nickname 수정
         String key = "member:" + member.getId() + ":nickname";
