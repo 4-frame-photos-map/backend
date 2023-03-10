@@ -2,13 +2,22 @@ package com.idea5.four_cut_photos_map.domain.member.service;
 
 import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoTokenResp;
 import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoUserInfoParam;
+import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
+import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
 import com.idea5.four_cut_photos_map.domain.member.dto.request.MemberUpdateReq;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
+import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitle;
+import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleLog;
+import com.idea5.four_cut_photos_map.domain.memberTitle.repository.MemberTitleLogRepository;
+import com.idea5.four_cut_photos_map.domain.memberTitle.repository.MemberTitleRepository;
+import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
+import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import com.idea5.four_cut_photos_map.global.error.ErrorCode;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.global.util.DatabaseCleaner;
+import com.idea5.four_cut_photos_map.job.CollectJob;
 import com.idea5.four_cut_photos_map.security.jwt.JwtService;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.JwtToken;
 import org.junit.jupiter.api.AfterEach;
@@ -38,7 +47,22 @@ class MemberServiceTest {
     MemberRepository memberRepository;
 
     @Autowired
+    MemberTitleRepository memberTitleRepository;
+
+    @Autowired
+    ShopRepository shopRepository;
+
+    @Autowired
+    FavoriteRepository favoriteRepository;
+
+    @Autowired
+    MemberTitleLogRepository memberTitleLogRepository;
+
+    @Autowired
     RedisDao redisDao;
+
+    @Autowired
+    CollectJob collectJob;
 
     @Autowired
     DatabaseCleaner databaseCleaner;
@@ -160,5 +184,39 @@ class MemberServiceTest {
                 memberService.updateNickname(member.getId(), new MemberUpdateReq("딸기"))
         );
         assertThat(exception.getMessage()).isEqualTo(ErrorCode.DUPLICATE_MEMBER_NICKNAME.getMessage());
+    }
+
+    @Test
+    @DisplayName("회원 대표 칭호를 찜 첫 걸음으로 설정")
+    void t6() {
+        // given
+        MemberTitle memberTitle1 = memberTitleRepository.save(new MemberTitle("뉴비", "회원가입"));
+        MemberTitle memberTitle2 = memberTitleRepository.save(new MemberTitle("리뷰 첫 걸음", "첫번째 리뷰 작성"));
+        MemberTitle memberTitle3 = memberTitleRepository.save(new MemberTitle("리뷰 홀릭", "리뷰 3개 이상 작성"));
+        MemberTitle memberTitle4 = memberTitleRepository.save(new MemberTitle("찜 첫 걸음", "첫번째 찜 추가"));
+        MemberTitle memberTitle5 = memberTitleRepository.save(new MemberTitle("찜 홀릭", "찜 3개 이상 추가"));
+
+        Member member = memberService.getMember(
+                new KakaoUserInfoParam(1111L, "딸기"),
+                new KakaoTokenResp("bearer", "kakao_access_token", 60, "kakao_refresh_token", 86400));
+        Shop shop = shopRepository.save(new Shop("인생네컷", "인생네컷 성수점", "서울시"));
+        favoriteRepository.save(new Favorite(member, shop));
+
+        collectJob.add();
+
+        // when
+        memberService.updateMainMemberTitle(member, memberTitle4.getId());
+
+        // then
+        // 뉴비 -> 대표 칭호 해제, 찜 첫 걸음 대표 칭호 설정
+        List<MemberTitleLog> memberTitleLogs = memberTitleLogRepository.findByMember(member);
+        MemberTitleLog memberTitleLog1 = memberTitleLogs.get(0);
+        MemberTitleLog memberTitleLog2 = memberTitleLogs.get(1);
+
+        assertThat(memberTitleLog1.getMemberTitle().getId()).isEqualTo(memberTitle1.getId());
+        assertThat(memberTitleLog1.getIsMain()).isFalse();
+
+        assertThat(memberTitleLog2.getMemberTitle().getId()).isEqualTo(memberTitle4.getId());
+        assertThat(memberTitleLog2.getIsMain()).isTrue();
     }
 }
