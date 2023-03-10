@@ -1,15 +1,10 @@
 package com.idea5.four_cut_photos_map.domain.shop.entity;
 
-import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.DynamicInsert;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.Entity;
 
 @Entity
 @Getter
@@ -33,5 +28,9 @@ public class Shop extends BaseEntity {
         this.brand = brand;
         this.placeName = placeName;
         this.roadAddressName = roadAddressName;
+    }
+
+    // TODO: 충돌때문에 임시로 생성
+    public Shop(String brand, String placeName, String roadAddressName, double v, double v1) {
     }
 }

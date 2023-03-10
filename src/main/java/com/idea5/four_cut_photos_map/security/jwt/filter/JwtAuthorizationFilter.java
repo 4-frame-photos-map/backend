@@ -1,10 +1,11 @@
 package com.idea5.four_cut_photos_map.security.jwt.filter;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
+import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
+import com.idea5.four_cut_photos_map.global.common.RedisDao;
+import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import com.idea5.four_cut_photos_map.security.jwt.JwtService;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
-import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
-import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -32,6 +34,7 @@ import static com.idea5.four_cut_photos_map.security.jwt.dto.TokenType.REFRESH_T
  * @See <a href="https://velog.io/@shinmj1207/Spring-Spring-Security-JWT-%EB%A1%9C%EA%B7%B8%EC%9D%B8">Spring Security + JWT 로그인</a>
  * @See <a href="https://alkhwa-113.tistory.com/entry/TIL-JWT-%EC%99%80-%EB%B3%B4%EC%95%88-CORS">JWT 토큰 무효화 참고1</a>
  * @See <a href="https://mellowp-dev.tistory.com/8">JWT 토큰 무효화 참고2</a>
+ * @See <a href="https://flyburi.com/584">인증 관련 클래스</a>
  */
 @Slf4j
 @Component
@@ -39,8 +42,9 @@ import static com.idea5.four_cut_photos_map.security.jwt.dto.TokenType.REFRESH_T
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
     private final JwtService jwtService;
-    private final MemberService memberService;
+    private final RedisDao redisDao;
     private final String BEARER_TOKEN_PREFIX = "Bearer ";
+    private final MemberService memberService;
 
     @Value("${jwt.atk.header}")
     private String tokenHeader;
@@ -69,14 +73,24 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             if(tokenType.equals(ACCESS_TOKEN.getName()) && jwtService.isBlackList(token)) {
                 throw new JwtException("유효하지 않은 토큰입니다.");
             }
-            // TODO: 매 요청마다 DB 조회하면 성능 문제(jwt 쓰는 이유가 없음) -> Redis 캐시로 해결
-            Member member = memberService.findById(memberId);
-//            CachedMemberParam cachedMember = memberService.findCachedById(memberId);
-//            log.info(cachedMember.getId().toString());
-//            log.info(cachedMember.getNickname());
-            // 2. 2차 체크(해당 엑세스 토큰이 화이트 리스트에 포함되는지 검증) -> 탈취된 토큰 무효화
+
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+
+            // 4. jwt 에서 id 를 얻고 Redis 에서 nickname 을 얻어서 Member 객체 생성
+            Member member = Member.builder()
+                    .id(memberId)
+                    .nickname(redisDao.getValues("member:" + memberId + ":nickname"))
+                    .build();
+//            Member member = memberService.findById(memberId);
+
+            stopWatch.stop();
+            log.info(stopWatch.prettyPrint());
+            log.info(String.valueOf(stopWatch.getTotalTimeSeconds()));
+
+            // 5. 2차 체크(해당 엑세스 토큰이 화이트 리스트에 포함되는지 검증) -> 탈취된 토큰 무효화
             if(member != null) {
-                log.info("JwtAuthorizationFilter 인증처리");
+                log.info("---Before forceAuthentication()---");
                 forceAuthentication(member);
             }
         }
@@ -92,20 +106,22 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         return null;
     }
 
-    // 강제 로그인 처리
+    // Spring Security 에 유저의 인증 정보 등록(컨트롤러 단에서 @AuthenticationPrincipal 로 인증 객체를 얻기 위함)
     private void forceAuthentication(Member member) {
         log.info(member.getId().toString());
-        // Member 를 기반으로 User 를 상속한 MemberContext 객체 생성
+        // 1. Member 를 기반으로 User 를 상속한 MemberContext 객체 생성
         MemberContext memberContext = new MemberContext(member);
+        // 2. Authentication 객체 생성
         UsernamePasswordAuthenticationToken authentication =
                 UsernamePasswordAuthenticationToken.authenticated(
                         memberContext,
                         null,
                         member.getAuthorities()
                 );
-        // 이후 컨트롤러 단에서 MemberContext 객체 사용O
+        // 3. Authentication 을 SecurityContext 에 담기
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
+        // 4. SecurityContext 를 SecurityContextHolder 에 담기
         SecurityContextHolder.setContext(context);
     }
 }

@@ -59,7 +59,7 @@ public class JwtService {
 
     // accessToken 이 블랙리스트로 등록되었는지 검증
     public Boolean isBlackList(String accessToken) {
-        String isLogout = redisDao.getValues(accessToken);
+        String isLogout = redisDao.getValues("jwt_black_list:" + accessToken);
         return isLogout == null ? false : true;
     }
 }

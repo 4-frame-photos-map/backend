@@ -25,4 +25,9 @@ public class MemberTitle extends BaseEntity {
 
     @OneToMany(mappedBy = "memberTitle", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberTitleLog> memberTitleLogs = new ArrayList<>();
+
+    public MemberTitle(String name, String content) {
+        this.name = name;
+        this.content = content;
+    }
 }

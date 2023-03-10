@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 @Getter
 public class MemberContext extends User {
     private final Long id;
+
+    // TODO: id, authorities, nickname 을 제외하고 모두 삭제하는 것은 어떠한지
     private final LocalDateTime createDate;
     private final LocalDateTime modifyDate;
     private final String nickname;
