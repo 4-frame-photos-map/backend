@@ -5,6 +5,7 @@ import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoUserInfoParam
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.member.dto.request.MemberUpdateReq;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberInfoResp;
+import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberTitleInfoResp;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberWithdrawlResp;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
@@ -63,10 +64,15 @@ public class MemberService {
     // 회원 id 로 기본 정보 조회
     public MemberInfoResp getMemberInfo(Long id) {
         Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException());
+        MemberTitleInfoResp memberTitleInfo = getMemberTitleInfo(member);
+        return MemberInfoResp.toDto(member, memberTitleInfo.getMainMemberTitle(), memberTitleInfo.getMemberTitleCnt());
+    }
+
+    public MemberTitleInfoResp getMemberTitleInfo(Member member) {
         log.info("----Before memberTitleService.findByMember(member)----");
         List<MemberTitleLog> memberTitleLogs = memberTitleService.findByMember(member);
-        // 대표 칭호 조회(회원가입 후 바로 칭호가 부여되지 않기 때문에 회원가입 당일에는 대표 칭호가 없을 수 있음)
         String mainMemberTitle = null;
+        // 대표 칭호 조회(회원가입 후 바로 칭호가 부여되지 않기 때문에 회원가입 당일에는 대표 칭호가 없을 수 있음)
         for(MemberTitleLog memberTitleLog : memberTitleLogs) {
             if(memberTitleLog.getIsMain()) {
                 log.info("----Before memberTitleLog.getMemberTitleName()----");
@@ -74,7 +80,7 @@ public class MemberService {
                 break;
             }
         }
-        return MemberInfoResp.toDto(member, mainMemberTitle, memberTitleLogs.size());
+        return new MemberTitleInfoResp(memberTitleLogs.size(), mainMemberTitle);
     }
 
     // 서비스 로그아웃(accessToken 무효화)
@@ -126,7 +132,6 @@ public class MemberService {
     // 회원 대표칭호 수정
     @Transactional
     public void updateMainMemberTitle(Member member, Long memberTitleId) {
-//        Member member = findById(memberId);
         memberTitleService.updateMainMemberTitle(member, memberTitleId);
     }
 
