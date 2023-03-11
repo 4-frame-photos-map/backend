@@ -50,7 +50,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
 
     @AfterEach
     public void cleanUpDatabase() {
-        databaseCleanUp.execute();
+        databaseCleaner.execute();
     }
 
     /**
