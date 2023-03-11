@@ -37,6 +37,7 @@ public class MemberController {
                 HttpStatus.OK);
     }
 
+    // 회원 닉네임 수정
     @PreAuthorize("isAuthenticated()")
     @PatchMapping("/nickname")
     public ResponseEntity<RsData> updateNickname(
