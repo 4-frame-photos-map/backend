@@ -76,7 +76,7 @@ public class ShopController {
         // 카카오 맵 api로 부터 받아온 Shop 리스트와 db에 저장된 Shop 비교
         for (KakaoResponseDto apiShop : kakaoApiResponse) {
             for (ShopDto shopDto : shopDtos) {
-                if (apiShop.getPlaceName().equals(shopDto.getPlaceName())) {
+                if (apiShop.getRoadAddressName().equals(shopDto.getRoadAddressName())) {
                     resultShops.add(ResponseShopBrand.of(apiShop));
                 }
             }

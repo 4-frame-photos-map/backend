@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface ShopRepository extends JpaRepository<Shop, Long> {
-    Optional<List<Shop>> findByBrand(String keyword);
+    Optional<List<Shop>> findByPlaceNameStartingWith(String keyword);
 
     Optional<Shop> findByRoadAddressName(String roadAddressName);
 }

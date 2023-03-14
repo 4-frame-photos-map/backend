@@ -36,7 +36,7 @@ public class ShopService {
     private final ShopTitleLogService shopTitleLogService;
 
     public List<ShopDto> findByBrand(String brandName){
-        List<Shop> shops = shopRepository.findByBrand(brandName).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
+        List<Shop> shops = shopRepository.findByPlaceNameStartingWith(brandName).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
         List<ShopDto> shopDtos = new ArrayList<>();
         for (Shop shop : shops)
             shopDtos.add(ShopDto.of(shop));
