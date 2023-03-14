@@ -59,4 +59,40 @@ public class ReviewController {
                 HttpStatus.OK);
     }
 
+    /**
+     * 회원 관련
+     */
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/member")
+    public ResponseEntity<RsData> getMemberReviews(@AuthenticationPrincipal MemberContext memberContext) {
+        List<ResponseReviewDto> reviews = reviewService.getAllMemberReviews(memberContext.getId());
+
+        return new ResponseEntity<>(
+                new RsData<>(true, "회원의 모든 리뷰 조회 완료", reviews),
+                HttpStatus.OK);
+    }
+
+    /**
+     * 상점 관련
+     */
+    @GetMapping("/shop/{shop-id}")
+    public ResponseEntity<RsData> getShopReviews(@PathVariable("shop-id") Long shopId) {
+        List<ResponseReviewDto> reviews = reviewService.getAllShopReviews(shopId);
+
+        return new ResponseEntity<>(
+                new RsData<>(true, "상점의 모든 리뷰 조회 완료", reviews),
+                HttpStatus.OK);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/shop/{shop-id}")
+    public ResponseEntity<RsData> writeReview(@PathVariable("shop-id") Long shopId,
+                                              @AuthenticationPrincipal MemberContext memberContext,
+                                              @Valid @RequestBody RequestReviewDto reviewDto) {
+        ResponseReviewDto responseReviewDto = reviewService.write(memberContext.getId(), shopId, reviewDto);
+
+        return new ResponseEntity<>(
+                new RsData<>(true, "상점 리뷰 작성 성공"),
+                HttpStatus.OK);
+    }
 }

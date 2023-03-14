@@ -275,7 +275,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
     }
 
     /**
-     * GET /shop/{shop-id}/reviews
+     * GET /reviews/shop/{shop-id}
      */
     @Test
     @DisplayName("상점의 전체 리뷰 조회")
@@ -301,7 +301,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
 
         // when
         ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
-                .get("/shop/" + shopId + "/reviews")
+                .get("/reviews/shop/" + shopId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken.getAccessToken())
         );
 
@@ -314,7 +314,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
     }
 
     /**
-     * GET /shop/{shop-id}/reviews
+     * GET /reviews/shop/{shop-id}
      * @throws throw new BusinessException(ErrorCode.REVIEW_NOT_FOUND);
      */
     @Test
@@ -334,7 +334,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
 
         // when
         ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
-                .get("/shop/" + shopId + "/reviews")
+                .get("/reviews/shop/" + shopId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken.getAccessToken())
         );
 
@@ -346,7 +346,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
     }
 
     /**
-     * POST /shop/{shop-id}/reviews
+     * POST /reviews/shop/{shop-id}
      */
     @Test
     @DisplayName("상점 리뷰 추가 요청")
@@ -367,7 +367,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
 
         // when
         ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
-                .post("/shop/" + shopId + "/reviews")
+                .post("/reviews/shop/" + shopId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken.getAccessToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(this.objectMapper.writeValueAsString(requestReviewDto))
@@ -382,7 +382,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
     }
 
     /**
-     * POST /shop/{shop-id}/reviews
+     * POST /reviews/shop/{shop-id}
      * @throws throw new BusinessException(ErrorCode.SHOP_NOT_FOUND);
      */
     @Test
@@ -403,7 +403,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
 
         // when
         ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
-                .post("/shop/" + shopId + "/reviews")
+                .post("/reviews/shop/" + shopId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken.getAccessToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(this.objectMapper.writeValueAsString(requestReviewDto))
@@ -418,7 +418,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
     }
 
     /**
-     * GET /member/reviews
+     * GET /reviews/member
      */
     @Test
     @DisplayName("회원의 전체 리뷰 조회 요청")
@@ -442,7 +442,7 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
 
         // when
         ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
-                .get("/member/reviews")
+                .get("/reviews/member")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken.getAccessToken()));
 
         // then
