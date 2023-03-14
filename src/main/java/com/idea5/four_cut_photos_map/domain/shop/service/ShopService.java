@@ -89,7 +89,7 @@ public class ShopService {
 
         for (KakaoResponseDto kakaoShop : kakaoShops) {
             for (ShopDto dbShop : dbShops) {
-                if (kakaoShop.getPlaceName().equals(dbShop.getPlaceName())) {
+                if (kakaoShop.getRoadAddressName().equals(dbShop.getRoadAddressName())) {
                     ResponseShopMarker responseShopMarker = ResponseShopMarker.of(kakaoShop);
                     responseShopMarker.setId(dbShop.getId());
                     // 상점이 칭호를 보유했으면 추가

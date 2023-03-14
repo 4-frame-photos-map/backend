@@ -54,12 +54,9 @@ class ShopServiceTest {
         // given
         Shop shop = Shop.builder()
                 .id(1L)
-                .brand("인생네컷")
                 .placeName("인생네컷 강남점")
                 .roadAddressName("서울 강남구~")
                 .favoriteCnt(0)
-                //.latitude(100.1)
-                //.longitude(100.2)
                 .build();
         shopRepository.save(shop);
 
@@ -70,8 +67,6 @@ class ShopServiceTest {
         assertAll(
                 ()->assertThat(shopDetail.getName()).isEqualTo("인생네컷 강남점"),
                 ()->assertThat(shopDetail.getAddress()).isEqualTo("서울 강남구~")
-                //()->assertThat(shopDetail.getLatitude()).isEqualTo(100.1),
-                //()->assertThat(shopDetail.getLongitude()).isEqualTo(100.2)
         );
     }
 
