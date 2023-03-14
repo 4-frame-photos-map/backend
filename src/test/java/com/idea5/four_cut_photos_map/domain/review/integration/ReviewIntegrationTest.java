@@ -315,11 +315,10 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
 
     /**
      * GET /reviews/shop/{shop-id}
-     * @throws throw new BusinessException(ErrorCode.REVIEW_NOT_FOUND);
      */
     @Test
-    @DisplayName("상점 전체 리뷰 조회 요청 실패")
-    void failedGetShopReviews() throws Exception {
+    @DisplayName("상점 전체 리뷰 조회 요청 - 데이터 없을 때")
+    void getShopReviews_NoReview() throws Exception {
         // given
         MemberTitle memberTitle = memberTitleRepository.save(MemberTitle.builder().name("뉴비").content("네컷지도 가입").build());
 
@@ -341,8 +340,9 @@ public class ReviewIntegrationTest extends BaseIntegrationTest {
         // then
         resultActions
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error.errorMessage").value(ErrorCode.REVIEW_NOT_FOUND.getMessage()));
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("상점의 모든 리뷰 조회 완료"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.length()").value(0));
     }
 
     /**

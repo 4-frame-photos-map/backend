@@ -39,27 +39,7 @@ public class ReviewService {
         return actorCanModify(member, review);
     }
 
-    private List<Review> findAllByShopId(Long shopId) {
-
-        List<Review> reviews = reviewRepository.findAllByShopIdOrderByCreateDateDesc(shopId);   // 최신 작성순
-
-        if (reviews.isEmpty()){
-            throw new BusinessException(ErrorCode.REVIEW_NOT_FOUND);
-        }
-
-        return reviews;
-    }
-
-    private List<Review> findAllByWriterId(Long writerId) {
-        List<Review> reviews = reviewRepository.findAllByWriterIdOrderByCreateDateDesc(writerId);
-
-        if (reviews.isEmpty()) {
-            throw new BusinessException(ErrorCode.REVIEW_NOT_FOUND);
-        }
-
-        return reviews;
-    }
-
+    @Transactional(readOnly = true)
     public ResponseReviewDto getReviewById(Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
@@ -67,35 +47,29 @@ public class ReviewService {
         return ResponseReviewDto.from(review);
     }
 
+    @Transactional(readOnly = true)
     public List<ResponseReviewDto> getAllShopReviews(Long shopId) {
         Shop shop = shopService.findById(shopId);
 
-        List<Review> reviews = findAllByShopId(shopId);
+        List<Review> reviews = reviewRepository.findAllByShopIdOrderByCreateDateDesc(shopId);   // 최신 작성순
 
         return reviews.stream()
                 .map(review -> ResponseReviewDto.from(review))
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<ResponseReviewDto> getAllMemberReviews(Long memberId) {
-        Member user = memberService.findById(memberId);
-        if (user == null) {
-            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
-        }
-
-        List<Review> reviews = findAllByWriterId(memberId);
+        List<Review> reviews = reviewRepository.findAllByWriterIdOrderByCreateDateDesc(memberId);
 
         return reviews.stream()
                 .map(review -> ResponseReviewDto.from(review))
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<ResponseReviewDto> getTop3ShopReviews(Long shopId) {
         List<Review> reviews = reviewRepository.findTop3ByShopIdOrderByCreateDateDesc(shopId);
-
-        if (reviews.isEmpty()) {
-            throw new BusinessException(ErrorCode.REVIEW_NOT_FOUND);
-        }
 
         return reviews.stream()
                 .map(review -> ResponseReviewDto.from(review))
@@ -104,9 +78,6 @@ public class ReviewService {
 
     public ResponseReviewDto write(Long memberId, Long shopId, RequestReviewDto reviewDto) {
         Member user = memberService.findById(memberId);
-        if (user == null) {
-            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
-        }
 
         Shop shop = shopService.findById(shopId);
 
@@ -127,9 +98,6 @@ public class ReviewService {
 
     public ResponseReviewDto modify(Long memberId, Long reviewId, RequestReviewDto reviewDto) {
         Member user = memberService.findById(memberId);
-        if(user == null) {
-            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
-        }
 
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
 
@@ -152,9 +120,6 @@ public class ReviewService {
 
     public void delete(Long memberId, Long reviewId) {
         Member user = memberService.findById(memberId);
-        if (user == null) {
-            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
-        }
 
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
