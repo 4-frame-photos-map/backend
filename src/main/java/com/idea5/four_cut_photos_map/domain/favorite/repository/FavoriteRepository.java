@@ -16,4 +16,6 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     Optional<List<Favorite>> findByMemberIdOrderByShop_PlaceName(Long memberId);
     List<Favorite> findByShopId(Long shopId);
     List<Favorite> findByMember(Member member);
+
+    Long countByMember(Member member);
 }
