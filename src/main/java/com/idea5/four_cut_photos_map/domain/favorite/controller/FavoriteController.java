@@ -14,13 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DUPLICATE_FAVORITE;
-import static com.idea5.four_cut_photos_map.global.error.ErrorCode.FAVORITES_NOT_FOUND;
 
 @RequestMapping("/favorites")
 @RestController
@@ -36,12 +33,9 @@ public class FavoriteController {
 
         List<FavoriteResponseDto> favoriteResponseDtos = favoriteService.getFavoritesList(memberContext.getId(), criteria);
 
-        if(ObjectUtils.isEmpty(favoriteResponseDtos)) {
-            throw new BusinessException(FAVORITES_NOT_FOUND);
-        }
-
         return new ResponseEntity<>(
-                new RsData<>(true, "찜 리스트 조회 성공", favoriteResponseDtos),
+                new RsData<>(true,
+                        favoriteResponseDtos != null? "찜 목록 조회 성공":"찜 목록이 없는 사용자", favoriteResponseDtos),
                 HttpStatus.OK);
     }
 
