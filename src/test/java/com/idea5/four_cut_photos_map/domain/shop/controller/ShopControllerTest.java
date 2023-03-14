@@ -201,14 +201,14 @@ class ShopControllerTest {
                 .andExpect(jsonPath("$.result[0].roadAddressName", containsString("서울 마포구 홍익로6길 21")))
                 .andExpect(jsonPath("$.result[0].longitude", equalTo(126.922894949096)))
                 .andExpect(jsonPath("$.result[0].latitude", equalTo(37.555493447252)))
-                .andExpect(jsonPath("$.result[0].distance", equalTo("18km")))
+                .andExpect(jsonPath("$.result[0].distance", equalTo("18.1km")))
 
 
                 .andExpect(jsonPath("$.result[1].placeName", containsString("하루필름 연남점")))
                 .andExpect(jsonPath("$.result[1].roadAddressName", containsString("서울 마포구 동교로46길 40")))
                 .andExpect(jsonPath("$.result[1].longitude", equalTo(126.926725005048)))
                 .andExpect(jsonPath("$.result[1].latitude", equalTo(37.5621542536479)))
-                .andExpect(jsonPath("$.result[1].distance", equalTo("18km")));
+                .andExpect(jsonPath("$.result[1].distance", equalTo("17.9km")));
     }
 
     @DisplayName("키워드로 조회된 상점 리스트 보여주기, DB에 동일 데이터 존재하지 않음")

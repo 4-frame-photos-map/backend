@@ -33,7 +33,7 @@ public class KakaoServiceTests {
     @DisplayName("카카오맵 API 호출하여 키워드로 장소 검색하기, 키워드 = 지역명")
     void t1() throws JsonProcessingException {
         // given
-        RequestKeywordSearch requestKeywordSearch= new RequestKeywordSearch("마포", 126.76819064893, 37.662161386065); // "마포 셀프사진", "마포 포토부스"도 ok
+        RequestKeywordSearch requestKeywordSearch= new RequestKeywordSearch("마포", 126.76819064893, 37.662161386065);
 
         // when
         List<KakaoKeywordResponseDto> apiShopJson = shopService.searchByKeyword(requestKeywordSearch);
@@ -47,14 +47,14 @@ public class KakaoServiceTests {
                 () -> assertThat(apiShopJson.get(0).getRoadAddressName()).isEqualTo("서울 마포구 홍익로6길 21"),
                 () -> assertThat(apiShopJson.get(0).getLongitude()).isEqualTo("126.922894949096"),
                 () -> assertThat(apiShopJson.get(0).getLatitude()).isEqualTo("37.555493447252"),
-                () -> assertThat(apiShopJson.get(0).getDistance()).isEqualTo("18km"));
+                () -> assertThat(apiShopJson.get(0).getDistance()).isEqualTo("18.1km"));
     }
 
     @Test
     @DisplayName("카카오맵 API 호출하여 키워드로 장소 검색하기, 키워드 = 지역명 + 브랜드")
     void t2() throws JsonProcessingException {
         // given
-        RequestKeywordSearch requestKeywordSearch= new RequestKeywordSearch("성수 포토이즘", 126.76819064893, 37.662161386065); // "마포 셀프사진", "마포 포토부스"도 ok
+        RequestKeywordSearch requestKeywordSearch= new RequestKeywordSearch("성수 포토이즘", 126.76819064893, 37.662161386065);
 
         // when
         List<KakaoKeywordResponseDto> apiShopJson = shopService.searchByKeyword(requestKeywordSearch);
@@ -68,14 +68,14 @@ public class KakaoServiceTests {
                 () ->assertThat(apiShopJson.get(0).getRoadAddressName()).isEqualTo("서울 성동구 서울숲2길 17-2"),
                 () ->assertThat(apiShopJson.get(0).getLongitude()).isEqualTo("127.04073790685483"),
                 () ->assertThat(apiShopJson.get(0).getLatitude()).isEqualTo("37.547177362006806"),
-                () ->assertThat(apiShopJson.get(0).getDistance()).isEqualTo("27km"));
+                () ->assertThat(apiShopJson.get(0).getDistance()).isEqualTo("27.2km"));
     }
 
     @Test
     @DisplayName("카카오맵 API 호출하여 키워드로 장소 검색하기, 키워드 = 브랜드 + 지점명")
     void t3() throws JsonProcessingException {
         // given
-        RequestKeywordSearch requestKeywordSearch= new RequestKeywordSearch("인생네컷 홍대동교점", 126.76819064893, 37.662161386065); // "마포 셀프사진", "마포 포토부스"도 ok
+        RequestKeywordSearch requestKeywordSearch= new RequestKeywordSearch("인생네컷 홍대동교점", 126.76819064893, 37.662161386065);
 
         // when
         List<KakaoKeywordResponseDto> apiShopJson = shopService.searchByKeyword(requestKeywordSearch);
@@ -89,7 +89,7 @@ public class KakaoServiceTests {
                 () ->  assertThat(apiShopJson.get(0).getRoadAddressName()).isEqualTo("서울 마포구 홍익로6길 21"),
                 () ->  assertThat(apiShopJson.get(0).getLongitude()).isEqualTo("126.922894949096"),
                 () -> assertThat(apiShopJson.get(0).getLatitude()).isEqualTo("37.555493447252"),
-                () ->  assertThat(apiShopJson.get(0).getDistance()).isEqualTo("18km"));
+                () ->  assertThat(apiShopJson.get(0).getDistance()).isEqualTo("18.1km"));
     }
 
     @Test
@@ -107,7 +107,7 @@ public class KakaoServiceTests {
                 .roadAddressName("서울 마포구 동교로46길 40")
                 .longitude("126.926725005048")
                 .latitude("37.5621542536479")
-                .distance("18km")
+                .distance("17.9km")
                 .build();
 
         apiShopJson.add(kakaoKeywordResponseDto);
@@ -124,6 +124,6 @@ public class KakaoServiceTests {
                 () -> assertThat(shops.get(0).getRoadAddressName()).isEqualTo("서울 마포구 동교로46길 40"),
                 () ->  assertThat(shops.get(0).getLongitude()).isEqualTo(126.926725005048), // Double
                 () ->   assertThat(shops.get(0).getLatitude()).isEqualTo(37.5621542536479), // Double
-                () ->   assertThat(shops.get(0).getDistance()).isEqualTo("18km"));
+                () ->   assertThat(shops.get(0).getDistance()).isEqualTo("17.9km"));
     }
 }
