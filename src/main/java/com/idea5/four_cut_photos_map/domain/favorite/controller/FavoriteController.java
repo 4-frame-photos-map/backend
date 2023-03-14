@@ -31,9 +31,10 @@ public class FavoriteController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "")
-    public ResponseEntity<RsData> showFavoritesList(@AuthenticationPrincipal MemberContext memberContext) {
+    public ResponseEntity<RsData> showFavoritesList(@AuthenticationPrincipal MemberContext memberContext,
+    @RequestParam(required = false, defaultValue = "created", value = "sort") String criteria) {
 
-        List<FavoriteResponseDto> favoriteResponseDtos = favoriteService.findByMemberId(memberContext.getId());
+        List<FavoriteResponseDto> favoriteResponseDtos = favoriteService.getFavoritesList(memberContext.getId(), criteria);
 
         if(ObjectUtils.isEmpty(favoriteResponseDtos)) {
             throw new BusinessException(FAVORITES_NOT_FOUND);
@@ -51,7 +52,9 @@ public class FavoriteController {
         Member member = memberContext.getMember();
 
         favoriteService.save(shopId, member);
+
         favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크
+
         return new ResponseEntity<>(
                 new RsData<>(true, "찜 추가 성공"),
                 HttpStatus.OK);
@@ -63,7 +66,9 @@ public class FavoriteController {
     public ResponseEntity<RsData> cancelShopFromFavorites(@PathVariable Long shopId,
                                                           @AuthenticationPrincipal MemberContext memberContext){
         favoriteService.cancel(shopId, memberContext.getId());
+
         favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크
+
         return new ResponseEntity<>(
                 new RsData<>(true, "찜 취소 성공"),
                 HttpStatus.OK);
