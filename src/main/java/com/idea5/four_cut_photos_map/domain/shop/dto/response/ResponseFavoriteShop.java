@@ -12,13 +12,11 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ResponseFavoriteShop {
     private Long id;
-    private String brand;
     private String placeName;
 
     public static ResponseFavoriteShop from(Shop shop) {
         return ResponseFavoriteShop.builder()
                 .id(shop.getId())
-                .brand(shop.getBrand())
                 .placeName(shop.getPlaceName())
                 .build();
     }
