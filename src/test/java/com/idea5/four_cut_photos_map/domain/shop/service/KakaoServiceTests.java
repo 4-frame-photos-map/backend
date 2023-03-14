@@ -96,9 +96,9 @@ public class KakaoServiceTests {
     @DisplayName("카카오맵 API 응답 데이터와 DB 데이터 비교하기")
     void t4() throws JsonProcessingException {
         // given
-        shopRepository.save(new Shop("인생네컷", "인생네컷 홍대동교점", "서울 마포구 홍익로6길 21"));
-        shopRepository.save(new Shop("하루필름", "하루필름 연남점", "서울 마포구 동교로46길 40"));
-        shopRepository.save(new Shop("포토이즘박스", "포토이즘박스 망원점", "서울 마포구 포은로 88"));
+        shopRepository.save(new Shop("인생네컷 홍대동교점", "서울 마포구 홍익로6길 21"));
+        shopRepository.save(new Shop("하루필름 연남점", "서울 마포구 동교로46길 40"));
+        shopRepository.save(new Shop("포토이즘박스 망원점", "서울 마포구 포은로 88"));
 
         List<KakaoKeywordResponseDto> apiShopJson = new ArrayList<>();
 

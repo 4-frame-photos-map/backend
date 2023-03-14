@@ -104,7 +104,6 @@ public class Util {
                 phone = "미등록";
 
             KakaoResponseDto dto = KakaoResponseDto.builder()
-                    .brand(brand)
                     .address_name(addressName)
                     .distance(distance)
                     .phone(phone)
@@ -164,7 +163,6 @@ public class Util {
                     phone = "미등록";
 
                 KakaoResponseDto dto = KakaoResponseDto.builder()
-                        .brand(brandName)
                         .address_name(addressName)
                         .distance(distance)
                         .phone(phone)
