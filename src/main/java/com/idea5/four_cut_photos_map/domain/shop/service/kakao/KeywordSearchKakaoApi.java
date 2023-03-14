@@ -62,6 +62,7 @@ public class KeywordSearchKakaoApi {
                     .roadAddressName(documents.get("road_address_name").textValue())
                     .longitude(documents.get("x").textValue())
                     .latitude(documents.get("y").textValue())
+                    .distance(Util.distanceFormatting(documents.get("distance").textValue()))
                     .build();
 
             resultList.add(dto);

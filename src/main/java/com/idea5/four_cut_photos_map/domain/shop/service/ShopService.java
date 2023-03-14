@@ -54,7 +54,7 @@ public class ShopService {
 
             if(dbShop != null) {
                 // dbShop, apiSop -> responseShop 변환
-                // 위도, 경도는 카카오맵 API로부터, 나머지는 DB Shop으로부터
+                // 위도, 경도, 중심좌표까지의 거리는 카카오맵 API로부터, 나머지는 DB Shop으로부터
                 ResponseShop responseShop = ResponseShop.from(dbShop, apiShop);
 
                 responseShops.add(responseShop);

@@ -49,7 +49,7 @@ public class ShopController {
 
 
     @GetMapping(value = "")
-    public ResponseEntity<RsData<List<ResponseShop>>> showKeywordSearchList(@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch) throws JsonProcessingException {
+    public ResponseEntity<RsData<List<ResponseShop>>> showListSearchedByKeyword(@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch) throws JsonProcessingException {
         // 1. 카카오맵 api 응답 데이터 받아오기
         List<KakaoKeywordResponseDto> apiShopJson = shopService.searchByKeyword(requestKeywordSearch);
 
