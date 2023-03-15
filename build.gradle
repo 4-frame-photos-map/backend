@@ -63,6 +63,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.google.guava/guava, CaseFormat 사용
     implementation group: 'com.google.guava', name: 'guava', version: 'r05'
+
+    // 암호화
+    implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
 }
 
 tasks.named('test') {

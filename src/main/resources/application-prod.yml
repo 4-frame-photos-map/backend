@@ -1,5 +1,16 @@
+server:
+  port: 8080 # 운영중일땐 포트 8080
+  servlet:
+    context-path: /
+
 spring:
   # todo 운영 데이터베이스 연결
+  jpa:
+    open-in-view: false # 영속성 컨텍스트의 생존 범위를 트랜잭션 범위로 한정
+    generate-ddl: true
+    show-sql: true # 콘솔창에 sql 출력
+    hibernate:
+      ddl-auto: none # 운영중에서는 creat, create-drop, update 사용하면 안됨
 
 # 운영 환경의 경우 요청이 많았을 경우 디버깅의 경우에 로그가 너무 많아 디스크 용량이 부족할 수 이썽서 "info"로 변경
 logging:
