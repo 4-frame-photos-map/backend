@@ -100,6 +100,7 @@ public class ShopService {
                         responseShopMarker.setShopTitles(shopTitleLogService.getShopTitles(dbShop.getId()));
                     }
                     resultShops.add(responseShopMarker);
+                    break;
                 }
             }
         }

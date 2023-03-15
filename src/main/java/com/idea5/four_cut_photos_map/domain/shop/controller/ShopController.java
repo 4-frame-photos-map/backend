@@ -68,9 +68,7 @@ public class ShopController {
         if (shopDtos.isEmpty())
             throw new BusinessException(BRAND_NOT_FOUND);
 
-
         List<KakaoResponseDto> kakaoApiResponse = shopService.searchBrand(requestBrandSearch);
-
         List<ResponseShopBrand> resultShops = new ArrayList<>(); // 응답값 리스트
 
         // 카카오 맵 api로 부터 받아온 Shop 리스트와 db에 저장된 Shop 비교
@@ -78,10 +76,10 @@ public class ShopController {
             for (ShopDto shopDto : shopDtos) {
                 if (apiShop.getRoadAddressName().equals(shopDto.getRoadAddressName())) {
                     resultShops.add(ResponseShopBrand.of(apiShop));
+                    break;
                 }
             }
         }
-
 
         // 검색 결과, 근처에 원하는 브랜드가 없을 때
         if (resultShops.isEmpty()) {
