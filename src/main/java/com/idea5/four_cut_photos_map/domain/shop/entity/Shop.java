@@ -5,6 +5,8 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.Table;
 
 @Entity
 @Getter
@@ -13,6 +15,7 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 @SuperBuilder
 @ToString
+@Table(indexes = {@Index(name = "address_index",columnList = "roadAddressName")})
 public class Shop extends BaseEntity {
 
     private String placeName; // 상점명
