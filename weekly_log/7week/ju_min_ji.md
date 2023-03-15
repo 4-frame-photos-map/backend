@@ -22,13 +22,17 @@
    - [x] Favorite Service 테스트 추가
 
 ### 궁금한 점(선택)
-Q1. 키워드 검색 API vs DB 데이터 비교로직에서 장소명으로 2차 필터링 시, 장소명 일치여부(equals)가 아니라 포함관계(contains)로 비교하도록 구현했는데 이에 대해 다른 
+Q1. 키워드 검색 API vs DB 데이터 비교로직에서 장소명으로 2차 필터링 시, 장소명 일치여부(equals)가 아니라 포함관계(contains)로 비교하도록 구현했는데 어떻게 생각하는지
   - 1차 : 도로명 주소 비교
   - 2차 : 카카오 API 데이터 장소명이 DB 장소명을 포함하는지 비교
   - 위와 같은 로직을 구현한 이유 : 장소명에 따로 지점명 없이 브랜드명만 있는 DB 데이터(공공데이터)가 다수 존재하기 때문
   - EX. 1차로 도로명 주소 검사는 거쳤다고 했을 때, `카카오 API placeName = 하루필름 망원점` vs `DB placeName = 하루필름`
-
-Q2. MemberContext로 인증이 필요한 Spring Test 방법?
+  
+  - `회의 결과`: 불안정한 초기데이터 문제(완전하지 않은 장소명)라는 근본적인 문제 해결 필요
+    - 백에서 이전 페이지 파라미터를 저장하는 방법(httpservletrequest)도 생각해보았으나 이전에 구현했던 SSR 방식과 달리 지금과 같은 CSR 방식에서 이전에 호출한 API 기록이 남을 수 있지 모르겠고, 카카오 API 데이터를 캐싱할 시 링크 공유받은 사용자 문제발생 가능
+    - 따라서 추가적으로 필요한 페이지에 카카오 API를 호출하는 방법 생각해봐야 할 것 같다는 결론
+ 
+Q2. MemberContext로 인증이 필요한 Spring Test 방법
   - 단순히 Member 생성만이 아니라, 로그인 된 채로 해당 Member의 MemberContext(즉 스프링시큐티리 인증정보 등록 후 인증 객체 가져오기)까지 필요할 때 Test 구현하는 방법
   - 시도방법 1: [Spring Security(스프링 시큐리티)를 사용하는 경우 단위테스트](https://reiphiel.tistory.com/entry/spring-security-unit-test)
   - 시도방법 2 : [Spring Boot | Spring Security Test @WithMockUser를 커스터마이징 해서 사용하자](https://gaemi606.tistory.com/entry/Spring-Boot-Spring-Security-Test-WithMockUser%EB%A5%BC-%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%A7%88%EC%9D%B4%EC%A7%95-%ED%95%B4%EC%84%9C-%EC%82%AC%EC%9A%A9%ED%95%98%EC%9E%90)
