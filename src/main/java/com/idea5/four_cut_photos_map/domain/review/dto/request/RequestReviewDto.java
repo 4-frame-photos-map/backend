@@ -2,11 +2,15 @@ package com.idea5.four_cut_photos_map.domain.review.dto.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.idea5.four_cut_photos_map.domain.member.entity.Member;
+import com.idea5.four_cut_photos_map.domain.review.entity.Review;
+import com.idea5.four_cut_photos_map.domain.review.entity.score.ItemScore;
+import com.idea5.four_cut_photos_map.domain.review.entity.score.PurityScore;
+import com.idea5.four_cut_photos_map.domain.review.entity.score.RetouchScore;
+import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
+import lombok.*;
 
+import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -29,4 +33,14 @@ public class RequestReviewDto {
     private String retouch;
 
     private String item;
+
+    public Review toEntity(){
+        return Review.builder()
+                .starRating(getStarRating())
+                .content(getContent())
+                .purity(getPurity() == null ? PurityScore.UNSELECTED : PurityScore.valueOf(getPurity()))
+                .retouch(getRetouch() == null ? RetouchScore.UNSELECTED : RetouchScore.valueOf(getRetouch()))
+                .item(getItem() == null ? ItemScore.UNSELECTED : ItemScore.valueOf(getItem()))
+                .build();
+    }
 }

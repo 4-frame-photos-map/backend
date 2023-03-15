@@ -81,15 +81,9 @@ public class ReviewService {
 
         Shop shop = shopService.findById(shopId);
 
-        Review review = Review.builder()
-                .writer(user)
-                .shop(shop)
-                .starRating(reviewDto.getStarRating())
-                .content(reviewDto.getContent())
-                .purity(reviewDto.getPurity() == null ? PurityScore.UNSELECTED : PurityScore.valueOf(reviewDto.getPurity()))
-                .retouch(reviewDto.getRetouch() == null ? RetouchScore.UNSELECTED : RetouchScore.valueOf(reviewDto.getRetouch()))
-                .item(reviewDto.getItem() == null ? ItemScore.UNSELECTED : ItemScore.valueOf(reviewDto.getItem()))
-                .build();
+        Review review = reviewDto.toEntity();
+        review.setWriter(user);
+        review.setShop(shop);
 
         reviewRepository.save(review);
 
@@ -97,25 +91,29 @@ public class ReviewService {
     }
 
     public ResponseReviewDto modify(Long memberId, Long reviewId, RequestReviewDto reviewDto) {
-        Member user = memberService.findById(memberId);
-
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
 
         // 수정 권한 확인
+        Member user = memberService.findById(memberId);
+
         if(!actorCanModify(user, review)) {
             throw new BusinessException(ErrorCode.WRITER_DOES_NOT_MATCH);
         }
 
         // Review Entity 수정
-        review.setStarRating(reviewDto.getStarRating());
-        review.setContent(reviewDto.getContent());
-        review.setPurity(reviewDto.getPurity() == null ? PurityScore.UNSELECTED : PurityScore.valueOf(reviewDto.getPurity()));
-        review.setRetouch(reviewDto.getRetouch() == null ? RetouchScore.UNSELECTED : RetouchScore.valueOf(reviewDto.getRetouch()));
-        review.setItem(reviewDto.getItem() == null ? ItemScore.UNSELECTED : ItemScore.valueOf(reviewDto.getItem()));
-
-        reviewRepository.save(review);  // 병합
+        review = updateReview(review, reviewDto);
 
         return ResponseReviewDto.from(review);
+    }
+
+    private Review updateReview(Review review, RequestReviewDto dto) {
+        review.setStarRating(dto.getStarRating());
+        review.setContent(dto.getContent());
+        review.setPurity(dto.getPurity() == null ? PurityScore.UNSELECTED : PurityScore.valueOf(dto.getPurity()));
+        review.setRetouch(dto.getRetouch() == null ? RetouchScore.UNSELECTED : RetouchScore.valueOf(dto.getRetouch()));
+        review.setItem(dto.getItem() == null ? ItemScore.UNSELECTED : ItemScore.valueOf(dto.getItem()));
+
+        return review;
     }
 
     public void delete(Long memberId, Long reviewId) {
