@@ -36,7 +36,7 @@ public class ShopService {
     private final ShopTitleLogService shopTitleLogService;
 
     public List<ShopDto> findByBrand(String brandName){
-        List<Shop> shops = shopRepository.findByPlaceNameStartingWith(brandName).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
+        List<Shop> shops = shopRepository.findDistinctByPlaceNameStartingWith(brandName).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
         List<ShopDto> shopDtos = new ArrayList<>();
         for (Shop shop : shops)
             shopDtos.add(ShopDto.of(shop));
@@ -49,13 +49,13 @@ public class ShopService {
 
         // 카카오 맵 API 데이터와 DB Shop 비교
         for (KakaoKeywordResponseDto apiShop: apiShops) {
-            List<Shop> dbShops = shopRepository.findByRoadAddressName(apiShop.getRoadAddressName()).orElse(null);
+            List<Shop> dbShops = shopRepository.findDistinctByRoadAddressName(apiShop.getRoadAddressName()).orElse(null);
 
             if(dbShops == null) continue;
 
             // 도로명주소 중복 데이터 존재 시 장소명으로 2차 필터링
             Shop dbShop = dbShops.size() == 1 ?  dbShops.get(0) : dbShops.stream()
-                    .filter(db -> db.getPlaceName().equals(apiShop.getPlaceName()))
+                    .filter(db -> apiShop.getPlaceName().contains(db.getPlaceName()))
                     .findFirst()
                     .orElse(null);
 
