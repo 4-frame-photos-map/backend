@@ -12,7 +12,7 @@ import javax.persistence.Entity;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 public class Shop extends BaseEntity {
 
     private String brand; // 브랜드명
