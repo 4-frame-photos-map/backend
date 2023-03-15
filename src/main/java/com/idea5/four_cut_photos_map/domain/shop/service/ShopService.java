@@ -47,20 +47,23 @@ public class ShopService {
     public List<ResponseShop> findShops(List<KakaoKeywordResponseDto> apiShops) {
         List<ResponseShop> responseShops = new ArrayList<>();
 
-        // 카카오 맵 API로 부터 받아온 데이터와 일치하는 DB Shop 가져오기
+        // 카카오 맵 API 데이터와 DB Shop 비교
         for (KakaoKeywordResponseDto apiShop: apiShops) {
-            // DB에서 도로명주소로 Shop 조회(비교)
-            Shop dbShop = shopRepository.findByRoadAddressName(apiShop.getRoadAddressName()).orElse(null);
+            List<Shop> dbShops = shopRepository.findByRoadAddressName(apiShop.getRoadAddressName()).orElse(null);
+
+            if(dbShops == null) continue;
+
+            // 도로명주소 중복 데이터 존재 시 장소명으로 2차 필터링
+            Shop dbShop = dbShops.size() == 1 ?  dbShops.get(0) : dbShops.stream()
+                    .filter(db -> db.getPlaceName().equals(apiShop.getPlaceName()))
+                    .findFirst()
+                    .orElse(null);
 
             if(dbShop != null) {
-                // dbShop, apiSop -> responseShop 변환
-                // 위도, 경도, 중심좌표까지의 거리는 카카오맵 API로부터, 나머지는 DB Shop으로부터
                 ResponseShop responseShop = ResponseShop.from(dbShop, apiShop);
-
                 responseShops.add(responseShop);
             }
         }
-
         if(responseShops.isEmpty()) {throw new BusinessException(SHOP_NOT_FOUND);}
 
         return responseShops;
