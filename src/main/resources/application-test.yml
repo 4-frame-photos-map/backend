@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:mariadb://${testDbIp:127.0.0.1}:3306/four_cut_photos_map_test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
     username: ${testDbId:root}
-    password: ${testDbPw:}
+    password: ${testDbPw:0114}
 
   jpa:
     hibernate:

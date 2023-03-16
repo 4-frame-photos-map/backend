@@ -1,7 +1,6 @@
 package com.idea5.four_cut_photos_map.security.jwt.filter;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
-import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import com.idea5.four_cut_photos_map.security.jwt.JwtService;
@@ -44,7 +43,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final RedisDao redisDao;
     private final String BEARER_TOKEN_PREFIX = "Bearer ";
-    private final MemberService memberService;
 
     @Value("${jwt.atk.header}")
     private String tokenHeader;

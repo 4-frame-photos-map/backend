@@ -8,6 +8,11 @@ import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitle;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleLog;
 import com.idea5.four_cut_photos_map.domain.memberTitle.repository.MemberTitleLogRepository;
 import com.idea5.four_cut_photos_map.domain.memberTitle.repository.MemberTitleRepository;
+import com.idea5.four_cut_photos_map.domain.review.entity.Review;
+import com.idea5.four_cut_photos_map.domain.review.entity.score.ItemScore;
+import com.idea5.four_cut_photos_map.domain.review.entity.score.PurityScore;
+import com.idea5.four_cut_photos_map.domain.review.entity.score.RetouchScore;
+import com.idea5.four_cut_photos_map.domain.review.repository.ReviewRepository;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.global.util.DatabaseCleaner;
@@ -47,6 +52,9 @@ class CollectJobTest {
 
     @Autowired
     private ShopRepository shopRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     @Autowired
     private DatabaseCleaner databaseCleaner;
@@ -207,9 +215,8 @@ class CollectJobTest {
         // given
         Member member = new Member();
         memberRepository.save(member);
-
         Shop shop = shopRepository.findById(1L).orElse(null);
-        // TODO: 리뷰 1개 작성
+        reviewRepository.save(new Review(member, shop, 4, "좋아요", PurityScore.GOOD, RetouchScore.UNSELECTED, ItemScore.BAD));
 
         // when
         collectJob.add();
@@ -234,7 +241,7 @@ class CollectJobTest {
         assertThat(memberTitleLog2.getMemberTitle().getContent()).isEqualTo("첫번째 리뷰 작성");
     }
 
-    @DisplayName("찜 3개 이상 추가한 회원에게 찜 홀릭 칭호 부여")
+    @DisplayName("리뷰 3개 이상 작성한 회원에게 리뷰 홀릭 칭호 부여")
     @Test
     void t6() {
         // given
@@ -245,6 +252,9 @@ class CollectJobTest {
         Shop shop2 = shopRepository.findById(2L).orElse(null);
         Shop shop3 = shopRepository.findById(3L).orElse(null);
         // TODO: 리뷰 3개 작성
+        reviewRepository.save(new Review(member, shop1, 4, "좋아요", PurityScore.GOOD, RetouchScore.UNSELECTED, ItemScore.BAD));
+        reviewRepository.save(new Review(member, shop2, 4, "좋아요", PurityScore.GOOD, RetouchScore.UNSELECTED, ItemScore.BAD));
+        reviewRepository.save(new Review(member, shop3, 4, "좋아요", PurityScore.GOOD, RetouchScore.UNSELECTED, ItemScore.BAD));
 
         // when
         collectJob.add();
