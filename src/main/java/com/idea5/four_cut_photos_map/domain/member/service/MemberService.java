@@ -122,11 +122,12 @@ public class MemberService {
     // 회원 닉네임 수정
     @Transactional
     public void updateNickname(Long id, MemberUpdateReq memberUpdateReq) {
-        Member member = findById(id);
-        // 기존 닉네임과 같으면 변경 불가
-        if(memberUpdateReq.getNickname().equals(member.getNickname()))
+        // 닉네임 중복 검사
+        if(memberRepository.existsByNickname(memberUpdateReq.getNickname()))
             throw new BusinessException(ErrorCode.DUPLICATE_MEMBER_NICKNAME);
+        Member member = findById(id);
         member.updateNickname(memberUpdateReq);
+        // TODO: 닉네임 레디스 삭제
         // redis 에 저장된 nickname 수정
         String key = "member:" + member.getId() + ":nickname";
         redisDao.setValues(key, memberUpdateReq.getNickname());
