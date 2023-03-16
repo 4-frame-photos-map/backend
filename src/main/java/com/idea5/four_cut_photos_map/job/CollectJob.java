@@ -7,6 +7,7 @@ import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleType;
 import com.idea5.four_cut_photos_map.domain.memberTitle.service.MemberTitleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
@@ -24,7 +25,7 @@ public class CollectJob {
     private final MemberTitleService memberTitleService;
 
     // 초 분 시 일 월 요일
-//    @Scheduled(cron = "0 * * * * *")      // TODO: 테스트용 매분마다 실행
+    @Scheduled(cron = "0 0/1 * * * *")      // TODO: 테스트용 매분마다 실행
 //    @Scheduled(cron = "0 0 0 * * *")    // 매일 0시 실행
     @Transactional
     public void add() {

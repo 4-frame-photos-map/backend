@@ -9,6 +9,7 @@ import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleLog;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleType;
 import com.idea5.four_cut_photos_map.domain.memberTitle.repository.MemberTitleLogRepository;
 import com.idea5.four_cut_photos_map.domain.memberTitle.repository.MemberTitleRepository;
+import com.idea5.four_cut_photos_map.domain.review.service.ReviewService;
 import com.idea5.four_cut_photos_map.global.error.ErrorCode;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,8 @@ public class MemberTitleService {
     private final MemberTitleRepository memberTitleRepository;
     private final MemberTitleLogRepository memberTitleLogRepository;
     private final FavoriteService favoriteService;
+
+    private final ReviewService reviewService;
 
     public MemberTitle findById(Long id) {
         return memberTitleRepository.findById(id).orElseThrow(() -> {
@@ -123,6 +126,16 @@ public class MemberTitleService {
         if(memberTitle.getId() == MemberTitleType.NEWBIE.getCode()) {
             // 1. 회원가입
             return true;
+        } else if(memberTitle.getId() == MemberTitleType.FIRST_REVIEW.getCode()) {
+            if(reviewService.getReviewCntByWriter(member) >= 1) {
+                // 2. 첫번째 리뷰
+                return true;
+            }
+        } else if(memberTitle.getId() == MemberTitleType.MANY_REVIEW.getCode()) {
+            if(reviewService.getReviewCntByWriter(member) >= 3) {
+                // 3. 리뷰 5개 이상
+                return true;
+            }
         } else if(memberTitle.getId() == MemberTitleType.FIRST_HEART.getCode()) {
             if(favoriteService.countByMember(member) >= 1) {
                 // 4. 첫번째 찜
