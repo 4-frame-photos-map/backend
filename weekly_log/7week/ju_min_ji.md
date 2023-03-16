@@ -38,10 +38,10 @@ Q2. MemberContext로 인증이 필요한 Spring Test 방법
   - 시도방법 2 : [Spring Boot | Spring Security Test @WithMockUser를 커스터마이징 해서 사용하자](https://gaemi606.tistory.com/entry/Spring-Boot-Spring-Security-Test-WithMockUser%EB%A5%BC-%EC%BB%A4%EC%8A%A4%ED%84%B0%EB%A7%88%EC%9D%B4%EC%A7%95-%ED%95%B4%EC%84%9C-%EC%82%AC%EC%9A%A9%ED%95%98%EC%9E%90)
 ### 다음주 계획(선택)
 - refactor : Shop 브랜드검색, 현재위치 기준 검색
-  - 현재위치 기준 Map Marker 
+  - 현재위치 기준 Map Marker, List
     - 수정 전 : 브랜드별로 분기
     - 수정 후 : 전체
-  - 브랜드검색 Map Marker
+  - 브랜드검색 Map Marker, List
     - 수정 전: 리스트형, 반경 2km 이내 미적용
-    - 수정 후: 맵 마커형, 반경 2km 이내 적용
+    - 수정 후: 맵 마커 + 리스트 둘 다 사용, 반경 2km 이내 적용
   - 카카오 API 호출 로직 중복 제거(키워드검색, 브랜드검색, 현재위치기준검색)
