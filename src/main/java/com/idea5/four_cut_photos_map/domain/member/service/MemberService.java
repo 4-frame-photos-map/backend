@@ -44,9 +44,12 @@ public class MemberService {
             member.updateKakaoRefreshToken(kakaoTokenResp.getRefreshToken());
         } else {
             // 신규 사용자인 경우 회원가입
+            // 유니크한 닉네임 설정
+            kakaoUserInfoParam.updateUniqueNickname();
             member = KakaoUserInfoParam.toEntity(kakaoUserInfoParam);
             member.updateKakaoRefreshToken(kakaoTokenResp.getRefreshToken());
             memberRepository.save(member);
+            // TODO : 닉네임 redis 저장 삭제하기
             // redis 에 nickname 저장
             String nicknameKey = "member:" + member.getId() + ":nickname";
             redisDao.setValues(nicknameKey, member.getNickname());

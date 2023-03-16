@@ -9,10 +9,7 @@ import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.global.util.DocumentManagement.Document;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public class Util {
@@ -183,4 +180,13 @@ public class Util {
         return list;
     }
 
+    // 난수 생성
+    public static String generateRandomNumber(int length) {
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < length; i++) {
+            sb.append(random.nextInt(9));
+        }
+        return sb.toString();
+    }
 }
