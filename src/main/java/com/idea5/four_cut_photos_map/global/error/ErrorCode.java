@@ -27,7 +27,7 @@ public enum ErrorCode {
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "리뷰를 찾을 수 없습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "회원을 찾을 수 없습니다."),
     WRITER_DOES_NOT_MATCH(HttpStatus.BAD_REQUEST, "400", "작성자가 일치하지 않습니다."),
-    DUPLICATE_MEMBER_NICKNAME(HttpStatus.CONFLICT, "409", "현재 닉네임과 동일합니다.");
+    DUPLICATE_MEMBER_NICKNAME(HttpStatus.CONFLICT, "409", "중복된 닉네임입니다.");
     private HttpStatus httpStatus;
     private String errorCode;
     private String message;

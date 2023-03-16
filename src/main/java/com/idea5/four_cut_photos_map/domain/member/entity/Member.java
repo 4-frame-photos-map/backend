@@ -12,8 +12,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -28,7 +26,8 @@ public class Member extends BaseEntity {
     @Column(unique = true)
     private Long kakaoId;       // 카카오 회원번호
 
-    private String nickname;    // 닉네임(default kakao nickname)
+    @Column(unique = true)
+    private String nickname;    // 닉네임(default kakao nickname + 4자리 난수)
 
     // TODO: 임시 추가
     private String kakaoRefreshToken;   // 카카오 리프레쉬 토큰

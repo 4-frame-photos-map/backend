@@ -14,6 +14,7 @@ import com.idea5.four_cut_photos_map.domain.memberTitle.service.MemberTitleServi
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import com.idea5.four_cut_photos_map.global.error.ErrorCode;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
+import com.idea5.four_cut_photos_map.global.util.Util;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ public class MemberService {
         } else {
             // 신규 사용자인 경우 회원가입
             // 유니크한 닉네임 설정
-            kakaoUserInfoParam.updateUniqueNickname();
+            kakaoUserInfoParam.updateNickname(generateUniqueNickname(kakaoUserInfoParam.getNickname()));
             member = KakaoUserInfoParam.toEntity(kakaoUserInfoParam);
             member.updateKakaoRefreshToken(kakaoTokenResp.getRefreshToken());
             memberRepository.save(member);
@@ -58,6 +59,15 @@ public class MemberService {
         String kakaoAtkKey = "member:" + member.getId() + ":kakao_access_token";
         redisDao.setValues(kakaoAtkKey, kakaoTokenResp.getAccessToken(), Duration.ofSeconds(kakaoTokenResp.getExpiresIn()));
         return member;
+    }
+
+    // 유니크한 닉네임 생성
+    public String generateUniqueNickname(String nickname) {
+        while(true) {
+            String newNickname = nickname + Util.generateRandomNumber(4);
+            if(memberRepository.existsByNickname(newNickname)) continue;
+            return newNickname;
+        }
     }
 
     public Member findById(Long id) {
