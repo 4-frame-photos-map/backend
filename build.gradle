@@ -57,6 +57,10 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.google.guava/guava, CaseFormat 사용
     implementation group: 'com.google.guava', name: 'guava', version: 'r05'
+
+    // https://mvnrepository.com/artifact/org.awaitility/awaitility
+    testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.2.0'
+
 }
 
 tasks.named('test') {

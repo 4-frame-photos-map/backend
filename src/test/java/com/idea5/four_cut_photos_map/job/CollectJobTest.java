@@ -1,6 +1,5 @@
 package com.idea5.four_cut_photos_map.job;
 
-import com.idea5.four_cut_photos_map.global.util.DatabaseCleaner;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
@@ -11,7 +10,9 @@ import com.idea5.four_cut_photos_map.domain.memberTitle.repository.MemberTitleLo
 import com.idea5.four_cut_photos_map.domain.memberTitle.repository.MemberTitleRepository;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
+import com.idea5.four_cut_photos_map.global.util.DatabaseCleaner;
 import lombok.extern.slf4j.Slf4j;
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,6 +23,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -275,4 +277,17 @@ class CollectJobTest {
         assertThat(memberTitleLog3.getMemberTitle().getName()).isEqualTo("리뷰 홀릭");
         assertThat(memberTitleLog3.getMemberTitle().getContent()).isEqualTo("리뷰 3개 이상 작성");
     }
+
+//    @Test
+//    void t() throws InterruptedException {
+//        memberRepository.save(new Member());
+////        Thread.sleep(15000L);
+//        Awaitility.await()
+//                .atMost(10, TimeUnit.SECONDS)
+//                .untilAsserted(
+//                        () -> assertThat(memberTitleLogRepository.findAll().size()).isEqualTo(1)
+//                );
+////        List<MemberTitleLog> memberTitleLogs = memberTitleLogRepository.findAll();
+//
+//    }
 }
