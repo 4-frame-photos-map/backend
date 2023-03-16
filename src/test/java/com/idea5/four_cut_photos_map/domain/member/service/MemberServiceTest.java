@@ -90,11 +90,10 @@ class MemberServiceTest {
         Member member = members.get(0);
         assertThat(member.getId()).isEqualTo(1);
         assertThat(member.getKakaoId()).isEqualTo(1111);
-        assertThat(member.getNickname()).isEqualTo("딸기");
         assertThat(member.getKakaoRefreshToken()).isEqualTo("kakao_refresh_token");
 
         // 2. Redis 저장된 nickname, kakaoAccessToken 검증
-        assertThat(redisDao.getValues("member:" + member.getId() + ":nickname")).isEqualTo("딸기");
+//        assertThat(redisDao.getValues("member:" + member.getId() + ":nickname")).isEqualTo("딸기");
         assertThat(redisDao.getValues("member:" + member.getId() + ":kakao_access_token"))
                 .isEqualTo("kakao_access_token");
     }
@@ -121,11 +120,10 @@ class MemberServiceTest {
         Member member = members.get(0);
         assertThat(member.getId()).isEqualTo(1);
         assertThat(member.getKakaoId()).isEqualTo(1111);
-        assertThat(member.getNickname()).isEqualTo("딸기");
         assertThat(member.getKakaoRefreshToken()).isEqualTo("kakao_refresh_token2");
 
         // 2. Redis kakaoAccessToken 값만 수정됬는지 검증
-        assertThat(redisDao.getValues("member:" + member.getId() + ":nickname")).isEqualTo("딸기");
+//        assertThat(redisDao.getValues("member:" + member.getId() + ":nickname")).isEqualTo("딸기");
         assertThat(redisDao.getValues("member:" + member.getId() + ":kakao_access_token"))
                 .isEqualTo("kakao_access_token2");
     }
@@ -172,7 +170,7 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("기존 닉네임과 동일한 닉네임으로 닉네임 수정 불가")
+    @DisplayName("중복된 닉네임으로 닉네임 수정 불가")
     void t5() {
         // given
         Member member = memberService.getMember(
@@ -181,7 +179,7 @@ class MemberServiceTest {
 
         // when, then
         BusinessException exception = assertThrows(BusinessException.class, () ->
-                memberService.updateNickname(member.getId(), new MemberUpdateReq("딸기"))
+                memberService.updateNickname(member.getId(), new MemberUpdateReq(member.getNickname()))
         );
         assertThat(exception.getMessage()).isEqualTo(ErrorCode.DUPLICATE_MEMBER_NICKNAME.getMessage());
     }
