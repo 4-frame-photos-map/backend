@@ -223,7 +223,7 @@ class MemberServiceTest {
         assertThat(redisDao.getValues(RedisDao.getRtkKey(member.getId()))).isEqualTo(jwtToken.getRefreshToken());
 
         // when
-        memberService.logout(jwtToken.getAccessToken());
+        memberService.logout(member.getId(), jwtToken.getAccessToken());
 
         // then
         // 1. Redis jwtAccessToken 블랙리스트 등록, jwtRefreshToken 삭제

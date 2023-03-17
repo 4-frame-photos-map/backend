@@ -91,13 +91,17 @@ public class AuthController {
      * 서비스 로그아웃
      * @param bearerToken accessToken
      */
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/logout")
-    public ResponseEntity<RsData> logout(@RequestHeader("Authorization") String bearerToken) {
+    public ResponseEntity<RsData> logout(
+            @RequestHeader("Authorization") String bearerToken,
+            @AuthenticationPrincipal MemberContext memberContext
+    ) {
         // 서비스 로그아웃
         log.info("서비스 로그아웃");
         String accessToken = bearerToken.substring(BEARER_TOKEN_PREFIX.length());
         // redis 에 해당 accessToken 블랙리스트로 저장하기
-        memberService.logout(accessToken);
+        memberService.logout(memberContext.getId(), accessToken);
         return new ResponseEntity<>(
                 new RsData<>(true, "로그아웃 성공"),
                 HttpStatus.OK);
