@@ -92,8 +92,7 @@ class MemberServiceTest {
         assertThat(member.getKakaoId()).isEqualTo(1111);
         assertThat(member.getKakaoRefreshToken()).isEqualTo("kakao_refresh_token");
 
-        // 2. Redis 저장된 nickname, kakaoAccessToken 검증
-//        assertThat(redisDao.getValues("member:" + member.getId() + ":nickname")).isEqualTo("딸기");
+        // 2. Redis 저장된 kakaoAccessToken 검증
         assertThat(redisDao.getValues("member:" + member.getId() + ":kakao_access_token"))
                 .isEqualTo("kakao_access_token");
     }
@@ -122,8 +121,7 @@ class MemberServiceTest {
         assertThat(member.getKakaoId()).isEqualTo(1111);
         assertThat(member.getKakaoRefreshToken()).isEqualTo("kakao_refresh_token2");
 
-        // 2. Redis kakaoAccessToken 값만 수정됬는지 검증
-//        assertThat(redisDao.getValues("member:" + member.getId() + ":nickname")).isEqualTo("딸기");
+        // 2. Redis kakaoAccessToken 값이 수정됬는지 검증
         assertThat(redisDao.getValues("member:" + member.getId() + ":kakao_access_token"))
                 .isEqualTo("kakao_access_token2");
     }
@@ -165,8 +163,6 @@ class MemberServiceTest {
         // 1. DB Member nickname 수정 검증
         Member updateMember = memberRepository.findById(member.getId()).orElse(null);
         assertThat(updateMember.getNickname()).isEqualTo("수박");
-        // 2. Redis nickname 수정 검증
-        assertThat(redisDao.getValues("member:" + member.getId() + ":nickname")).isEqualTo("수박");
     }
 
     @Test
