@@ -1,21 +1,13 @@
-package com.idea5.four_cut_photos_map.domain.favorite.controller;
+package com.idea5.four_cut_photos_map.domain.favorite.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponseDto;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
-import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
-import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
-import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.global.util.DatabaseCleaner;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Request;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,12 +16,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-
-
-import java.util.ArrayList;
-import java.util.List;
 
 @SpringBootTest
 @Transactional

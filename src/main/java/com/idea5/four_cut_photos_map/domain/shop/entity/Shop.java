@@ -30,8 +30,4 @@ public class Shop extends BaseEntity {
         this.placeName = placeName;
         this.roadAddressName = roadAddressName;
     }
-
-    // TODO: 충돌때문에 임시로 생성
-    public Shop(String brand, String placeName, String roadAddressName, double v, double v1) {
-    }
 }
