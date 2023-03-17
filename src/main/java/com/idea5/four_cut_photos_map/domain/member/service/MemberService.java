@@ -50,10 +50,6 @@ public class MemberService {
             member = KakaoUserInfoParam.toEntity(kakaoUserInfoParam);
             member.updateKakaoRefreshToken(kakaoTokenResp.getRefreshToken());
             memberRepository.save(member);
-            // TODO : 닉네임 redis 저장 삭제하기
-            // redis 에 nickname 저장
-            String nicknameKey = "member:" + member.getId() + ":nickname";
-            redisDao.setValues(nicknameKey, member.getNickname());
         }
         // redis 에 Access Token 저장 및 갱신
         String kakaoAtkKey = "member:" + member.getId() + ":kakao_access_token";
@@ -137,10 +133,6 @@ public class MemberService {
             throw new BusinessException(ErrorCode.DUPLICATE_MEMBER_NICKNAME);
         Member member = findById(id);
         member.updateNickname(memberUpdateReq);
-        // TODO: 닉네임 레디스 삭제
-        // redis 에 저장된 nickname 수정
-        String key = "member:" + member.getId() + ":nickname";
-        redisDao.setValues(key, memberUpdateReq.getNickname());
     }
 
     // 회원 대표칭호 수정
