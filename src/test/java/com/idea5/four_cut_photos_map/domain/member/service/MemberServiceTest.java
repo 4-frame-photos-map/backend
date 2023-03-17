@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
@@ -209,5 +210,26 @@ class MemberServiceTest {
 
         assertThat(memberTitleLog2.getMemberTitle().getId()).isEqualTo(memberTitle4.getId());
         assertThat(memberTitleLog2.getIsMain()).isTrue();
+    }
+
+    @Test
+    @DisplayName("회원 로그아웃 시, Redis 의 refreshToken 삭제, accessToken 블랙리스트로 등록")
+    void t7() {
+        // given
+        Member member = memberService.getMember(
+                new KakaoUserInfoParam(1111L, "딸기"),
+                new KakaoTokenResp("bearer", "kakao_access_token", 60, "kakao_refresh_token", 86400));
+        JwtToken jwtToken = jwtService.generateTokens(member);
+        assertThat(redisDao.getValues(RedisDao.getRtkKey(member.getId()))).isEqualTo(jwtToken.getRefreshToken());
+
+        // when
+        memberService.logout(jwtToken.getAccessToken());
+
+        // then
+        // 1. Redis jwtAccessToken 블랙리스트 등록, jwtRefreshToken 삭제
+        assertAll(
+                () -> assertThat(redisDao.getValues(RedisDao.getBlackListAtkKey(jwtToken.getAccessToken()))).isEqualTo("logout"),
+                () -> assertThat(redisDao.getValues(RedisDao.getRtkKey(member.getId()))).isNull()
+        );
     }
 }
