@@ -40,7 +40,6 @@ public class KakaoServiceTests {
 
         // then
         assertAll(
-                () -> assertThat(apiShopJson).isNotNull(),
                 () -> assertThat(apiShopJson).isNotEmpty(),
                 () -> assertThat(apiShopJson.size()).isEqualTo(15),
                 () -> assertThat(apiShopJson.get(0).getPlaceName()).isEqualTo("인생네컷 홍대동교점"),
@@ -61,7 +60,6 @@ public class KakaoServiceTests {
 
         // then
         assertAll(
-                () -> assertThat(apiShopJson).isNotNull(),
                 () ->assertThat(apiShopJson).isNotEmpty(),
                 () ->assertThat(apiShopJson.size()).isEqualTo(8),
                 () ->assertThat(apiShopJson.get(0).getPlaceName()).isEqualTo("포토이즘박스 성수점"),
@@ -82,7 +80,6 @@ public class KakaoServiceTests {
 
         // then
         assertAll(
-                () -> assertThat(apiShopJson).isNotNull(),
                 () -> assertThat(apiShopJson).isNotEmpty(),
                 () -> assertThat(apiShopJson.size()).isEqualTo(1),
                 () -> assertThat(apiShopJson.get(0).getPlaceName()).isEqualTo("인생네컷 홍대동교점"),
@@ -117,7 +114,6 @@ public class KakaoServiceTests {
 
         // then
         assertAll(
-                () -> assertThat(shops).isNotNull(),
                 () -> assertThat(shops).isNotEmpty(),
                 () -> assertThat(shops.size()).isEqualTo(1),
                 () -> assertThat(shops.get(0).getPlaceName()).isEqualTo("하루필름 연남점"),

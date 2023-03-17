@@ -8,6 +8,7 @@ import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.global.util.DatabaseCleaner;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,13 +37,7 @@ public class FavoriteServiceTests {
     @Autowired
     DatabaseCleaner databaseCleaner;
 
-
     @BeforeEach
-    void beforeEach(){
-        clearData();
-        createSampleData();
-    }
-
     public void createSampleData(){
         Member member = new Member();
         memberRepository.save(member);
@@ -59,7 +54,7 @@ public class FavoriteServiceTests {
         favoriteRepository.save(new Favorite(member,shop2));
         favoriteRepository.save(new Favorite(member,shop3));
     }
-
+    @AfterEach
     public void clearData(){
         databaseCleaner.execute();
     }
@@ -75,7 +70,6 @@ public class FavoriteServiceTests {
 
         // then
         assertAll(
-                () -> assertThat(favoriteResponseDtos).isNotNull(),
                 () -> assertThat(favoriteResponseDtos).isNotEmpty(),
                 () -> assertThat(favoriteResponseDtos.size()).isEqualTo(3),
                 () -> assertThat(favoriteResponseDtos.get(0).getShop().getPlaceName()).isEqualTo("하루필름 연남점"),
@@ -93,7 +87,6 @@ public class FavoriteServiceTests {
 
         // then
         assertAll(
-                () -> assertThat(favoriteResponseDtos).isNotNull(),
                 () -> assertThat(favoriteResponseDtos).isNotEmpty(),
                 () -> assertThat(favoriteResponseDtos.size()).isEqualTo(3),
                 () -> assertThat(favoriteResponseDtos.get(0).getShop().getPlaceName()).isEqualTo("인생네컷 홍대동교점"),

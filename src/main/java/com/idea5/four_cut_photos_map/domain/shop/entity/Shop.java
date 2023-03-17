@@ -15,8 +15,8 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
-@Table(indexes = {@Index(name = "address_index",columnList = "roadAddressName"),
-        @Index(name = "name_index",columnList = "roadAddressName")})
+@Table(indexes = {@Index(name = "idx_shop_address",columnList = "roadAddressName"),
+        @Index(name = "idx_shop_name",columnList = "roadAddressName")})
 public class Shop extends BaseEntity {
 
     private String placeName; // 상점명
