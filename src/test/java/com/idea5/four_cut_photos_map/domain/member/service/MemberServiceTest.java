@@ -93,8 +93,7 @@ class MemberServiceTest {
         assertThat(member.getKakaoRefreshToken()).isEqualTo("kakao_refresh_token");
 
         // 2. Redis 저장된 kakaoAccessToken 검증
-        assertThat(redisDao.getValues("member:" + member.getId() + ":kakao_access_token"))
-                .isEqualTo("kakao_access_token");
+        assertThat(redisDao.getValues(RedisDao.getKakaoAtkKey(member.getId()))).isEqualTo("kakao_access_token");
     }
 
     @Test
@@ -122,8 +121,7 @@ class MemberServiceTest {
         assertThat(member.getKakaoRefreshToken()).isEqualTo("kakao_refresh_token2");
 
         // 2. Redis kakaoAccessToken 값이 수정됬는지 검증
-        assertThat(redisDao.getValues("member:" + member.getId() + ":kakao_access_token"))
-                .isEqualTo("kakao_access_token2");
+        assertThat(redisDao.getValues(RedisDao.getKakaoAtkKey(member.getId()))).isEqualTo("kakao_access_token2");
     }
 
     @Test
@@ -134,8 +132,7 @@ class MemberServiceTest {
                 new KakaoUserInfoParam(1111L, "딸기"),
                 new KakaoTokenResp("bearer", "kakao_access_token", 60, "kakao_refresh_token", 86400));
         JwtToken jwtToken = jwtService.generateTokens(member);
-        assertThat(redisDao.getValues("member:" + member.getId() + ":jwt_refresh_token"))
-                .isEqualTo(jwtToken.getRefreshToken());
+        assertThat(redisDao.getValues(RedisDao.getRtkKey(member.getId()))).isEqualTo(jwtToken.getRefreshToken());
 
         // when
         memberService.deleteMember(member.getId(), jwtToken.getAccessToken());
@@ -144,8 +141,8 @@ class MemberServiceTest {
         // 1. DB Member 삭제
         assertThat(memberRepository.count()).isEqualTo(0);
         // 2. Redis jwtAccessToken 블랙리스트 등록, jwtRefreshToken 삭제
-        assertThat(redisDao.getValues("jwt_black_list:" + jwtToken.getAccessToken())).isEqualTo("withdrawl");
-        assertThat(redisDao.getValues("member:" + member.getId() + ":jwt_refresh_token")).isNull();
+        assertThat(redisDao.getValues(RedisDao.getBlackListAtkKey(jwtToken.getAccessToken()))).isEqualTo("withdrawl");
+        assertThat(redisDao.getValues(RedisDao.getRtkKey(member.getId()))).isNull();
     }
 
     @Test
