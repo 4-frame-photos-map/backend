@@ -30,10 +30,11 @@ public class JwtService {
     public JwtToken generateTokens(Member member) {
         String accessToken = jwtProvider.generateAccessToken(member.getId(), member.getAuthorities());
         String refreshToken = jwtProvider.generateRefreshToken(member.getId(), member.getAuthorities());
-        // refreshToken redis 에 저장(key, value, 유효시간)
-        // member:memberId:jwt_refresh_token
-        String key = "member:" + member.getId() + ":jwt_refresh_token";
-        redisDao.setValues(key, refreshToken, Duration.ofMillis(60 * 60 * 24 * 30L));
+        // refreshToken redis 에 저장
+        redisDao.setValues(
+                RedisDao.getRtkKey(member.getId()),
+                refreshToken,
+                Duration.ofMillis(60 * 60 * 24 * 30L));
 
         return JwtToken.builder()
                 .accessToken(accessToken)
@@ -44,8 +45,7 @@ public class JwtService {
     // accessToken 재발급
     public AccessToken reissueAccessToken(String refreshToken, Long memberId, Collection<? extends GrantedAuthority> authorities) {
         // 1. redis 에서 memberId(key)로 refreshToken 조회
-        String key = "member:" + memberId + ":jwt_refresh_token";
-        String redisRefreshToken = redisDao.getValues(key);
+        String redisRefreshToken = redisDao.getValues(RedisDao.getRtkKey(memberId));
         // 2. redis 에 저장된 refreshToken 과 요청 헤더로 전달된 refreshToken 값이 일치하는지 확인
         if(!refreshToken.equals(redisRefreshToken)) {
             throw new RuntimeException("refreshToken 불일치");
@@ -59,7 +59,7 @@ public class JwtService {
 
     // accessToken 이 블랙리스트로 등록되었는지 검증
     public Boolean isBlackList(String accessToken) {
-        String isLogout = redisDao.getValues("jwt_black_list:" + accessToken);
+        String isLogout = redisDao.getValues(RedisDao.getBlackListAtkKey(accessToken));
         return isLogout == null ? false : true;
     }
 }

@@ -51,9 +51,11 @@ public class MemberService {
             member.updateKakaoRefreshToken(kakaoTokenResp.getRefreshToken());
             memberRepository.save(member);
         }
-        // redis 에 Access Token 저장 및 갱신
-        String kakaoAtkKey = "member:" + member.getId() + ":kakao_access_token";
-        redisDao.setValues(kakaoAtkKey, kakaoTokenResp.getAccessToken(), Duration.ofSeconds(kakaoTokenResp.getExpiresIn()));
+        // redis 에 Access Token 저장
+        redisDao.setValues(
+                RedisDao.getKakaoAtkKey(member.getId()),
+                kakaoTokenResp.getAccessToken(),
+                Duration.ofSeconds(kakaoTokenResp.getExpiresIn()));
         return member;
     }
 
@@ -100,24 +102,26 @@ public class MemberService {
             redisDao.deleteValues(memberId.toString());
         }
         // 2. redis 에 해당 accessToken 블랙리스트로 등록
-        Long expiration = jwtProvider.getExpiration(accessToken);
-        String key = "jwt_black_list:" + accessToken;
-        redisDao.setValues(key, "logout", Duration.ofMillis(expiration));
+        redisDao.setValues(
+                RedisDao.getBlackListAtkKey(accessToken),
+                "logout",
+                Duration.ofMillis(jwtProvider.getExpiration(accessToken)));
     }
 
     // 회원 삭제
     @Transactional
     public MemberWithdrawlResp deleteMember(Long id, String accessToken) {
         // 1. 회원의 refreshToken 이 있으면 삭제
-        if (redisDao.hasKey("member:" + id + ":jwt_refresh_token")) {
-            redisDao.deleteValues("member:" + id + ":jwt_refresh_token");
+        if (redisDao.hasKey(RedisDao.getRtkKey(id))) {
+            redisDao.deleteValues(RedisDao.getRtkKey(id));
         }
         // 2. redis 에 해당 accessToken 블랙리스트로 등록
-        Long expiration = jwtProvider.getExpiration(accessToken);
-        String key = "jwt_black_list:" + accessToken;
-        redisDao.setValues(key, "withdrawl", Duration.ofMillis(expiration));
+        redisDao.setValues(
+                RedisDao.getBlackListAtkKey(accessToken),
+                "withdrawl",
+                Duration.ofMillis(jwtProvider.getExpiration(accessToken)));
         // TODO: 양방향 매핑으로 변경할지 고민중
-        // TODO: Member 삭제하기 전 Member 를 참조하고 있는 엔티티(MemberTitleLog, Favorite) 먼저 삭제하기
+        // Member 삭제하기 전 Member 를 참조하고 있는 엔티티(MemberTitleLog, Favorite) 먼저 삭제하기
         memberTitleService.deleteByMemberId(id);
         favoriteService.deleteByMemberId(id);
         // 3. DB 에서 회원 삭제
@@ -143,7 +147,7 @@ public class MemberService {
 
     // 회원 Kakao Access Token 조회
     public String getKakaoAccessToken(Long id) {
-        return redisDao.getValues("member:" + id + ":kakao_access_token");
+        return redisDao.getValues(RedisDao.getKakaoAtkKey(id));
     }
 
     // 회원 Kakao Refresh Token 조회

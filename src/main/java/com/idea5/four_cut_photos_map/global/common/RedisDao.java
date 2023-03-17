@@ -48,4 +48,19 @@ public class RedisDao {
     public Boolean hasKey(String key) {
         return redisTemplate.hasKey(key);
     }
+
+    // 회원의 kakao access token 을 저장하는 key
+    public static String getKakaoAtkKey(Long memberId) {
+        return "member:" + memberId + ":kakao_access_token";
+    }
+
+    // 회원의 jwt refresh token 을 저장하는 key
+    public static String getRtkKey(Long memberId) {
+        return "member:" + memberId + ":jwt_refresh_token";
+    }
+
+    // 블랙리스트 jwt access token 을 관리하는 key
+    public static String getBlackListAtkKey(String accessToken) {
+        return "jwt_black_list:" + accessToken;
+    }
 }
