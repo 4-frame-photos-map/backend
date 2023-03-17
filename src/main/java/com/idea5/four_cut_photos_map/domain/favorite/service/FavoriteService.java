@@ -74,7 +74,7 @@ public class FavoriteService {
         };
     }
     public List<FavoriteResponseDto> findByMemberIdOrderByCreateDateDesc(Long memberId) {
-        List<Favorite> favorites = favoriteRepository.findByMemberIdOrderByCreateDateDesc(memberId).orElse(null);
+        List<Favorite> favorites = favoriteRepository.findByMemberIdOrderByCreateDateDesc(memberId);
 
         if(favorites.isEmpty()) {return null;}
 
@@ -85,7 +85,7 @@ public class FavoriteService {
     }
 
     public List<FavoriteResponseDto> findByMemberIdOrderByPlaceName(Long memberId) {
-        List<Favorite> favorites = favoriteRepository.findByMemberIdOrderByShop_PlaceName(memberId).orElse(null);
+        List<Favorite> favorites = favoriteRepository.findByMemberIdOrderByShop_PlaceName(memberId);
 
         if(favorites.isEmpty()) {return null;}
 
