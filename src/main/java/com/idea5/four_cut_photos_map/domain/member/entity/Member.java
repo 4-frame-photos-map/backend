@@ -21,7 +21,6 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "MEMBERS")
 public class Member extends BaseEntity {
     @Column(unique = true)
     private Long kakaoId;       // 카카오 회원번호

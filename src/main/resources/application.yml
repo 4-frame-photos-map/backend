@@ -45,8 +45,8 @@ spring:
 
   sql:
     init:
-      mode: always
-#      mode: never
+#      mode: always
+      mode: never
 
 
 logging:
