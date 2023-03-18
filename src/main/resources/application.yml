@@ -15,8 +15,8 @@ spring:
   datasource:
     url: jdbc:mariadb://localhost:3306/four_cut_photos_map?useUnicode=true&characterEncoding=utf8&serverTimeZone=Asia/Seoul&allowPublicKeyRetrieval=true&useSSL=false
     driver-class-name: org.mariadb.jdbc.Driver
-    username: root
-    password:
+    username: user1
+    password: Ttest12341234@
     hikari:
 
   cache:
@@ -32,7 +32,7 @@ spring:
     generate-ddl: true
     show-sql: true # 콘솔창에 sql 출력
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true # sql문 이쁘게 출력

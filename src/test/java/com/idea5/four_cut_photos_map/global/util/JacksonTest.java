@@ -82,7 +82,6 @@ public class JacksonTest {
                 phone = "미등록";
 
             KakaoResponseDto dto = KakaoResponseDto.builder()
-                    .brand(keyword)
                     .address_name(addressName)
                     .distance(distance)
                     .phone(phone)

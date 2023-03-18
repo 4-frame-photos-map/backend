@@ -60,7 +60,7 @@ class ShopTitleLogServiceTest {
     @Test
     void findShopTitleLogs_success() {
         // given
-        Shop shop = new Shop("인생네컷", "인생네컷 천안안서점", "충남 천안시 동남구 상명대길 58");
+        Shop shop = new Shop("인생네컷 천안안서점", "충남 천안시 동남구 상명대길 58",0);
         shopRepository.save(shop);
 
         ShopTitle shopTitle1 = new ShopTitle("핫 플레이스", "찜 수 5개 이상", "사람들이 주로 이용하는 포토부스에요.");
@@ -89,7 +89,7 @@ class ShopTitleLogServiceTest {
     @Test
     void findShopTitleLogs_fail() {
         // given
-        Shop shop = new Shop("인생네컷", "인생네컷 천안안서점", "충남 천안시 동남구 상명대길 58");
+        Shop shop = new Shop("인생네컷 천안안서점", "충남 천안시 동남구 상명대길 58",0);
         shopRepository.save(shop);
 
         ShopTitle shopTitle1 = new ShopTitle("핫 플레이스", "찜 수 5개 이상", "사람들이 주로 이용하는 포토부스에요.");
@@ -114,7 +114,7 @@ class ShopTitleLogServiceTest {
     @Test
     void addShopTitleLog() {
         // given
-        Shop shop = new Shop("인생네컷", "인생네컷 천안안서점", "충남 천안시 동남구 상명대길 58");
+        Shop shop = new Shop("인생네컷 천안안서점", "충남 천안시 동남구 상명대길 58",0);
         shopRepository.save(shop);
 
         ShopTitle shopTitle1 = new ShopTitle("핫 플레이스", "찜 수 5개 이상", "사람들이 주로 이용하는 포토부스에요.");
@@ -144,7 +144,7 @@ class ShopTitleLogServiceTest {
     @Test
     void deleteShopTitle() {
         // given
-        Shop shop = new Shop("인생네컷", "인생네컷 천안안서점", "충남 천안시 동남구 상명대길 58");
+        Shop shop = new Shop("인생네컷 천안안서점", "충남 천안시 동남구 상명대길 58",0);
         shopRepository.save(shop);
 
         ShopTitle shopTitle1 = new ShopTitle("핫 플레이스", "찜 수 5개 이상", "사람들이 주로 이용하는 포토부스에요.");
@@ -180,7 +180,7 @@ class ShopTitleLogServiceTest {
 
                 // list 조회시, 삭제된 칭호는 조회될 수 없다. ( doesNotContain )
                 () -> assertThat(list).extracting("name", "conditions", "content")
-                      .doesNotContain(tuple(shopTitle1.getName(), shopTitle1.getConditions(), shopTitle1.getContent())),
+                        .doesNotContain(tuple(shopTitle1.getName(), shopTitle1.getConditions(), shopTitle1.getContent())),
 
                 // list 조회시, 기존에 있던 칭호들은 모두 조회된다. ( contains )
                 () -> assertThat(list).extracting("name", "conditions", "content")
@@ -188,7 +188,7 @@ class ShopTitleLogServiceTest {
                                 tuple(shopTitle2.getName(), shopTitle2.getConditions(), shopTitle2.getContent()),
                                 tuple(shopTitle3.getName(), shopTitle3.getConditions(), shopTitle3.getContent()),
                                 tuple(shopTitle4.getName(), shopTitle4.getConditions(), shopTitle4.getContent())
-                                )
+                        )
 
         );
 
@@ -217,7 +217,7 @@ class ShopTitleLogServiceTest {
         memberRepository.save(memberE);
 
         // 좋아요 대상 Shop 저장
-        Shop shop = new Shop("인생네컷", "인생네컷 천안안서점", "충남 천안시 동남구 상명대길 58");
+        Shop shop = new Shop("인생네컷 천안안서점", "충남 천안시 동남구 상명대길 58",0);
         shopRepository.save(shop);
 
         // when

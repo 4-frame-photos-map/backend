@@ -12,4 +12,5 @@ public class KakaoKeywordResponseDto {
         public String roadAddressName; // 도로명 주소
         public String longitude; // 경도
         public String latitude; // 위도
+        public String distance; // 중심좌표까지의 거리
 }

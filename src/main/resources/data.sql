@@ -1,3 +1,12 @@
+-- MySQL에 JSON 파일 Shop 테이블에 import 후 create_date, modify_date, favorite_cnt 초기화하기
+UPDATE shop SET create_date = Now() WHERE create_date IS NULL;
+UPDATE shop SET modify_date = Now() WHERE modify_date IS NULL;
+UPDATE shop SET favorite_cnt = 0 WHERE favorite_cnt IS NULL;
+
+-- Shop import 데이터에서 '서울특별시'를 '서울'로 변경
+UPDATE shop SET road_address_name= REPLACE(road_address_name,'서울특별시','서울');
+
+/*
 INSERT INTO SHOP(create_date, modify_date, road_address_name, place_name, brand, favorite_cnt)VALUES (NOW(), NOW(), '서울 성동구 서울숲2길 48', '인생네컷 서울숲노가리마트로드점', '인생네컷', 0);
 INSERT INTO SHOP(create_date, modify_date, road_address_name, place_name, brand, favorite_cnt) VALUES(NOW(), NOW(), '서울 성동구 서울숲2길 17-2', '포토이즘박스 성수점', '포토이즘박스', 0);
 INSERT INTO SHOP(create_date, modify_date, road_address_name, place_name, brand, favorite_cnt) VALUES(NOW(), NOW(), '서울 성동구 서울숲4길 13', '인생네컷 카페성수로드점', '인생네컷', 0);
@@ -21,6 +30,7 @@ INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(),
 INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(), NOW(), '리뷰 홀릭', '리뷰 5회 누적');
 INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(), NOW(), '찜 첫 걸음', '찜 1회 누적');
 INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(), NOW(), '찜 홀릭', '찜 5회 누적');
+*/
 
 -- member(100개)
 -- INSERT INTO MEMBER(create_date, modify_date) VALUES (NOW(), NOW());
