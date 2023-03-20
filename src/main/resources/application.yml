@@ -24,7 +24,7 @@ spring:
 
   # redis 설정
   redis:
-    host: localhost
+    host: 49.50.175.194
     port: 6379
 
   jpa:
