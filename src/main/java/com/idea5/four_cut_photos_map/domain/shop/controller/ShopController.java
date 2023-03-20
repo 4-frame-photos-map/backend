@@ -8,6 +8,7 @@ import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
+import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopBrand;
@@ -48,9 +49,9 @@ public class ShopController {
 
 
     @GetMapping(value = "")
-    public ResponseEntity<RsData<List<ResponseShop>>> showKeywordSearchList(@RequestParam(defaultValue = "즉석사진") String keyword) throws JsonProcessingException {
+    public ResponseEntity<RsData<List<ResponseShop>>> showListSearchedByKeyword(@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch) throws JsonProcessingException {
         // 1. 카카오맵 api 응답 데이터 받아오기
-        List<KakaoKeywordResponseDto> apiShopJson = shopService.searchByKeyword(keyword);
+        List<KakaoKeywordResponseDto> apiShopJson = shopService.searchByKeyword(requestKeywordSearch);
 
         // 2. db 데이터와 비교
         List<ResponseShop> shops = shopService.findShops(apiShopJson);
@@ -67,20 +68,18 @@ public class ShopController {
         if (shopDtos.isEmpty())
             throw new BusinessException(BRAND_NOT_FOUND);
 
-
         List<KakaoResponseDto> kakaoApiResponse = shopService.searchBrand(requestBrandSearch);
-
         List<ResponseShopBrand> resultShops = new ArrayList<>(); // 응답값 리스트
 
         // 카카오 맵 api로 부터 받아온 Shop 리스트와 db에 저장된 Shop 비교
         for (KakaoResponseDto apiShop : kakaoApiResponse) {
             for (ShopDto shopDto : shopDtos) {
-                if (apiShop.getPlaceName().equals(shopDto.getPlaceName())) {
+                if (apiShop.getRoadAddressName().equals(shopDto.getRoadAddressName())) {
                     resultShops.add(ResponseShopBrand.of(apiShop));
+                    break;
                 }
             }
         }
-
 
         // 검색 결과, 근처에 원하는 브랜드가 없을 때
         if (resultShops.isEmpty()) {

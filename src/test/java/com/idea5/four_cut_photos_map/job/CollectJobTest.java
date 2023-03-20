@@ -68,9 +68,9 @@ class CollectJobTest {
         memberTitleRepository.save(new MemberTitle("찜 첫 걸음", "첫번째 찜 추가"));
         memberTitleRepository.save(new MemberTitle("찜 홀릭", "찜 3개 이상 추가"));
 
-        shopRepository.save(new Shop("인생네컷", "인생네컷 성수점", "서울시"));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 잠실점", "서울시"));
-        shopRepository.save(new Shop("인생네컷", "인생네컷 강남점", "서울시"));
+        shopRepository.save(new Shop("인생네컷 성수점", "서울시", 0));
+        shopRepository.save(new Shop("인생네컷 잠실점", "서울시", 0));
+        shopRepository.save(new Shop("인생네컷 강남점", "서울시", 0));
     }
 
     @AfterEach

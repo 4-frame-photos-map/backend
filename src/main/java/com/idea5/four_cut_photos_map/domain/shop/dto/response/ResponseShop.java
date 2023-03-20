@@ -14,6 +14,7 @@ public class ResponseShop {
     private String roadAddressName; // 전체 도로명 주소
     private double latitude; // 위도
     private double longitude; // 경도
+    private String distance; // 중심좌표까지의 거리
 
     public static ResponseShop from(Shop shop, KakaoKeywordResponseDto apiShop){
         return ResponseShop.builder()
@@ -22,6 +23,7 @@ public class ResponseShop {
                 .roadAddressName(shop.getRoadAddressName())
                 .longitude(Double.parseDouble(apiShop.getLongitude()))
                 .latitude(Double.parseDouble(apiShop.getLatitude()))
+                .distance(apiShop.getDistance())
                 .build();
     }
 }

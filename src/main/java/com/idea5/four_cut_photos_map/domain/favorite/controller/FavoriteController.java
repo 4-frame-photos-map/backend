@@ -14,13 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DUPLICATE_FAVORITE;
-import static com.idea5.four_cut_photos_map.global.error.ErrorCode.FAVORITES_NOT_FOUND;
 
 @RequestMapping("/favorites")
 @RestController
@@ -31,16 +28,14 @@ public class FavoriteController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "")
-    public ResponseEntity<RsData> showFavoritesList(@AuthenticationPrincipal MemberContext memberContext) {
+    public ResponseEntity<RsData> showFavoritesList(@AuthenticationPrincipal MemberContext memberContext,
+    @RequestParam(required = false, defaultValue = "created", value = "sort") String criteria) {
 
-        List<FavoriteResponseDto> favoriteResponseDtos = favoriteService.findByMemberId(memberContext.getId());
-
-        if(ObjectUtils.isEmpty(favoriteResponseDtos)) {
-            throw new BusinessException(FAVORITES_NOT_FOUND);
-        }
+        List<FavoriteResponseDto> favoriteResponseDtos = favoriteService.getFavoritesList(memberContext.getId(), criteria);
 
         return new ResponseEntity<>(
-                new RsData<>(true, "찜 리스트 조회 성공", favoriteResponseDtos),
+                new RsData<>(true,
+                        favoriteResponseDtos != null? "찜 목록 조회 성공":"찜 목록이 없는 사용자", favoriteResponseDtos),
                 HttpStatus.OK);
     }
 
@@ -51,7 +46,9 @@ public class FavoriteController {
         Member member = memberContext.getMember();
 
         favoriteService.save(shopId, member);
+
         favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크
+
         return new ResponseEntity<>(
                 new RsData<>(true, "찜 추가 성공"),
                 HttpStatus.OK);
@@ -63,7 +60,9 @@ public class FavoriteController {
     public ResponseEntity<RsData> cancelShopFromFavorites(@PathVariable Long shopId,
                                                           @AuthenticationPrincipal MemberContext memberContext){
         favoriteService.cancel(shopId, memberContext.getId());
+
         favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크
+
         return new ResponseEntity<>(
                 new RsData<>(true, "찜 취소 성공"),
                 HttpStatus.OK);

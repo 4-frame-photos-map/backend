@@ -4,10 +4,8 @@ import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteRespon
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseFavoriteShop;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
-import com.idea5.four_cut_photos_map.domain.shoptitle.entity.ShopTitle;
 import com.idea5.four_cut_photos_map.domain.shoptitle.service.ShopTitleService;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
@@ -69,18 +67,35 @@ public class FavoriteService {
         shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0? 0 : shop.getFavoriteCnt() - 1);
     }
 
-    public List<FavoriteResponseDto> findByMemberId(Long memberId) {
-        List<Favorite> favorites = favoriteRepository.findByMemberId(memberId).orElse(null);
+    public List<FavoriteResponseDto> getFavoritesList(Long memberId, String criteria) {
+        return switch (criteria) {
+            case "placename" -> findByMemberIdOrderByPlaceName(memberId);
+            default -> findByMemberIdOrderByCreateDateDesc(memberId);
+        };
+    }
+    public List<FavoriteResponseDto> findByMemberIdOrderByCreateDateDesc(Long memberId) {
+        List<Favorite> favorites = favoriteRepository.findByMemberIdOrderByCreateDateDesc(memberId);
 
         if(favorites.isEmpty()) {return null;}
 
         return  favorites
-                    .stream()
-                    .map(favorite -> FavoriteResponseDto.from(favorite))
-                    .collect(Collectors.toList());
-        }
+                .stream()
+                .map(favorite -> FavoriteResponseDto.from(favorite))
+                .collect(Collectors.toList());
+    }
 
-    public Favorite findByShopIdAndMemberId(Long shopId, Long memberId) {
+    public List<FavoriteResponseDto> findByMemberIdOrderByPlaceName(Long memberId) {
+        List<Favorite> favorites = favoriteRepository.findByMemberIdOrderByShop_PlaceName(memberId);
+
+        if(favorites.isEmpty()) {return null;}
+
+        return  favorites
+                .stream()
+                .map(favorite -> FavoriteResponseDto.from(favorite))
+                .collect(Collectors.toList());
+    }
+
+        public Favorite findByShopIdAndMemberId(Long shopId, Long memberId) {
         return favoriteRepository.findByShopIdAndMemberId(shopId, memberId).orElse(null);
     }
 
