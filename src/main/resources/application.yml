@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8080
   servlet:
     context-path: /
 
@@ -11,8 +11,9 @@ spring:
     include:
       - base-addi
 
-  # todo 개발 데이터베이스 연결 ( h2가 편하면 h2로 바꾸자 )
+  # MaraiDB -> MySQL
   datasource:
+
     url: jdbc:mariadb://localhost:3306/four_cut_photos_map?useUnicode=true&characterEncoding=utf8&serverTimeZone=Asia/Seoul&allowPublicKeyRetrieval=true&useSSL=false
     driver-class-name: org.mariadb.jdbc.Driver
     username: user1
@@ -32,7 +33,10 @@ spring:
     generate-ddl: true
     show-sql: true # 콘솔창에 sql 출력
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
+      naming:
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+#        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
     properties:
       hibernate:
         format_sql: true # sql문 이쁘게 출력
@@ -42,7 +46,8 @@ spring:
 
   sql:
     init:
-      mode: always
+#      mode: always
+      mode: never
 
 
 logging:
