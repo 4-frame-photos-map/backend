@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 
 @DataJpaTest    // JPA 테스트
@@ -51,14 +52,17 @@ class DatabaseCleanerTest {
                 .map(EntityType::getName)   // 엔티티의 이름 반환
                 .collect(Collectors.toList());
 
-        assertThat(tableNames.size()).isEqualTo(7);
-        assertThat(tableNames).contains("Member");
-        assertThat(tableNames).contains("MemberTitle");
-        assertThat(tableNames).contains("MemberTitleLog");
-        assertThat(tableNames).contains("Shop");
-        assertThat(tableNames).contains("ShopTitle");
-        assertThat(tableNames).contains("ShopTitleLog");
-        assertThat(tableNames).contains("Favorite");
+        assertAll(
+                () -> assertThat(tableNames.size()).isEqualTo(8),
+                () -> assertThat(tableNames).contains("Member"),
+                () -> assertThat(tableNames).contains("MemberTitle"),
+                () -> assertThat(tableNames).contains("MemberTitleLog"),
+                () -> assertThat(tableNames).contains("Shop"),
+                () -> assertThat(tableNames).contains("ShopTitle"),
+                () -> assertThat(tableNames).contains("ShopTitleLog"),
+                () -> assertThat(tableNames).contains("Favorite"),
+                () -> assertThat(tableNames).contains("Review")
+        );
     }
 
     @Test
@@ -71,14 +75,17 @@ class DatabaseCleanerTest {
                 .map(e -> CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, e.getName())) // 클래스 이름을 DB 테이블명 생성 규칙에 따라 LOWER_UNDERSCORE 로 변환
                 .collect(Collectors.toList());
 
-        assertThat(tableNames.size()).isEqualTo(7);
-        assertThat(tableNames).contains("member");
-        assertThat(tableNames).contains("member_title");
-        assertThat(tableNames).contains("member_title_log");
-        assertThat(tableNames).contains("shop");
-        assertThat(tableNames).contains("shop_title");
-        assertThat(tableNames).contains("shop_title_log");
-        assertThat(tableNames).contains("favorite");
+        assertAll(
+                () -> assertThat(tableNames.size()).isEqualTo(8),
+                () -> assertThat(tableNames).contains("member"),
+                () -> assertThat(tableNames).contains("member_title"),
+                () -> assertThat(tableNames).contains("member_title_log"),
+                () -> assertThat(tableNames).contains("shop"),
+                () -> assertThat(tableNames).contains("shop_title"),
+                () -> assertThat(tableNames).contains("shop_title_log"),
+                () -> assertThat(tableNames).contains("favorite"),
+                () -> assertThat(tableNames).contains("review")
+        );
     }
 
     @Test
@@ -90,13 +97,16 @@ class DatabaseCleanerTest {
                 .map(e -> CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, e.getName())) // 엔티티의 이름을 DB 테이블명 생성 규칙에 따라 LOWER_UNDERSCORE 로 변환
                 .collect(Collectors.toList());
 
-        assertThat(tableNames.size()).isEqualTo(7);
-        assertThat(tableNames).contains("member");
-        assertThat(tableNames).contains("member_title");
-        assertThat(tableNames).contains("member_title_log");
-        assertThat(tableNames).contains("shop");
-        assertThat(tableNames).contains("shop_title");
-        assertThat(tableNames).contains("shop_title_log");
-        assertThat(tableNames).contains("favorite");
+        assertAll(
+                () -> assertThat(tableNames.size()).isEqualTo(8),
+                () -> assertThat(tableNames).contains("member"),
+                () -> assertThat(tableNames).contains("member_title"),
+                () -> assertThat(tableNames).contains("member_title_log"),
+                () -> assertThat(tableNames).contains("shop"),
+                () -> assertThat(tableNames).contains("shop_title"),
+                () -> assertThat(tableNames).contains("shop_title_log"),
+                () -> assertThat(tableNames).contains("favorite"),
+                () -> assertThat(tableNames).contains("review")
+        );
     }
 }
