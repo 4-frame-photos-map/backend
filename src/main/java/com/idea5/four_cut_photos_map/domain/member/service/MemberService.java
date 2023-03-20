@@ -16,6 +16,8 @@ import com.idea5.four_cut_photos_map.global.error.ErrorCode;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.global.util.Util;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
+import com.idea5.four_cut_photos_map.security.jwt.JwtService;
+import com.idea5.four_cut_photos_map.security.jwt.dto.response.JwtToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,14 @@ public class MemberService {
     private final RedisDao redisDao;
     private final MemberTitleService memberTitleService;
     private final FavoriteService favoriteService;
+    private final JwtService jwtService;
+
+    // 서비스 로그인
+    @Transactional
+    public JwtToken login(KakaoUserInfoParam kakaoUserInfoParam, KakaoTokenResp kakaoTokenResp) {
+        // jwt accessToken, refreshToken 발급
+        return jwtService.generateTokens(getMember(kakaoUserInfoParam, kakaoTokenResp));
+    }
 
     // 회원 가져오기
     @Transactional

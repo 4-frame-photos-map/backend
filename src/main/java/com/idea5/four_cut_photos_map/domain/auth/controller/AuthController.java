@@ -1,11 +1,10 @@
 package com.idea5.four_cut_photos_map.domain.auth.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoTokenResp;
-import com.idea5.four_cut_photos_map.domain.auth.service.KakaoService;
-import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoUserInfoParam;
 import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoLoginResp;
-import com.idea5.four_cut_photos_map.domain.member.entity.Member;
+import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoTokenResp;
+import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoUserInfoParam;
+import com.idea5.four_cut_photos_map.domain.auth.service.KakaoService;
 import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.security.jwt.JwtService;
@@ -50,11 +49,9 @@ public class AuthController {
         KakaoTokenResp kakaoTokenResp = kakaoService.getKakaoTokens(code);
         // 2. 토큰으로 사용자 정보 가져오기 요청
         KakaoUserInfoParam kakaoUserInfoParam = kakaoService.getKakaoUserInfo(kakaoTokenResp);
-        // 3. 제공받은 사용자 정보로 서비스 회원 여부 확인후 회원가입 처리
-        Member member = memberService.getMember(kakaoUserInfoParam, kakaoTokenResp);
-        // 4. 서비스 로그인
-        // jwt accessToken, refreshToken 발급
-        JwtToken jwtToken = jwtService.generateTokens(member);
+        // 3. 제공받은 사용자 정보(kakaoId)로 회원 검증(새로운 회원은 회원가입) -> 서비스 로그인
+        JwtToken jwtToken = memberService.login(kakaoUserInfoParam, kakaoTokenResp);
+
         // header 에 토큰 담기
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authentication", jwtToken.getAccessToken());
