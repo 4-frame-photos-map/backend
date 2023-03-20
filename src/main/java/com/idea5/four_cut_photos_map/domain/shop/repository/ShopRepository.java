@@ -12,8 +12,6 @@ import java.util.Optional;
 
 @Repository
 public interface ShopRepository extends JpaRepository<Shop, Long> {
-
-    Optional<Shop> findByPlaceName(String placeName);
-
-    Optional<List<Shop>> findByBrand(String keyword);
+    List<Shop> findDistinctByPlaceNameStartingWith(String keyword);
+    List<Shop> findDistinctByRoadAddressName(String roadAddressName);
 }

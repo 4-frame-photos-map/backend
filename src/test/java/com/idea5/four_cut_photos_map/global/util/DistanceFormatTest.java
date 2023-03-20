@@ -26,19 +26,23 @@
 //        String kmTest3 = "2320"; // 2.3km
 //        String kmTest4 = "2350"; // 2.3km
 //        String kmTest5 = "2480"; // 2.5km
+//        String kmTest6 = "23200"; // 23.2km
+//
 //        // when
 //        String test1 = Util.distanceFormatting(kmTest1);
 //        String test2 = Util.distanceFormatting(kmTest2);
 //        String test3 = Util.distanceFormatting(kmTest3);
 //        String test4 = Util.distanceFormatting(kmTest4);
 //        String test5 = Util.distanceFormatting(kmTest5);
+//        String test6 = Util.distanceFormatting(kmTest6);
 //        // then
 //        assertAll(
 //                ()->assertThat(test1).isEqualTo("2km"),
 //                ()->assertThat(test2).isEqualTo("2.3km"),
 //                ()->assertThat(test3).isEqualTo("2.3km"),
 //                ()->assertThat(test4).isEqualTo("2.4km"),
-//                ()->assertThat(test5).isEqualTo("2.5km")
+//                ()->assertThat(test5).isEqualTo("2.5km"),
+//                ()->assertThat(test6).isEqualTo("23.2km")
 //        );
 //    }
 //
@@ -53,7 +57,7 @@
 //        String kmTest5 = "123"; // 123m
 //        String kmTest6= "1"; // 1m
 //        String kmTest7= "23"; // 23m
-//        String kmTest8= "0"; // 20
+//        String kmTest8= "0"; // 0m
 //
 //        // when
 //        String test1 = Util.distanceFormatting(kmTest1);
@@ -80,17 +84,13 @@
 //    @Test
 //    void distanceLength_is_greater_than_5() {
 //        // given
-//        String distance1 = "23200"; // 23km
-//        String distance2 = "232000"; // 232km
-//        // when
+//        String distance = "232000"; // 232km
 //
+//        // when
 //        // 변수명 = Util.distanceFormatting(변수명)을 안하는 이유 : https://madplay.github.io/post/effectively-final-in-java
-//        String firstDistance = Util.distanceFormatting(distance1);
-//        String secondDistance = Util.distanceFormatting(distance2);
+//        String test = Util.distanceFormatting(distance);
+//
 //        // then
-//        assertAll(
-//                () -> assertThat(firstDistance).isEqualTo("23km"),
-//                () -> assertThat(secondDistance).isEqualTo("232km")
-//                );
+//        assertThat(test).isEqualTo("232km");
 //    }
 //}

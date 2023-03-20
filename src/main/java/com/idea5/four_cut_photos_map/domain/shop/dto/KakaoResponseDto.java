@@ -11,7 +11,6 @@ import lombok.*;
 @ToString
 public class KakaoResponseDto {
 
-    private String brand;
     private String address_name;
     private String distance;
     private String phone;
@@ -30,7 +29,6 @@ public class KakaoResponseDto {
                 .distance(document.getDistance())
                 .x(document.getX())
                 .y(document.getY())
-                .brand(brandName)
                 .phone(document.getPhone()).build();
     }
 

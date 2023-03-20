@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
+import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
 import com.idea5.four_cut_photos_map.global.util.Util;
@@ -30,7 +31,7 @@ public class KeywordSearchKakaoApi {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    public List<KakaoKeywordResponseDto> searchByKeyword(String keyword) throws JsonProcessingException {
+    public List<KakaoKeywordResponseDto> searchByKeyword(RequestKeywordSearch requestKeywordSearch) throws JsonProcessingException {
         // 1. 결과값 담을 객체 생성
         List<KakaoKeywordResponseDto> resultList = new ArrayList<>();
 
@@ -42,7 +43,9 @@ public class KeywordSearchKakaoApi {
 
         // 3. 파라미터를 사용하여 요청 URL 정의
         String apiURL = "https://dapi.kakao.com/v2/local/search/keyword.JSON?"
-                + "query=" + keyword; // request param (x, y, radius 등 검색 조건 추가 가능)
+                + "query=" + requestKeywordSearch.getKeyword()+ " 즉석사진"
+                + "&x=" + requestKeywordSearch.getLongitude()
+                + "&y=" + requestKeywordSearch.getLatitude();
 
         // 4. exchange 메서드로 api 호출
         String body = restTemplate.exchange(apiURL, HttpMethod.GET, entity, String.class).getBody();
@@ -59,6 +62,7 @@ public class KeywordSearchKakaoApi {
                     .roadAddressName(documents.get("road_address_name").textValue())
                     .longitude(documents.get("x").textValue())
                     .latitude(documents.get("y").textValue())
+                    .distance(Util.distanceFormatting(documents.get("distance").textValue()))
                     .build();
 
             resultList.add(dto);

@@ -35,7 +35,7 @@ spring:
       ddl-auto: create
       naming:
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
-#        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+    #        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
     properties:
       hibernate:
         format_sql: true # sql문 이쁘게 출력
@@ -45,7 +45,7 @@ spring:
 
   sql:
     init:
-#      mode: always
+      #      mode: always
       mode: never
 
 

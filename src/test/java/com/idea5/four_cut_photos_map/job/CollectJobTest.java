@@ -53,19 +53,19 @@
 //
 //    @BeforeEach
 //    void init() {
-//        log.info("---Before init()---");
+////        log.info("---Before init()---");
 //        memberTitleRepository.save(new MemberTitle("뉴비", "회원가입"));
 //        memberTitleRepository.save(new MemberTitle("리뷰 첫 걸음", "첫번째 리뷰 작성"));
 //        memberTitleRepository.save(new MemberTitle("리뷰 홀릭", "리뷰 3개 이상 작성"));
 //        memberTitleRepository.save(new MemberTitle("찜 첫 걸음", "첫번째 찜 추가"));
 //        memberTitleRepository.save(new MemberTitle("찜 홀릭", "찜 3개 이상 추가"));
 //
-//        shopRepository.save(new Shop("인생네컷", "인생네컷 성수점", "서울시"));
+//        shopRepository.save(new Shop("인생네컷 성수점", "서울시",0));
 //    }
 //
 //    @AfterEach
 //    void after() {
-//        log.info("---Before after()---");
+////        log.info("---Before after()---");
 //        databaseCleaner.execute();
 //    }
 //
