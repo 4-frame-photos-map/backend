@@ -11,12 +11,12 @@ spring:
     include:
       - base-addi
 
-  # todo 개발 데이터베이스 연결 ( h2가 편하면 h2로 바꾸자 )
+  # MaraiDB -> MySQL
   datasource:
-    url: jdbc:mysql://${db.host}:3306/four_cut_photos_map?useUnicode=true&characterEncoding=utf8&serverTimeZone=Asia/Seoul&allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mysql://localhost:3306/four_cut_photos_map?useUnicode=true&characterEncoding=utf8&serverTimeZone=Asia/Seoul&allowPublicKeyRetrieval=true&useSSL=false
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${db.user}
-    password: ${db.password}
+    username: root
+    password: user1234
     hikari:
 
   cache:
@@ -24,7 +24,7 @@ spring:
 
   # redis 설정
   redis:
-    host: 49.50.175.194
+    host: localhost
     port: 6379
 
   jpa:
