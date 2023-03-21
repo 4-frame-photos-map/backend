@@ -27,10 +27,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.*;
-import java.util.function.Predicate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static com.idea5.four_cut_photos_map.global.error.ErrorCode.*;
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DISTANCE_IS_EMPTY;
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_BRAND;
 
 
 @RequestMapping("/shops")
@@ -43,8 +46,8 @@ public class ShopController {
     private final FavoriteService favoriteService;
 
     private final ShopTitleLogService shopTitleLogService;
-    private final String NO_CONTENT_MATCHING_KEYWORD = "키워드(%s)에 해당하는 상점이 존재하지 않습니다.";
-    private final String NO_CONTENT_FOR_RADIUS = "반경 2km 이내에 브랜드(%s)가 존재하지 않습니다.";
+    private final String NO_CONTENT_MATCHING_KEYWORD = "키워드(%s)에 해당하는 지점이 존재하지 않습니다.";
+    private final String NO_CONTENT_WITHIN_RADIUS = "반경 2km 이내에 %s 지점이 존재하지 않습니다.";
 
     @GetMapping(value = "")
     public ResponseEntity<RsData<List<ResponseShop>>> showListSearchedByKeyword(@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch) throws JsonProcessingException {
@@ -65,7 +68,7 @@ public class ShopController {
             ));
 
         return ResponseEntity.ok(
-                new RsData<List<ResponseShop>>(true, "키워드로 Shop 조회 성공", shops)
+                new RsData<>(true, "키워드로 Shop 조회 성공", shops)
         );
     }
 
@@ -73,13 +76,13 @@ public class ShopController {
     public ResponseEntity<RsData<List<ResponseShopBrand>>> showBrandListBySearch(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch) {
         // 대표 브랜드에 해당하는지 먼저 확인
         if(shopService.isRepresentativeBrand(requestBrandSearch.getBrand()))
-            throw new BusinessException(BRAND_NOT_FOUND);
+            throw new BusinessException(INVALID_BRAND);
 
-        // api 검색전, DB에서 먼저 있는지 확인하는게 더 효율적 // todo : api 먼저 호출 후 db 조회하도록 // 데이터 양이 늘어났으므로
+        // api 검색전, DB에서 먼저 있는지 확인하는게 더 효율적
         List<ShopDto> shopDtos = shopService.findByBrand(requestBrandSearch.getBrand());
         if (shopDtos.isEmpty())
             return ResponseEntity.ok(new RsData<>(
-                    true, String.format(NO_CONTENT_FOR_RADIUS, requestBrandSearch.getBrand())
+                    true, String.format(NO_CONTENT_WITHIN_RADIUS, requestBrandSearch.getBrand())
             ));
 
         List<KakaoResponseDto> kakaoApiResponse = shopService.searchBrand(requestBrandSearch);
@@ -98,7 +101,7 @@ public class ShopController {
         // 검색 결과, 근처에 원하는 브랜드가 없을 때
         if (resultShops.isEmpty()) {
             return ResponseEntity.ok(new RsData<>(
-                    true, String.format(NO_CONTENT_FOR_RADIUS, requestBrandSearch.getBrand())
+                    true, String.format(NO_CONTENT_WITHIN_RADIUS, requestBrandSearch.getBrand())
             ));
         }
 
