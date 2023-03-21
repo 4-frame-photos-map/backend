@@ -14,12 +14,14 @@ import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.domain.shop.service.kakao.KeywordSearchKakaoApi;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
+import com.idea5.four_cut_photos_map.global.common.data.Brand;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUND;
@@ -108,5 +110,8 @@ public class ShopService {
             list.addAll(keywordSearchKakaoApi.searchByBrand(brandSearch, i));
         }
         return list;
+    }
+    public boolean isRepresentativeBrand(String requestBrand) {
+        return Arrays.stream(Brand.Names).anyMatch(representative -> representative.equals(requestBrand));
     }
 }

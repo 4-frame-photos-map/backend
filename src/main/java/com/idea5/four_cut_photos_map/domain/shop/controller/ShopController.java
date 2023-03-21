@@ -27,10 +27,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Predicate;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.*;
 
@@ -73,7 +71,9 @@ public class ShopController {
 
     @GetMapping("/brand")
     public ResponseEntity<RsData<List<ResponseShopBrand>>> showBrandListBySearch(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch) {
-        // todo: brand가 대표 브랜드에 해당하는 브랜드인지 먼저 확인
+        // 대표 브랜드에 해당하는지 먼저 확인
+        if(shopService.isRepresentativeBrand(requestBrandSearch.getBrand()))
+            throw new BusinessException(BRAND_NOT_FOUND);
 
         // api 검색전, DB에서 먼저 있는지 확인하는게 더 효율적 // todo : api 먼저 호출 후 db 조회하도록 // 데이터 양이 늘어났으므로
         List<ShopDto> shopDtos = shopService.findByBrand(requestBrandSearch.getBrand());
@@ -106,6 +106,8 @@ public class ShopController {
                 true, "브랜드로 반경 2km 이내 Shop 조회 성공", resultShops
         ));
     }
+
+
 
 
     //현재 위치 기준, 반경 2km
