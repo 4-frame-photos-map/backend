@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUND;
 
@@ -37,11 +38,11 @@ public class ShopService {
 
     public List<ShopDto> findByBrand(String brandName){
         List<Shop> shops = shopRepository.findDistinctByPlaceNameStartingWith(brandName);
-        List<ShopDto> shopDtos = new ArrayList<>();
-        for (Shop shop : shops)
-            shopDtos.add(ShopDto.of(shop));
-        return shopDtos;
 
+        return shops
+                .stream()
+                .map(shop -> ShopDto.of(shop))
+                .collect(Collectors.toList());
     }
 
     public List<ResponseShop> findShops(List<KakaoKeywordResponseDto> apiShops) {
@@ -106,7 +107,7 @@ public class ShopService {
 
     public List<KakaoResponseDto> searchBrand(RequestBrandSearch brandSearch) {
         List<KakaoResponseDto> list = new ArrayList<>();
-        for (int i = 1; i <= 3; i++) {
+        for (int i = 0; i < Brand.Names.length; i++) {
             list.addAll(keywordSearchKakaoApi.searchByBrand(brandSearch, i));
         }
         return list;
