@@ -1,28 +1,26 @@
 package com.idea5.four_cut_photos_map.domain.shop.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
-import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopMarker;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.domain.shop.service.kakao.KeywordSearchKakaoApi;
-import com.idea5.four_cut_photos_map.domain.shoptitle.service.ShopTitleService;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
-import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUND;
 
@@ -64,8 +62,6 @@ public class ShopService {
                 responseShops.add(responseShop);
             }
         }
-        if(responseShops.isEmpty()) {throw new BusinessException(SHOP_NOT_FOUND);}
-
         return responseShops;
     }
 

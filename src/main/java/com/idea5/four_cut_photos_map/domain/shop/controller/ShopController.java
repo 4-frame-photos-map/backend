@@ -32,8 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.idea5.four_cut_photos_map.global.error.ErrorCode.BRAND_NOT_FOUND;
-import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DISTANCE_IS_EMPTY;
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.*;
 
 
 @RequestMapping("/shops")
@@ -46,15 +45,26 @@ public class ShopController {
     private final FavoriteService favoriteService;
 
     private final ShopTitleLogService shopTitleLogService;
-
+    private final String NO_CONTENT_MATCHING_KEYWORD = "키워드(%s)에 해당하는 상점이 존재하지 않습니다.";
+    private final String NO_CONTENT_FOR_RADIUS = "반경 2km 이내에 브랜드(%s)가 존재하지 않습니다.";
 
     @GetMapping(value = "")
     public ResponseEntity<RsData<List<ResponseShop>>> showListSearchedByKeyword(@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch) throws JsonProcessingException {
+        // todo: 키워드 유효성 검사(유도한 키워드가 맞는지)
+
         // 1. 카카오맵 api 응답 데이터 받아오기
         List<KakaoKeywordResponseDto> apiShopJson = shopService.searchByKeyword(requestKeywordSearch);
+        if(apiShopJson.isEmpty())
+            return ResponseEntity.ok(new RsData<>(
+                    true, String.format(NO_CONTENT_MATCHING_KEYWORD, requestKeywordSearch.getKeyword())
+            ));
 
         // 2. db 데이터와 비교
         List<ResponseShop> shops = shopService.findShops(apiShopJson);
+        if(shops.isEmpty())
+            return ResponseEntity.ok(new RsData<>(
+                    true, String.format(NO_CONTENT_MATCHING_KEYWORD, requestKeywordSearch.getKeyword())
+            ));
 
         return ResponseEntity.ok(
                 new RsData<List<ResponseShop>>(true, "키워드로 Shop 조회 성공", shops)
@@ -63,10 +73,14 @@ public class ShopController {
 
     @GetMapping("/brand")
     public ResponseEntity<RsData<List<ResponseShopBrand>>> showBrandListBySearch(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch) {
-        // api 검색전, DB에서 먼저 있는지 확인하는게 더 효율적
+        // todo: brand가 대표 브랜드에 해당하는 브랜드인지 먼저 확인
+
+        // api 검색전, DB에서 먼저 있는지 확인하는게 더 효율적 // todo : api 먼저 호출 후 db 조회하도록 // 데이터 양이 늘어났으므로
         List<ShopDto> shopDtos = shopService.findByBrand(requestBrandSearch.getBrand());
         if (shopDtos.isEmpty())
-            throw new BusinessException(BRAND_NOT_FOUND);
+            return ResponseEntity.ok(new RsData<>(
+                    true, String.format(NO_CONTENT_FOR_RADIUS, requestBrandSearch.getBrand())
+            ));
 
         List<KakaoResponseDto> kakaoApiResponse = shopService.searchBrand(requestBrandSearch);
         List<ResponseShopBrand> resultShops = new ArrayList<>(); // 응답값 리스트
@@ -84,12 +98,12 @@ public class ShopController {
         // 검색 결과, 근처에 원하는 브랜드가 없을 때
         if (resultShops.isEmpty()) {
             return ResponseEntity.ok(new RsData<>(
-                    true, String.format("근처에 %s이(가) 없습니다.", requestBrandSearch.getBrand()), resultShops
+                    true, String.format(NO_CONTENT_FOR_RADIUS, requestBrandSearch.getBrand())
             ));
         }
 
         return ResponseEntity.ok(new RsData<>(
-                true, "brand 검색 성공", resultShops
+                true, "브랜드로 반경 2km 이내 Shop 조회 성공", resultShops
         ));
     }
 
@@ -106,8 +120,10 @@ public class ShopController {
             maps.put(brandName, list);
         }
 
+        // todo: 데이터가 존재하지 않을 때 응답 처리
+
         return ResponseEntity.ok(
-                new RsData<Map<String, List<ResponseShopMarker>>>(true, "Shop 마커 성공", maps)
+                new RsData<Map<String, List<ResponseShopMarker>>>(true, "반경 2km 이내 Shop 조회 성공", maps)
         );
     }
 
@@ -136,6 +152,6 @@ public class ShopController {
             shopDetailDto.setShopTitles(shopTitles);
         }
 
-        return ResponseEntity.ok(shopDetailDto);
+        return ResponseEntity.ok(shopDetailDto); // todo: 응답구조에 맞게 처리
     }
 }
