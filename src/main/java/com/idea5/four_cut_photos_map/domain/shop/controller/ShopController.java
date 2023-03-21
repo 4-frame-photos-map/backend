@@ -61,7 +61,7 @@ public class ShopController {
             ));
 
         // 2. db 데이터와 비교
-        List<ResponseShop> shops = shopService.findShops(apiShopJson);
+        List<ResponseShop> shops = shopService.compareShopsForKeyword(apiShopJson);
         if(shops.isEmpty())
             return ResponseEntity.ok(new RsData<>(
                     true, String.format(NO_CONTENT_MATCHING_KEYWORD, requestKeywordSearch.getKeyword())
@@ -85,11 +85,11 @@ public class ShopController {
                     true, String.format(NO_CONTENT_WITHIN_RADIUS, requestBrandSearch.getBrand())
             ));
 
-        List<KakaoResponseDto> kakaoApiResponse = shopService.searchBrand(requestBrandSearch);
+        List<KakaoKeywordResponseDto> kakaoApiResponse = shopService.searchBrand(requestBrandSearch);
         List<ResponseShopBrand> resultShops = new ArrayList<>(); // 응답값 리스트
 
         // 카카오 맵 api로 부터 받아온 Shop 리스트와 db에 저장된 Shop 비교
-        for (KakaoResponseDto apiShop : kakaoApiResponse) {
+        for (KakaoKeywordResponseDto apiShop : kakaoApiResponse) {
             for (ShopDto shopDto : shopDtos) {
                 if (apiShop.getRoadAddressName().equals(shopDto.getRoadAddressName())) {
                     resultShops.add(ResponseShopBrand.of(apiShop));
@@ -111,24 +111,26 @@ public class ShopController {
     }
 
 
-
-
     //현재 위치 기준, 반경 2km
     @GetMapping("/marker")
-    public ResponseEntity<RsData<Map<String, List<ResponseShopMarker>>>> currentLocationSearch(@ModelAttribute @Valid RequestShop requestShop) {
+    public ResponseEntity<RsData<List<ResponseShopMarker>>> currentLocationSearch(@ModelAttribute @Valid RequestShop requestShop) {
 
-        String[] names = Brand.Names; // 브랜드명 ( 하루필름, 인생네컷 ... )
+        // 1. 카카오맵 api 응답 데이터 받아오기
+        List<KakaoKeywordResponseDto> apiShopJson = shopService.searchByCurrentLocation(requestShop);
+        if(apiShopJson.isEmpty())
+            return ResponseEntity.ok(new RsData<>(
+                    true, String.format(NO_CONTENT_WITHIN_RADIUS, "전체 브랜드")
+            ));
 
-        Map<String, List<ResponseShopMarker>> maps = new HashMap<>();
-        for (String brandName : names) {
-            List<ResponseShopMarker> list = shopService.searchMarkers(requestShop, brandName);
-            maps.put(brandName, list);
-        }
-
-        // todo: 데이터가 존재하지 않을 때 응답 처리
+        // 2. db 데이터와 비교
+        List<ResponseShopMarker> shops = shopService.compareShopsWithinRadius(apiShopJson);
+        if(shops.isEmpty())
+            return ResponseEntity.ok(new RsData<>(
+                    true, String.format(NO_CONTENT_WITHIN_RADIUS, "전체 브랜드")
+            ));
 
         return ResponseEntity.ok(
-                new RsData<Map<String, List<ResponseShopMarker>>>(true, "반경 2km 이내 Shop 조회 성공", maps)
+                new RsData<>(true, "반경 2km 이내 Shop 조회 성공", shops)
         );
     }
 
@@ -159,4 +161,21 @@ public class ShopController {
 
         return ResponseEntity.ok(shopDetailDto); // todo: 응답구조에 맞게 처리
     }
+
+    // 브랜드별 Map Marker
+    // 현재 위치 기준, 반경 2km
+//    @GetMapping("/marker")
+//    public ResponseEntity<RsData<Map<String, List<ResponseShopMarker>>>> currentLocationSearch(@ModelAttribute @Valid RequestShop requestShop) {
+//
+//        String[] names = Brand.Names; // 브랜드명 ( 하루필름, 인생네컷 ... )
+//
+//        Map<String, List<ResponseShopMarker>> maps = new HashMap<>();
+//        for (String brandName : names) {
+//            List<ResponseShopMarker> list = shopService.searchMarkers(requestShop, brandName);
+//            maps.put(brandName, list);
+//        }
+////
+//        return ResponseEntity.ok(
+//                new RsData<Map<String, List<ResponseShopMarker>>>(true, "반경 2km 이내 Shop 조회 성공", maps)
+//        );
 }

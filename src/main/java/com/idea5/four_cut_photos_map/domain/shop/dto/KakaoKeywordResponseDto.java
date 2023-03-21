@@ -13,4 +13,5 @@ public class KakaoKeywordResponseDto {
         public String longitude; // 경도
         public String latitude; // 위도
         public String distance; // 중심좌표까지의 거리
+        public String phone; // todo: 필요없다면 제거 필요
 }

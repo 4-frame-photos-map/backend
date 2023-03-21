@@ -1,5 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
+import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.*;
@@ -22,13 +23,13 @@ public class ResponseShopBrand {
         this.distance = distance;
     }
 
-    static public ResponseShopBrand of(KakaoResponseDto dto){
+    static public ResponseShopBrand of(KakaoKeywordResponseDto dto){
         return ResponseShopBrand.builder()
                 .placeName(dto.getPlaceName())
                 .roadAddressName(dto.getRoadAddressName())
                 .phone(dto.getPhone())
-                .x(dto.getX())
-                .y(dto.getY())
+                .x(dto.getLongitude())
+                .y(dto.getLatitude())
                 .distance(dto.getDistance())
                 .build();
     }

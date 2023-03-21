@@ -15,6 +15,7 @@ public class ResponseShop {
     private double latitude; // 위도
     private double longitude; // 경도
     private String distance; // 중심좌표까지의 거리
+    private String phone; // todo: 논의 후 필요없다면 제거 필요
 
     public static ResponseShop from(Shop shop, KakaoKeywordResponseDto apiShop){
         return ResponseShop.builder()
@@ -24,6 +25,7 @@ public class ResponseShop {
                 .longitude(Double.parseDouble(apiShop.getLongitude()))
                 .latitude(Double.parseDouble(apiShop.getLatitude()))
                 .distance(apiShop.getDistance())
+                .phone(apiShop.getPhone())
                 .build();
     }
 }
