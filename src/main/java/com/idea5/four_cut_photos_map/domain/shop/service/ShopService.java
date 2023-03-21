@@ -51,15 +51,12 @@ public class ShopService {
 
         // 카카오 맵 API 데이터와 DB Shop 비교
         for (KakaoKeywordResponseDto apiShop: apiShops) {
-            List<Shop> dbShops = shopRepository.findDistinctByRoadAddressName(apiShop.getRoadAddressName());
+            List<Shop> dbShops = findByRoadAddressName(apiShop);
 
             if(dbShops.isEmpty()) continue;
 
             // 도로명주소 중복 데이터 존재 시 장소명으로 2차 필터링
-            Shop dbShop = dbShops.size() == 1 ?  dbShops.get(0) : dbShops.stream()
-                    .filter(db -> apiShop.getPlaceName().contains(db.getPlaceName()))
-                    .findFirst()
-                    .orElse(null);
+            Shop dbShop = dbShops.size() == 1 ?  dbShops.get(0) : compareByPlaceName(apiShop.getPlaceName(), dbShops);
 
             if(dbShop != null) {
                 ResponseShop responseShop = ResponseShop.from(dbShop, apiShop);
@@ -72,17 +69,12 @@ public class ShopService {
     public List<ResponseShopMarker> compareShopsWithinRadius(List<KakaoKeywordResponseDto> apiShops) {
         List<ResponseShopMarker> responseShopMarkers = new ArrayList<>();
 
-        // 카카오 맵 API 데이터와 DB Shop 비교
         for (KakaoKeywordResponseDto apiShop: apiShops) {
-            List<Shop> dbShops = shopRepository.findDistinctByRoadAddressName(apiShop.getRoadAddressName());
+            List<Shop> dbShops = findByRoadAddressName(apiShop);
 
             if(dbShops.isEmpty()) continue;
 
-            // 도로명주소 중복 데이터 존재 시 장소명으로 2차 필터링
-            Shop dbShop = dbShops.size() == 1 ?  dbShops.get(0) : dbShops.stream()
-                    .filter(db -> apiShop.getPlaceName().contains(db.getPlaceName()))
-                    .findFirst()
-                    .orElse(null);
+            Shop dbShop = dbShops.size() == 1 ?  dbShops.get(0) : compareByPlaceName(apiShop.getPlaceName(), dbShops);
 
             if(dbShop != null) {
                 ResponseShopMarker responseShopMarker = ResponseShopMarker.from(dbShop, apiShop);
@@ -90,6 +82,18 @@ public class ShopService {
             }
         }
         return responseShopMarkers;
+    }
+
+    private Shop compareByPlaceName(String apiShopPlaceName, List<Shop> dbShops) {
+        return dbShops.stream()
+                .filter(dbShop -> apiShopPlaceName.contains(dbShop.getPlaceName()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private List<Shop> findByRoadAddressName(KakaoKeywordResponseDto apiShop) {
+        List<Shop> dbShops = shopRepository.findDistinctByRoadAddressName(apiShop.getRoadAddressName());
+        return dbShops;
     }
 
     public ResponseShopDetail findShopById(Long id, String distance) {
