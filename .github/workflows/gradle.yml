@@ -28,7 +28,13 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-        
+    
+    - name: Make application-base-addi.yml
+      run: |
+        cd ./src/main/resources
+        touch ./application-base-addi.yml
+        echo "${{ secrets.BASE_ADDI }}" > ./application-base-addi.yml
+      shell: bash
         
     - name: Make gradlew executable
       run: chmod 744 ./gradlew
