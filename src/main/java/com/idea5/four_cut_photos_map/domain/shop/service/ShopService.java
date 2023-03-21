@@ -1,8 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.shop.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
-import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
@@ -137,22 +135,9 @@ public class ShopService {
         return Arrays.stream(Brand.Names).anyMatch(representative -> representative.equals(requestBrand));
     }
 
-    // 브랜드별 검색 (페이징)
-//    public List<KakaoResponseDto> searchBrand(RequestBrandSearch brandSearch) {
-//        List<KakaoResponseDto> list = new ArrayList<>();
-//        for (int i = 1; i <= 4; i++) {
-//            list.addAll(keywordSearchKakaoApi.searchByQueryWord(brandSearch, i));
-//        }
-//        return list;
-//    }
-
     // 브랜드별 Map Marker
 //    public List<ResponseShopMarker> searchMarkers(RequestShop shop, String brandName) {
-//        List<KakaoKeywordResponseDto> kakaoShops = keywordSearchKakaoApi.searchByQueryWord(
-//                DEFAULT_QUERY_WORD,
-//                shop.getLongitude(),
-//                shop.getLatitude(),
-//                true);
+//        List<KakaoKeywordResponseDto> kakaoShops = keywordSearchKakaoApi.searchByQueryWord(shop, brandName);
 //        List<ShopDto> dbShops = findByBrand(brandName);
 //        List<ResponseShopMarker> resultShops = new ArrayList<>();
 //

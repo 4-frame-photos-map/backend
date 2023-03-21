@@ -1,17 +1,11 @@
 package com.idea5.four_cut_photos_map.global.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idea5.four_cut_photos_map.AppConfig;
-import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
-import com.idea5.four_cut_photos_map.global.util.DocumentManagement.Document;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
