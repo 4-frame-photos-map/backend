@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.shop.service.kakao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
@@ -8,8 +9,11 @@ import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
+import com.idea5.four_cut_photos_map.global.util.DocumentManagement;
 import com.idea5.four_cut_photos_map.global.util.Util;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -19,8 +23,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KeywordSearchKakaoApi {
@@ -93,7 +98,7 @@ public class KeywordSearchKakaoApi {
 
         // 4. exchange 메서드로 api 호출
         String body = restTemplate.exchange(apiURL, HttpMethod.GET, entity, String.class).getBody();
-        List<KakaoResponseDto> list = Util.jackson2(body, request.getBrand());
+        List<KakaoResponseDto> list = jackson2(body, request.getBrand());
         return list;
     }
 
@@ -116,7 +121,31 @@ public class KeywordSearchKakaoApi {
         System.out.println("apiURL = " + apiURL);
 
         String body = restTemplate.exchange(apiURL, HttpMethod.GET, entity, String.class).getBody();
-        List<KakaoResponseDto> kakaoResponseDtos = Util.jackson2(body, brandName);
+        List<KakaoResponseDto> kakaoResponseDtos = jackson2(body, brandName);
         return kakaoResponseDtos;
+    }
+
+    public List<KakaoResponseDto> jackson2(String body, String brandName){
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        ArrayList<KakaoResponseDto> list = new ArrayList<>();
+        try{
+
+            DocumentManagement documentManagement = objectMapper.readValue(body, DocumentManagement.class);
+            DocumentManagement.Document[] documents = documentManagement.getDocuments();
+            for (DocumentManagement.Document document : documents) {
+                String phone = document.getPhone();
+                if (phone.equals("")) {
+                    document.setPhone("미등록");
+                }
+                document.setDistance(Util.distanceFormatting(document.getDistance()));
+
+                KakaoResponseDto dto = KakaoResponseDto.from(document, brandName);
+                list.add(dto);
+            }
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
+        return list;
+
     }
 }
