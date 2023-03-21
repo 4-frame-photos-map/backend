@@ -61,8 +61,11 @@ jobs:
         password: ${{ secrets.BACKEND_PASSWORD }}
         port: ${{ secrets.BACKEND_PORT }}
         script: |
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/photosmap
             docker stop ${{ secrets.BACKEND_PROJECT_NAME }}
+            docker rm ${{ secrets.BACKEND_PROJECT_NAME }}
+            docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/photosmap
             
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/photosmap
+      
             docker run --name=${{ secrets.BACKEND_PROJECT_NAME }} -p 8080:8080 -v /docker_projects/photosmap/volumes/gen:/gen --restart unless-stopped -e TZ=Asia/Seoul -d ${{ secrets.DOCKERHUB_USERNAME }}/photosmap
             docker image prune -f
