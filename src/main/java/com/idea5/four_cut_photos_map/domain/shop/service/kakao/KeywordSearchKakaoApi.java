@@ -3,14 +3,13 @@ package com.idea5.four_cut_photos_map.domain.shop.service.kakao;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
-import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
 import com.idea5.four_cut_photos_map.global.util.Util;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -87,7 +86,9 @@ public class KeywordSearchKakaoApi {
                 + "&y="+request.getLatitude()
                 + "&size=15"
                 + "&page="+page
-                + "&sort=distance"; // 거리순
+                + "&sort=distance" // 거리순
+                + "&radius=2000"; // 반경 2km 이내
+
         System.out.println("apiURL = " + apiURL);
 
         // 4. exchange 메서드로 api 호출
