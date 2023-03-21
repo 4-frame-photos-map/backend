@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Getter
@@ -13,11 +14,11 @@ import javax.validation.constraints.NotNull;
 @ToString
 public class RequestBrandSearch {
 
-    @NotNull(message = "브랜드는 필수 입력값 입니다.")
+    @NotBlank(message = "브랜드는 필수 입력값 입니다.")
     private String brand; // 위도
     @NotNull(message = "경도는 필수 입력값 입니다.")
-    private double longitude; // 경도
+    private Double longitude; // 경도
     @NotNull(message = "위도는 필수 입력값 입니다.")
-    private double latitude; // 위도
+    private Double latitude; // 위도
 
 }
