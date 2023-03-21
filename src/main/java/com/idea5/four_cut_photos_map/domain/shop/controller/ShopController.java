@@ -75,7 +75,7 @@ public class ShopController {
     @GetMapping("/brand")
     public ResponseEntity<RsData<List<ResponseShopBrand>>> showBrandListBySearch(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch) {
         // 대표 브랜드에 해당하는지 먼저 확인
-        if(shopService.isRepresentativeBrand(requestBrandSearch.getBrand()))
+        if(shopService.isRepresentativeBrand(requestBrandSearch.getBrand()) == false)
             throw new BusinessException(INVALID_BRAND);
 
         // api 검색전, DB에서 먼저 있는지 확인하는게 더 효율적
