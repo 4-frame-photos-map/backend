@@ -70,8 +70,6 @@ public class KeywordSearchKakaoApi {
                         .longitude(documents.get("x").textValue())
                         .latitude(documents.get("y").textValue())
                         .distance(Util.distanceFormatting(documents.get("distance").textValue()))
-                        .phone(documents.get("phone").equals("") ?
-                                "미등록" : documents.get("phone").textValue()) // todo: 필요성 논의 후 필요없다면 제거 필요
                         .build();
 
                 resultList.add(dto);
