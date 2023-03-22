@@ -64,6 +64,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             || tokenType.equals(REFRESH_TOKEN.getName()) && !requestURI.equals(atkReissueUri)) {
                 throw new JwtException("유효하지 않은 토큰입니다.");
             }
+            // TODO: accessToken 블랙리스트 검사 없애기
             // 3. 해당 accessToken 이 블랙리스트로 redis 에 등록되었는지 검증
             if(tokenType.equals(ACCESS_TOKEN.getName()) && jwtService.isBlackList(token)) {
                 throw new JwtException("유효하지 않은 토큰입니다.");

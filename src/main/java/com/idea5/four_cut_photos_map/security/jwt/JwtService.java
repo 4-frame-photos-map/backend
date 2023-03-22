@@ -50,6 +50,7 @@ public class JwtService {
         if(!refreshToken.equals(redisRefreshToken)) {
             throw new RuntimeException("refreshToken 불일치");
         }
+        // TODO: 기존 refreshToken 을 삭제하고 refreshToken 도 함께 재발급할지 고민중
         // 3. accessToken 재발급
         String newAccessToken = jwtProvider.generateAccessToken(memberId, authorities);
         return AccessToken.builder()
