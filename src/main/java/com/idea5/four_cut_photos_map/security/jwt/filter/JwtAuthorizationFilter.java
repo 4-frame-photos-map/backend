@@ -1,8 +1,6 @@
 package com.idea5.four_cut_photos_map.security.jwt.filter;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
-import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
-import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import com.idea5.four_cut_photos_map.security.jwt.JwtService;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
@@ -14,7 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -42,9 +39,7 @@ import static com.idea5.four_cut_photos_map.security.jwt.dto.TokenType.REFRESH_T
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
     private final JwtService jwtService;
-    private final RedisDao redisDao;
     private final String BEARER_TOKEN_PREFIX = "Bearer ";
-    private final MemberService memberService;
 
     @Value("${jwt.atk.header}")
     private String tokenHeader;
@@ -69,24 +64,24 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             || tokenType.equals(REFRESH_TOKEN.getName()) && !requestURI.equals(atkReissueUri)) {
                 throw new JwtException("유효하지 않은 토큰입니다.");
             }
+            // TODO: accessToken 블랙리스트 검사 없애기
             // 3. 해당 accessToken 이 블랙리스트로 redis 에 등록되었는지 검증
             if(tokenType.equals(ACCESS_TOKEN.getName()) && jwtService.isBlackList(token)) {
                 throw new JwtException("유효하지 않은 토큰입니다.");
             }
 
-            StopWatch stopWatch = new StopWatch();
-            stopWatch.start();
+//            StopWatch stopWatch = new StopWatch();
+//            stopWatch.start();
 
-            // 4. jwt 에서 id 를 얻고 Redis 에서 nickname 을 얻어서 Member 객체 생성
+            // 4. jwt 에서 id 를 얻어 Member 객체 생성
             Member member = Member.builder()
                     .id(memberId)
-                    .nickname(redisDao.getValues("member:" + memberId + ":nickname"))
                     .build();
 //            Member member = memberService.findById(memberId);
 
-            stopWatch.stop();
-            log.info(stopWatch.prettyPrint());
-            log.info(String.valueOf(stopWatch.getTotalTimeSeconds()));
+//            stopWatch.stop();
+//            log.info(stopWatch.prettyPrint());
+//            log.info(String.valueOf(stopWatch.getTotalTimeSeconds()));
 
             // 5. 2차 체크(해당 엑세스 토큰이 화이트 리스트에 포함되는지 검증) -> 탈취된 토큰 무효화
             if(member != null) {

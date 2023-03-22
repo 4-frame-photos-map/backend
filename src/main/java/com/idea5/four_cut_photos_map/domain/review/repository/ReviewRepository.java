@@ -1,5 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.review.repository;
 
+import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.review.entity.Review;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -16,4 +17,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findAllByWriterIdOrderByCreateDateDesc(Long writerId);
 
     List<Review> findTop3ByShopIdOrderByCreateDateDesc(Long shopId);
+
+    Long countByWriter(Member writer);
 }
