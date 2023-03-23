@@ -12,11 +12,9 @@ import lombok.*;
 public class ResponseShopBrand {
     private String placeName; // 장소명
     private String roadAddressName; // 도로명 주소
-    private String x; // 경도
-    private String y; // 위도
+    private String longitude; // 경도
+    private String latitude; // 위도
     private String distance; // 거리
-
-    private String phone;
 
     public void setDistance(String distance){
         this.distance = distance;
@@ -26,9 +24,8 @@ public class ResponseShopBrand {
         return ResponseShopBrand.builder()
                 .placeName(dto.getPlaceName())
                 .roadAddressName(dto.getRoadAddressName())
-                .phone(dto.getPhone())
-                .x(dto.getLongitude())
-                .y(dto.getLatitude())
+                .longitude(dto.getLongitude())
+                .latitude(dto.getLatitude())
                 .distance(dto.getDistance())
                 .build();
     }

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -48,28 +49,27 @@ public class KeywordSearchKakaoApi {
                 + "&radius=2000"; // 반경 2km 이내
 
         // 4. exchange 메서드로 api 호출
-        String body = restTemplate.exchange(apiURL, HttpMethod.GET, entity, String.class).getBody();
+        JsonNode documents = restTemplate.exchange(apiURL, HttpMethod.GET, entity, JsonNode.class)
+                .getBody()
+                .get("documents");
 
         // 5. JSON -> DTO 역직렬화
-        return deserialize(resultList, body);
+        return deserialize(resultList, documents);
     }
 
-    private List<KakaoResponseDto> deserialize(List<KakaoResponseDto> resultList, String body) {
+    private List<KakaoResponseDto> deserialize(List<KakaoResponseDto> resultList, JsonNode documents) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         try {
-            JsonNode node = objectMapper.readTree(body);
-            List<String> countList = node.get("documents").findValuesAsText("place_name");
-
-            for(int i=0; i<countList.size(); i++) {
-                JsonNode documents = node.get("documents").get(i);
+            for(int i=0; i<documents.size(); i++) {
+                JsonNode document = documents.get(i);
 
                 KakaoResponseDto dto = KakaoResponseDto.builder()
-                        .placeName(documents.get("place_name").textValue())
-                        .roadAddressName(documents.get("road_address_name").textValue())
-                        .longitude(documents.get("x").textValue())
-                        .latitude(documents.get("y").textValue())
-                        .distance(Util.distanceFormatting(documents.get("distance").textValue()))
+                        .placeName(document.get("place_name").textValue())
+                        .roadAddressName(document.get("road_address_name").textValue())
+                        .longitude(document.get("x").textValue())
+                        .latitude(document.get("y").textValue())
+                        .distance(Util.distanceFormatting(document.get("distance").textValue()))
                         .build();
 
                 resultList.add(dto);

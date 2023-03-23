@@ -5,7 +5,7 @@ import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopKeyword;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopMarker;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
@@ -41,8 +41,8 @@ public class ShopService {
                 .collect(Collectors.toList());
     }
 
-        public List<ResponseShop> compareShopsForKeyword(List<KakaoResponseDto> apiShops) {
-        List<ResponseShop> responseShops = new ArrayList<>();
+        public List<ResponseShopKeyword> compareShopsForKeyword(List<KakaoResponseDto> apiShops) {
+        List<ResponseShopKeyword> responseShopKeywords = new ArrayList<>();
 
         // 카카오 맵 API 데이터와 DB Shop 비교
         for (KakaoResponseDto apiShop: apiShops) {
@@ -54,11 +54,11 @@ public class ShopService {
             Shop dbShop = dbShops.size() == 1 ?  dbShops.get(0) : compareByPlaceName(apiShop.getPlaceName(), dbShops);
 
             if(dbShop != null) {
-                ResponseShop responseShop = ResponseShop.from(dbShop, apiShop);
-                responseShops.add(responseShop);
+                ResponseShopKeyword responseShopKeyword = ResponseShopKeyword.from(dbShop, apiShop);
+                responseShopKeywords.add(responseShopKeyword);
             }
         }
-        return responseShops;
+        return responseShopKeywords;
     }
 
     public List<ResponseShopMarker> compareShopsWithinRadius(List<KakaoResponseDto> apiShops) {

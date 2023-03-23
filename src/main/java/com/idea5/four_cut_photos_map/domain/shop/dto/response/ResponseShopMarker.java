@@ -20,7 +20,6 @@ public class ResponseShopMarker {
     private String roadAddressName; // 도로명 주소
     private String longitude; // 경도
     private String latitude; // 위도
-    private String phone; // 번호
     private String distance; // 거리
 
     @JsonIgnore // 상점이 보유한 칭호가 없다면 null 보다는 응답 데이터에서 제외되는게 더 낫다고 생각
@@ -38,7 +37,6 @@ public class ResponseShopMarker {
                 .longitude(apiShop.getLongitude())
                 .latitude(apiShop.getLatitude())
                 .distance(apiShop.getDistance())
-                .phone(apiShop.getPhone())
                 .build();
     }
 }

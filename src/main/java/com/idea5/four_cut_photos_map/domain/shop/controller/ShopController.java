@@ -9,7 +9,7 @@ import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShop;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopKeyword;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopBrand;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopMarker;
@@ -40,13 +40,12 @@ public class ShopController {
 
     private final ShopService shopService;
     private final FavoriteService favoriteService;
-
     private final ShopTitleLogService shopTitleLogService;
     private final String NO_CONTENT_MATCHING_KEYWORD = "키워드(%s)에 해당하는 지점이 존재하지 않습니다.";
     private final String NO_CONTENT_WITHIN_RADIUS = "반경 2km 이내에 %s 지점이 존재하지 않습니다.";
 
     @GetMapping(value = "")
-    public ResponseEntity<RsData<List<ResponseShop>>> showListSearchedByKeyword(@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch) throws JsonProcessingException {
+    public ResponseEntity<RsData<List<ResponseShopKeyword>>> showKeywordSearches(@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch) throws JsonProcessingException {
         // todo: 키워드 유효성 검사(유도한 키워드가 맞는지)
 
         // 1. 카카오맵 api 응답 데이터 받아오기
@@ -57,7 +56,7 @@ public class ShopController {
             ));
 
         // 2. db 데이터와 비교
-        List<ResponseShop> shops = shopService.compareShopsForKeyword(apiShopJson);
+        List<ResponseShopKeyword> shops = shopService.compareShopsForKeyword(apiShopJson);
         if(shops.isEmpty())
             return ResponseEntity.ok(new RsData<>(
                     true, String.format(NO_CONTENT_MATCHING_KEYWORD, requestKeywordSearch.getKeyword())
@@ -69,7 +68,7 @@ public class ShopController {
     }
 
     @GetMapping("/brand")
-    public ResponseEntity<RsData<List<ResponseShopBrand>>> showBrandListBySearch(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch) {
+    public ResponseEntity<RsData<List<ResponseShopBrand>>> showBrandSearches(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch) {
         // 대표 브랜드에 해당하는지 먼저 확인
         if(shopService.isRepresentativeBrand(requestBrandSearch.getBrand()) == false)
             throw new BusinessException(INVALID_BRAND);
