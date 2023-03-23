@@ -1,7 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.*;
 
@@ -30,7 +30,7 @@ public class ResponseShopMarker {
 
     public void setShopTitles(List<String> shopTitles){ this.shopTitles = shopTitles;}
 
-    public static ResponseShopMarker from(Shop shop, KakaoKeywordResponseDto apiShop){
+    public static ResponseShopMarker from(Shop shop, KakaoResponseDto apiShop){
         return ResponseShopMarker.builder()
                 .id(shop.getId())
                 .placeName(shop.getPlaceName())

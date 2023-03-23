@@ -3,7 +3,7 @@ package com.idea5.four_cut_photos_map.domain.shop.service.kakao;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.global.util.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +27,9 @@ public class KeywordSearchKakaoApi {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    public List<KakaoKeywordResponseDto> searchByQueryWord(String queryWord, Double longitude, Double latitude, boolean hasRadius) {
+    public List<KakaoResponseDto> searchByQueryWord(String queryWord, Double longitude, Double latitude, boolean hasRadius) {
         // 1. 결과값 담을 객체 생성
-        List<KakaoKeywordResponseDto> resultList = new ArrayList<>();
+        List<KakaoResponseDto> resultList = new ArrayList<>();
 
         // 2. header 설정을 위해 HttpHeader 클래스 생성 후 HttpEntity 객체에 넣어준다.
         HttpHeaders headers = new HttpHeaders();
@@ -54,7 +54,7 @@ public class KeywordSearchKakaoApi {
         return deserialize(resultList, body);
     }
 
-    private List<KakaoKeywordResponseDto> deserialize(List<KakaoKeywordResponseDto> resultList, String body) {
+    private List<KakaoResponseDto> deserialize(List<KakaoResponseDto> resultList, String body) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         try {
@@ -64,7 +64,7 @@ public class KeywordSearchKakaoApi {
             for(int i=0; i<countList.size(); i++) {
                 JsonNode documents = node.get("documents").get(i);
 
-                KakaoKeywordResponseDto dto = KakaoKeywordResponseDto.builder()
+                KakaoResponseDto dto = KakaoResponseDto.builder()
                         .placeName(documents.get("place_name").textValue())
                         .roadAddressName(documents.get("road_address_name").textValue())
                         .longitude(documents.get("x").textValue())

@@ -10,8 +10,6 @@ import java.util.Map;
 
 @Slf4j
 public class Util {
-
-    private final static ObjectMapper mapper = new ObjectMapper();
     private static ObjectMapper getObjectMapper() {
         return (ObjectMapper) AppConfig.getContext().getBean("objectMapper");
     }

@@ -1,6 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
-import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.*;
 
@@ -17,7 +17,7 @@ public class ResponseShop {
     private String distance; // 중심좌표까지의 거리
     private String phone; // todo: 논의 후 필요없다면 제거 필요
 
-    public static ResponseShop from(Shop shop, KakaoKeywordResponseDto apiShop){
+    public static ResponseShop from(Shop shop, KakaoResponseDto apiShop){
         return ResponseShop.builder()
                 .id(shop.getId())
                 .placeName(shop.getPlaceName())

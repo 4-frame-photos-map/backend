@@ -7,7 +7,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class KakaoKeywordResponseDto {
+public class KakaoResponseDto {
         public String placeName; // 장소명
         public String roadAddressName; // 도로명 주소
         public String longitude; // 경도

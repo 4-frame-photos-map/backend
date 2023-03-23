@@ -4,7 +4,7 @@ package com.idea5.four_cut_photos_map.domain.shop.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
-import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoKeywordResponseDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
@@ -50,7 +50,7 @@ public class ShopController {
         // todo: 키워드 유효성 검사(유도한 키워드가 맞는지)
 
         // 1. 카카오맵 api 응답 데이터 받아오기
-        List<KakaoKeywordResponseDto> apiShopJson = shopService.searchByKeyword(requestKeywordSearch);
+        List<KakaoResponseDto> apiShopJson = shopService.searchByKeyword(requestKeywordSearch);
         if(apiShopJson.isEmpty())
             return ResponseEntity.ok(new RsData<>(
                     true, String.format(NO_CONTENT_MATCHING_KEYWORD, requestKeywordSearch.getKeyword())
@@ -81,11 +81,11 @@ public class ShopController {
                     true, String.format(NO_CONTENT_WITHIN_RADIUS, requestBrandSearch.getBrand())
             ));
 
-        List<KakaoKeywordResponseDto> kakaoApiResponse = shopService.searchBrand(requestBrandSearch);
+        List<KakaoResponseDto> kakaoApiResponse = shopService.searchBrand(requestBrandSearch);
         List<ResponseShopBrand> resultShops = new ArrayList<>(); // 응답값 리스트
 
         // 카카오 맵 api로 부터 받아온 Shop 리스트와 db에 저장된 Shop 비교
-        for (KakaoKeywordResponseDto apiShop : kakaoApiResponse) {
+        for (KakaoResponseDto apiShop : kakaoApiResponse) {
             for (ShopDto shopDto : shopDtos) {
                 if (apiShop.getRoadAddressName().equals(shopDto.getRoadAddressName())) {
                     resultShops.add(ResponseShopBrand.of(apiShop));
@@ -112,7 +112,7 @@ public class ShopController {
     public ResponseEntity<RsData<List<ResponseShopMarker>>> currentLocationSearch(@ModelAttribute @Valid RequestShop requestShop) {
 
         // 1. 카카오맵 api 응답 데이터 받아오기
-        List<KakaoKeywordResponseDto> apiShopJson = shopService.searchByCurrentLocation(requestShop);
+        List<KakaoResponseDto> apiShopJson = shopService.searchByCurrentLocation(requestShop);
         if(apiShopJson.isEmpty())
             return ResponseEntity.ok(new RsData<>(
                     true, String.format(NO_CONTENT_WITHIN_RADIUS, "전체 브랜드")
