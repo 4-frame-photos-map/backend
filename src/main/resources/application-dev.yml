@@ -1,5 +1,6 @@
 server:
-  port: 8080
+  # port: 8080
+  port: 8081 #로컬 테스트 kakao.redirect-uri가 8081로 설정되지 않아 변경 전까지 8081로 수정
   servlet:
 #    context-path: /dev
 
