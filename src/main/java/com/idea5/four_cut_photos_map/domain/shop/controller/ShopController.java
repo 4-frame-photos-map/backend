@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
-import com.idea5.four_cut_photos_map.domain.shop.dto.ShopDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopKeyword;
@@ -16,13 +15,11 @@ import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogSer
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
-import io.netty.util.internal.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -103,30 +100,26 @@ public class ShopController {
 
     // todo : @Validated 유효성 검사 시, httpstatus code 전달하는 방법
     @GetMapping("/{shopId}")
-    public ResponseEntity<ResponseShopDetail> detail(@PathVariable(name = "shopId") Long id,
-                                                     @RequestParam(name = "distance", required = false, defaultValue = "") String distance,
-                                                     @AuthenticationPrincipal MemberContext memberContext) {
-        if (distance.isEmpty()) {
-            throw new BusinessException(DISTANCE_IS_EMPTY);
-        }
+    public ResponseEntity<RsData<ResponseShopDetail>> detail(@PathVariable(name = "shopId") Long id,
+                                                             @RequestParam(name = "distance", required = false, defaultValue = "") String distance,
+                                                             @AuthenticationPrincipal MemberContext memberContext) {
+
+        if (distance.isEmpty()) throw new BusinessException(DISTANCE_IS_EMPTY);
+
         ResponseShopDetail shopDetailDto = shopService.findShopById(id, distance);
 
         if (memberContext != null) {
             Favorite favorite = favoriteService.findByShopIdAndMemberId(shopDetailDto.getId(), memberContext.getId());
-
-            if (favorite == null) {
-                shopDetailDto.setCanBeAddedToFavorites(true);
-            } else {
-                shopDetailDto.setCanBeAddedToFavorites(false);
-            }
+            shopDetailDto.setCanBeAddedToFavorites(favorite == null ? true : false);
         }
 
         if (shopTitleLogService.existShopTitles(id)) {
             List<String> shopTitles = shopTitleLogService.getShopTitles(id);
             shopDetailDto.setShopTitles(shopTitles);
         }
-
-        return ResponseEntity.ok(shopDetailDto); // todo: 응답구조에 맞게 처리
+        return ResponseEntity.ok(
+                new RsData<>(true, "상점 상세 조회 성공", shopDetailDto)
+        );
     }
 
     // 브랜드별 Map Marker
