@@ -14,11 +14,10 @@ import javax.validation.constraints.NotNull;
 @ToString
 public class RequestBrandSearch {
 
-    @NotBlank(message = "브랜드는 필수 입력값 입니다.")
-    private String brand; // 위도
+    private String brand;
     @NotNull(message = "경도는 필수 입력값 입니다.")
-    private Double longitude; // 경도
+    private Double longitude;
     @NotNull(message = "위도는 필수 입력값 입니다.")
-    private Double latitude; // 위도
+    private Double latitude;
 
 }

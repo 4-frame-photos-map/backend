@@ -28,6 +28,7 @@ public class KeywordSearchKakaoApi {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
+
     public List<KakaoResponseDto> searchByQueryWord(String queryWord, Double longitude, Double latitude, boolean hasRadius) {
         // 1. 결과값 담을 객체 생성
         List<KakaoResponseDto> resultList = new ArrayList<>();

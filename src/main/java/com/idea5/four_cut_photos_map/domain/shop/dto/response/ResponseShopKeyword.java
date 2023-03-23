@@ -16,7 +16,7 @@ public class ResponseShopKeyword {
     private String longitude; // 경도
     private String distance; // 중심좌표까지의 거리
 
-    public static ResponseShopKeyword from(Shop shop, KakaoResponseDto apiShop){
+    public static ResponseShopKeyword of(Shop shop, KakaoResponseDto apiShop){
         return ResponseShopKeyword.builder()
                 .id(shop.getId())
                 .placeName(shop.getPlaceName())
