@@ -14,8 +14,8 @@ public class ResponseMarker {
 
     private Long id; // PK
     private String name;// 장소명
-    private double latitude; // 위도
-    private double longitude; // 경도
+    private String latitude; // 위도
+    private String longitude; // 경도
     private String distance; // 중심좌표까지의 거리
 
 

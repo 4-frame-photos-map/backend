@@ -18,8 +18,8 @@ public class ResponseShopMarker {
     private Long id;
     private String placeName; // 장소명
     private String roadAddressName; // 도로명 주소
-    private double longitude; // 경도
-    private double latitude; // 위도
+    private String longitude; // 경도
+    private String latitude; // 위도
     private String phone; // 번호
     private String distance; // 거리
 
@@ -35,8 +35,8 @@ public class ResponseShopMarker {
                 .id(shop.getId())
                 .placeName(shop.getPlaceName())
                 .roadAddressName(shop.getRoadAddressName())
-                .longitude(Double.parseDouble(apiShop.getLongitude()))
-                .latitude(Double.parseDouble(apiShop.getLatitude()))
+                .longitude(apiShop.getLongitude())
+                .latitude(apiShop.getLatitude())
                 .distance(apiShop.getDistance())
                 .phone(apiShop.getPhone())
                 .build();

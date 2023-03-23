@@ -31,8 +31,6 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUN
 public class ShopService {
     private final ShopRepository shopRepository;
     private final KeywordSearchKakaoApi keywordSearchKakaoApi;
-
-    private final ShopTitleLogService shopTitleLogService;
     private final String DEFAULT_QUERY_WORD = "즉석사진";
 
     public List<ShopDto> findByBrand(String brandName){
