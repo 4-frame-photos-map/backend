@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.idea5.four_cut_photos_map.domain.shop.service.ShopService.DEFAULT_QUERY_WORD;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -30,15 +32,14 @@ public class KeywordSearchKakaoApi {
 
 
     public List<KakaoResponseDto> searchByQueryWord(String queryWord, Double longitude, Double latitude, boolean hasRadius) {
-        // 1. 리턴 객체 생성
         List<KakaoResponseDto> resultList = new ArrayList<>();
 
-        // 2. header 설정
+        // 1. header 설정
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "KakaoAK " + kakao_apikey);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        // 3. 요청 URL 정의
+        // 2. 요청 URL 정의
         String apiURL = "https://dapi.kakao.com/v2/local/search/keyword.JSON?"
                 + "query=" + queryWord
                 + "&x=" + longitude
@@ -48,12 +49,12 @@ public class KeywordSearchKakaoApi {
                 += "&sort=distance" // 거리순 정렬
                 + "&radius=2000"; // 반경 2km 이내
 
-        // 4. api 호출
+        // 3. api 호출
         JsonNode documents = restTemplate.exchange(apiURL, HttpMethod.GET, entity, JsonNode.class)
                 .getBody()
                 .get("documents");
 
-        // 5. JSON -> DTO 역직렬화
+        // 4. JSON -> DTO 역직렬화
         return deserialize(resultList, documents);
     }
 
@@ -80,7 +81,7 @@ public class KeywordSearchKakaoApi {
         return resultList;
     }
 
-    public String searchByRoadAddressName(String RoadAddressName) {
+    public String searchByRoadAddressName(String queryWord) {
         // 1. header 설정
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "KakaoAK " + kakao_apikey);
@@ -88,7 +89,7 @@ public class KeywordSearchKakaoApi {
 
         // 2. 요청 URL 정의
         String apiURL = "https://dapi.kakao.com/v2/local/search/keyword.JSON?"
-                + "query=" + RoadAddressName
+                + "query=" + queryWord
                 + "&size=1"; // 정확도순 상위 하나의 지점만 응답받도록 제한
 
         // 3. api 호출
@@ -97,6 +98,9 @@ public class KeywordSearchKakaoApi {
                 .get("documents");
 
         // 4. JSON -> String 역직렬화
-        return documents.get(0).get("place_name").textValue();
+        String roadAddressName = queryWord.replace(DEFAULT_QUERY_WORD,"");
+        if((documents.get(0).get("road_address_name").asText()).equals(roadAddressName))
+            return documents.get(0).get("place_name").asText();
+        else return null;
     }
 }

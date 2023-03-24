@@ -29,9 +29,9 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUN
 @Slf4j
 
 public class ShopService {
+    public static final String DEFAULT_QUERY_WORD = "즉석사진";
     private final ShopRepository shopRepository;
     private final KeywordSearchKakaoApi keywordSearchKakaoApi;
-    private static final String DEFAULT_QUERY_WORD = "즉석사진";
 
     public List<ResponseShopKeyword> compareWithDbShops(List<KakaoResponseDto> apiShops) {
         List<ResponseShopKeyword> resultShop = new ArrayList<>();
@@ -82,10 +82,17 @@ public class ShopService {
     public ResponseShopDetail findShopById(Long id, String distance) {
         Shop dbShop = shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
 
-        String apiShopPlaceName = searchByRoadAddressName(dbShop);
+        dbShop = renameShop(dbShop);
 
-        ResponseShopDetail shopDto = ResponseShopDetail.of(dbShop, distance, apiShopPlaceName);
+        ResponseShopDetail shopDto = ResponseShopDetail.of(dbShop, distance);
         return shopDto;
+    }
+
+    private Shop renameShop(Shop dbShop) {
+        String apiPlaceName = searchByRoadAddressName(dbShop);
+        if(apiPlaceName != null) dbShop.setPlaceName(apiPlaceName);
+
+        return dbShop;
     }
 
     public Shop findById(Long id) {
