@@ -114,8 +114,7 @@ public class ShopService {
 
     public String searchByRoadAddressName(Shop dbShop) {
         return keywordSearchKakaoApi.searchByRoadAddressName (
-                dbShop.getRoadAddressName() + DEFAULT_QUERY_WORD,
-                1
+                dbShop.getRoadAddressName() + DEFAULT_QUERY_WORD
         );
     }
 

@@ -80,7 +80,7 @@ public class KeywordSearchKakaoApi {
         return resultList;
     }
 
-    public String searchByRoadAddressName(String RoadAddressName, int size) {
+    public String searchByRoadAddressName(String RoadAddressName) {
         // 1. header 설정
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "KakaoAK " + kakao_apikey);
@@ -89,7 +89,7 @@ public class KeywordSearchKakaoApi {
         // 2. 요청 URL 정의
         String apiURL = "https://dapi.kakao.com/v2/local/search/keyword.JSON?"
                 + "query=" + RoadAddressName
-                + "&size=" + size;
+                + "&size=1"; // 정확도순 상위 하나의 지점만 응답받도록 제한
 
         // 3. api 호출
         JsonNode documents = restTemplate.exchange(apiURL, HttpMethod.GET, entity, JsonNode.class)
