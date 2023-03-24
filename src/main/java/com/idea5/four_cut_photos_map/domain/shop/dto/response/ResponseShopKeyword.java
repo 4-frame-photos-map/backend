@@ -21,7 +21,7 @@ public class ResponseShopKeyword {
     public static ResponseShopKeyword of(Shop shop, KakaoResponseDto apiShop){
         return ResponseShopKeyword.builder()
                 .id(shop.getId())
-                .placeName(shop.getPlaceName())
+                .placeName(apiShop.getPlaceName())
                 .roadAddressName(shop.getRoadAddressName())
                 .longitude(apiShop.getLongitude())
                 .latitude(apiShop.getLatitude())

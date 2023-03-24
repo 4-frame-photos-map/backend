@@ -35,7 +35,6 @@ public class ResponseShopDetail {
                 .roadAddressName(shop.getRoadAddressName())
                 .distance(distance)
                 .favoriteCnt(shop.getFavoriteCnt())
-                .canBeAddedToFavorites(false)
                 .build();
     }
 
