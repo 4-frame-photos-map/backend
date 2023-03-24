@@ -45,7 +45,6 @@ public class ShopController {
     public ResponseEntity<RsData<List<ResponseShopKeyword>>> showSearchesByKeyword(@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch) throws JsonProcessingException {
         // todo: 키워드 유효성 검사(유도한 키워드가 맞는지)
 
-        // 1. 카카오맵 api 응답 데이터 받아오기
         List<KakaoResponseDto> apiShop = shopService.searchByKeyword(requestKeywordSearch);
         if(apiShop.isEmpty())
             return ResponseEntity.ok(
@@ -53,7 +52,6 @@ public class ShopController {
                             String.format("키워드(%s)에 해당하는 지점이 존재하지 않습니다.", requestKeywordSearch.getKeyword()))
             );
 
-        // 2. db 데이터와 비교
         List<ResponseShopKeyword> resultShops = shopService.compareWithDbShops(apiShop);
         if(resultShops.isEmpty())
             return ResponseEntity.ok(
@@ -62,13 +60,12 @@ public class ShopController {
             );
 
         return ResponseEntity.ok(
-                new RsData<>(true, "키워드로 지점 조회 성공", resultShops)
+                new RsData<>(true, "키워드로 지점 조회 성공, 정확도순 정렬", resultShops)
         );
     }
 
     @GetMapping("/brand")
     public ResponseEntity<RsData<List<ResponseShopBrand>>> showSearchesByBrand(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch) {
-        // 1. 대표브랜드 여부 확인
         boolean hasBrand = false;
         if(!ObjectUtils.isEmpty(requestBrandSearch.getBrand())) {
             if (!shopService.isRepresentativeBrand(requestBrandSearch.getBrand()))
@@ -76,15 +73,13 @@ public class ShopController {
             else hasBrand = true;
         }
 
-        // 2. 카카오맵 api 응답 데이터 받아오기
         List<KakaoResponseDto> apiShop = shopService.searchByBrand(requestBrandSearch);
         if(apiShop.isEmpty())
             return ResponseEntity.ok(
                     new RsData<>(true,
-                            String.format("반경 2km 이내에 %s 지점이 존재하지 않습니다.", requestBrandSearch.getBrand()))
+                            String.format("반경 2km 이내에 %s 지점이 존재하지 않습니다.", hasBrand? requestBrandSearch.getBrand():"전체"))
             );
 
-        // 3. db 데이터와 비교
         List<ResponseShopBrand> resultShops = new ArrayList<>();
         resultShops = shopService.compareWithDbShops(apiShop, resultShops);
         if(resultShops.isEmpty())
@@ -94,7 +89,7 @@ public class ShopController {
             );
 
         return ResponseEntity.ok(
-                new RsData<>(true, "반경 2km 이내 지점 조회 성공", resultShops)
+                new RsData<>(true, "반경 2km 이내 지점 조회 성공, 거리순 정렬", resultShops)
         );
     }
 
@@ -118,7 +113,7 @@ public class ShopController {
             shopDetailDto.setShopTitles(shopTitles);
         }
         return ResponseEntity.ok(
-                new RsData<>(true, "상점 상세 조회 성공", shopDetailDto)
+                new RsData<>(true, "지점 상세 조회 성공", shopDetailDto)
         );
     }
 
