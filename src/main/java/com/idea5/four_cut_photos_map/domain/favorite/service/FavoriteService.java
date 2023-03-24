@@ -95,7 +95,7 @@ public class FavoriteService {
                 .collect(Collectors.toList());
     }
 
-        public Favorite findByShopIdAndMemberId(Long shopId, Long memberId) {
+    public Favorite findByShopIdAndMemberId(Long shopId, Long memberId) {
         return favoriteRepository.findByShopIdAndMemberId(shopId, memberId).orElse(null);
     }
 

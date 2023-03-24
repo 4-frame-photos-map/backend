@@ -42,7 +42,8 @@ public class ShopController {
 
 
     @GetMapping(value = "")
-    public ResponseEntity<RsData<List<ResponseShopKeyword>>> showSearchesByKeyword(@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch) throws JsonProcessingException {
+    public ResponseEntity<RsData<List<ResponseShopKeyword>>> showSearchesByKeyword(@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch,
+                                                                                   @AuthenticationPrincipal MemberContext memberContext) {
         // todo: 키워드 유효성 검사(유도한 키워드가 맞는지)
 
         List<KakaoResponseDto> apiShop = shopService.searchByKeyword(requestKeywordSearch);
@@ -59,13 +60,22 @@ public class ShopController {
                             String.format("키워드(%s)에 해당하는 지점이 존재하지 않습니다.", requestKeywordSearch.getKeyword()))
             );
 
+        if (memberContext != null) {
+            resultShops.stream().forEach(resultShop -> {
+                Favorite favorite = favoriteService.findByShopIdAndMemberId(resultShop.getId(), memberContext.getId());
+                resultShop.setCanBeAddedToFavorites(favorite == null);
+                    }
+            );
+        }
+
         return ResponseEntity.ok(
                 new RsData<>(true, "키워드로 지점 조회 성공, 정확도순 정렬", resultShops)
         );
     }
 
     @GetMapping("/brand")
-    public ResponseEntity<RsData<List<ResponseShopBrand>>> showSearchesByBrand(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch) {
+    public ResponseEntity<RsData<List<ResponseShopBrand>>> showSearchesByBrand(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch,
+                                                                               @AuthenticationPrincipal MemberContext memberContext) {
         boolean hasBrand = false;
         if(!ObjectUtils.isEmpty(requestBrandSearch.getBrand())) {
             if (!shopService.isRepresentativeBrand(requestBrandSearch.getBrand()))
@@ -87,6 +97,14 @@ public class ShopController {
                     new RsData<>(true,
                             String.format("반경 2km 이내에 %s 지점이 존재하지 않습니다.", hasBrand? requestBrandSearch.getBrand():"전체"))
             );
+
+        if (memberContext != null) {
+            resultShops.stream().forEach(resultShop -> {
+                        Favorite favorite = favoriteService.findByShopIdAndMemberId(resultShop.getId(), memberContext.getId());
+                        resultShop.setCanBeAddedToFavorites(favorite == null);
+                    }
+            );
+        }
 
         return ResponseEntity.ok(
                 new RsData<>(true, "반경 2km 이내 지점 조회 성공, 거리순 정렬", resultShops)

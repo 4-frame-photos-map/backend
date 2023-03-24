@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,6 +21,8 @@ public class ResponseShopBrand {
     private String longitude; // 경도
     private String latitude; // 위도
     private String distance; // 거리
+    private boolean canBeAddedToFavorites; // 사용자의 찜 여부
+
 
     public void setDistance(String distance){
         this.distance = distance;

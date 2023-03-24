@@ -21,7 +21,7 @@ public class ResponseShopDetail {
     private String placeName;// 장소명
     private String roadAddressName; // 전체 도로명 주소
     private String distance; // 중심좌표까지의 거리
-    private boolean canBeAddedToFavorites; // 사용자의 찜 여부 // Entity에 추가 X(Entity Manager 관리 범위에 속하지 X)
+    private boolean canBeAddedToFavorites; // 사용자의 찜 여부
     private int favoriteCnt; // 찜 수
 
 //    @JsonIgnore // 상점이 보유한 칭호가 없다면 null 보다는 응답 데이터에서 제외되는게 더 낫다고 생각
