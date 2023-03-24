@@ -28,10 +28,10 @@ public class ResponseShopDetail {
     private List<String> shopTitles = new ArrayList<>();
 
         // todo : Review 추가;
-    public static ResponseShopDetail of(Shop shop, String distance){
+    public static ResponseShopDetail of(Shop shop, String distance, String apiShopPlaceName){
         return ResponseShopDetail.builder()
                 .id(shop.getId())
-                .placeName(shop.getPlaceName())
+                .placeName(apiShopPlaceName)
                 .roadAddressName(shop.getRoadAddressName())
                 .distance(distance)
                 .favoriteCnt(shop.getFavoriteCnt())

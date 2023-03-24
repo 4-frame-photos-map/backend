@@ -105,7 +105,7 @@ public class ShopController {
 
         if (memberContext != null) {
             Favorite favorite = favoriteService.findByShopIdAndMemberId(shopDetailDto.getId(), memberContext.getId());
-            shopDetailDto.setCanBeAddedToFavorites(favorite == null ? true : false);
+            shopDetailDto.setCanBeAddedToFavorites(favorite == null);
         }
 
         if (shopTitleLogService.existShopTitles(id)) {

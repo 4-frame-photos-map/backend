@@ -30,16 +30,15 @@ public class KeywordSearchKakaoApi {
 
 
     public List<KakaoResponseDto> searchByQueryWord(String queryWord, Double longitude, Double latitude, boolean hasRadius) {
-        // 1. 결과값 담을 객체 생성
+        // 1. 리턴 객체 생성
         List<KakaoResponseDto> resultList = new ArrayList<>();
 
-        // 2. header 설정을 위해 HttpHeader 클래스 생성 후 HttpEntity 객체에 넣어준다.
+        // 2. header 설정
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "KakaoAK " + kakao_apikey);
-
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        // 3. 파라미터를 사용하여 요청 URL 정의
+        // 3. 요청 URL 정의
         String apiURL = "https://dapi.kakao.com/v2/local/search/keyword.JSON?"
                 + "query=" + queryWord
                 + "&x=" + longitude
@@ -49,7 +48,7 @@ public class KeywordSearchKakaoApi {
                 += "&sort=distance" // 거리순 정렬
                 + "&radius=2000"; // 반경 2km 이내
 
-        // 4. exchange 메서드로 api 호출
+        // 4. api 호출
         JsonNode documents = restTemplate.exchange(apiURL, HttpMethod.GET, entity, JsonNode.class)
                 .getBody()
                 .get("documents");
@@ -79,5 +78,25 @@ public class KeywordSearchKakaoApi {
             log.error(e.getMessage());
         }
         return resultList;
+    }
+
+    public String searchByRoadAddressName(String RoadAddressName, int size) {
+        // 1. header 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "KakaoAK " + kakao_apikey);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        // 2. 요청 URL 정의
+        String apiURL = "https://dapi.kakao.com/v2/local/search/keyword.JSON?"
+                + "query=" + RoadAddressName
+                + "&size=" + size;
+
+        // 3. api 호출
+        JsonNode documents = restTemplate.exchange(apiURL, HttpMethod.GET, entity, JsonNode.class)
+                .getBody()
+                .get("documents");
+
+        // 4. JSON -> String 역직렬화
+        return documents.get(0).get("place_name").textValue();
     }
 }

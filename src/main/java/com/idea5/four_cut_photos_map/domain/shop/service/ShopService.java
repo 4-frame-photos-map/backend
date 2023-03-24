@@ -80,10 +80,12 @@ public class ShopService {
     }
 
     public ResponseShopDetail findShopById(Long id, String distance) {
-        Shop shop = shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
-        ResponseShopDetail shopDto = ResponseShopDetail.of(shop, distance);
-        return shopDto;
+        Shop dbShop = shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
 
+        String apiShopPlaceName = searchByRoadAddressName(dbShop);
+
+        ResponseShopDetail shopDto = ResponseShopDetail.of(dbShop, distance, apiShopPlaceName);
+        return shopDto;
     }
 
     public Shop findById(Long id) {
@@ -109,8 +111,17 @@ public class ShopService {
                 true
         );
     }
+
+    public String searchByRoadAddressName(Shop dbShop) {
+        return keywordSearchKakaoApi.searchByRoadAddressName (
+                dbShop.getRoadAddressName() + DEFAULT_QUERY_WORD,
+                1
+        );
+    }
+
     public boolean isRepresentativeBrand(String requestBrand) {
-        return Arrays.stream(Brand.Names).anyMatch(representative -> representative.equals(requestBrand));
+        return Arrays.stream(Brand.Names)
+                .anyMatch(representative -> representative.equals(requestBrand));
     }
 
     // 브랜드별 Map Marker
