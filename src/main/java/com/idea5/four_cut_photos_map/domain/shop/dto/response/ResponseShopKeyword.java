@@ -1,6 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
-import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.kakao.KakaoMapSearchDto;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.*;
 
@@ -18,11 +18,11 @@ public class ResponseShopKeyword {
     private String distance;
     private boolean canBeAddedToFavorites;
 
-    public static ResponseShopKeyword of(Shop shop, KakaoResponseDto apiShop){
+    public static ResponseShopKeyword of(Shop dbShop, KakaoMapSearchDto apiShop){
         return ResponseShopKeyword.builder()
-                .id(shop.getId())
+                .id(dbShop.getId())
                 .placeName(apiShop.getPlaceName())
-                .roadAddressName(shop.getRoadAddressName())
+                .roadAddressName(dbShop.getRoadAddressName())
                 .longitude(apiShop.getLongitude())
                 .latitude(apiShop.getLatitude())
                 .distance(apiShop.getDistance())

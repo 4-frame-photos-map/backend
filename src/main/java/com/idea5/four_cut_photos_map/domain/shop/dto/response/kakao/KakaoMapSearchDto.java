@@ -1,14 +1,17 @@
-package com.idea5.four_cut_photos_map.domain.shop.dto;
+package com.idea5.four_cut_photos_map.domain.shop.dto.response.kakao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+/**
+ * 카카오맵 API 공통 응답 DTO (키워드 조회, 전체/브랜드별 조회)
+ */
 @Builder
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class KakaoResponseDto {
+public class KakaoMapSearchDto {
         @JsonProperty("place_name")
         public String placeName; // 장소명
         @JsonProperty("road_address_name")

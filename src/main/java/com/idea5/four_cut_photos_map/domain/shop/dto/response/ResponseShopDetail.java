@@ -1,7 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,18 +19,20 @@ public class ResponseShopDetail {
     private String placeName;
     private String roadAddressName;
     private String distance;
+    private String placeUrl;
     private boolean canBeAddedToFavorites;
 
 //    @JsonIgnore // 상점이 보유한 칭호가 없다면 null 보다는 응답 데이터에서 제외되는게 더 낫다고 생각
     private List<String> shopTitles = new ArrayList<>();
 
         // todo : Review 추가;
-    public static ResponseShopDetail of(Shop shop, String distance){
+    public static ResponseShopDetail of(Shop dbShop, String distance, String placeUrl){
         return ResponseShopDetail.builder()
-                .id(shop.getId())
-                .placeName(shop.getPlaceName())
-                .roadAddressName(shop.getRoadAddressName())
+                .id(dbShop.getId())
+                .placeName(dbShop.getPlaceName())
+                .roadAddressName(dbShop.getRoadAddressName())
                 .distance(distance)
+                .placeUrl(placeUrl)
                 .build();
     }
 

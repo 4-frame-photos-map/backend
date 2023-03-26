@@ -1,12 +1,8 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.kakao.KakaoMapSearchDto;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
@@ -27,14 +23,14 @@ public class ResponseShopBrand {
 //    private List<String> shopTitles = new ArrayList<>();
 //    public void setShopTitles(List<String> shopTitles){ this.shopTitles = shopTitles;}
 
-    static public ResponseShopBrand of(Shop shop, KakaoResponseDto dto){
+    static public ResponseShopBrand of(Shop dbShop, KakaoMapSearchDto apiShop){
         return ResponseShopBrand.builder()
-                .id(shop.getId())
-                .placeName(dto.getPlaceName())
-                .roadAddressName(dto.getRoadAddressName())
-                .longitude(dto.getLongitude())
-                .latitude(dto.getLatitude())
-                .distance(dto.getDistance())
+                .id(dbShop.getId())
+                .placeName(apiShop.getPlaceName())
+                .roadAddressName(apiShop.getRoadAddressName())
+                .longitude(apiShop.getLongitude())
+                .latitude(apiShop.getLatitude())
+                .distance(apiShop.getDistance())
                 .build();
     }
 }

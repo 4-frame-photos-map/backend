@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 회원 찜 목록 조회 응답 DTO
+ */
 @Getter
 @Setter
 @Builder

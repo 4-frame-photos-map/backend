@@ -1,15 +1,15 @@
 package com.idea5.four_cut_photos_map.domain.shop.controller;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
-import com.idea5.four_cut_photos_map.domain.shop.dto.KakaoResponseDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.kakao.KakaoMapSearchDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopKeyword;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopBrand;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
+import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
@@ -26,6 +26,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.idea5.four_cut_photos_map.domain.shop.service.ShopService.DEFAULT_QUERY_WORD;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DISTANCE_IS_EMPTY;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_BRAND;
 
@@ -35,7 +36,6 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_BRAND
 @RequiredArgsConstructor
 @Slf4j
 public class ShopController {
-
     private final ShopService shopService;
     private final FavoriteService favoriteService;
     private final ShopTitleLogService shopTitleLogService;
@@ -46,7 +46,7 @@ public class ShopController {
                                                                                    @AuthenticationPrincipal MemberContext memberContext) {
         // todo: 키워드 유효성 검사(유도한 키워드가 맞는지)
 
-        List<KakaoResponseDto> apiShop = shopService.searchByKeyword(requestKeywordSearch);
+        List<KakaoMapSearchDto> apiShop = shopService.searchByKeyword(requestKeywordSearch);
         if(apiShop.isEmpty())
             return ResponseEntity.ok(
                     new RsData<>(true,
@@ -76,18 +76,18 @@ public class ShopController {
     @GetMapping("/brand")
     public ResponseEntity<RsData<List<ResponseShopBrand>>> showSearchesByBrand(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch,
                                                                                @AuthenticationPrincipal MemberContext memberContext) {
-        boolean hasBrand = false;
+        String brandForMsg = "전체";
         if(!ObjectUtils.isEmpty(requestBrandSearch.getBrand())) {
             if (!shopService.isRepresentativeBrand(requestBrandSearch.getBrand()))
                 throw new BusinessException(INVALID_BRAND);
-            else hasBrand = true;
+            else brandForMsg = requestBrandSearch.getBrand();
         }
 
-        List<KakaoResponseDto> apiShop = shopService.searchByBrand(requestBrandSearch);
+        List<KakaoMapSearchDto> apiShop = shopService.searchByBrand(requestBrandSearch);
         if(apiShop.isEmpty())
             return ResponseEntity.ok(
                     new RsData<>(true,
-                            String.format("반경 2km 이내에 %s 지점이 존재하지 않습니다.", hasBrand? requestBrandSearch.getBrand():"전체"))
+                            String.format("반경 2km 이내에 %s 지점이 존재하지 않습니다.", brandForMsg))
             );
 
         List<ResponseShopBrand> resultShops = new ArrayList<>();
@@ -95,7 +95,7 @@ public class ShopController {
         if(resultShops.isEmpty())
             return ResponseEntity.ok(
                     new RsData<>(true,
-                            String.format("반경 2km 이내에 %s 지점이 존재하지 않습니다.", hasBrand? requestBrandSearch.getBrand():"전체"))
+                            String.format("반경 2km 이내에 %s 지점이 존재하지 않습니다.", brandForMsg))
             );
 
         if (memberContext != null) {
@@ -119,7 +119,8 @@ public class ShopController {
 
         if (distance.isEmpty()) throw new BusinessException(DISTANCE_IS_EMPTY);
 
-        ResponseShopDetail shopDetailDto = shopService.findShopById(id, distance);
+        Shop dbShop = shopService.findById(id);
+        ResponseShopDetail shopDetailDto = shopService.renameShopAndGetPlaceUrl(dbShop, distance);
 
         if (memberContext != null) {
             Favorite favorite = favoriteService.findByShopIdAndMemberId(shopDetailDto.getId(), memberContext.getId());
