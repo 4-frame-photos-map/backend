@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static com.idea5.four_cut_photos_map.security.jwt.dto.TokenType.ACCESS_TOKEN;
+import static com.idea5.four_cut_photos_map.security.jwt.dto.TokenType.REFRESH_TOKEN;
 
 /**
  * JWT 인증처리 필터
@@ -60,6 +61,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             // 2. 올바른 토큰 타입(ATK, RTK)으로 요청했는지 검증(아래 2가지 예외)
             // 2-1. accessToken 재발급 요청에 accessToken 을 담아 요청한 경우
             // 2-2. accessToken 재발급 외의 요청에 refreshToken 을 담아 요청한 경우
+            log.info("requestURI=" + requestURI);
+            // refreshToken 으로 인증이 되어버리는 문제 해결
+            if(tokenType.equals(REFRESH_TOKEN.getName()) && !requestURI.equals(atkReissueUri)) {
+                throw new JwtException("유효하지 않은 토큰입니다.");
+            }
 //            if(tokenType.equals(ACCESS_TOKEN.getName()) && requestURI.equals(atkReissueUri)
 //            || tokenType.equals(REFRESH_TOKEN.getName()) && !requestURI.equals(atkReissueUri)) {
 //                throw new JwtException("유효하지 않은 토큰입니다.");
