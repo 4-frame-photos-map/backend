@@ -60,23 +60,14 @@ public class KeywordSearchKakaoApi {
 
     private List<KakaoResponseDto> deserialize(List<KakaoResponseDto> resultList, JsonNode documents) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        try {
-            for(int i=0; i<documents.size(); i++) {
-                JsonNode document = documents.get(i);
-
-                KakaoResponseDto dto = KakaoResponseDto.builder()
-                        .placeName(document.get("place_name").textValue())
-                        .roadAddressName(document.get("road_address_name").textValue())
-                        .longitude(document.get("x").textValue())
-                        .latitude(document.get("y").textValue())
-                        .distance(Util.distanceFormatting(document.get("distance").textValue()))
-                        .build();
-
+        for (JsonNode document : documents) {
+            try {
+                KakaoResponseDto dto = objectMapper.treeToValue(document, KakaoResponseDto.class);
+                dto.setDistance(Util.distanceFormatting(dto.getDistance()));
                 resultList.add(dto);
+            } catch (Exception e) {
+                log.error(e.getMessage());
             }
-        } catch (Exception e){
-            log.error(e.getMessage());
         }
         return resultList;
     }
