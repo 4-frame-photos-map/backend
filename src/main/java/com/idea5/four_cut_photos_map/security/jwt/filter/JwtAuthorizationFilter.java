@@ -52,6 +52,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("JwtAuthorizationFilter doFilterInternal()");
         String token = getJwtToken(request);
+        // TODO : 모든 요청에서 필터를 거치기 때문에 인증이 필요없는 API 에서 유효하지않은 accessToken 을 사용하면 오류나는 문제있음
         // 1. 토큰이 유효한지 검증
         if(StringUtils.hasText(token) && jwtProvider.verify(token)) {
             Long memberId = jwtProvider.getId(token);
@@ -60,10 +61,15 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             // 2. 올바른 토큰 타입(ATK, RTK)으로 요청했는지 검증(아래 2가지 예외)
             // 2-1. accessToken 재발급 요청에 accessToken 을 담아 요청한 경우
             // 2-2. accessToken 재발급 외의 요청에 refreshToken 을 담아 요청한 경우
-            if(tokenType.equals(ACCESS_TOKEN.getName()) && requestURI.equals(atkReissueUri)
-            || tokenType.equals(REFRESH_TOKEN.getName()) && !requestURI.equals(atkReissueUri)) {
+            log.info("requestURI=" + requestURI);
+            // refreshToken 으로 인증이 되어버리는 문제 해결
+            if(tokenType.equals(REFRESH_TOKEN.getName()) && !requestURI.equals(atkReissueUri)) {
                 throw new JwtException("유효하지 않은 토큰입니다.");
             }
+//            if(tokenType.equals(ACCESS_TOKEN.getName()) && requestURI.equals(atkReissueUri)
+//            || tokenType.equals(REFRESH_TOKEN.getName()) && !requestURI.equals(atkReissueUri)) {
+//                throw new JwtException("유효하지 않은 토큰입니다.");
+//            }
             // TODO: accessToken 블랙리스트 검사 없애기
             // 3. 해당 accessToken 이 블랙리스트로 redis 에 등록되었는지 검증
             if(tokenType.equals(ACCESS_TOKEN.getName()) && jwtService.isBlackList(token)) {

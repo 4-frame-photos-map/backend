@@ -6,12 +6,10 @@ import com.idea5.four_cut_photos_map.security.jwt.dto.response.AccessToken;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.JwtToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.util.Collection;
 
 /**
  * redis 를 이용하는 jwt 서비스(토큰 발급/재발급, 블랙리스트 검사)
@@ -42,17 +40,24 @@ public class JwtService {
                 .build();
     }
 
+    // TODO: 리팩토링
     // accessToken 재발급
-    public AccessToken reissueAccessToken(String refreshToken, Long memberId, Collection<? extends GrantedAuthority> authorities) {
-        // 1. redis 에서 memberId(key)로 refreshToken 조회
+    public AccessToken reissueAccessToken(String refreshToken) {
+        // 1. refreshToken 으로부터 memberId 조회
+        Long memberId = jwtProvider.getId(refreshToken);
+        // 2. redis 에서 memberId(key)로 refreshToken 조회
         String redisRefreshToken = redisDao.getValues(RedisDao.getRtkKey(memberId));
-        // 2. redis 에 저장된 refreshToken 과 요청 헤더로 전달된 refreshToken 값이 일치하는지 확인
+        // 3. redis 에 저장된 refreshToken 과 요청 헤더로 전달된 refreshToken 값이 일치하는지 확인
         if(!refreshToken.equals(redisRefreshToken)) {
             throw new RuntimeException("refreshToken 불일치");
         }
+        // 4. member 객체 생성
+        Member member = Member.builder()
+                .id(memberId)
+                .build();
         // TODO: 기존 refreshToken 을 삭제하고 refreshToken 도 함께 재발급할지 고민중
-        // 3. accessToken 재발급
-        String newAccessToken = jwtProvider.generateAccessToken(memberId, authorities);
+        // 5. accessToken 재발급
+        String newAccessToken = jwtProvider.generateAccessToken(memberId, member.getAuthorities());
         return AccessToken.builder()
                 .accessToken(newAccessToken)
                 .build();
