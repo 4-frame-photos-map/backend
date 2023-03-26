@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.idea5.four_cut_photos_map.domain.shop.service.kakao.KakaoMapSearchApi.DEFAULT_QUERY_WORD;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUND;
 
 @Service
@@ -27,7 +28,6 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUN
 @Slf4j
 
 public class ShopService {
-    public static final String DEFAULT_QUERY_WORD = "즉석사진";
     private final ShopRepository shopRepository;
     private final KakaoMapSearchApi kakaoMapSearchApi;
 
@@ -94,7 +94,7 @@ public class ShopService {
 
     public List<KakaoMapSearchDto> searchByKeyword(RequestKeywordSearch keywordSearch) {
         return kakaoMapSearchApi.searchByQueryWord (
-                keywordSearch.getKeyword() + DEFAULT_QUERY_WORD,
+                keywordSearch.getKeyword(),
                 keywordSearch.getLongitude(),
                 keywordSearch.getLatitude(),
                 false
@@ -114,7 +114,7 @@ public class ShopService {
 
     public String[] searchByRoadAddressName(Shop dbShop) {
         return kakaoMapSearchApi.searchByRoadAddressName (
-                dbShop.getRoadAddressName() + DEFAULT_QUERY_WORD
+                dbShop.getRoadAddressName()
         );
     }
 

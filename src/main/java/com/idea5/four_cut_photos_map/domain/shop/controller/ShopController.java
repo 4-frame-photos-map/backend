@@ -26,7 +26,6 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.idea5.four_cut_photos_map.domain.shop.service.ShopService.DEFAULT_QUERY_WORD;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DISTANCE_IS_EMPTY;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_BRAND;
 
