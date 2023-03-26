@@ -120,7 +120,7 @@ public class ShopService {
 
     public boolean isRepresentativeBrand(String requestBrand) {
         return Arrays.stream(Brand.Names)
-                .anyMatch(representative -> representative.equals(requestBrand));
+                .anyMatch(representative -> representative.equals(requestBrand.trim()));
     }
 
     // 브랜드별 Map Marker
