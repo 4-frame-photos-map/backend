@@ -3,15 +3,16 @@ package com.idea5.four_cut_photos_map.domain.shop.controller;
 
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
+import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
+import com.idea5.four_cut_photos_map.domain.review.service.ReviewService;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShopBriefInfo;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShopDetail;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopBriefInfo;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
-import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
@@ -22,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -39,9 +39,10 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_BRAND
 public class ShopController {
     private final ShopService shopService;
     private final FavoriteService favoriteService;
-    private final ShopTitleLogService shopTitleLogService;
+    private final ReviewService reviewService;
 
 
+    // todo: 리뷰 평점, 총 리뷰수 추가
     @GetMapping(value = "")
     public ResponseEntity<RsData<List<ResponseShop>>> showSearchesByKeyword(@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch,
                                                                             @AuthenticationPrincipal MemberContext memberContext) {
@@ -75,6 +76,7 @@ public class ShopController {
         );
     }
 
+    // todo: 리뷰 평점, 총 리뷰수 추가
     @GetMapping("/brand")
     public ResponseEntity<RsData<List<ResponseShop>>> showSearchesByBrand(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch,
                                                                                @AuthenticationPrincipal MemberContext memberContext) {
@@ -115,9 +117,9 @@ public class ShopController {
         );
     }
 
-    // todo : @Validated 유효성 검사 시, httpstatus code 전달하는 방법
+    // todo: 리뷰 평점, 총 리뷰수 추가
     @GetMapping("/{shop-id}")
-    public ResponseEntity<RsData<ResponseShopDetail>> detail(@PathVariable(name = "shop-id") Long id,
+    public ResponseEntity<RsData<ResponseShopDetail>> showDetail (@PathVariable(name = "shop-id") Long id,
                                                              @ModelAttribute @Valid RequestShopDetail requestShopDetail,
                                                              @AuthenticationPrincipal MemberContext memberContext) {
 
@@ -127,6 +129,9 @@ public class ShopController {
                 requestShopDetail.getPlaceUrl(),
                 requestShopDetail.getDistance()
         );
+
+        List<ResponseReviewDto> recentReviews = reviewService.getTop3ShopReviews(shopDetailDto.getId());
+        shopDetailDto.setRecentReviews(recentReviews);
 
         if (memberContext != null) {
             Favorite favorite = favoriteService.findByShopIdAndMemberId(shopDetailDto.getId(), memberContext.getId());
@@ -144,6 +149,7 @@ public class ShopController {
         );
     }
 
+    // todo: 리뷰 평점, 총 리뷰수 추가
     @GetMapping("/{shop-id}/info")
     public ResponseEntity<RsData<ResponseShopBriefInfo>> showBriefInfo (@PathVariable(name = "shop-id") Long id,
                                                                         @ModelAttribute @Valid RequestShopBriefInfo requestShopBriefInfo,

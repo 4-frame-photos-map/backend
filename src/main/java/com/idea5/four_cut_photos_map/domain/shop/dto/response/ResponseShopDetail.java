@@ -3,6 +3,7 @@ package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +25,7 @@ public class ResponseShopDetail {
     private String distance;
     private String placeUrl;
     private boolean canBeAddedToFavorites;
+    private List<ResponseReviewDto> recentReviews;
 
 
         // todo : Review 추가;
