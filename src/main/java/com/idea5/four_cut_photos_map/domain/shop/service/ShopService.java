@@ -58,7 +58,8 @@ public class ShopService {
                 .orElse(null);
     }
 
-    public ResponseShopDetail renameShopAndSetShopInfo(Shop dbShop, String placeName, String placeUrl, String distance) {
+    public ResponseShopDetail renameShopAndSetShopInfo(long id, String placeName, String placeUrl, String distance) {
+        Shop dbShop = findById(id);
         return ResponseShopDetail.of(dbShop, placeName, placeUrl, distance);
     }
 

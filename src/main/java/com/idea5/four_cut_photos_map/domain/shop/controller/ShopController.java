@@ -5,8 +5,10 @@ import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
+import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShopBriefInfo;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShopDetail;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopBriefInfo;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
@@ -119,12 +121,12 @@ public class ShopController {
                                                              @ModelAttribute @Valid RequestShopDetail requestShopDetail,
                                                              @AuthenticationPrincipal MemberContext memberContext) {
 
-        Shop dbShop = shopService.findById(id);
         ResponseShopDetail shopDetailDto = shopService.renameShopAndSetShopInfo(
-                dbShop,
+                id,
                 requestShopDetail.getPlaceName(),
                 requestShopDetail.getPlaceUrl(),
-                requestShopDetail.getDistance());
+                requestShopDetail.getDistance()
+        );
 
         if (memberContext != null) {
             Favorite favorite = favoriteService.findByShopIdAndMemberId(shopDetailDto.getId(), memberContext.getId());
@@ -139,6 +141,28 @@ public class ShopController {
 
         return ResponseEntity.ok(
                 new RsData<>(true, "지점 상세 조회 성공", shopDetailDto)
+        );
+    }
+
+    @GetMapping("/{shop-id}/info")
+    public ResponseEntity<RsData<ResponseShopBriefInfo>> showBriefInfo (@PathVariable(name = "shop-id") Long id,
+                                                                        @ModelAttribute @Valid RequestShopBriefInfo requestShopBriefInfo,
+                                                                        @AuthenticationPrincipal MemberContext memberContext) {
+
+        ResponseShopBriefInfo responseShopBriefInfo = ResponseShopBriefInfo.of(
+                id,
+                requestShopBriefInfo.getPlaceName(),
+                requestShopBriefInfo.getDistance(),
+                requestShopBriefInfo.getPlaceUrl()
+                );
+
+        if (memberContext != null) {
+            Favorite favorite = favoriteService.findByShopIdAndMemberId(responseShopBriefInfo.getId(), memberContext.getId());
+            responseShopBriefInfo.setCanBeAddedToFavorites(favorite == null);
+        }
+
+        return ResponseEntity.ok(
+                new RsData<>(true, "지점 간단 조회 성공, Map Marker 모달용", responseShopBriefInfo)
         );
     }
 
