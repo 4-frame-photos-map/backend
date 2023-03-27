@@ -58,15 +58,8 @@ public class ShopService {
                 .orElse(null);
     }
 
-    public ResponseShopDetail renameShopAndGetPlaceUrl(Shop dbShop, String distance) {
-        String[] apiShop = kakaoMapSearchApi.searchByRoadAddressName(dbShop.getRoadAddressName());
-        String apiPlaceName = apiShop[0];
-        String apiPlaceUrl = apiShop[1];
-
-        if(apiPlaceName != null) dbShop.setPlaceName(apiPlaceName);
-
-        ResponseShopDetail shopDto = ResponseShopDetail.of(dbShop, distance, apiPlaceUrl);
-        return shopDto;
+    public ResponseShopDetail renameShopAndSetShopInfo(Shop dbShop, String placeName, String placeUrl, String distance) {
+        return ResponseShopDetail.of(dbShop, placeName, placeUrl, distance);
     }
 
     public Shop findById(Long id) {

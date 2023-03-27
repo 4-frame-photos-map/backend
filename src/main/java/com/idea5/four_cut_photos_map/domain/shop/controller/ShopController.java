@@ -113,15 +113,17 @@ public class ShopController {
     }
 
     // todo : @Validated 유효성 검사 시, httpstatus code 전달하는 방법
-    @GetMapping("/{shopId}")
-    public ResponseEntity<RsData<ResponseShopDetail>> detail(@PathVariable(name = "shopId") Long id,
+    @GetMapping("/{shop-id}")
+    public ResponseEntity<RsData<ResponseShopDetail>> detail(@PathVariable(name = "shop-id") Long id,
+                                                             @RequestParam(name = "placeName") String placeName,
+                                                             @RequestParam(name = "placeUrl") String placeUrl,
                                                              @RequestParam(name = "distance", required = false, defaultValue = "") String distance,
                                                              @AuthenticationPrincipal MemberContext memberContext) {
 
         if (distance.isEmpty()) throw new BusinessException(DISTANCE_IS_EMPTY);
 
         Shop dbShop = shopService.findById(id);
-        ResponseShopDetail shopDetailDto = shopService.renameShopAndGetPlaceUrl(dbShop, distance);
+        ResponseShopDetail shopDetailDto = shopService.renameShopAndSetShopInfo(dbShop, placeName, placeUrl, distance);
 
         if (memberContext != null) {
             Favorite favorite = favoriteService.findByShopIdAndMemberId(shopDetailDto.getId(), memberContext.getId());

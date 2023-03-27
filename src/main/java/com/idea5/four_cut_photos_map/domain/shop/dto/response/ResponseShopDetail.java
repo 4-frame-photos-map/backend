@@ -24,10 +24,10 @@ public class ResponseShopDetail {
 
 
         // todo : Review 추가;
-    public static ResponseShopDetail of(Shop dbShop, String distance, String placeUrl){
+    public static ResponseShopDetail of(Shop dbShop, String placeName, String placeUrl, String distance){
         return ResponseShopDetail.builder()
                 .id(dbShop.getId())
-                .placeName(dbShop.getPlaceName())
+                .placeName(placeName)
                 .roadAddressName(dbShop.getRoadAddressName())
                 .distance(distance)
                 .placeUrl(placeUrl)
