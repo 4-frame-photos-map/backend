@@ -22,4 +22,6 @@ public class KakaoMapSearchDto {
         public String latitude; // 위도
         @JsonProperty("distance")
         public String distance; // 중심좌표까지의 거리
+        @JsonProperty("place_url")
+        public String placeUrl;
 }
