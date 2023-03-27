@@ -23,7 +23,7 @@ public class ResponseShopDetail {
     private boolean canBeAddedToFavorites;
 
 //    @JsonIgnore // 상점이 보유한 칭호가 없다면 null 보다는 응답 데이터에서 제외되는게 더 낫다고 생각
-    private List<String> shopTitles = new ArrayList<>();
+//    private List<String> shopTitles = new ArrayList<>();
 
         // todo : Review 추가;
     public static ResponseShopDetail of(Shop dbShop, String distance, String placeUrl){
@@ -36,7 +36,7 @@ public class ResponseShopDetail {
                 .build();
     }
 
-    public void setShopTitles(List<String> shopTitles) {
-        this.shopTitles = shopTitles;
-    }
+//    public void setShopTitles(List<String> shopTitles) {
+//        this.shopTitles = shopTitles;
+//    }
 }

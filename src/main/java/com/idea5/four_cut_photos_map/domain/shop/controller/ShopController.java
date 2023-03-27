@@ -123,10 +123,12 @@ public class ShopController {
             shopDetailDto.setCanBeAddedToFavorites(favorite == null);
         }
 
-        if (shopTitleLogService.existShopTitles(id)) {
-            List<String> shopTitles = shopTitleLogService.getShopTitles(id);
-            shopDetailDto.setShopTitles(shopTitles);
-        }
+        // todo : shopTitle 적용할 구체적인 페이지 논의 필요 -> 임의로 주석 처리
+//        if (shopTitleLogService.existShopTitles(id)) {
+//            List<String> shopTitles = shopTitleLogService.getShopTitles(id);
+//            shopDetailDto.setShopTitles(shopTitles);
+//        }
+
         return ResponseEntity.ok(
                 new RsData<>(true, "지점 상세 조회 성공", shopDetailDto)
         );
