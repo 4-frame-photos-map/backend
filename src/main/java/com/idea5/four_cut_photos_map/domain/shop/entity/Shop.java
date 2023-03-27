@@ -1,12 +1,11 @@
 package com.idea5.four_cut_photos_map.domain.shop.entity;
 
+import com.idea5.four_cut_photos_map.domain.brand.entity.Brand;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -18,7 +17,9 @@ import javax.persistence.Table;
 @Table(indexes = {@Index(name = "idx_shop_address",columnList = "roadAddressName"),
         @Index(name = "idx_shop_name",columnList = "roadAddressName")})
 public class Shop extends BaseEntity {
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id")
+    private Brand brand;
     private String placeName; // 상점명
     private String roadAddressName; // 주소
     private Integer favoriteCnt; // 찜 수 // MySQL Integer == MySQL int
