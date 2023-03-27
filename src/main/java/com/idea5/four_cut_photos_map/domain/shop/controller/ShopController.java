@@ -19,9 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +35,7 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_BRAND
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class ShopController {
     private final ShopService shopService;
     private final FavoriteService favoriteService;
@@ -115,12 +118,10 @@ public class ShopController {
     // todo : @Validated 유효성 검사 시, httpstatus code 전달하는 방법
     @GetMapping("/{shop-id}")
     public ResponseEntity<RsData<ResponseShopDetail>> detail(@PathVariable(name = "shop-id") Long id,
-                                                             @RequestParam(name = "placeName") String placeName,
-                                                             @RequestParam(name = "placeUrl") String placeUrl,
-                                                             @RequestParam(name = "distance") String distance,
+                                                             @RequestParam @NotBlank String placeName,
+                                                             @RequestParam @NotBlank String placeUrl,
+                                                             @RequestParam @NotBlank String distance,
                                                              @AuthenticationPrincipal MemberContext memberContext) {
-
-        if (distance.isEmpty()) throw new BusinessException(DISTANCE_IS_EMPTY);
 
         Shop dbShop = shopService.findById(id);
         ResponseShopDetail shopDetailDto = shopService.renameShopAndSetShopInfo(dbShop, placeName, placeUrl, distance);

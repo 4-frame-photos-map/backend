@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Getter
 @Builder
+@Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ErrorResponse {
     private String errorCode;

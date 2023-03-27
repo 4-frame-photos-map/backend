@@ -11,6 +11,14 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import javax.validation.ConstraintViolationException;
+import javax.validation.Path;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -79,6 +87,25 @@ public class GlobalExceptionHandler {
 //        RsData rsData = new RsData(400, "AccessDeniedException", errorResponse);
         RsData<Object> rsData = new RsData<>(false, errorResponse);
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(rsData);
+    }
+
+    /**
+     * 주로 PathVariable, RequestParam 유효성 검증(@Validation) 실패한 경우
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity<RsData> handleConstraintViolation(ConstraintViolationException e) {
+        log.error("ConstraintViolationException", e);
+
+//        String message ="";
+//        String field = e.getConstraintViolations().stream().map(error ->{
+//            Stream<Path.Node> stream= StreamSupport.stream(error.getPropertyPath().spliterator(),false);
+//            List<Path.Node> list =stream.collect(Collectors.toList());
+//            return list.get(list.size()-1).getName();
+//        }).collect(Collectors.joining(","));
+         ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST.toString(), e.getLocalizedMessage());
+        RsData<Object> rsData = new RsData<>(false, errorResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(rsData);
     }
 
