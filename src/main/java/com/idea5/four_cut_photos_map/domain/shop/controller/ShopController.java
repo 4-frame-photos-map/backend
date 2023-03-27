@@ -3,12 +3,11 @@ package com.idea5.four_cut_photos_map.domain.shop.controller;
 
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.kakao.KakaoMapSearchDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopKeyword;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopBrand;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
@@ -23,7 +22,6 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DISTANCE_IS_EMPTY;
@@ -41,8 +39,8 @@ public class ShopController {
 
 
     @GetMapping(value = "")
-    public ResponseEntity<RsData<List<ResponseShopKeyword>>> showSearchesByKeyword(@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch,
-                                                                                   @AuthenticationPrincipal MemberContext memberContext) {
+    public ResponseEntity<RsData<List<ResponseShop>>> showSearchesByKeyword(@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch,
+                                                                            @AuthenticationPrincipal MemberContext memberContext) {
         // todo: 키워드 유효성 검사(유도한 키워드가 맞는지)
 
         List<KakaoMapSearchDto> apiShop = shopService.searchByKeyword(requestKeywordSearch);
@@ -52,7 +50,7 @@ public class ShopController {
                             String.format("키워드(%s)에 해당하는 지점이 존재하지 않습니다.", requestKeywordSearch.getKeyword()))
             );
 
-        List<ResponseShopKeyword> resultShops = shopService.compareWithDbShops(apiShop);
+        List<ResponseShop> resultShops = shopService.compareWithDbShops(apiShop);
         if(resultShops.isEmpty())
             return ResponseEntity.ok(
                     new RsData<>(true,
@@ -73,7 +71,7 @@ public class ShopController {
     }
 
     @GetMapping("/brand")
-    public ResponseEntity<RsData<List<ResponseShopBrand>>> showSearchesByBrand(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch,
+    public ResponseEntity<RsData<List<ResponseShop>>> showSearchesByBrand(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch,
                                                                                @AuthenticationPrincipal MemberContext memberContext) {
         String brandForMsg = "전체";
         if(!ObjectUtils.isEmpty(requestBrandSearch.getBrand())) {
@@ -89,8 +87,7 @@ public class ShopController {
                             String.format("반경 2km 이내에 %s 지점이 존재하지 않습니다.", brandForMsg))
             );
 
-        List<ResponseShopBrand> resultShops = new ArrayList<>();
-        resultShops = shopService.compareWithDbShops(apiShop, resultShops);
+        List<ResponseShop> resultShops = shopService.compareWithDbShops(apiShop);
         if(resultShops.isEmpty())
             return ResponseEntity.ok(
                     new RsData<>(true,

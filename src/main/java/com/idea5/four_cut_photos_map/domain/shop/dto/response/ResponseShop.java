@@ -1,16 +1,18 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.kakao.KakaoMapSearchDto;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.*;
 
+/**
+ * 키워드 조회, 전체/브랜드별 조회 공통 응답 DTO
+ */
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ResponseShopBrand {
+public class ResponseShop {
     private Long id;
     private String placeName;
     private String roadAddressName;
@@ -23,8 +25,8 @@ public class ResponseShopBrand {
 //    private List<String> shopTitles = new ArrayList<>();
 //    public void setShopTitles(List<String> shopTitles){ this.shopTitles = shopTitles;}
 
-    static public ResponseShopBrand of(Shop dbShop, KakaoMapSearchDto apiShop){
-        return ResponseShopBrand.builder()
+    static public ResponseShop of(Shop dbShop, KakaoMapSearchDto apiShop){
+        return ResponseShop.builder()
                 .id(dbShop.getId())
                 .placeName(apiShop.getPlaceName())
                 .roadAddressName(apiShop.getRoadAddressName())

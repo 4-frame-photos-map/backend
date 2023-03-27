@@ -1,4 +1,4 @@
-package com.idea5.four_cut_photos_map.domain.shop.dto.response.kakao;
+package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;

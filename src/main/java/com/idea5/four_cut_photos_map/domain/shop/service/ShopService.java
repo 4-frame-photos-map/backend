@@ -1,11 +1,10 @@
 package com.idea5.four_cut_photos_map.domain.shop.service;
 
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.kakao.KakaoMapSearchDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopBrand;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopKeyword;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.domain.shop.service.kakao.KakaoMapSearchApi;
@@ -19,6 +18,8 @@ import org.springframework.util.ObjectUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.idea5.four_cut_photos_map.domain.shop.service.kakao.KakaoMapSearchApi.DEFAULT_QUERY_WORD;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUND;
@@ -31,36 +32,16 @@ public class ShopService {
     private final ShopRepository shopRepository;
     private final KakaoMapSearchApi kakaoMapSearchApi;
 
-    public List<ResponseShopKeyword> compareWithDbShops(List<KakaoMapSearchDto> apiShops) {
-        List<ResponseShopKeyword> resultShop = new ArrayList<>();
-
+    public List<ResponseShop> compareWithDbShops(List<KakaoMapSearchDto> apiShops) {
+        List<ResponseShop> resultShop = new ArrayList<>();
         for (KakaoMapSearchDto apiShop: apiShops) {
             List<Shop> dbShops = compareRoadAddressName(apiShop);
+            if (dbShops.isEmpty()) continue;
 
-            if(dbShops.isEmpty()) continue;
+            Shop dbShop = dbShops.size() == 1 ? dbShops.get(0) : comparePlaceName(apiShop, dbShops);
 
-            Shop dbShop = dbShops.size() == 1 ?  dbShops.get(0) : comparePlaceName(apiShop.getPlaceName(), dbShops);
-
-            if(dbShop != null) {
-                ResponseShopKeyword responseShopKeyword = ResponseShopKeyword.of(dbShop, apiShop);
-                resultShop.add(responseShopKeyword);
-            }
-        }
-        return resultShop;
-    }
-
-    public List<ResponseShopBrand> compareWithDbShops(List<KakaoMapSearchDto> apiShops, List<ResponseShopBrand> resultShop) {
-        for (KakaoMapSearchDto apiShop: apiShops) {
-            List<Shop> dbShops = compareRoadAddressName(apiShop);
-
-            if(dbShops.isEmpty()) continue;
-
-            Shop dbShop = dbShops.size() == 1 ?  dbShops.get(0) : comparePlaceName(apiShop.getPlaceName(), dbShops);
-
-            if(dbShop != null) {
-                ResponseShopBrand responseShopMarker = ResponseShopBrand.of(dbShop, apiShop);
-                resultShop.add(responseShopMarker);
-            }
+            ResponseShop responseShop = ResponseShop.of(dbShop, apiShop);
+            resultShop.add(responseShop);
         }
         return resultShop;
     }
@@ -70,15 +51,15 @@ public class ShopService {
         return dbShops;
     }
 
-    private Shop comparePlaceName(String apiShopPlaceName, List<Shop> dbShops) {
+    private Shop comparePlaceName(KakaoMapSearchDto apiShop, List<Shop> dbShops) {
         return dbShops.stream()
-                .filter(dbShop -> apiShopPlaceName.contains(dbShop.getPlaceName()))
+                .filter(dbShop -> apiShop.getPlaceName().contains(dbShop.getPlaceName()))
                 .findFirst()
                 .orElse(null);
     }
 
     public ResponseShopDetail renameShopAndGetPlaceUrl(Shop dbShop, String distance) {
-        String[] apiShop = searchByRoadAddressName(dbShop);
+        String[] apiShop = kakaoMapSearchApi.searchByRoadAddressName(dbShop.getRoadAddressName());
         String apiPlaceName = apiShop[0];
         String apiPlaceUrl = apiShop[1];
 
@@ -109,12 +90,6 @@ public class ShopService {
                 brandSearch.getLongitude(),
                 brandSearch.getLatitude(),
                 true
-        );
-    }
-
-    public String[] searchByRoadAddressName(Shop dbShop) {
-        return kakaoMapSearchApi.searchByRoadAddressName (
-                dbShop.getRoadAddressName()
         );
     }
 
