@@ -5,6 +5,7 @@ import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
+import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShopDetail;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
@@ -34,7 +35,6 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_BRAND
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@Validated
 public class ShopController {
     private final ShopService shopService;
     private final FavoriteService favoriteService;
@@ -117,13 +117,15 @@ public class ShopController {
     // todo : @Validated 유효성 검사 시, httpstatus code 전달하는 방법
     @GetMapping("/{shop-id}")
     public ResponseEntity<RsData<ResponseShopDetail>> detail(@PathVariable(name = "shop-id") Long id,
-                                                             @RequestParam @NotBlank String placeName,
-                                                             @RequestParam @NotBlank String placeUrl,
-                                                             @RequestParam @NotBlank String distance,
+                                                             @ModelAttribute @Valid RequestShopDetail requestShopDetail,
                                                              @AuthenticationPrincipal MemberContext memberContext) {
 
         Shop dbShop = shopService.findById(id);
-        ResponseShopDetail shopDetailDto = shopService.renameShopAndSetShopInfo(dbShop, placeName, placeUrl, distance);
+        ResponseShopDetail shopDetailDto = shopService.renameShopAndSetShopInfo(
+                dbShop,
+                requestShopDetail.getPlaceName(),
+                requestShopDetail.getPlaceUrl(),
+                requestShopDetail.getDistance());
 
         if (memberContext != null) {
             Favorite favorite = favoriteService.findByShopIdAndMemberId(shopDetailDto.getId(), memberContext.getId());
