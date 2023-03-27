@@ -31,7 +31,8 @@ public class SecurityConfig {
 //                                .anyRequest()
 //                                .authenticated()
 //                )
-                .cors().disable() // 타 도메인에서 API 호출 가능
+                .cors() // 타 도메인에서 API 호출 가능
+                .and()
                 .csrf().disable() // CSRF 토큰 끄기
                 .httpBasic().disable() // Spring Security 가 제공하는 기본 로그인 화면 사용X
                 .formLogin().disable() // 폼 로그인 방식 사용X

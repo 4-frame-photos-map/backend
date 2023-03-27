@@ -5,7 +5,6 @@ import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -17,10 +16,6 @@ import java.util.stream.Collectors;
 public class MemberContext extends User {
     private final Long id;
 
-    // TODO: id, authorities, nickname 을 제외하고 모두 삭제하는 것은 어떠한지
-    private final LocalDateTime createDate;
-    private final LocalDateTime modifyDate;
-    private final String nickname;
     private final Set<GrantedAuthority> authorities;
 
     public MemberContext(Member member) {
@@ -28,9 +23,6 @@ public class MemberContext extends User {
         super(member.getId().toString(), "", member.getAuthorities());
 
         this.id = member.getId();
-        this.createDate = member.getCreateDate();
-        this.modifyDate = member.getModifyDate();
-        this.nickname = member.getNickname();
         this.authorities = member.getAuthorities().stream().collect(Collectors.toSet());
     }
 
@@ -38,9 +30,6 @@ public class MemberContext extends User {
         return Member
                 .builder()
                 .id(id)
-                .createDate(createDate)
-                .modifyDate(modifyDate)
-                .nickname(nickname)
                 .build();
     }
 }
