@@ -117,7 +117,7 @@ public class ShopController {
     public ResponseEntity<RsData<ResponseShopDetail>> detail(@PathVariable(name = "shop-id") Long id,
                                                              @RequestParam(name = "placeName") String placeName,
                                                              @RequestParam(name = "placeUrl") String placeUrl,
-                                                             @RequestParam(name = "distance", required = false, defaultValue = "") String distance,
+                                                             @RequestParam(name = "distance") String distance,
                                                              @AuthenticationPrincipal MemberContext memberContext) {
 
         if (distance.isEmpty()) throw new BusinessException(DISTANCE_IS_EMPTY);
