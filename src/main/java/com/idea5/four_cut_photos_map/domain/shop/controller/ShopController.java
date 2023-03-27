@@ -22,6 +22,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DISTANCE_IS_EMPTY;
@@ -41,20 +42,21 @@ public class ShopController {
     @GetMapping(value = "")
     public ResponseEntity<RsData<List<ResponseShop>>> showSearchesByKeyword(@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch,
                                                                             @AuthenticationPrincipal MemberContext memberContext) {
-        // todo: 키워드 유효성 검사(유도한 키워드가 맞는지)
-
+        List<ResponseShop> resultShops = new ArrayList<>();
         List<KakaoMapSearchDto> apiShop = shopService.searchByKeyword(requestKeywordSearch);
         if(apiShop.isEmpty())
             return ResponseEntity.ok(
                     new RsData<>(true,
-                            String.format("키워드(%s)에 해당하는 지점이 존재하지 않습니다.", requestKeywordSearch.getKeyword()))
+                            String.format("키워드(%s)에 해당하는 지점이 존재하지 않습니다.", requestKeywordSearch.getKeyword()),
+                            resultShops)
             );
 
-        List<ResponseShop> resultShops = shopService.compareWithDbShops(apiShop);
+        resultShops = shopService.compareWithDbShops(apiShop);
         if(resultShops.isEmpty())
             return ResponseEntity.ok(
                     new RsData<>(true,
-                            String.format("키워드(%s)에 해당하는 지점이 존재하지 않습니다.", requestKeywordSearch.getKeyword()))
+                            String.format("키워드(%s)에 해당하는 지점이 존재하지 않습니다.", requestKeywordSearch.getKeyword()),
+                            resultShops)
             );
 
         if (memberContext != null) {
@@ -74,6 +76,7 @@ public class ShopController {
     public ResponseEntity<RsData<List<ResponseShop>>> showSearchesByBrand(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch,
                                                                                @AuthenticationPrincipal MemberContext memberContext) {
         String brandForMsg = "전체";
+        List<ResponseShop> resultShops = new ArrayList<>();
         if(!ObjectUtils.isEmpty(requestBrandSearch.getBrand())) {
             if (!shopService.isRepresentativeBrand(requestBrandSearch.getBrand()))
                 throw new BusinessException(INVALID_BRAND);
@@ -84,14 +87,16 @@ public class ShopController {
         if(apiShop.isEmpty())
             return ResponseEntity.ok(
                     new RsData<>(true,
-                            String.format("반경 2km 이내에 %s 지점이 존재하지 않습니다.", brandForMsg))
+                            String.format("반경 2km 이내에 %s 지점이 존재하지 않습니다.", brandForMsg),
+                            resultShops)
             );
 
-        List<ResponseShop> resultShops = shopService.compareWithDbShops(apiShop);
+        resultShops = shopService.compareWithDbShops(apiShop);
         if(resultShops.isEmpty())
             return ResponseEntity.ok(
                     new RsData<>(true,
-                            String.format("반경 2km 이내에 %s 지점이 존재하지 않습니다.", brandForMsg))
+                            String.format("반경 2km 이내에 %s 지점이 존재하지 않습니다.", brandForMsg),
+                            resultShops)
             );
 
         if (memberContext != null) {
