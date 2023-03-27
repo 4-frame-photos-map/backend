@@ -1,5 +1,7 @@
 package com.idea5.four_cut_photos_map.global.error;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.validation.BindingResult;
@@ -9,6 +11,7 @@ import java.util.List;
 
 @Getter
 @Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ErrorResponse {
     private String errorCode;
     private String errorMessage;
