@@ -1,12 +1,9 @@
 package com.idea5.four_cut_photos_map.domain.favorite.controller;
 
 import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponseDto;
-import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
-import com.idea5.four_cut_photos_map.global.error.ErrorCode;
-import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +44,8 @@ public class FavoriteController {
 
         favoriteService.save(shopId, member);
 
-        favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크
+        // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
+//        favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크
 
         return new ResponseEntity<>(
                 new RsData<>(true, "찜 추가 성공"),
@@ -61,7 +59,8 @@ public class FavoriteController {
                                                           @AuthenticationPrincipal MemberContext memberContext){
         favoriteService.cancel(shopId, memberContext.getId());
 
-        favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크
+        // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
+//        favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크
 
         return new ResponseEntity<>(
                 new RsData<>(true, "찜 취소 성공"),

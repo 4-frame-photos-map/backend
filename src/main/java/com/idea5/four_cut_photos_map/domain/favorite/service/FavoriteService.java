@@ -73,6 +73,7 @@ public class FavoriteService {
             default -> findByMemberIdOrderByCreateDateDesc(memberId);
         };
     }
+
     public List<FavoriteResponseDto> findByMemberIdOrderByCreateDateDesc(Long memberId) {
         List<Favorite> favorites = favoriteRepository.findByMemberIdOrderByCreateDateDesc(memberId);
 
@@ -99,19 +100,21 @@ public class FavoriteService {
         return favoriteRepository.findByShopIdAndMemberId(shopId, memberId).orElse(null);
     }
 
-    @Transactional
-    public boolean isHotPlace(Long shopId) {
-        // Favorite DB에 저장된 Shop 찾기
-        List<Favorite> list = favoriteRepository.findByShopId(shopId);
+    // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
+//    @Transactional
+//    public boolean isHotPlace(Long shopId) {
+//        // Favorite DB에 저장된 Shop 찾기
+//        List<Favorite> list = favoriteRepository.findByShopId(shopId);
+//
+//        // 찜수가 5개 이상이면 칭호부여
+//        if (list.size() >= 5) {
+//            shopTitleLogService.save(shopId, HOT_PLACE.getId());
+//            return true;
+//        }
+//
+//        return false;
+//    }
 
-        // 찜수가 5개 이상이면 칭호부여
-        if (list.size() >= 5) {
-            shopTitleLogService.save(shopId, HOT_PLACE.getId());
-            return true;
-        }
-
-        return false;
-    }
     public void deleteByMemberId(Long memberId) {
         List<Favorite> favorites = favoriteRepository.findByMember(Member.builder().id(memberId).build());
         for(Favorite favorite : favorites) {

@@ -21,10 +21,6 @@ public class ResponseShop {
     private String distance;
     private boolean canBeAddedToFavorites;
 
-//    @JsonIgnore // 상점이 보유한 칭호가 없다면 null 보다는 응답 데이터에서 제외되는게 더 낫다고 생각
-//    private List<String> shopTitles = new ArrayList<>();
-//    public void setShopTitles(List<String> shopTitles){ this.shopTitles = shopTitles;}
-
     static public ResponseShop of(Shop dbShop, KakaoMapSearchDto apiShop){
         return ResponseShop.builder()
                 .id(dbShop.getId())

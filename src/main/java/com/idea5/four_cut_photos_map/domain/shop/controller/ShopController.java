@@ -128,7 +128,7 @@ public class ShopController {
             shopDetailDto.setCanBeAddedToFavorites(favorite == null);
         }
 
-        // todo : shopTitle 적용할 구체적인 페이지 논의 필요 -> 임의로 주석 처리
+        // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
 //        if (shopTitleLogService.existShopTitles(id)) {
 //            List<String> shopTitles = shopTitleLogService.getShopTitles(id);
 //            shopDetailDto.setShopTitles(shopTitles);
@@ -151,7 +151,7 @@ public class ShopController {
 //            List<ResponseShopMarker> list = shopService.searchMarkers(requestShop, brandName);
 //            maps.put(brandName, list);
 //        }
-////
+//
 //        return ResponseEntity.ok(
 //                new RsData<Map<String, List<ResponseShopMarker>>>(true, "반경 2km 이내 Shop 조회 성공", maps)
 //        );
