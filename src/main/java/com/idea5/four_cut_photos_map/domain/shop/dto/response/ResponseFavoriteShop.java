@@ -1,5 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +15,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ResponseFavoriteShop {
     private Long id;
     private String placeName;

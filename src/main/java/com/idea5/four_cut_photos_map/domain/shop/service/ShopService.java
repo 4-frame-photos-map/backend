@@ -76,8 +76,6 @@ public class ShopService {
     }
 
     public List<KakaoMapSearchDto> searchByBrand(RequestBrandSearch brandSearch) {
-        if(ObjectUtils.isEmpty(brandSearch.getBrand())) brandSearch.setBrand(DEFAULT_QUERY_WORD);
-
         return kakaoMapSearchApi.searchByQueryWord (
                 brandSearch.getBrand(),
                 brandSearch.getLongitude(),
