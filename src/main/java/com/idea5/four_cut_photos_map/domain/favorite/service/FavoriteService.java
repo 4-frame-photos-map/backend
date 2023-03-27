@@ -1,6 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.favorite.service;
 
-import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponseDto;
+import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponse;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
@@ -14,9 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.idea5.four_cut_photos_map.domain.shoptitle.entity.ShopTitleType.HOT_PLACE;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DELETED_FAVORITE;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DUPLICATE_FAVORITE;
 
@@ -67,32 +67,30 @@ public class FavoriteService {
         shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0? 0 : shop.getFavoriteCnt() - 1);
     }
 
-    public List<FavoriteResponseDto> getFavoritesList(Long memberId, String criteria) {
+    public List<FavoriteResponse> getFavoritesList(Long memberId, String criteria) {
         return switch (criteria) {
             case "placename" -> findByMemberIdOrderByPlaceName(memberId);
             default -> findByMemberIdOrderByCreateDateDesc(memberId);
         };
     }
 
-    public List<FavoriteResponseDto> findByMemberIdOrderByCreateDateDesc(Long memberId) {
+    public List<FavoriteResponse> findByMemberIdOrderByCreateDateDesc(Long memberId) {
         List<Favorite> favorites = favoriteRepository.findByMemberIdOrderByCreateDateDesc(memberId);
-
-        if(favorites.isEmpty()) {return null;}
 
         return  favorites
                 .stream()
-                .map(favorite -> FavoriteResponseDto.from(favorite))
+                .filter(Objects::nonNull)
+                .map(favorite -> FavoriteResponse.from(favorite))
                 .collect(Collectors.toList());
     }
 
-    public List<FavoriteResponseDto> findByMemberIdOrderByPlaceName(Long memberId) {
+    public List<FavoriteResponse> findByMemberIdOrderByPlaceName(Long memberId) {
         List<Favorite> favorites = favoriteRepository.findByMemberIdOrderByShop_PlaceName(memberId);
-
-        if(favorites.isEmpty()) {return null;}
 
         return  favorites
                 .stream()
-                .map(favorite -> FavoriteResponseDto.from(favorite))
+                .filter(Objects::nonNull)
+                .map(favorite -> FavoriteResponse.from(favorite))
                 .collect(Collectors.toList());
     }
 
