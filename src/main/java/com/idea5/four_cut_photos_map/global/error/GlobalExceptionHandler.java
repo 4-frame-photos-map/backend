@@ -96,14 +96,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<RsData> handleConstraintViolation(ConstraintViolationException e) {
         log.error("ConstraintViolationException", e);
-
-        List<String> fieldList = e.getConstraintViolations().stream().map(error ->{
-            Stream<Path.Node> stream= StreamSupport.stream(error.getPropertyPath().spliterator(),false);
-            List<Path.Node> list =stream.collect(Collectors.toList());
-            return list.get(list.size()-1).getName();
-        }).collect(Collectors.toList());
-
-        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST.toString(), e.getMessage(), fieldList);
+        String[] errorMessages = e.getMessage().split(",");
+        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST.toString(), errorMessages);
         RsData<Object> rsData = new RsData<>(false, errorResponse);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(rsData);

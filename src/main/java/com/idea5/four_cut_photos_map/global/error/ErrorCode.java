@@ -12,7 +12,6 @@ public enum ErrorCode {
     TEST(HttpStatus.INTERNAL_SERVER_ERROR, "001", "business Error"),
     SHOP_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "지점을 찾을 수 없습니다."),
     INVALID_BRAND(HttpStatus.NOT_FOUND, "400", "[brand] 해당 브랜드는 대표 브랜드에 해당되지 않습니다"),
-    DISTANCE_IS_EMPTY(HttpStatus.BAD_REQUEST, "400", "[distance] 거리는 필수 입력값 입니다."),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED,"401", "만료된 토큰입니다."),
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "400,", "유효하지 않은 토큰입니다."),
     NON_TOKEN(HttpStatus.BAD_REQUEST, "400", "HTTP Authorization header 에 토큰을 담아 요청해주세요."),

@@ -27,7 +27,6 @@ import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DISTANCE_IS_EMPTY;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_BRAND;
 
 

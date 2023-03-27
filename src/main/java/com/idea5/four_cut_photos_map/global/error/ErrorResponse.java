@@ -25,11 +25,11 @@ public class ErrorResponse {
                 .build();
     }
 
-    // 에러 정보들을 Error Field 통해 처리
-    public static ErrorResponse of(String errorCode, String errorMessage, List<String> errorFieldList){
+    // 에러 정보들을 [field] : msg 로 구조화
+    public static ErrorResponse of(String errorCode, String[] errorMessages){
         return ErrorResponse.builder()
                 .errorCode(errorCode)
-                .errorMessage(createErrorMessage(errorMessage, errorFieldList))
+                .errorMessage(createErrorMessage(errorMessages))
                 .build();
     }
 
@@ -65,17 +65,22 @@ public class ErrorResponse {
 
     }
 
-    private static String createErrorMessage(String errorMessage, List<String> errorFieldList) {
+    private static String createErrorMessage(String[] errorMessages) {
         StringBuilder sb = new StringBuilder();
-        String[] msg = errorMessage.split(",");
-        for (int i=0; i<errorFieldList.size(); i++) {
-            if(i != 0){
+        boolean isFirst = true;
+
+        for (String errorMessage : errorMessages) {
+            errorMessage = errorMessage.split("\\.")[1];
+            if(!isFirst){
                 sb.append(", ");
             }
+            else {
+                isFirst = false;
+            }
             sb.append("[");
-            sb.append((errorFieldList.get(i)));
+            sb.append((errorMessage.split(":")[0])); // error Field
             sb.append("] ");
-            sb.append(msg[i].split(":")[1]);
+            sb.append(errorMessage.split(":")[1]); // error Message
         }
         return sb.toString();
     }
