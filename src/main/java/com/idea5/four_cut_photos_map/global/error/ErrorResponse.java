@@ -25,6 +25,14 @@ public class ErrorResponse {
                 .build();
     }
 
+    // 에러 정보들을 Error Field 통해 처리
+    public static ErrorResponse of(String errorCode, String errorMessage, List<String> errorFieldList){
+        return ErrorResponse.builder()
+                .errorCode(errorCode)
+                .errorMessage(createErrorMessage(errorMessage, errorFieldList))
+                .build();
+    }
+
 
     // 에러 정보들을 BindingResult을 통해 처리
     public static ErrorResponse of(String errorCode, BindingResult bindingResult){
@@ -57,5 +65,19 @@ public class ErrorResponse {
 
     }
 
+    private static String createErrorMessage(String errorMessage, List<String> errorFieldList) {
+        StringBuilder sb = new StringBuilder();
+        String[] msg = errorMessage.split(",");
+        for (int i=0; i<errorFieldList.size(); i++) {
+            if(i != 0){
+                sb.append(", ");
+            }
+            sb.append("[");
+            sb.append((errorFieldList.get(i)));
+            sb.append("] ");
+            sb.append(msg[i].split(":")[1]);
+        }
+        return sb.toString();
+    }
 
 }
