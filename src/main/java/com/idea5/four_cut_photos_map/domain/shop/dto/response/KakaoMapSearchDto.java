@@ -13,15 +13,15 @@ import lombok.*;
 @NoArgsConstructor
 public class KakaoMapSearchDto {
         @JsonProperty("place_name")
-        public String placeName; // 장소명
+        public String placeName;
         @JsonProperty("road_address_name")
-        public String roadAddressName; // 도로명 주소
+        public String roadAddressName;
         @JsonProperty("x")
-        public String longitude; // 경도
+        public String longitude;
         @JsonProperty("y")
-        public String latitude; // 위도
+        public String latitude;
         @JsonProperty("distance")
-        public String distance; // 중심좌표까지의 거리
+        public String distance;
         @JsonProperty("place_url")
-        public String placeUrl; // 장소 url
+        public String placeUrl;
 }

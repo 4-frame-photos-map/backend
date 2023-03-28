@@ -46,7 +46,6 @@ public class ShopController {
                                                                             @AuthenticationPrincipal MemberContext memberContext) {
         List<ResponseShop> resultShops = new ArrayList<>();
 
-        // 1. 키워드로 카카오맵 검색
         List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByKeyword(requestKeywordSearch);
         if(apiShop.isEmpty())
             return ResponseEntity.ok(
@@ -55,7 +54,6 @@ public class ShopController {
                             resultShops)
             );
 
-        // 2. 카카오맵 데이터와 DB 비교
         resultShops = shopService.compareWithDbShops(apiShop);
         if(resultShops.isEmpty())
             return ResponseEntity.ok(
@@ -64,7 +62,6 @@ public class ShopController {
                             resultShops)
             );
 
-        // 3. 찜 가능여부 설정
         if (memberContext != null) {
             resultShops.forEach(resultShop -> {
                 Favorite favorite = favoriteService.findByShopIdAndMemberId(resultShop.getId(), memberContext.getId());
@@ -84,13 +81,11 @@ public class ShopController {
         String brandForMsg = "전체";
         List<ResponseShop> resultShops = new ArrayList<>();
 
-        // 1. 대표 브랜드 여부 검사
         if(!ObjectUtils.isEmpty(requestBrandSearch.getBrand())) {
             if (!shopService.isRepresentativeBrand(requestBrandSearch.getBrand())) throw new BusinessException(INVALID_BRAND);
             else brandForMsg = requestBrandSearch.getBrand();
         }
 
-        // 2. 브랜드로 카카오맵 검색 (브랜드값 없을 시 즉석사진만으로 검색)
         List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByBrand(requestBrandSearch);
         if(apiShop.isEmpty())
             return ResponseEntity.ok(
@@ -99,7 +94,6 @@ public class ShopController {
                             resultShops)
             );
 
-        // 3. 카카오맵 데이터와 DB 비교
         resultShops = shopService.compareWithDbShops(apiShop);
         if(resultShops.isEmpty())
             return ResponseEntity.ok(
@@ -108,7 +102,6 @@ public class ShopController {
                             resultShops)
             );
 
-        // 4. 찜 가능여부 설정
         if (memberContext != null) {
             resultShops.forEach(resultShop -> {
                         Favorite favorite = favoriteService.findByShopIdAndMemberId(resultShop.getId(), memberContext.getId());
@@ -127,7 +120,6 @@ public class ShopController {
                                                              @ModelAttribute @Valid RequestShopDetail requestShopDetail,
                                                              @AuthenticationPrincipal MemberContext memberContext) {
 
-        // 1. 파라미터와 DB Shop 정보로 응답 DTO 생성
         ResponseShopDetail shopDetailDto = shopService.setResponseDto(
                 id,
                 requestShopDetail.getPlaceName(),
@@ -136,11 +128,9 @@ public class ShopController {
                 ResponseShopDetail.class
         );
 
-        // 2. 최신순 리뷰 3개 응답에 추가
         List<ResponseReviewDto> recentReviews = reviewService.getTop3ShopReviews(shopDetailDto.getId());
         shopDetailDto.setRecentReviews(recentReviews);
 
-        // 3. 찜 가능여부 설정
         if (memberContext != null) {
             Favorite favorite = favoriteService.findByShopIdAndMemberId(shopDetailDto.getId(), memberContext.getId());
             shopDetailDto.setCanBeAddedToFavorites(favorite == null);
@@ -162,7 +152,6 @@ public class ShopController {
                                                                         @ModelAttribute @Valid RequestShopBriefInfo requestShopBriefInfo,
                                                                         @AuthenticationPrincipal MemberContext memberContext) {
 
-        // 1. 파라미터와 DB Shop 정보로 응답 DTO 생성
         ResponseShopBriefInfo responseShopBriefInfo = shopService.setResponseDto(
                 id,
                 requestShopBriefInfo.getPlaceName(),
@@ -171,7 +160,6 @@ public class ShopController {
                 ResponseShopBriefInfo.class
         );
 
-        // 2. 찜 가능 여부 설정
         if (memberContext != null) {
             Favorite favorite = favoriteService.findByShopIdAndMemberId(responseShopBriefInfo.getId(), memberContext.getId());
             responseShopBriefInfo.setCanBeAddedToFavorites(favorite == null);
