@@ -44,7 +44,7 @@ public class ShopController {
 
     // todo: 리뷰 평점, 총 리뷰수 추가
     @GetMapping(value = "")
-    public ResponseEntity<RsData<List<ResponseShop>>> showSearchesByKeyword(@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch,
+    public ResponseEntity<RsData<List<ResponseShop>>> showSearchResultsByKeyword (@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch,
                                                                             @AuthenticationPrincipal MemberContext memberContext) {
         List<ResponseShop> resultShops = new ArrayList<>();
         List<KakaoMapSearchDto> apiShop = shopService.searchByKeyword(requestKeywordSearch);
@@ -78,7 +78,7 @@ public class ShopController {
 
     // todo: 리뷰 평점, 총 리뷰수 추가
     @GetMapping("/brand")
-    public ResponseEntity<RsData<List<ResponseShop>>> showSearchesByBrand(@ModelAttribute @Valid RequestBrandSearch requestBrandSearch,
+    public ResponseEntity<RsData<List<ResponseShop>>> showSearchResultsByBrand (@ModelAttribute @Valid RequestBrandSearch requestBrandSearch,
                                                                                @AuthenticationPrincipal MemberContext memberContext) {
         String brandForMsg = "전체";
         List<ResponseShop> resultShops = new ArrayList<>();

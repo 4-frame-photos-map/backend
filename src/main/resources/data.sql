@@ -2,6 +2,8 @@
 UPDATE shop SET create_date = Now() WHERE create_date IS NULL;
 UPDATE shop SET modify_date = Now() WHERE modify_date IS NULL;
 UPDATE shop SET favorite_cnt = 0 WHERE favorite_cnt IS NULL;
+UPDATE shop SET star_rating_avg = 0 WHERE star_rating_avg IS NULL;
+UPDATE shop SET review_cnt = 0 WHERE review_cnt IS NULL;
 
 -- Shop import 데이터에서 '서울특별시'를 '서울'로 변경
 UPDATE shop SET road_address_name= REPLACE(road_address_name,'서울특별시','서울');

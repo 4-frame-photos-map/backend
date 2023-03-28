@@ -27,7 +27,8 @@ public class FavoriteController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "")
     public ResponseEntity<RsData<List<FavoriteResponse>>> showFavoritesList(@AuthenticationPrincipal MemberContext memberContext,
-                                                                            @RequestParam(required = false, defaultValue = "created", value = "sort") String criteria) {
+                                                                            @RequestParam(required = false, defaultValue = "created",
+                                                                                    value = "sort") String criteria) {
 
         List<FavoriteResponse> favoriteResponses = favoriteService.getFavoritesList(memberContext.getId(), criteria);
 

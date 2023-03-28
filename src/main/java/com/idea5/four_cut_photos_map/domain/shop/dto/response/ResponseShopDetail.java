@@ -13,6 +13,9 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 상세 조회 응답 DTO
+ */
 @AllArgsConstructor
 @Getter
 @Setter
