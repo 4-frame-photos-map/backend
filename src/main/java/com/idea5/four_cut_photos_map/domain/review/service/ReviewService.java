@@ -149,4 +149,9 @@ public class ReviewService {
         shop.setStarRatingAvg(avgStarRating);
 
     }
+
+    // 회원의 리뷰수 조회
+    public Long getReviewCntByWriter(Member member) {
+        return reviewRepository.countByWriter(member);
+    }
 }

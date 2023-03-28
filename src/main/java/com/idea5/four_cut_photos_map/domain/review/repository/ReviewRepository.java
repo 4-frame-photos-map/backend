@@ -1,5 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.review.repository;
 
+import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.review.entity.Review;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,4 +23,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT AVG(r.starRating) FROM Review r WHERE r.shop.id = :shopId")
     Double getAverageStarRating(Long shopId);
+
+    Long countByWriter(Member writer);
 }

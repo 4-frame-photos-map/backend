@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idea5.four_cut_photos_map.AppConfig;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+
+import java.util.*;
 
 @Slf4j
 public class Util {
@@ -75,4 +75,13 @@ public class Util {
         return String.format("%.0fkm", dkm);
     }
 
+    // 난수 생성
+    public static String generateRandomNumber(int length) {
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < length; i++) {
+            sb.append(random.nextInt(9));
+        }
+        return sb.toString();
+    }
 }
