@@ -37,8 +37,10 @@ public class ShopService {
 
             Shop dbShop = dbShops.size() == 1 ? dbShops.get(0) : comparePlaceName(apiShop, dbShops);
 
-            ResponseShop responseShop = ResponseShop.of(dbShop, apiShop);
-            resultShop.add(responseShop);
+            if(dbShop != null) {
+                ResponseShop responseShop = ResponseShop.of(dbShop, apiShop);
+                resultShop.add(responseShop);
+            }
         }
         return resultShop;
     }
