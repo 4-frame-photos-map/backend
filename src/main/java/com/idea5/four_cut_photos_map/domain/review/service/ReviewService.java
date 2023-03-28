@@ -17,10 +17,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StopWatch;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -131,24 +129,21 @@ public class ReviewService {
             throw new BusinessException(ErrorCode.WRITER_DOES_NOT_MATCH);
         }
 
-        updateShopReviewStats(review);
-
         reviewRepository.delete(review);
+
+        updateShopReviewStats(review);
     }
 
     // Shop 리뷰 관련 통계 컬럼 업데이트
     public void updateShopReviewStats(Review review) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
         Shop shop = shopService.findById(review.getShop().getId());
 
         int reviewCount = reviewRepository.countByShopId(shop.getId());
+        log.info("reviewcnt="+reviewCount);
         double avgStarRating = reviewRepository.getAverageStarRating(shop.getId());
+        log.info(("rate"+avgStarRating));
 
         shop.setReviewCnt(reviewCount);
         shop.setStarRatingAvg(avgStarRating);
-        stopWatch.stop();
-        log.info(stopWatch.prettyPrint());
-        log.info("========stop=======");
     }
 }

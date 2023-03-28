@@ -155,7 +155,7 @@ public class ShopController {
                                                                         @ModelAttribute @Valid RequestShopBriefInfo requestShopBriefInfo,
                                                                         @AuthenticationPrincipal MemberContext memberContext) {
 
-        ResponseShopBriefInfo responseShopBriefInfo = ResponseShopBriefInfo.of(
+        ResponseShopBriefInfo responseShopBriefInfo = shopService.renameShopAndSetShopBriefInfo(
                 id,
                 requestShopBriefInfo.getPlaceName(),
                 requestShopBriefInfo.getDistance(),

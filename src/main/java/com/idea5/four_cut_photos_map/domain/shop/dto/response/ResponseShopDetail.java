@@ -10,7 +10,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,16 +21,17 @@ import java.util.List;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ResponseShopDetail {
-    private Long id;
+    private long id;
     private String placeName;
     private String roadAddressName;
     private String distance;
     private String placeUrl;
+    private double starRatingAvg;
+    private int reviewCnt;
     private boolean canBeAddedToFavorites;
     private List<ResponseReviewDto> recentReviews;
 
 
-        // todo : Review 추가;
     public static ResponseShopDetail of(Shop dbShop, String placeName, String placeUrl, String distance){
         return ResponseShopDetail.builder()
                 .id(dbShop.getId())
@@ -39,6 +39,8 @@ public class ResponseShopDetail {
                 .roadAddressName(dbShop.getRoadAddressName())
                 .distance(distance)
                 .placeUrl(placeUrl)
+                .starRatingAvg(dbShop.getStarRatingAvg())
+                .reviewCnt(dbShop.getReviewCnt())
                 .build();
     }
 

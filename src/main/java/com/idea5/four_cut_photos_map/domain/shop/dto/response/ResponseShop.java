@@ -23,6 +23,8 @@ public class ResponseShop {
     private String latitude;
     private String distance;
     private String placeUrl;
+    private double starRatingAvg;
+    private int reviewCnt;
     private boolean canBeAddedToFavorites;
 
     static public ResponseShop of(Shop dbShop, KakaoMapSearchDto apiShop){
@@ -34,6 +36,8 @@ public class ResponseShop {
                 .latitude(apiShop.getLatitude())
                 .distance(apiShop.getDistance())
                 .placeUrl(apiShop.getPlaceUrl())
+                .starRatingAvg(dbShop.getStarRatingAvg())
+                .reviewCnt(dbShop.getReviewCnt())
                 .build();
     }
 }

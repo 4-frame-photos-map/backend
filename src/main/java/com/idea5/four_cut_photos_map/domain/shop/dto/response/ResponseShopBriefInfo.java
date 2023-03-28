@@ -2,6 +2,7 @@ package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,18 +22,18 @@ public class ResponseShopBriefInfo {
     private String distance;
     private String placeUrl;
     private double starRatingAvg;
-    private double reviewCnt;
+    private int reviewCnt;
     private boolean canBeAddedToFavorites;
 
 
-    static public ResponseShopBriefInfo of(long id, String placeName, String distance, String placeUrl){
+    static public ResponseShopBriefInfo of(Shop dbShop, String placeName, String distance, String placeUrl){
         return ResponseShopBriefInfo.builder()
-                .id(id)
+                .id(dbShop.getId())
                 .placeName(placeName)
                 .distance(distance)
                 .placeUrl(placeUrl)
-//                .ratingAvg()
-//                .reviewCnt()
+                .starRatingAvg(dbShop.getStarRatingAvg())
+                .reviewCnt(dbShop.getReviewCnt())
                 .build();
     }
 }

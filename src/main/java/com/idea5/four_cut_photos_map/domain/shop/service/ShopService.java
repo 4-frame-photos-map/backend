@@ -4,6 +4,7 @@ import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopBriefInfo;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
@@ -58,6 +59,12 @@ public class ShopService {
         Shop dbShop = findById(id);
         return ResponseShopDetail.of(dbShop, placeName, placeUrl, distance);
     }
+
+    public ResponseShopBriefInfo renameShopAndSetShopBriefInfo(long id, String placeName, String placeUrl, String distance) {
+        Shop dbShop = findById(id);
+        return ResponseShopBriefInfo.of(dbShop, placeName, placeUrl, distance);
+    }
+
 
     public Shop findById(Long id) {
         return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
