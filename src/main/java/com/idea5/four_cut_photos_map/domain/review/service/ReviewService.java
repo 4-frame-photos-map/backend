@@ -141,7 +141,11 @@ public class ReviewService {
         int reviewCount = reviewRepository.countByShopId(shop.getId());
         shop.setReviewCnt(reviewCount);
 
-        double avgStarRating = reviewCount == 0 ? 0.0 : reviewRepository.getAverageStarRating(shop.getId());
+        double avgStarRating = 0.0;
+        if(reviewCount != 0) {
+            avgStarRating = reviewRepository.getAverageStarRating(shop.getId());
+            avgStarRating = Double.parseDouble(String.format("%.1f", avgStarRating));
+        }
         shop.setStarRatingAvg(avgStarRating);
 
     }
