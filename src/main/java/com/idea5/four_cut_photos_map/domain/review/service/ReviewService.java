@@ -139,11 +139,10 @@ public class ReviewService {
         Shop shop = shopService.findById(review.getShop().getId());
 
         int reviewCount = reviewRepository.countByShopId(shop.getId());
-        log.info("reviewcnt="+reviewCount);
-        double avgStarRating = reviewRepository.getAverageStarRating(shop.getId());
-        log.info(("rate"+avgStarRating));
-
         shop.setReviewCnt(reviewCount);
+
+        double avgStarRating = reviewCount == 0 ? 0.0 : reviewRepository.getAverageStarRating(shop.getId());
         shop.setStarRatingAvg(avgStarRating);
+
     }
 }
