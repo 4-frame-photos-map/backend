@@ -79,9 +79,10 @@ public class BrandServiceTest {
                 when(brandRepository.findById(id)).thenThrow(exception);
 
                 // then
-                org.junit.jupiter.api.Assertions.assertThrows(BusinessException.class, () -> brandService.getBrandById(id));
+                Assertions.assertThatThrownBy(() -> brandService.getBrandById(id))
+                        .isInstanceOf(exception.getClass())
+                        .hasMessageContaining(exception.getMessage());
             }
         }
-
     }
 }
