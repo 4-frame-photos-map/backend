@@ -14,7 +14,6 @@ import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopBriefInfo;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
-import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
@@ -42,7 +41,6 @@ public class ShopController {
     private final ReviewService reviewService;
 
 
-    // todo: 리뷰 평점, 총 리뷰수 추가
     @GetMapping(value = "")
     public ResponseEntity<RsData<List<ResponseShop>>> showSearchResultsByKeyword (@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch,
                                                                             @AuthenticationPrincipal MemberContext memberContext) {
@@ -76,7 +74,6 @@ public class ShopController {
         );
     }
 
-    // todo: 리뷰 평점, 총 리뷰수 추가
     @GetMapping("/brand")
     public ResponseEntity<RsData<List<ResponseShop>>> showSearchResultsByBrand (@ModelAttribute @Valid RequestBrandSearch requestBrandSearch,
                                                                                @AuthenticationPrincipal MemberContext memberContext) {
@@ -117,7 +114,6 @@ public class ShopController {
         );
     }
 
-    // todo: 리뷰 평점, 총 리뷰수 추가
     @GetMapping("/{shop-id}")
     public ResponseEntity<RsData<ResponseShopDetail>> showDetail (@PathVariable(name = "shop-id") Long id,
                                                              @ModelAttribute @Valid RequestShopDetail requestShopDetail,
@@ -127,7 +123,8 @@ public class ShopController {
                 id,
                 requestShopDetail.getPlaceName(),
                 requestShopDetail.getPlaceUrl(),
-                requestShopDetail.getDistance()
+                requestShopDetail.getDistance(),
+                ResponseShopDetail.class
         );
 
         List<ResponseReviewDto> recentReviews = reviewService.getTop3ShopReviews(shopDetailDto.getId());
@@ -149,18 +146,18 @@ public class ShopController {
         );
     }
 
-    // todo: 리뷰 평점, 총 리뷰수 추가
     @GetMapping("/{shop-id}/info")
     public ResponseEntity<RsData<ResponseShopBriefInfo>> showBriefInfo (@PathVariable(name = "shop-id") Long id,
                                                                         @ModelAttribute @Valid RequestShopBriefInfo requestShopBriefInfo,
                                                                         @AuthenticationPrincipal MemberContext memberContext) {
 
-        ResponseShopBriefInfo responseShopBriefInfo = shopService.renameShopAndSetShopBriefInfo(
+        ResponseShopBriefInfo responseShopBriefInfo = shopService.renameShopAndSetShopInfo(
                 id,
                 requestShopBriefInfo.getPlaceName(),
+                requestShopBriefInfo.getPlaceUrl(),
                 requestShopBriefInfo.getDistance(),
-                requestShopBriefInfo.getPlaceUrl()
-                );
+                ResponseShopBriefInfo.class
+        );
 
         if (memberContext != null) {
             Favorite favorite = favoriteService.findByShopIdAndMemberId(responseShopBriefInfo.getId(), memberContext.getId());

@@ -23,5 +23,5 @@ public class KakaoMapSearchDto {
         @JsonProperty("distance")
         public String distance; // 중심좌표까지의 거리
         @JsonProperty("place_url")
-        public String placeUrl;
+        public String placeUrl; // 장소 url
 }

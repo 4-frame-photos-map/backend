@@ -57,21 +57,6 @@ public class ShopService {
                 .orElse(null);
     }
 
-    public ResponseShopDetail renameShopAndSetShopInfo(long id, String placeName, String placeUrl, String distance) {
-        Shop dbShop = findById(id);
-        return ResponseShopDetail.of(dbShop, placeName, placeUrl, distance);
-    }
-
-    public ResponseShopBriefInfo renameShopAndSetShopBriefInfo(long id, String placeName, String placeUrl, String distance) {
-        Shop dbShop = findById(id);
-        return ResponseShopBriefInfo.of(dbShop, placeName, placeUrl, distance);
-    }
-
-
-    public Shop findById(Long id) {
-        return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
-    }
-
     public List<KakaoMapSearchDto> searchByKeyword(RequestKeywordSearch keywordSearch) {
         return kakaoMapSearchApi.searchByQueryWord (
                 keywordSearch.getKeyword(),
@@ -90,10 +75,23 @@ public class ShopService {
         );
     }
 
+    public Shop findById(Long id) {
+        return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
+    }
+
+    public <T extends ResponseShopBriefInfo> T renameShopAndSetShopInfo(long id, String placeName, String placeUrl, String distance, Class<T> responseClass) {
+        Shop dbShop = findById(id);
+        if(responseClass.equals(ResponseShopDetail.class))
+            return responseClass.cast(ResponseShopDetail.of(dbShop, placeName, placeUrl, distance));
+        else
+            return (T) T.of(dbShop, placeName, placeUrl, distance);
+    }
+
     public boolean isRepresentativeBrand(String requestBrand) {
         return Arrays.stream(Brand.Names)
                 .anyMatch(representative -> representative.equals(requestBrand.trim()));
     }
+
 
     // 브랜드별 Map Marker
 //    public List<ResponseShopMarker> searchMarkers(RequestShop shop, String brandName) {

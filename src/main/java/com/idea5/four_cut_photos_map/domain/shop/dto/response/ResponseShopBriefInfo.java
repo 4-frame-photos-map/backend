@@ -3,18 +3,15 @@ package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 /**
  * 간단 조회 응답 DTO (Map Marker 모달용)
  */
-@AllArgsConstructor
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ResponseShopBriefInfo {
     private long id;
@@ -26,7 +23,7 @@ public class ResponseShopBriefInfo {
     private boolean canBeAddedToFavorites;
 
 
-    static public ResponseShopBriefInfo of(Shop dbShop, String placeName, String distance, String placeUrl){
+    static public ResponseShopBriefInfo of(Shop dbShop, String placeName, String placeUrl, String distance){
         return ResponseShopBriefInfo.builder()
                 .id(dbShop.getId())
                 .placeName(placeName)
