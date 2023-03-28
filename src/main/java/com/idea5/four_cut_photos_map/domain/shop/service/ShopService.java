@@ -29,6 +29,7 @@ public class ShopService {
     private final ShopRepository shopRepository;
     private final KakaoMapSearchApi kakaoMapSearchApi;
 
+
     public List<ResponseShop> compareWithDbShops(List<KakaoMapSearchDto> apiShops) {
         List<ResponseShop> resultShop = new ArrayList<>();
         for (KakaoMapSearchDto apiShop: apiShops) {
@@ -79,12 +80,14 @@ public class ShopService {
         return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
     }
 
-    public <T extends ResponseShopBriefInfo> T renameShopAndSetShopInfo(long id, String placeName, String placeUrl, String distance, Class<T> responseClass) {
+    public <T extends ResponseShopBriefInfo> T renameShopAndSetShopInfo(long id, String placeName, String placeUrl,
+                                                                        String distance, Class<T> responseClass) {
         Shop dbShop = findById(id);
-        if(responseClass.equals(ResponseShopDetail.class))
+
+        if (responseClass.equals(ResponseShopDetail.class))
             return responseClass.cast(ResponseShopDetail.of(dbShop, placeName, placeUrl, distance));
         else
-            return (T) T.of(dbShop, placeName, placeUrl, distance);
+            return responseClass.cast(T.of(dbShop, placeName, placeUrl, distance));
     }
 
     public boolean isRepresentativeBrand(String requestBrand) {

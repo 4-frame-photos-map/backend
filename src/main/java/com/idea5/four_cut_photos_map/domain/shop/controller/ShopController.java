@@ -62,7 +62,7 @@ public class ShopController {
             );
 
         if (memberContext != null) {
-            resultShops.stream().forEach(resultShop -> {
+            resultShops.forEach(resultShop -> {
                 Favorite favorite = favoriteService.findByShopIdAndMemberId(resultShop.getId(), memberContext.getId());
                 resultShop.setCanBeAddedToFavorites(favorite == null);
                     }
@@ -102,7 +102,7 @@ public class ShopController {
             );
 
         if (memberContext != null) {
-            resultShops.stream().forEach(resultShop -> {
+            resultShops.forEach(resultShop -> {
                         Favorite favorite = favoriteService.findByShopIdAndMemberId(resultShop.getId(), memberContext.getId());
                         resultShop.setCanBeAddedToFavorites(favorite == null);
                     }
