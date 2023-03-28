@@ -2,10 +2,12 @@ package com.idea5.four_cut_photos_map.global.error;
 
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
+import com.idea5.four_cut_photos_map.security.jwt.exception.NonTokenException;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -69,16 +71,38 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 권한이 없는 사용자의 요청에 대한 예외 처리
-     * 1) 로그인이 필요한 요청 헤더에 토큰이 없는 경우
+     * 빈 토큰
      */
-    @ExceptionHandler(AccessDeniedException.class)
-    protected ResponseEntity<RsData> handleAccessDenied(AccessDeniedException e) {
-        log.error("AccessDeniedException", e);
-        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.FORBIDDEN.toString(), e.getMessage());
-//        RsData rsData = new RsData(400, "AccessDeniedException", errorResponse);
+    @ExceptionHandler(NonTokenException.class)
+    protected ResponseEntity<RsData> handleAccessDenied(NonTokenException e) {
+        log.error("NonTokenException", e);
+        ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.NON_TOKEN.getErrorCode(), ErrorCode.NON_TOKEN.getMessage());
         RsData<Object> rsData = new RsData<>(false, errorResponse);
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(rsData);
+    }
+
+    /**
+     * 유효하지 않은 토큰
+     */
+    @ExceptionHandler(JwtException.class)
+    protected ResponseEntity<RsData> handleInvalidToken(JwtException e) {
+        log.error("JwtException", e);
+        ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.INVALID_TOKEN.getErrorCode(), ErrorCode.INVALID_TOKEN.getMessage());
+        RsData<Object> rsData = new RsData<>(false, errorResponse);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(rsData);
+    }
+
+    /**
+     * 만료된 토큰
+     */
+    @ExceptionHandler(ExpiredJwtException.class)
+    protected ResponseEntity<RsData> handleExpiredToken(ExpiredJwtException e) {
+        log.error("ExpiredJwtException", e);
+        ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.EXPIRED_TOKEN.getErrorCode(), ErrorCode.EXPIRED_TOKEN.getMessage());
+        RsData<Object> rsData = new RsData<>(false, errorResponse);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(rsData);
     }
 

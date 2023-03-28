@@ -4,6 +4,7 @@ import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import com.idea5.four_cut_photos_map.security.jwt.dto.TokenType;
+import com.idea5.four_cut_photos_map.security.jwt.exception.NonTokenException;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,10 +59,13 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     // request Authorization header 의 jwt token 값 꺼내기
     private String getJwtToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(tokenHeader);
-        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_TOKEN_PREFIX)) {
-            return bearerToken.substring(BEARER_TOKEN_PREFIX.length());
-        }
-        return null;
+        // Authorization 헤더에 값이 없는 경우
+        if(bearerToken == null)
+            throw new NonTokenException();
+        // 공백이나 Bearer 로 시작하지 않는 경우
+        if(!StringUtils.hasText(bearerToken) || !bearerToken.startsWith(BEARER_TOKEN_PREFIX))
+            throw new JwtException("");
+        return bearerToken.substring(BEARER_TOKEN_PREFIX.length());
     }
 
     // Spring Security 에 유저의 인증 정보 등록(컨트롤러 단에서 @AuthenticationPrincipal 로 인증 객체를 얻기 위함)
