@@ -92,7 +92,7 @@ public class MemberService {
     public MemberTitleInfoResp getMemberTitleInfo(Member member) {
         log.info("----Before memberTitleService.findByMember(member)----");
         List<MemberTitleLog> memberTitleLogs = memberTitleService.findByMember(member);
-        String mainMemberTitle = null;
+        String mainMemberTitle = "";
         // 대표 칭호 조회(회원가입 후 바로 칭호가 부여되지 않기 때문에 회원가입 당일에는 대표 칭호가 없을 수 있음)
         for(MemberTitleLog memberTitleLog : memberTitleLogs) {
             if(memberTitleLog.getIsMain()) {
