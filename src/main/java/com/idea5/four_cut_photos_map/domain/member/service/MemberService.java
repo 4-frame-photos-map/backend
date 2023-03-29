@@ -15,7 +15,6 @@ import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import com.idea5.four_cut_photos_map.global.error.ErrorCode;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.global.util.Util;
-import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import com.idea5.four_cut_photos_map.security.jwt.JwtService;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.JwtToken;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
-    private final JwtProvider jwtProvider;
     private final RedisDao redisDao;
     private final MemberTitleService memberTitleService;
     private final FavoriteService favoriteService;
@@ -121,8 +119,8 @@ public class MemberService {
         if (redisDao.hasKey(RedisDao.getRtkKey(id))) {
             redisDao.deleteValues(RedisDao.getRtkKey(id));
         }
-        // TODO: 양방향 매핑으로 변경할지 고민중
-        // Member 삭제하기 전 Member 를 참조하고 있는 엔티티(MemberTitleLog, Favorite) 먼저 삭제하기
+        // TODO: 현재 방식에서 리뷰 삭제시 순환참조 문제 발생, 양방향 매핑으로 변경할지 고민중
+        // Member 삭제하기 전 Member 를 참조하고 있는 엔티티(MemberTitleLog, Favorite, Review) 먼저 삭제하기
         memberTitleService.deleteByMemberId(id);
         favoriteService.deleteByMemberId(id);
         // 3. DB 에서 회원 삭제
