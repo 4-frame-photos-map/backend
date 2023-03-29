@@ -84,7 +84,9 @@ public class MemberService {
 
     // 회원 id 로 기본 정보 조회
     public MemberInfoResp getMemberInfo(Long id) {
-        Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException());
+        Member member = memberRepository.findById(id).orElseThrow(
+                () -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND)
+        );
         MemberTitleInfoResp memberTitleInfo = getMemberTitleInfo(member);
         return MemberInfoResp.toDto(member, memberTitleInfo.getMainMemberTitle(), memberTitleInfo.getMemberTitleCnt());
     }
