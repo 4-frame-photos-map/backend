@@ -18,7 +18,6 @@ import lombok.*;
 public class ResponseShop {
     private Long id;
     private String placeName;
-    private String roadAddressName;
     private String longitude;
     private String latitude;
     private String distance;
@@ -31,7 +30,6 @@ public class ResponseShop {
         return ResponseShop.builder()
                 .id(dbShop.getId())
                 .placeName(apiShop.getPlaceName())
-                .roadAddressName(apiShop.getRoadAddressName())
                 .longitude(apiShop.getLongitude())
                 .latitude(apiShop.getLatitude())
                 .distance(apiShop.getDistance())
