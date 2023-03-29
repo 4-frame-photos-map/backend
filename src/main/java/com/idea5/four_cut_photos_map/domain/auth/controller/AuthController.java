@@ -96,7 +96,7 @@ public class AuthController {
         log.info("서비스 로그아웃");
         String accessToken = bearerToken.substring(BEARER_TOKEN_PREFIX.length());
         // redis 에 해당 accessToken 블랙리스트로 저장하기
-        memberService.logout(memberContext.getId(), accessToken);
+        memberService.logout(memberContext.getId());
         return new ResponseEntity<>(
                 new RsData<>(true, "로그아웃 성공"),
                 HttpStatus.OK);

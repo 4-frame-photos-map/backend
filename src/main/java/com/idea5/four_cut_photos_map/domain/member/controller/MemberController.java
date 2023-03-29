@@ -83,7 +83,7 @@ public class MemberController {
         }
         // 2. 연결 끊기
         kakaoService.disconnect(kakaoAccessToken);
-        MemberWithdrawlResp memberWithdrawlResp = memberService.deleteMember(memberContext.getId(), jwtAccessToken);
+        MemberWithdrawlResp memberWithdrawlResp = memberService.deleteMember(memberContext.getId());
         return new ResponseEntity<>(
                 new RsData<>(true, "회원탈퇴 성공", memberWithdrawlResp),
                 HttpStatus.OK);
