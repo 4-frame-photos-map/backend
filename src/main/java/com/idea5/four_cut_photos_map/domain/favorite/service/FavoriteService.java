@@ -79,7 +79,6 @@ public class FavoriteService {
 
         return  favorites
                 .stream()
-                .filter(Objects::nonNull)
                 .map(favorite -> FavoriteResponse.from(favorite))
                 .collect(Collectors.toList());
     }
@@ -89,7 +88,6 @@ public class FavoriteService {
 
         return  favorites
                 .stream()
-                .filter(Objects::nonNull)
                 .map(favorite -> FavoriteResponse.from(favorite))
                 .collect(Collectors.toList());
     }
