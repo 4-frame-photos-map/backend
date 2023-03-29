@@ -104,17 +104,12 @@ public class MemberService {
         return new MemberTitleInfoResp(memberTitleLogs.size(), mainMemberTitle);
     }
 
-    // 서비스 로그아웃(accessToken 무효화)
+    // 서비스 로그아웃
     public void logout(Long memberId, String accessToken) {
         // 1. 회원의 refreshToken 이 있으면 삭제
         if(redisDao.hasKey(RedisDao.getRtkKey(memberId))) {
             redisDao.deleteValues(RedisDao.getRtkKey(memberId));
         }
-        // 2. redis 에 해당 accessToken 블랙리스트로 등록
-        redisDao.setValues(
-                RedisDao.getBlackListAtkKey(accessToken),
-                "logout",
-                Duration.ofMillis(jwtProvider.getExpiration(accessToken)));
     }
 
     // 회원 삭제
@@ -124,11 +119,6 @@ public class MemberService {
         if (redisDao.hasKey(RedisDao.getRtkKey(id))) {
             redisDao.deleteValues(RedisDao.getRtkKey(id));
         }
-        // 2. redis 에 해당 accessToken 블랙리스트로 등록
-        redisDao.setValues(
-                RedisDao.getBlackListAtkKey(accessToken),
-                "withdrawl",
-                Duration.ofMillis(jwtProvider.getExpiration(accessToken)));
         // TODO: 양방향 매핑으로 변경할지 고민중
         // Member 삭제하기 전 Member 를 참조하고 있는 엔티티(MemberTitleLog, Favorite) 먼저 삭제하기
         memberTitleService.deleteByMemberId(id);
