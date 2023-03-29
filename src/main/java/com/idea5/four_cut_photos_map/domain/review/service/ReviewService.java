@@ -138,7 +138,7 @@ public class ReviewService {
     public void updateShopReviewStats(Review review) {
         Shop shop = shopService.findById(review.getShop().getId());
 
-        int reviewCount = reviewRepository.countByShopId(shop.getId());
+        int reviewCount = reviewRepository.countByShop(shop);
         shop.setReviewCnt(reviewCount);
 
         double avgStarRating = 0.0;
