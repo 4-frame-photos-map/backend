@@ -24,7 +24,7 @@ public class ResponseShop {
     private String placeUrl;
     private double starRatingAvg;
     private int reviewCnt;
-    private boolean canBeAddedToFavorites;
+    private boolean isFavorite;
 
     static public ResponseShop of(Shop dbShop, KakaoMapSearchDto apiShop){
         return ResponseShop.builder()

@@ -65,7 +65,7 @@ public class ShopController {
         if (memberContext != null) {
             resultShops.forEach(resultShop -> {
                 Favorite favorite = favoriteService.findByShopIdAndMemberId(resultShop.getId(), memberContext.getId());
-                resultShop.setCanBeAddedToFavorites(favorite == null);
+                resultShop.setFavorite(favorite == null);
                     }
             );
         }
@@ -105,7 +105,7 @@ public class ShopController {
         if (memberContext != null) {
             resultShops.forEach(resultShop -> {
                         Favorite favorite = favoriteService.findByShopIdAndMemberId(resultShop.getId(), memberContext.getId());
-                        resultShop.setCanBeAddedToFavorites(favorite == null);
+                        resultShop.setFavorite(favorite == null);
                     }
             );
         }
@@ -133,7 +133,7 @@ public class ShopController {
 
         if (memberContext != null) {
             Favorite favorite = favoriteService.findByShopIdAndMemberId(shopDetailDto.getId(), memberContext.getId());
-            shopDetailDto.setCanBeAddedToFavorites(favorite == null);
+            shopDetailDto.setFavorite(favorite == null);
         }
 
         // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
@@ -162,7 +162,7 @@ public class ShopController {
 
         if (memberContext != null) {
             Favorite favorite = favoriteService.findByShopIdAndMemberId(responseShopBriefInfo.getId(), memberContext.getId());
-            responseShopBriefInfo.setCanBeAddedToFavorites(favorite == null);
+            responseShopBriefInfo.setFavorite(favorite == null);
         }
 
         return ResponseEntity.ok(

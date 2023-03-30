@@ -20,7 +20,7 @@ public class ResponseShopBriefInfo {
     private String placeUrl;
     private double starRatingAvg;
     private int reviewCnt;
-    private boolean canBeAddedToFavorites;
+    private boolean isFavorite;
 
 
     static public ResponseShopBriefInfo of(Shop dbShop, String placeName, String placeUrl, String distance){
