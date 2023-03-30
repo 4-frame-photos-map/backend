@@ -26,7 +26,9 @@ public class KakaoMapSearchApi {
     private String kakao_apikey;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+    public final int radius= 2000;
     public static final String DEFAULT_QUERY_WORD = "즉석사진";
+
 
 
 
@@ -46,7 +48,7 @@ public class KakaoMapSearchApi {
 
         if (hasRadius) apiURL
                 += "&sort=distance" // 거리순 정렬
-                + "&radius=2000"; // 반경 2km 이내
+                + "&radius=" + radius; // 반경 2km 이내
 
         // 3. api 호출
         JsonNode documents = restTemplate.exchange(apiURL, HttpMethod.GET, entity, JsonNode.class)
