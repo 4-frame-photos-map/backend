@@ -59,6 +59,34 @@ public class KakaoMapSearchApi {
         return deserialize(resultList, documents);
     }
 
+    public String[] searchByRoadAddressName(String roadAddressName) {
+        // 1. header 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "KakaoAK " + kakao_apikey);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        // 2. 요청 URL 정의
+        String apiURL = "https://dapi.kakao.com/v2/local/search/keyword.JSON?"
+                + "query=" + roadAddressName + DEFAULT_QUERY_WORD
+                + "&size=1"; // 정확도순 상위 하나의 지점만 응답받도록 제한
+
+        // 3. api 호출
+        JsonNode document = restTemplate.exchange(apiURL, HttpMethod.GET, entity, JsonNode.class)
+                .getBody()
+                .get("documents")
+                .get(0);
+
+        // 4. JSON -> String 역직렬화
+        // 100% 일치 결과 없으면 유사도 제일 높은 장소 받아오기 때문에
+        // 요청 도로명 주소와 완전히 일치하는지 검사 필요
+        if(document.get("road_address_name").asText().equals(roadAddressName))
+            return new String[] {
+                    document.get("place_name").asText(), document.get("place_url").asText(),
+                    document.get("x").asText(), document.get("y").asText()
+        };
+        else return null;
+    }
+
     private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {

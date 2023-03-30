@@ -19,14 +19,18 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ResponseShopDetail extends ResponseShopBriefInfo {
     private String roadAddressName;
+    private String longitude;
+    private String latitude;
     private List<ResponseReviewDto> recentReviews;
 
 
-    public static ResponseShopDetail of(Shop dbShop, String placeName, String placeUrl, String distance){
+    public static ResponseShopDetail of(Shop dbShop, String placeName, String placeUrl, String longitude, String latitude,  String distance){
         return ResponseShopDetail.builder()
                 .id(dbShop.getId())
                 .placeName(placeName)
                 .roadAddressName(dbShop.getRoadAddressName())
+                .longitude(longitude)
+                .latitude(latitude)
                 .distance(distance)
                 .placeUrl(placeUrl)
                 .starRatingAvg(dbShop.getStarRatingAvg())
