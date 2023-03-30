@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     TEST(HttpStatus.INTERNAL_SERVER_ERROR, "001", "business Error"),
     SHOP_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "지점을 찾을 수 없습니다."),
+    INVALID_SHOP_ID(HttpStatus.NOT_FOUND, "400", "[id] 해당 id는 셀프 즉석사진관에 해당하는 id가 아닙니다. DB에 저장된 데이터 중 다른 업종에 속한 id 입니다."),
     INVALID_BRAND(HttpStatus.NOT_FOUND, "400", "[brand] 해당 브랜드는 대표 브랜드에 해당되지 않습니다"),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED,"401", "만료된 토큰입니다."),
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "401", "유효하지 않은 토큰입니다."),

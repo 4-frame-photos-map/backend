@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_SHOP_ID;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUND;
 
 @Service
@@ -82,6 +83,8 @@ public class ShopService {
 
     public ResponseShopDetail renameShopAndSetResponseDto(Shop dbShop, String distance) {
         String[] apiShop = kakaoMapSearchApi.searchByRoadAddressName(dbShop.getRoadAddressName());
+
+        if(apiShop == null) throw new BusinessException(INVALID_SHOP_ID);
         String placeName = apiShop[0];
         String placeUrl = apiShop[1];
         String longitude = apiShop[2];
