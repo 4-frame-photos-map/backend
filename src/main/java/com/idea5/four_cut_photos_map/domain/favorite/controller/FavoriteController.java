@@ -1,12 +1,9 @@
 package com.idea5.four_cut_photos_map.domain.favorite.controller;
 
-import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponseDto;
-import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
+import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponse;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
-import com.idea5.four_cut_photos_map.global.error.ErrorCode;
-import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -28,15 +26,17 @@ public class FavoriteController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "")
-    public ResponseEntity<RsData> showFavoritesList(@AuthenticationPrincipal MemberContext memberContext,
-    @RequestParam(required = false, defaultValue = "created", value = "sort") String criteria) {
+    public ResponseEntity<RsData<List<FavoriteResponse>>> showFavoritesList(@AuthenticationPrincipal MemberContext memberContext,
+                                                                            @RequestParam(required = false, defaultValue = "created",
+                                                                                    value = "sort") String criteria) {
 
-        List<FavoriteResponseDto> favoriteResponseDtos = favoriteService.getFavoritesList(memberContext.getId(), criteria);
+        List<FavoriteResponse> favoriteResponses = favoriteService.getFavoritesList(memberContext.getId(), criteria);
 
-        return new ResponseEntity<>(
+        return ResponseEntity.ok(
                 new RsData<>(true,
-                        favoriteResponseDtos != null? "찜 목록 조회 성공":"찜 목록이 없는 사용자", favoriteResponseDtos),
-                HttpStatus.OK);
+                        favoriteResponses.isEmpty() ? "찜 목록이 없는 사용자" : "찜 목록 조회 성공",
+                        favoriteResponses)
+        );
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -47,11 +47,11 @@ public class FavoriteController {
 
         favoriteService.save(shopId, member);
 
-        favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크
+        // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
+//        favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크
 
-        return new ResponseEntity<>(
-                new RsData<>(true, "찜 추가 성공"),
-                HttpStatus.OK);
+        return ResponseEntity.ok(
+                new RsData<>(true, "찜 추가 성공"));
     }
 
 
@@ -61,10 +61,10 @@ public class FavoriteController {
                                                           @AuthenticationPrincipal MemberContext memberContext){
         favoriteService.cancel(shopId, memberContext.getId());
 
-        favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크
+        // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
+//        favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크
 
-        return new ResponseEntity<>(
-                new RsData<>(true, "찜 취소 성공"),
-                HttpStatus.OK);
+        return ResponseEntity.ok(
+                new RsData<>(true, "찜 취소 성공"));
     }
 }

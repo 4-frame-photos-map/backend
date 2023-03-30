@@ -86,6 +86,8 @@ public class ReviewService {
 
         reviewRepository.save(review);
 
+        updateShopReviewStats(review);
+
         return ResponseReviewDto.from(review, user, shop);
     }
 
@@ -101,6 +103,8 @@ public class ReviewService {
 
         // Review Entity 수정
         review = updateReview(review, reviewDto);
+
+        updateShopReviewStats(review);
 
         return ResponseReviewDto.from(review);
     }
@@ -126,6 +130,24 @@ public class ReviewService {
         }
 
         reviewRepository.delete(review);
+
+        updateShopReviewStats(review);
+    }
+
+    // Shop 리뷰 관련 통계 컬럼 업데이트
+    public void updateShopReviewStats(Review review) {
+        Shop shop = shopService.findById(review.getShop().getId());
+
+        int reviewCount = reviewRepository.countByShop(shop);
+        shop.setReviewCnt(reviewCount);
+
+        double avgStarRating = 0.0;
+        if(reviewCount != 0) {
+            avgStarRating = reviewRepository.getAverageStarRating(shop.getId());
+            avgStarRating = Double.parseDouble(String.format("%.1f", avgStarRating));
+        }
+        shop.setStarRatingAvg(avgStarRating);
+
     }
 
     // 회원의 리뷰수 조회
