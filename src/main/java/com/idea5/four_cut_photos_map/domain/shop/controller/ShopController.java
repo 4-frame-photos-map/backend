@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -36,6 +37,7 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_BRAND
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class ShopController {
     private final ShopService shopService;
     private final FavoriteService favoriteService;
@@ -122,7 +124,7 @@ public class ShopController {
                                                              @AuthenticationPrincipal MemberContext memberContext) {
 
         Shop dbShop = shopService.findById(id);
-        ResponseShopDetail shopDetailDto = shopService.renameShopAndGetPlaceUrl(dbShop, distance);
+        ResponseShopDetail shopDetailDto = shopService.renameShopAndSetResponseDto(dbShop, distance);
 
         if (memberContext != null) {
             Favorite favorite = favoriteService.findByShopIdAndMemberId(shopDetailDto.getId(), memberContext.getId());
@@ -157,8 +159,7 @@ public class ShopController {
                 id,
                 requestShopBriefInfo.getPlaceName(),
                 requestShopBriefInfo.getPlaceUrl(),
-                requestShopBriefInfo.getDistance(),
-                ResponseShopBriefInfo.class
+                requestShopBriefInfo.getDistance()
         );
 
         if (memberContext != null) {

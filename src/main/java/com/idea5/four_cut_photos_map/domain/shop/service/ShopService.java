@@ -80,27 +80,20 @@ public class ShopService {
         return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
     }
 
-    public ResponseShopDetail renameShopAndGetPlaceUrl(Shop dbShop, String distance) {
+    public ResponseShopDetail renameShopAndSetResponseDto(Shop dbShop, String distance) {
         String[] apiShop = kakaoMapSearchApi.searchByRoadAddressName(dbShop.getRoadAddressName());
-        String apiPlaceName = apiShop[0];
-        String apiPlaceUrl = apiShop[1];
+        String placeName = apiShop[0];
+        String placeUrl = apiShop[1];
+        String longitude = apiShop[2];
+        String latitude = apiShop[3];
 
-        if(apiPlaceName != null) dbShop.setPlaceName(apiPlaceName);
-
-        ResponseShopDetail shopDto = setResponseDto(dbShop.getId(),apiPlaceName, apiPlaceUrl, distance, ResponseShopDetail.class);
-        return shopDto;
+        return ResponseShopDetail.of(dbShop, placeName, placeUrl, longitude, latitude, distance);
     }
 
 
-    public <T extends ResponseShopBriefInfo> T setResponseDto (long id, String placeName, String placeUrl, String distance,
-                                                                                                Class<T> responseClass) {
+    public ResponseShopBriefInfo setResponseDto (long id, String placeName, String placeUrl, String distance) {
         Shop dbShop = findById(id);
-
-        if (responseClass.equals(ResponseShopDetail.class)) {
-            return responseClass.cast(ResponseShopDetail.of(dbShop, placeName, placeUrl, distance));
-        } else {
-            return responseClass.cast(T.of(dbShop, placeName, placeUrl, distance));
-        }
+        return ResponseShopBriefInfo.of(dbShop, placeName, placeUrl, distance);
     }
 
     public boolean isRepresentativeBrand(String requestBrand) {
