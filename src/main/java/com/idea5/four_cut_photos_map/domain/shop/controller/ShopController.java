@@ -8,11 +8,11 @@ import com.idea5.four_cut_photos_map.domain.review.service.ReviewService;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShopBriefInfo;
-import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShopDetail;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopBriefInfo;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
+import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
@@ -25,6 +25,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -117,16 +118,16 @@ public class ShopController {
 
     @GetMapping("/{shop-id}")
     public ResponseEntity<RsData<ResponseShopDetail>> showDetail (@PathVariable(name = "shop-id") Long id,
-                                                             @ModelAttribute @Valid RequestShopDetail requestShopDetail,
+                                                             @RequestParam @NotBlank String distance,
                                                              @AuthenticationPrincipal MemberContext memberContext) {
 
-        ResponseShopDetail shopDetailDto = shopService.setResponseDto(
-                id,
-                requestShopDetail.getPlaceName(),
-                requestShopDetail.getPlaceUrl(),
-                requestShopDetail.getDistance(),
-                ResponseShopDetail.class
-        );
+        Shop dbShop = shopService.findById(id);
+        ResponseShopDetail shopDetailDto = shopService.renameShopAndGetPlaceUrl(dbShop, distance);
+
+        if (memberContext != null) {
+            Favorite favorite = favoriteService.findByShopIdAndMemberId(shopDetailDto.getId(), memberContext.getId());
+            shopDetailDto.setFavorite(favorite == null);
+        }
 
         List<ResponseReviewDto> recentReviews = reviewService.getTop3ShopReviews(shopDetailDto.getId());
         shopDetailDto.setRecentReviews(recentReviews);
