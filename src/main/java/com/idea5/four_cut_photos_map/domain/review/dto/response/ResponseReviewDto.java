@@ -34,7 +34,7 @@ public class ResponseReviewDto {
     private ReviewMemberDto memberInfo;
 
     // Shop 관련 정보
-    private ReviewShopDto shopInfo;
+//    private ReviewShopDto shopInfo;
 
     public static ResponseReviewDto from(Review review) {
         return ResponseReviewDto.from(review, review.getWriter(), review.getShop());
@@ -46,11 +46,11 @@ public class ResponseReviewDto {
                 .nickname(writer.getNickname())
                 .build();
 
-        ReviewShopDto reviewShopDto = ReviewShopDto.builder()
-                .id(shop.getId())
-                .placeName(shop.getPlaceName())
-                .roadAddressName(shop.getRoadAddressName())
-                .build();
+//        ReviewShopDto reviewShopDto = ReviewShopDto.builder()
+//                .id(shop.getId())
+//                .placeName(shop.getPlaceName())
+//                .roadAddressName(shop.getRoadAddressName())
+//                .build();
 
         return ResponseReviewDto.builder()
                 .id(review.getId())
@@ -62,7 +62,7 @@ public class ResponseReviewDto {
                 .retouch(review.getRetouch())
                 .item(review.getItem())
                 .memberInfo(reviewMemberDto)
-                .shopInfo(reviewShopDto)
+//                .shopInfo(reviewShopDto)
                 .build();
     }
 }

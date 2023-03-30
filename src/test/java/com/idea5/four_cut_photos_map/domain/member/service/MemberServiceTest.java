@@ -191,7 +191,7 @@ class MemberServiceTest {
         Member member = memberService.getMember(
                 new KakaoUserInfoParam(1111L, "딸기"),
                 new KakaoTokenResp("bearer", "kakao_access_token", 60, "kakao_refresh_token", 86400));
-        Shop shop = shopRepository.save(new Shop("인생네컷 성수점", "서울시", 0));
+        Shop shop = shopRepository.save(new Shop("인생네컷 성수점", "서울시", 0,0,0.0));
         favoriteRepository.save(new Favorite(member, shop));
 
         collectJob.add();

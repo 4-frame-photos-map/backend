@@ -1,6 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.favorite.service;
 
-import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponseDto;
+import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponse;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
@@ -14,9 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.idea5.four_cut_photos_map.domain.shoptitle.entity.ShopTitleType.HOT_PLACE;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DELETED_FAVORITE;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DUPLICATE_FAVORITE;
 
@@ -67,51 +67,50 @@ public class FavoriteService {
         shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0? 0 : shop.getFavoriteCnt() - 1);
     }
 
-    public List<FavoriteResponseDto> getFavoritesList(Long memberId, String criteria) {
+    public List<FavoriteResponse> getFavoritesList(Long memberId, String criteria) {
         return switch (criteria) {
             case "placename" -> findByMemberIdOrderByPlaceName(memberId);
             default -> findByMemberIdOrderByCreateDateDesc(memberId);
         };
     }
-    public List<FavoriteResponseDto> findByMemberIdOrderByCreateDateDesc(Long memberId) {
+
+    public List<FavoriteResponse> findByMemberIdOrderByCreateDateDesc(Long memberId) {
         List<Favorite> favorites = favoriteRepository.findByMemberIdOrderByCreateDateDesc(memberId);
 
-        if(favorites.isEmpty()) {return null;}
-
         return  favorites
                 .stream()
-                .map(favorite -> FavoriteResponseDto.from(favorite))
+                .map(favorite -> FavoriteResponse.from(favorite))
                 .collect(Collectors.toList());
     }
 
-    public List<FavoriteResponseDto> findByMemberIdOrderByPlaceName(Long memberId) {
+    public List<FavoriteResponse> findByMemberIdOrderByPlaceName(Long memberId) {
         List<Favorite> favorites = favoriteRepository.findByMemberIdOrderByShop_PlaceName(memberId);
 
-        if(favorites.isEmpty()) {return null;}
-
         return  favorites
                 .stream()
-                .map(favorite -> FavoriteResponseDto.from(favorite))
+                .map(favorite -> FavoriteResponse.from(favorite))
                 .collect(Collectors.toList());
     }
 
-        public Favorite findByShopIdAndMemberId(Long shopId, Long memberId) {
+    public Favorite findByShopIdAndMemberId(Long shopId, Long memberId) {
         return favoriteRepository.findByShopIdAndMemberId(shopId, memberId).orElse(null);
     }
 
-    @Transactional
-    public boolean isHotPlace(Long shopId) {
-        // Favorite DB에 저장된 Shop 찾기
-        List<Favorite> list = favoriteRepository.findByShopId(shopId);
+    // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
+//    @Transactional
+//    public boolean isHotPlace(Long shopId) {
+//        // Favorite DB에 저장된 Shop 찾기
+//        List<Favorite> list = favoriteRepository.findByShopId(shopId);
+//
+//        // 찜수가 5개 이상이면 칭호부여
+//        if (list.size() >= 5) {
+//            shopTitleLogService.save(shopId, HOT_PLACE.getId());
+//            return true;
+//        }
+//
+//        return false;
+//    }
 
-        // 찜수가 5개 이상이면 칭호부여
-        if (list.size() >= 5) {
-            shopTitleLogService.save(shopId, HOT_PLACE.getId());
-            return true;
-        }
-
-        return false;
-    }
     public void deleteByMemberId(Long memberId) {
         List<Favorite> favorites = favoriteRepository.findByMember(Member.builder().id(memberId).build());
         for(Favorite favorite : favorites) {

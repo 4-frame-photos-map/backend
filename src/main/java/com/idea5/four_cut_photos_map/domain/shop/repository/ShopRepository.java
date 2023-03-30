@@ -12,6 +12,5 @@ import java.util.Optional;
 
 @Repository
 public interface ShopRepository extends JpaRepository<Shop, Long> {
-    List<Shop> findDistinctByPlaceNameStartingWith(String keyword);
     List<Shop> findDistinctByRoadAddressName(String roadAddressName);
 }
