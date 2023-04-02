@@ -14,15 +14,16 @@ import javax.persistence.*;
 @NoArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
-@Table(indexes = {@Index(name = "idx_shop_address",columnList = "roadAddressName"),
-        @Index(name = "idx_shop_name",columnList = "roadAddressName")})
+@Table(indexes = {@Index(name = "idx_shop_address",columnList = "roadAddressName")})
 public class Shop extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
     private Brand brand;
-    private String placeName; // 상점명
-    private String roadAddressName; // 주소
-    private Integer favoriteCnt; // 찜 수 // MySQL Integer == MySQL int
+    private String placeName;
+    private String roadAddressName;
+    private Integer favoriteCnt; // MySQL Integer == MySQL int
+    private Integer reviewCnt;
+    private Double starRatingAvg;
 
 
     // TODO: 상점 상세페이지뿐만 아니라 상점 리스트 페이지에도 favoriteCnt(찜 수)를 전송해야 할 지? 논의

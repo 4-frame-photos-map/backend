@@ -142,14 +142,15 @@ class MemberServiceTest {
         assertThat(redisDao.getValues(RedisDao.getRtkKey(member.getId()))).isEqualTo(jwtToken.getRefreshToken());
 
         // when
-        memberService.deleteMember(member.getId(), jwtToken.getAccessToken());
+        memberService.deleteMember(member.getId());
 
         // then
-        // 1. DB Member 삭제
-        assertThat(memberRepository.count()).isEqualTo(0);
-        // 2. Redis jwtAccessToken 블랙리스트 등록, jwtRefreshToken 삭제
-        assertThat(redisDao.getValues(RedisDao.getBlackListAtkKey(jwtToken.getAccessToken()))).isEqualTo("withdrawl");
-        assertThat(redisDao.getValues(RedisDao.getRtkKey(member.getId()))).isNull();
+        assertAll(
+                // 1. DB Member 삭제
+                () -> assertThat(memberRepository.count()).isEqualTo(0),
+                // 2. Redis jwtAccessToken 블랙리스트 등록, jwtRefreshToken 삭제
+                () -> assertThat(redisDao.getValues(RedisDao.getRtkKey(member.getId()))).isNull()
+        );
     }
 
     @Test
@@ -199,7 +200,7 @@ class MemberServiceTest {
         Member member = memberService.getMember(
                 new KakaoUserInfoParam(1111L, "딸기"),
                 new KakaoTokenResp("bearer", "kakao_access_token", 60, "kakao_refresh_token", 86400));
-        Shop shop = shopRepository.save(new Shop(brand, "인생네컷 성수점", "서울시", 0));
+        Shop shop = shopRepository.save(new Shop(brand, "인생네컷 성수점", "서울시", 0,0,0.0));
         favoriteRepository.save(new Favorite(member, shop));
 
         collectJob.add();
@@ -231,7 +232,7 @@ class MemberServiceTest {
         assertThat(redisDao.getValues(RedisDao.getRtkKey(member.getId()))).isEqualTo(jwtToken.getRefreshToken());
 
         // when
-        memberService.logout(member.getId(), jwtToken.getAccessToken());
+        memberService.logout(member.getId());
 
         // then
         // 1. Redis jwtAccessToken 블랙리스트 등록, jwtRefreshToken 삭제

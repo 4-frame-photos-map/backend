@@ -1,7 +1,10 @@
 package com.idea5.four_cut_photos_map.global.error;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
@@ -9,6 +12,8 @@ import java.util.List;
 
 @Getter
 @Builder
+@Setter
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ErrorResponse {
     private String errorCode;
     private String errorMessage;
@@ -17,6 +22,14 @@ public class ErrorResponse {
         return ErrorResponse.builder()
                 .errorCode(errorCode)
                 .errorMessage(errorMessage)
+                .build();
+    }
+
+    // 에러 정보들을 [field] : msg 로 구조화
+    public static ErrorResponse of(String errorCode, String[] errorMessages){
+        return ErrorResponse.builder()
+                .errorCode(errorCode)
+                .errorMessage(createErrorMessage(errorMessages))
                 .build();
     }
 
@@ -52,5 +65,24 @@ public class ErrorResponse {
 
     }
 
+    private static String createErrorMessage(String[] errorMessages) {
+        StringBuilder sb = new StringBuilder();
+        boolean isFirst = true;
+
+        for (String errorMessage : errorMessages) {
+            errorMessage = errorMessage.split("\\.")[1];
+            if(!isFirst){
+                sb.append(", ");
+            }
+            else {
+                isFirst = false;
+            }
+            sb.append("[");
+            sb.append((errorMessage.split(":")[0])); // error Field
+            sb.append("] ");
+            sb.append(errorMessage.split(":")[1]); // error Message
+        }
+        return sb.toString();
+    }
 
 }

@@ -1,51 +1,48 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@AllArgsConstructor
+/**
+ * 상세 조회 응답 DTO
+ */
 @Getter
 @Setter
-@Builder
-public class ResponseShopDetail {
+@SuperBuilder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public class ResponseShopDetail extends ResponseShopBriefInfo {
+    private String roadAddressName;
+    private String longitude;
+    private String latitude;
+    private List<ResponseReviewDto> recentReviews;
 
-    private Long id; // PK
-    private String name;// 장소명
-    private String address; // 전체 도로명 주소
-    private String distance; // 중심좌표까지의 거리
-    private boolean canBeAddedToFavorites; // 사용자의 찜 여부 // Entity에 추가 X(Entity Manager 관리 범위에 속하지 X)
-    private int favoriteCnt; // 찜 수
 
-//    @JsonIgnore // 상점이 보유한 칭호가 없다면 null 보다는 응답 데이터에서 제외되는게 더 낫다고 생각
-    private List<String> shopTitles = new ArrayList<>();
-
-        // todo : Review 추가;
-    public static ResponseShopDetail of(Shop shop, String distance){
+    public static ResponseShopDetail of(Shop dbShop, String placeName, String placeUrl, String longitude, String latitude,  String distance){
         return ResponseShopDetail.builder()
-                .id(shop.getId())
-                .name(shop.getPlaceName())
-                .address(shop.getRoadAddressName())
+                .id(dbShop.getId())
+                .placeName(placeName)
+                .roadAddressName(dbShop.getRoadAddressName())
+                .longitude(longitude)
+                .latitude(latitude)
                 .distance(distance)
-                .favoriteCnt(shop.getFavoriteCnt())
-                .canBeAddedToFavorites(false)
+                .placeUrl(placeUrl)
+                .starRatingAvg(dbShop.getStarRatingAvg())
+                .reviewCnt(dbShop.getReviewCnt())
                 .build();
     }
 
-    public void setDistance(String distance){
-        this.distance = distance;
-    }
 
-    public void setShopTitles(List<String> shopTitles) {
-        this.shopTitles = shopTitles;
-    }
-
-
+    // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
+//    @JsonIgnore // 상점이 보유한 칭호가 없다면 null 보다는 응답 데이터에서 제외되는게 더 낫다고 생각
+//    private List<String> shopTitles = new ArrayList<>();
+//    public void setShopTitles(List<String> shopTitles) {
+//        this.shopTitles = shopTitles;
+//    }
 }

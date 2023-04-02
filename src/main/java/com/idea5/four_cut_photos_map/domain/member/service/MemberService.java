@@ -15,7 +15,6 @@ import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import com.idea5.four_cut_photos_map.global.error.ErrorCode;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.global.util.Util;
-import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import com.idea5.four_cut_photos_map.security.jwt.JwtService;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.JwtToken;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
-    private final JwtProvider jwtProvider;
     private final RedisDao redisDao;
     private final MemberTitleService memberTitleService;
     private final FavoriteService favoriteService;
@@ -84,7 +82,9 @@ public class MemberService {
 
     // 회원 id 로 기본 정보 조회
     public MemberInfoResp getMemberInfo(Long id) {
-        Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException());
+        Member member = memberRepository.findById(id).orElseThrow(
+                () -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND)
+        );
         MemberTitleInfoResp memberTitleInfo = getMemberTitleInfo(member);
         return MemberInfoResp.toDto(member, memberTitleInfo.getMainMemberTitle(), memberTitleInfo.getMemberTitleCnt());
     }
@@ -92,7 +92,7 @@ public class MemberService {
     public MemberTitleInfoResp getMemberTitleInfo(Member member) {
         log.info("----Before memberTitleService.findByMember(member)----");
         List<MemberTitleLog> memberTitleLogs = memberTitleService.findByMember(member);
-        String mainMemberTitle = null;
+        String mainMemberTitle = "";
         // 대표 칭호 조회(회원가입 후 바로 칭호가 부여되지 않기 때문에 회원가입 당일에는 대표 칭호가 없을 수 있음)
         for(MemberTitleLog memberTitleLog : memberTitleLogs) {
             if(memberTitleLog.getIsMain()) {
@@ -104,33 +104,23 @@ public class MemberService {
         return new MemberTitleInfoResp(memberTitleLogs.size(), mainMemberTitle);
     }
 
-    // 서비스 로그아웃(accessToken 무효화)
-    public void logout(Long memberId, String accessToken) {
+    // 서비스 로그아웃
+    public void logout(Long id) {
         // 1. 회원의 refreshToken 이 있으면 삭제
-        if(redisDao.hasKey(RedisDao.getRtkKey(memberId))) {
-            redisDao.deleteValues(RedisDao.getRtkKey(memberId));
+        if(redisDao.hasKey(RedisDao.getRtkKey(id))) {
+            redisDao.deleteValues(RedisDao.getRtkKey(id));
         }
-        // 2. redis 에 해당 accessToken 블랙리스트로 등록
-        redisDao.setValues(
-                RedisDao.getBlackListAtkKey(accessToken),
-                "logout",
-                Duration.ofMillis(jwtProvider.getExpiration(accessToken)));
     }
 
     // 회원 삭제
     @Transactional
-    public MemberWithdrawlResp deleteMember(Long id, String accessToken) {
+    public MemberWithdrawlResp deleteMember(Long id) {
         // 1. 회원의 refreshToken 이 있으면 삭제
         if (redisDao.hasKey(RedisDao.getRtkKey(id))) {
             redisDao.deleteValues(RedisDao.getRtkKey(id));
         }
-        // 2. redis 에 해당 accessToken 블랙리스트로 등록
-        redisDao.setValues(
-                RedisDao.getBlackListAtkKey(accessToken),
-                "withdrawl",
-                Duration.ofMillis(jwtProvider.getExpiration(accessToken)));
-        // TODO: 양방향 매핑으로 변경할지 고민중
-        // Member 삭제하기 전 Member 를 참조하고 있는 엔티티(MemberTitleLog, Favorite) 먼저 삭제하기
+        // TODO: 현재 방식에서 리뷰 삭제시 순환참조 문제 발생, 양방향 매핑으로 변경할지 고민중
+        // Member 삭제하기 전 Member 를 참조하고 있는 엔티티(MemberTitleLog, Favorite, Review) 먼저 삭제하기
         memberTitleService.deleteByMemberId(id);
         favoriteService.deleteByMemberId(id);
         // 3. DB 에서 회원 삭제
