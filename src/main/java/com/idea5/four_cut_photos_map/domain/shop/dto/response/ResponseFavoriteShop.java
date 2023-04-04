@@ -21,6 +21,9 @@ public class ResponseFavoriteShop {
     private String placeName;
     private String roadAddressName;
     private String distance;
+    private double starRatingAvg;
+    private int reviewCnt;
+    private int favoriteCnt;
 
     public static ResponseFavoriteShop from(Shop shop, String placeName, String distance) {
         return ResponseFavoriteShop.builder()
@@ -28,6 +31,9 @@ public class ResponseFavoriteShop {
                 .placeName(placeName)
                 .roadAddressName(shop.getRoadAddressName())
                 .distance(distance)
+                .starRatingAvg(shop.getStarRatingAvg())
+                .reviewCnt(shop.getReviewCnt())
+                .favoriteCnt(shop.getFavoriteCnt())
                 .build();
     }
 }
