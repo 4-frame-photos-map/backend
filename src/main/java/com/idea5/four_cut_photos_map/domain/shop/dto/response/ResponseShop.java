@@ -2,6 +2,8 @@ package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.idea5.four_cut_photos_map.domain.brand.dto.response.ResponseBrandDto;
+import com.idea5.four_cut_photos_map.domain.brand.entity.Brand;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.*;
 
@@ -25,8 +27,9 @@ public class ResponseShop {
     private double starRatingAvg;
     private int reviewCnt;
     private boolean isFavorite;
+    private ResponseBrandDto brand;
 
-    static public ResponseShop of(Shop dbShop, KakaoMapSearchDto apiShop){
+    static public ResponseShop of(Shop dbShop, KakaoMapSearchDto apiShop, ResponseBrandDto brand){
         return ResponseShop.builder()
                 .id(dbShop.getId())
                 .placeName(apiShop.getPlaceName())
@@ -36,6 +39,7 @@ public class ResponseShop {
                 .placeUrl(apiShop.getPlaceUrl())
                 .starRatingAvg(dbShop.getStarRatingAvg())
                 .reviewCnt(dbShop.getReviewCnt())
+                .brand(brand)
                 .build();
     }
 }

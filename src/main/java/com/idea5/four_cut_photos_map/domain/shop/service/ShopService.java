@@ -1,5 +1,8 @@
 package com.idea5.four_cut_photos_map.domain.shop.service;
 
+import com.idea5.four_cut_photos_map.domain.brand.dto.response.ResponseBrandDto;
+import com.idea5.four_cut_photos_map.domain.brand.entity.MajorBrand;
+import com.idea5.four_cut_photos_map.domain.brand.service.BrandService;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
@@ -9,7 +12,6 @@ import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.domain.shop.service.kakao.KakaoMapSearchApi;
-import com.idea5.four_cut_photos_map.global.common.data.Brand;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,7 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUN
 public class ShopService {
     private final ShopRepository shopRepository;
     private final KakaoMapSearchApi kakaoMapSearchApi;
+    private final BrandService brandService;
 
 
     public List<ResponseShop> compareWithDbShops(List<KakaoMapSearchDto> apiShops) {
@@ -40,7 +43,8 @@ public class ShopService {
             Shop dbShop = dbShops.size() == 1 ? dbShops.get(0) : comparePlaceName(apiShop, dbShops);
 
             if(dbShop != null) {
-                ResponseShop responseShop = ResponseShop.of(dbShop, apiShop);
+                ResponseBrandDto brandDto = brandService.getBrandById(dbShop.getBrand().getId());
+                ResponseShop responseShop = ResponseShop.of(dbShop, apiShop, brandDto);
                 resultShop.add(responseShop);
             }
         }
@@ -100,8 +104,9 @@ public class ShopService {
     }
 
     public boolean isRepresentativeBrand(String requestBrand) {
-        return Arrays.stream(Brand.Names)
-                .anyMatch(representative -> representative.equals(requestBrand.trim()));
+        return Arrays.stream(MajorBrand.values()).anyMatch(
+                representative -> representative.getBrandName().equals(requestBrand.trim())
+        );
     }
 
 

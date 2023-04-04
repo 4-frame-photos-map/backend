@@ -89,6 +89,7 @@ public class ShopController {
             else brandForMsg = requestBrandSearch.getBrand();
         }
 
+
         List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByBrand(requestBrandSearch);
         if(apiShop.isEmpty())
             return ResponseEntity.ok(
