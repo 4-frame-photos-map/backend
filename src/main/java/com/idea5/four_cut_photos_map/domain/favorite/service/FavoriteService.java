@@ -79,7 +79,7 @@ public class FavoriteService {
 
         return  favorites
                 .stream()
-                .map(favorite -> FavoriteResponse.from(favorite))
+                .map(favorite -> shopService.renameShopAndSetResponseDto(favorite, longitude, latitude))
                 .collect(Collectors.toList());
     }
 
@@ -88,7 +88,7 @@ public class FavoriteService {
 
         return  favorites
                 .stream()
-                .map(favorite -> FavoriteResponse.from(favorite))
+                .map(favorite -> shopService.renameShopAndSetResponseDto(favorite, longitude, latitude))
                 .collect(Collectors.toList());
     }
 

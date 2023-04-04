@@ -1,5 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.shop.service;
 
+import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponse;
+import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
@@ -91,6 +93,20 @@ public class ShopService {
         String latitude = apiShop[3];
 
         return ResponseShopDetail.of(dbShop, placeName, placeUrl, longitude, latitude, distance);
+    }
+
+    public FavoriteResponse renameShopAndSetResponseDto(Favorite favorite, Double curLnt, Double curLat) {
+        String[] apiShop = kakaoMapSearchApi.searchByRoadAddressName(
+                favorite.getShop().getRoadAddressName(),
+                curLnt,
+                curLat
+        );
+
+        if(apiShop == null) throw new BusinessException(INVALID_SHOP_ID);
+        String placeName = apiShop[0];
+        String distance = apiShop[1];
+
+        return FavoriteResponse.from(favorite, placeName, distance);
     }
 
 
