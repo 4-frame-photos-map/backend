@@ -73,9 +73,9 @@ public class BrandServiceTest {
             @DisplayName("해당 id를 가진 브랜드 존재하지 않음")
             void getBrandByIdFail1() {
                 // given
-                BusinessException exception = new BusinessException(ErrorCode.BRAND_NOT_FOUND);
+                BusinessException exception = new BusinessException(ErrorCode.INVALID_BRAND);
 
-                // mocking
+                // when
                 when(brandRepository.findById(id)).thenThrow(exception);
 
                 // then

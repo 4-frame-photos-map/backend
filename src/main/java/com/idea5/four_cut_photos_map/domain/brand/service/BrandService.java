@@ -18,7 +18,7 @@ public class BrandService {
     private final BrandRepository brandRepository;
 
     public ResponseBrandDto getBrandById(Long id) {
-        Brand brand = brandRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.BRAND_NOT_FOUND));
+        Brand brand = brandRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.INVALID_BRAND));
 
         return ResponseBrandDto.from(brand);
     }
