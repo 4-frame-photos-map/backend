@@ -67,14 +67,14 @@ public class FavoriteService {
         shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0? 0 : shop.getFavoriteCnt() - 1);
     }
 
-    public List<FavoriteResponse> getFavoritesList(Long memberId, String criteria) {
+    public List<FavoriteResponse> getFavoritesList(Long memberId, String criteria, Double longitude, Double latitude) {
         return switch (criteria) {
-            case "placename" -> findByMemberIdOrderByPlaceName(memberId);
-            default -> findByMemberIdOrderByCreateDateDesc(memberId);
+            case "placename" -> findByMemberIdOrderByPlaceName(memberId, longitude, latitude);
+            default -> findByMemberIdOrderByCreateDateDesc(memberId, longitude, latitude);
         };
     }
 
-    public List<FavoriteResponse> findByMemberIdOrderByCreateDateDesc(Long memberId) {
+    public List<FavoriteResponse> findByMemberIdOrderByCreateDateDesc(Long memberId, Double longitude, Double latitude) {
         List<Favorite> favorites = favoriteRepository.findByMemberIdOrderByCreateDateDesc(memberId);
 
         return  favorites
@@ -83,7 +83,7 @@ public class FavoriteService {
                 .collect(Collectors.toList());
     }
 
-    public List<FavoriteResponse> findByMemberIdOrderByPlaceName(Long memberId) {
+    public List<FavoriteResponse> findByMemberIdOrderByPlaceName(Long memberId, Double longitude, Double latitude) {
         List<Favorite> favorites = favoriteRepository.findByMemberIdOrderByShop_PlaceName(memberId);
 
         return  favorites

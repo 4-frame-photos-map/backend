@@ -1,5 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.favorite.controller;
 
+import com.idea5.four_cut_photos_map.domain.favorite.dto.request.FavoriteRequest;
 import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponse;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
@@ -13,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,10 +29,16 @@ public class FavoriteController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "")
     public ResponseEntity<RsData<List<FavoriteResponse>>> showFavoritesList(@AuthenticationPrincipal MemberContext memberContext,
-                                                                            @RequestParam(required = false, defaultValue = "created",
-                                                                                    value = "sort") String criteria) {
+                                                                            @ModelAttribute @Valid FavoriteRequest favoriteRequest,
+                                                                            @RequestParam(required = false, defaultValue = "created", value = "sort")
+                                                                                String criteria) {
 
-        List<FavoriteResponse> favoriteResponses = favoriteService.getFavoritesList(memberContext.getId(), criteria);
+        List<FavoriteResponse> favoriteResponses = favoriteService.getFavoritesList(
+                memberContext.getId(),
+                criteria,
+                favoriteRequest.getLongitude(),
+                favoriteRequest.getLatitude()
+        );
 
         return ResponseEntity.ok(new RsData<>(favoriteResponses));
     }
