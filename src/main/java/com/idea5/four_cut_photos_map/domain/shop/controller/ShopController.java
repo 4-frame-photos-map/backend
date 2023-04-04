@@ -109,7 +109,7 @@ public class ShopController {
     }
 
     /**
-     * 지점 상세 조회
+     * 상세 조회
      */
     @GetMapping("/{shop-id}")
     public ResponseEntity<RsData<ResponseShopDetail>> showDetail (@PathVariable(name = "shop-id") Long id,
@@ -142,7 +142,7 @@ public class ShopController {
     }
 
     /**
-     * 지점 간단 조회, Map Marker 모달용
+     * 간단 조회, Map Marker 모달용
      */
     @GetMapping("/{shop-id}/info")
     public ResponseEntity<RsData<ResponseShopBriefInfo>> showBriefInfo (@PathVariable(name = "shop-id") Long id,

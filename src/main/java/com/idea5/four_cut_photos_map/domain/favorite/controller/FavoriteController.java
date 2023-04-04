@@ -32,11 +32,7 @@ public class FavoriteController {
 
         List<FavoriteResponse> favoriteResponses = favoriteService.getFavoritesList(memberContext.getId(), criteria);
 
-        return ResponseEntity.ok(
-                new RsData<>(true,
-                        favoriteResponses.isEmpty() ? "찜 목록이 없는 사용자" : "찜 목록 조회 성공",
-                        favoriteResponses)
-        );
+        return ResponseEntity.ok(new RsData<>(favoriteResponses));
     }
 
     @PreAuthorize("isAuthenticated()")
