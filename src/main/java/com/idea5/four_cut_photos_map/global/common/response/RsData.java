@@ -22,6 +22,10 @@ public class RsData<T> {
     private T result;       // API 가 응답해야하는 리소스 (선택)
 
     // 성공 응답
+    public RsData(T result) {
+        this.result = result;
+    }
+
     public RsData(boolean success, String message) {
         this.success = success;
         this.message = message;
