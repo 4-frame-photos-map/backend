@@ -42,7 +42,7 @@ public class FavoriteController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value = "/{shopId}")
-    public ResponseEntity<RsData> addShopToFavorites(@PathVariable Long shopId,
+    public ResponseEntity<String> addShopToFavorites(@PathVariable Long shopId,
                                                      @AuthenticationPrincipal MemberContext memberContext){
 
         favoriteService.save(shopId, memberContext.getMember());
@@ -50,8 +50,7 @@ public class FavoriteController {
         // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
 //        favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크
 
-        return ResponseEntity.ok(
-                new RsData<>(true, "찜 추가 성공"));
+        return ResponseEntity.ok("");
     }
 
 
