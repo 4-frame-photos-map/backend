@@ -47,9 +47,8 @@ public class FavoriteController {
     @PostMapping(value = "/{shopId}")
     public ResponseEntity<RsData> addShopToFavorites(@PathVariable Long shopId,
                                                      @AuthenticationPrincipal MemberContext memberContext){
-        Member member = memberContext.getMember();
 
-        favoriteService.save(shopId, member);
+        favoriteService.save(shopId, memberContext.getMember());
 
         // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
 //        favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크

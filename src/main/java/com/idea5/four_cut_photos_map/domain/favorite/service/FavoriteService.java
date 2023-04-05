@@ -17,12 +17,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DELETED_FAVORITE;
-import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DUPLICATE_FAVORITE;
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.*;
 
 @RequiredArgsConstructor
 @Service
 public class FavoriteService {
+    private final int MAX_FAVORITE_SHOP_COUNT = 20;
     private final ShopService shopService;
     private final FavoriteRepository favoriteRepository;
 
@@ -38,7 +38,12 @@ public class FavoriteService {
             throw new BusinessException(DUPLICATE_FAVORITE);
         }
 
-        // 2. 저장
+        // 2. 최대 찜 개수 초과 여부 체크
+        if(countByMember(member) >= MAX_FAVORITE_SHOP_COUNT){
+            throw new BusinessException(FAVORITE_LIMIT_EXCEEDED);
+        }
+
+        // 3. 저장
         Shop shop = shopService.findById(shopId);
         Favorite favorite = Favorite.builder()
                 .member(member)
@@ -46,7 +51,7 @@ public class FavoriteService {
                 .build();
         favoriteRepository.save(favorite);
 
-        // 3. shop 찜 수 갱신
+        // 4. shop 찜 수 갱신
         shop.setFavoriteCnt(shop.getFavoriteCnt()+1);
     }
 
