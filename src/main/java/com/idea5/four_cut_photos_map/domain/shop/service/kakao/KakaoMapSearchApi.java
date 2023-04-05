@@ -23,7 +23,7 @@ import java.util.List;
 public class KakaoMapSearchApi {
 
     @Value("${REST_API_KEY}")
-    private final String REST_API_KEY;
+    private String REST_API_KEY;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     public final int radius= 2000;
