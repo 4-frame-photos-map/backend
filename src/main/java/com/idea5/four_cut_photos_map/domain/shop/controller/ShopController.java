@@ -48,18 +48,18 @@ public class ShopController {
      * 키워드 조회, 정확도순 정렬
      */
     @GetMapping(value = "")
-    public ResponseEntity<RsData<List<ResponseShop>>> showSearchResultsByKeyword (@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch,
+    public ResponseEntity<List<ResponseShop>> showSearchResultsByKeyword (@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch,
                                                                             @AuthenticationPrincipal MemberContext memberContext) {
         List<ResponseShop> resultShops = new ArrayList<>();
 
         List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByKeyword(requestKeywordSearch);
         if(apiShop.isEmpty()) {
-            return ResponseEntity.ok(new RsData<>(resultShops));
+            return ResponseEntity.ok(resultShops);
         }
 
         resultShops = shopService.compareWithDbShops(apiShop);
         if(resultShops.isEmpty()) {
-            return ResponseEntity.ok(new RsData<>(resultShops));
+            return ResponseEntity.ok(resultShops);
         }
 
         if (memberContext != null) {
@@ -70,14 +70,14 @@ public class ShopController {
             );
         }
 
-        return ResponseEntity.ok(new RsData<>(resultShops));
+        return ResponseEntity.ok(resultShops);
     }
 
     /**
      * 브랜드별 조회, 거리순 정렬
      */
     @GetMapping("/brand")
-    public ResponseEntity<RsData<List<ResponseShop>>> showSearchResultsByBrand (@ModelAttribute @Valid RequestBrandSearch requestBrandSearch,
+    public ResponseEntity<List<ResponseShop>> showSearchResultsByBrand (@ModelAttribute @Valid RequestBrandSearch requestBrandSearch,
                                                                                @AuthenticationPrincipal MemberContext memberContext) {
         List<ResponseShop> resultShops = new ArrayList<>();
 
@@ -89,12 +89,12 @@ public class ShopController {
 
         List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByBrand(requestBrandSearch);
         if(apiShop.isEmpty()) {
-            return ResponseEntity.ok(new RsData<>(resultShops));
+            return ResponseEntity.ok(resultShops);
         }
 
         resultShops = shopService.compareWithDbShops(apiShop);
         if(resultShops.isEmpty()) {
-            return ResponseEntity.ok(new RsData<>(resultShops));
+            return ResponseEntity.ok(resultShops);
         }
 
         if (memberContext != null) {
@@ -105,14 +105,14 @@ public class ShopController {
             );
         }
 
-        return ResponseEntity.ok(new RsData<>(resultShops));
+        return ResponseEntity.ok(resultShops);
     }
 
     /**
      * 상세 조회
      */
     @GetMapping("/{shop-id}")
-    public ResponseEntity<RsData<ResponseShopDetail>> showDetail (@PathVariable(name = "shop-id") Long id,
+    public ResponseEntity<ResponseShopDetail> showDetail (@PathVariable(name = "shop-id") Long id,
                                                              @RequestParam @NotBlank String distance,
                                                              @AuthenticationPrincipal MemberContext memberContext) {
 
@@ -138,14 +138,14 @@ public class ShopController {
 //            shopDetailDto.setShopTitles(shopTitles);
 //        }
 
-        return ResponseEntity.ok(new RsData<>(shopDetailDto));
+        return ResponseEntity.ok(shopDetailDto);
     }
 
     /**
      * 간단 조회, Map Marker 모달용
      */
     @GetMapping("/{shop-id}/info")
-    public ResponseEntity<RsData<ResponseShopBriefInfo>> showBriefInfo (@PathVariable(name = "shop-id") Long id,
+    public ResponseEntity<ResponseShopBriefInfo> showBriefInfo (@PathVariable(name = "shop-id") Long id,
                                                                         @ModelAttribute @Valid RequestShopBriefInfo requestShopBriefInfo,
                                                                         @AuthenticationPrincipal MemberContext memberContext) {
 
@@ -161,7 +161,7 @@ public class ShopController {
             responseShopBriefInfo.setFavorite(favorite == null);
         }
 
-        return ResponseEntity.ok(new RsData<>(responseShopBriefInfo));
+        return ResponseEntity.ok(responseShopBriefInfo);
     }
 
     // 브랜드별 Map Marker
