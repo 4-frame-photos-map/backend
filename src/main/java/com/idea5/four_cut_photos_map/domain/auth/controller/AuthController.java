@@ -8,7 +8,6 @@ import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoUserInfoParam
 import com.idea5.four_cut_photos_map.domain.auth.service.KakaoService;
 import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
-import com.idea5.four_cut_photos_map.security.jwt.JwtProvider;
 import com.idea5.four_cut_photos_map.security.jwt.JwtService;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.AccessToken;
@@ -33,7 +32,6 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/auth")
 public class AuthController {
     private final JwtService jwtService;
-    private final JwtProvider jwtProvider;
     private final MemberService memberService;
     private final KakaoService kakaoService;
 
