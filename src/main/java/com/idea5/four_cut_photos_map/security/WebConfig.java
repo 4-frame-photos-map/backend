@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.security;
 
 import com.idea5.four_cut_photos_map.security.jwt.interceptor.AuthenticationInterceptor;
+import com.idea5.four_cut_photos_map.security.jwt.interceptor.OptionalAuthenticationInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -13,6 +14,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
     private final AuthenticationInterceptor authenticationInterceptor;
+    private final OptionalAuthenticationInterceptor optionalAuthenticationInterceptor;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -29,5 +31,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(authenticationInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/auth/login/kakao", "/shops/**", "/auth/token"); // 인가작업을 제외할 API 경로 설정
+        registry.addInterceptor(optionalAuthenticationInterceptor)
+                .addPathPatterns("/shops/**");
     }
 }
