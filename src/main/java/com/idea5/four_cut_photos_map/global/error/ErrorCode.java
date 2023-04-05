@@ -11,8 +11,8 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     TEST(HttpStatus.INTERNAL_SERVER_ERROR, "001", "business Error"),
     SHOP_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "지점을 찾을 수 없습니다."),
-    INVALID_SHOP_ID(HttpStatus.NOT_FOUND, "400", "[id] 해당 id는 셀프 즉석사진관에 해당하는 id가 아닙니다. DB에 저장된 데이터 중 다른 업종에 속한 id 입니다."),
-    INVALID_BRAND(HttpStatus.NOT_FOUND, "400", "[brand] 해당 브랜드는 대표 브랜드에 해당되지 않습니다"),
+    INVALID_SHOP_ID(HttpStatus.BAD_REQUEST, "400", "[id] 해당 id는 셀프 즉석사진관에 해당하는 id가 아닙니다. DB에 저장된 데이터 중 다른 업종에 속한 id 입니다."),
+    INVALID_BRAND(HttpStatus.BAD_REQUEST, "400", "[brand] 해당 브랜드는 대표 브랜드에 해당되지 않습니다"),
 
     // 인증 관련 오류
     NON_TOKEN(HttpStatus.UNAUTHORIZED, "100", "HTTP Authorization header 에 토큰을 담아 요청해주세요."),
@@ -20,7 +20,7 @@ public enum ErrorCode {
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED,"102", "만료된 토큰입니다."),
 
     DUPLICATE_FAVORITE(HttpStatus.CONFLICT, "409", "해당 지점은 이미 찜 되어있습니다."),
-    DELETED_FAVORITE(HttpStatus.CONFLICT, "409", "해당 지점은 이미 찜 취소되었습니다."),
+    DELETED_FAVORITE(HttpStatus.CONFLICT, "409", "해당 지점은 이미 찜 되어있지 않습니다."),
     MEMBER_TITLE_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "해당 회원 칭호가 존재하지 않습니다."),
     MEMBER_TITLE_NOT_HAD(HttpStatus.NOT_FOUND, "404", "해당 회원이 칭호를 소유하고 있지 않습니다."),
     SHOP_TITLE_LOGS_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "해당 지점은 칭호가 없습니다."),
@@ -29,7 +29,9 @@ public enum ErrorCode {
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "리뷰를 찾을 수 없습니다."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "회원을 찾을 수 없습니다."),
     WRITER_DOES_NOT_MATCH(HttpStatus.BAD_REQUEST, "400", "작성자가 일치하지 않습니다."),
-    DUPLICATE_MEMBER_NICKNAME(HttpStatus.CONFLICT, "409", "중복된 닉네임입니다.");
+    DUPLICATE_MEMBER_NICKNAME(HttpStatus.CONFLICT, "409", "중복된 닉네임입니다."),
+    FAVORITE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "400", "최대 찜 개수를 초과하였습니다.");
+
     private HttpStatus httpStatus;
     private String errorCode;
     private String message;

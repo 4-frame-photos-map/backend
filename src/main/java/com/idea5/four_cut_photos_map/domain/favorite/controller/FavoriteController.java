@@ -1,9 +1,8 @@
 package com.idea5.four_cut_photos_map.domain.favorite.controller;
 
+import com.idea5.four_cut_photos_map.domain.favorite.dto.request.FavoriteRequest;
 import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponse;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
-import com.idea5.four_cut_photos_map.domain.member.entity.Member;
-import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -26,45 +25,40 @@ public class FavoriteController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "")
-    public ResponseEntity<RsData<List<FavoriteResponse>>> showFavoritesList(@AuthenticationPrincipal MemberContext memberContext,
-                                                                            @RequestParam(required = false, defaultValue = "created",
-                                                                                    value = "sort") String criteria) {
+    public ResponseEntity<List<FavoriteResponse>> showFavoritesList(@AuthenticationPrincipal MemberContext memberContext,
+                                                                    @ModelAttribute @Valid FavoriteRequest favoriteRequest,
+                                                                    @RequestParam(required = false, defaultValue = "created", value = "sort")
+                                                                        String criteria) {
 
-        List<FavoriteResponse> favoriteResponses = favoriteService.getFavoritesList(memberContext.getId(), criteria);
-
-        return ResponseEntity.ok(
-                new RsData<>(true,
-                        favoriteResponses.isEmpty() ? "찜 목록이 없는 사용자" : "찜 목록 조회 성공",
-                        favoriteResponses)
+        List<FavoriteResponse> favoriteResponses = favoriteService.getFavoritesList(
+                memberContext.getId(),
+                criteria,
+                favoriteRequest.getLongitude(),
+                favoriteRequest.getLatitude()
         );
+
+        return ResponseEntity.ok(favoriteResponses);
     }
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value = "/{shopId}")
-    public ResponseEntity<RsData> addShopToFavorites(@PathVariable Long shopId,
-                                                     @AuthenticationPrincipal MemberContext memberContext){
-        Member member = memberContext.getMember();
+    public void addShopToFavorites(@PathVariable Long shopId,
+                                   @AuthenticationPrincipal MemberContext memberContext) {
 
-        favoriteService.save(shopId, member);
+        favoriteService.save(shopId, memberContext.getMember());
 
         // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
 //        favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크
-
-        return ResponseEntity.ok(
-                new RsData<>(true, "찜 추가 성공"));
     }
 
 
     @PreAuthorize("isAuthenticated()")
-    @DeleteMapping(value="/{shopId}")
-    public ResponseEntity<RsData> cancelShopFromFavorites(@PathVariable Long shopId,
-                                                          @AuthenticationPrincipal MemberContext memberContext){
+    @DeleteMapping(value = "/{shopId}")
+    public void cancelShopFromFavorites(@PathVariable Long shopId,
+                                        @AuthenticationPrincipal MemberContext memberContext) {
         favoriteService.cancel(shopId, memberContext.getId());
 
         // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
 //        favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크
-
-        return ResponseEntity.ok(
-                new RsData<>(true, "찜 취소 성공"));
     }
 }

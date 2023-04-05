@@ -35,6 +35,7 @@ public class ResponseShopDetail extends ResponseShopBriefInfo {
                 .placeUrl(placeUrl)
                 .starRatingAvg(dbShop.getStarRatingAvg())
                 .reviewCnt(dbShop.getReviewCnt())
+                .favoriteCnt(dbShop.getFavoriteCnt())
                 .build();
     }
 

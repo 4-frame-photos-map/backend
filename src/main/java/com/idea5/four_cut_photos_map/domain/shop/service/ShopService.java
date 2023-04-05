@@ -1,5 +1,8 @@
 package com.idea5.four_cut_photos_map.domain.shop.service;
 
+import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponse;
+import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
+import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
@@ -9,14 +12,12 @@ import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.domain.shop.service.kakao.KakaoMapSearchApi;
-import com.idea5.four_cut_photos_map.global.common.data.Brand;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_SHOP_ID;
@@ -28,6 +29,7 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUN
 
 public class ShopService {
     private final ShopRepository shopRepository;
+    private final FavoriteRepository favoriteRepository;
     private final KakaoMapSearchApi kakaoMapSearchApi;
 
 
@@ -93,15 +95,28 @@ public class ShopService {
         return ResponseShopDetail.of(dbShop, placeName, placeUrl, longitude, latitude, distance);
     }
 
+    public FavoriteResponse renameShopAndSetResponseDto(Favorite favorite, Double curLnt, Double curLat) {
+        String[] apiShop = kakaoMapSearchApi.searchByRoadAddressName(
+                favorite.getShop().getRoadAddressName(),
+                curLnt,
+                curLat
+        );
+
+        if(apiShop == null) {
+            favoriteRepository.deleteById(favorite.getId());
+            return null;
+        }
+
+        String placeName = apiShop[0];
+        String distance = apiShop[1];
+
+        return FavoriteResponse.from(favorite, placeName, distance);
+    }
+
 
     public ResponseShopBriefInfo setResponseDto (long id, String placeName, String placeUrl, String distance) {
         Shop dbShop = findById(id);
         return ResponseShopBriefInfo.of(dbShop, placeName, placeUrl, distance);
-    }
-
-    public boolean isRepresentativeBrand(String requestBrand) {
-        return Arrays.stream(Brand.Names)
-                .anyMatch(representative -> representative.equals(requestBrand.trim()));
     }
 
 

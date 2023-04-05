@@ -44,26 +44,23 @@ public class ShopController {
     private final ReviewService reviewService;
 
 
+    /**
+     * 키워드 조회, 정확도순 정렬
+     */
     @GetMapping(value = "")
-    public ResponseEntity<RsData<List<ResponseShop>>> showSearchResultsByKeyword (@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch,
+    public ResponseEntity<List<ResponseShop>> showSearchResultsByKeyword (@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch,
                                                                             @AuthenticationPrincipal MemberContext memberContext) {
         List<ResponseShop> resultShops = new ArrayList<>();
 
         List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByKeyword(requestKeywordSearch);
-        if(apiShop.isEmpty())
-            return ResponseEntity.ok(
-                    new RsData<>(true,
-                            String.format("키워드(%s)에 해당하는 지점이 존재하지 않습니다.", requestKeywordSearch.getKeyword()),
-                            resultShops)
-            );
+        if(apiShop.isEmpty()) {
+            return ResponseEntity.ok(resultShops);
+        }
 
         resultShops = shopService.compareWithDbShops(apiShop);
-        if(resultShops.isEmpty())
-            return ResponseEntity.ok(
-                    new RsData<>(true,
-                            String.format("키워드(%s)에 해당하는 지점이 존재하지 않습니다.", requestKeywordSearch.getKeyword()),
-                            resultShops)
-            );
+        if(resultShops.isEmpty()) {
+            return ResponseEntity.ok(resultShops);
+        }
 
         if (memberContext != null) {
             resultShops.forEach(resultShop -> {
@@ -73,37 +70,26 @@ public class ShopController {
             );
         }
 
-        return ResponseEntity.ok(
-                new RsData<>(true, "키워드로 지점 조회 성공, 정확도순 정렬", resultShops)
-        );
+        return ResponseEntity.ok(resultShops);
     }
 
+    /**
+     * 브랜드별 조회, 거리순 정렬
+     */
     @GetMapping("/brand")
-    public ResponseEntity<RsData<List<ResponseShop>>> showSearchResultsByBrand (@ModelAttribute @Valid RequestBrandSearch requestBrandSearch,
+    public ResponseEntity<List<ResponseShop>> showSearchResultsByBrand (@ModelAttribute @Valid RequestBrandSearch requestBrandSearch,
                                                                                @AuthenticationPrincipal MemberContext memberContext) {
-        String brandForMsg = "전체";
         List<ResponseShop> resultShops = new ArrayList<>();
 
-        if(!ObjectUtils.isEmpty(requestBrandSearch.getBrand())) {
-            if (!shopService.isRepresentativeBrand(requestBrandSearch.getBrand())) throw new BusinessException(INVALID_BRAND);
-            else brandForMsg = requestBrandSearch.getBrand();
+        List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByBrand(requestBrandSearch);
+        if(apiShop.isEmpty()) {
+            return ResponseEntity.ok(resultShops);
         }
 
-        List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByBrand(requestBrandSearch);
-        if(apiShop.isEmpty())
-            return ResponseEntity.ok(
-                    new RsData<>(true,
-                            String.format("반경 2km 이내에 %s 지점이 존재하지 않습니다.", brandForMsg),
-                            resultShops)
-            );
-
         resultShops = shopService.compareWithDbShops(apiShop);
-        if(resultShops.isEmpty())
-            return ResponseEntity.ok(
-                    new RsData<>(true,
-                            String.format("반경 2km 이내에 %s 지점이 존재하지 않습니다.", brandForMsg),
-                            resultShops)
-            );
+        if(resultShops.isEmpty()) {
+            return ResponseEntity.ok(resultShops);
+        }
 
         if (memberContext != null) {
             resultShops.forEach(resultShop -> {
@@ -113,13 +99,14 @@ public class ShopController {
             );
         }
 
-        return ResponseEntity.ok(
-                new RsData<>(true, "반경 2km 이내 지점 조회 성공, 거리순 정렬", resultShops)
-        );
+        return ResponseEntity.ok(resultShops);
     }
 
+    /**
+     * 상세 조회
+     */
     @GetMapping("/{shop-id}")
-    public ResponseEntity<RsData<ResponseShopDetail>> showDetail (@PathVariable(name = "shop-id") Long id,
+    public ResponseEntity<ResponseShopDetail> showDetail (@PathVariable(name = "shop-id") Long id,
                                                              @RequestParam @NotBlank String distance,
                                                              @AuthenticationPrincipal MemberContext memberContext) {
 
@@ -145,13 +132,14 @@ public class ShopController {
 //            shopDetailDto.setShopTitles(shopTitles);
 //        }
 
-        return ResponseEntity.ok(
-                new RsData<>(true, "지점 상세 조회 성공", shopDetailDto)
-        );
+        return ResponseEntity.ok(shopDetailDto);
     }
 
+    /**
+     * 간단 조회, Map Marker 모달용
+     */
     @GetMapping("/{shop-id}/info")
-    public ResponseEntity<RsData<ResponseShopBriefInfo>> showBriefInfo (@PathVariable(name = "shop-id") Long id,
+    public ResponseEntity<ResponseShopBriefInfo> showBriefInfo (@PathVariable(name = "shop-id") Long id,
                                                                         @ModelAttribute @Valid RequestShopBriefInfo requestShopBriefInfo,
                                                                         @AuthenticationPrincipal MemberContext memberContext) {
 
@@ -167,9 +155,7 @@ public class ShopController {
             responseShopBriefInfo.setFavorite(favorite == null);
         }
 
-        return ResponseEntity.ok(
-                new RsData<>(true, "지점 간단 조회 성공, Map Marker 모달용", responseShopBriefInfo)
-        );
+        return ResponseEntity.ok(responseShopBriefInfo);
     }
 
     // 브랜드별 Map Marker
