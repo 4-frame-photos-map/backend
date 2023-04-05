@@ -3,7 +3,6 @@ package com.idea5.four_cut_photos_map.domain.shop.service;
 import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponse;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
-import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
@@ -13,14 +12,12 @@ import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.domain.shop.service.kakao.KakaoMapSearchApi;
-import com.idea5.four_cut_photos_map.global.common.data.Brand;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_SHOP_ID;
@@ -120,11 +117,6 @@ public class ShopService {
     public ResponseShopBriefInfo setResponseDto (long id, String placeName, String placeUrl, String distance) {
         Shop dbShop = findById(id);
         return ResponseShopBriefInfo.of(dbShop, placeName, placeUrl, distance);
-    }
-
-    public boolean isRepresentativeBrand(String requestBrand) {
-        return Arrays.stream(Brand.Names)
-                .anyMatch(representative -> representative.equals(requestBrand.trim()));
     }
 
 

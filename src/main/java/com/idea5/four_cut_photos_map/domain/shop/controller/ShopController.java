@@ -81,12 +81,6 @@ public class ShopController {
                                                                                @AuthenticationPrincipal MemberContext memberContext) {
         List<ResponseShop> resultShops = new ArrayList<>();
 
-        if(!ObjectUtils.isEmpty(requestBrandSearch.getBrand())) {
-            if (!shopService.isRepresentativeBrand(requestBrandSearch.getBrand())) {
-                throw new BusinessException(INVALID_BRAND);
-            }
-        }
-
         List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByBrand(requestBrandSearch);
         if(apiShop.isEmpty()) {
             return ResponseEntity.ok(resultShops);
