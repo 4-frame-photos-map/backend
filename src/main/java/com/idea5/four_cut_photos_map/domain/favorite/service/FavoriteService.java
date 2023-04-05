@@ -85,6 +85,7 @@ public class FavoriteService {
         return  favorites
                 .stream()
                 .map(favorite -> shopService.renameShopAndSetResponseDto(favorite, longitude, latitude))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
@@ -94,6 +95,7 @@ public class FavoriteService {
         return  favorites
                 .stream()
                 .map(favorite -> shopService.renameShopAndSetResponseDto(favorite, longitude, latitude))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 

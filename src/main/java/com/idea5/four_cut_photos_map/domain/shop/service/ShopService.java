@@ -2,6 +2,8 @@ package com.idea5.four_cut_photos_map.domain.shop.service;
 
 import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponse;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
+import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
+import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
@@ -30,6 +32,7 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUN
 
 public class ShopService {
     private final ShopRepository shopRepository;
+    private final FavoriteRepository favoriteRepository;
     private final KakaoMapSearchApi kakaoMapSearchApi;
 
 
@@ -102,7 +105,11 @@ public class ShopService {
                 curLat
         );
 
-        if(apiShop == null) throw new BusinessException(INVALID_SHOP_ID);
+        if(apiShop == null) {
+            favoriteRepository.deleteById(favorite.getId());
+            return null;
+        }
+
         String placeName = apiShop[0];
         String distance = apiShop[1];
 
