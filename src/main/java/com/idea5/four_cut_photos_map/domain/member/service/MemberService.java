@@ -39,32 +39,33 @@ public class MemberService {
     // 서비스 로그인
     @Transactional
     public JwtToken login(KakaoUserInfoParam kakaoUserInfoParam, KakaoTokenResp kakaoTokenResp) {
-        // jwt accessToken, refreshToken 발급
-        return jwtService.generateTokens(getMember(kakaoUserInfoParam, kakaoTokenResp));
-    }
-
-    // 회원 가져오기
-    @Transactional
-    public Member getMember(KakaoUserInfoParam kakaoUserInfoParam, KakaoTokenResp kakaoTokenResp) {
-        // Unique 한 값인 kakaoId 로 조회
+        // 1. Unique 한 값인 kakaoId 로 조회
         Member member = memberRepository.findByKakaoId(kakaoUserInfoParam.getId()).orElse(null);
-        if(member != null) {
-            // DB 에 Refresh Token 갱신
-            member.updateKakaoRefreshToken(kakaoTokenResp.getRefreshToken());
+        if(member == null) {
+            // 2. 신규 사용자는 회원가입
+            member = join(kakaoUserInfoParam, kakaoTokenResp);
         } else {
-            // 신규 사용자인 경우 회원가입
-            // 유니크한 닉네임 설정
-            kakaoUserInfoParam.updateNickname(generateUniqueNickname(kakaoUserInfoParam.getNickname()));
-            member = KakaoUserInfoParam.toEntity(kakaoUserInfoParam);
+            // 3. 기존 가입자는 DB 의 kakaoRefreshToken 갱신
             member.updateKakaoRefreshToken(kakaoTokenResp.getRefreshToken());
-            memberRepository.save(member);
         }
-        // redis 에 Access Token 저장
+        // 4. redis 에 kakaoAccessToken 저장
         redisDao.setValues(
                 RedisDao.getKakaoAtkKey(member.getId()),
                 kakaoTokenResp.getAccessToken(),
                 Duration.ofSeconds(kakaoTokenResp.getExpiresIn()));
-        return member;
+        // 5. jwt accessToken, refreshToken 발급
+        return jwtService.generateTokens(member);
+    }
+
+    // 회원가입
+    public Member join(KakaoUserInfoParam kakaoUserInfoParam, KakaoTokenResp kakaoTokenResp) {
+        // 유니크한 닉네임 생성
+        String nickname = generateUniqueNickname(kakaoUserInfoParam.getNickname());
+        Member member = KakaoUserInfoParam.toEntity(
+                kakaoUserInfoParam.getId(),
+                nickname,
+                kakaoTokenResp.getRefreshToken());
+        return memberRepository.save(member);
     }
 
     // 유니크한 닉네임 생성

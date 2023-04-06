@@ -14,10 +14,11 @@ public class KakaoUserInfoParam {
     private Long id;            // 회원번호
     private String nickname;
 
-    public static Member toEntity(KakaoUserInfoParam kakaoUserInfoParam) {
+    public static Member toEntity(Long kakaoId, String nickname, String kakaoRefreshToken) {
         return Member.builder()
-                .kakaoId(kakaoUserInfoParam.getId())
-                .nickname(kakaoUserInfoParam.getNickname())
+                .kakaoId(kakaoId)
+                .nickname(nickname)
+                .kakaoRefreshToken(kakaoRefreshToken)
                 .build();
     }
 
