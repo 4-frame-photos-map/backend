@@ -22,7 +22,7 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.*;
 @RequiredArgsConstructor
 @Service
 public class FavoriteService {
-    private final int MAX_FAVORITE_SHOP_COUNT = 20;
+    public static final int MAX_FAVORITE_SHOP_COUNT = 20;
     private final ShopService shopService;
     private final FavoriteRepository favoriteRepository;
 
