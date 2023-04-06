@@ -14,14 +14,12 @@ import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopBriefI
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
-import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +28,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_BRAND;
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.DISTANCE_IS_EMPTY;
 
 
 @RequestMapping("/shops")
@@ -107,8 +105,12 @@ public class ShopController {
      */
     @GetMapping("/{shop-id}")
     public ResponseEntity<ResponseShopDetail> showDetail (@PathVariable(name = "shop-id") Long id,
-                                                             @RequestParam @NotBlank String distance,
+                                                             @RequestParam String distance,
                                                              @AuthenticationPrincipal MemberContext memberContext) {
+
+        if(distance.isBlank()){
+            throw new BusinessException(DISTANCE_IS_EMPTY);
+        }
 
         Shop dbShop = shopService.findById(id);
         ResponseShopDetail shopDetailDto = shopService.renameShopAndSetResponseDto(dbShop, distance);
