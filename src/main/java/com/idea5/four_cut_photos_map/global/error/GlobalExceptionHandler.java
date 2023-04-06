@@ -8,7 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -105,8 +108,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException e) {
         log.error("ConstraintViolationException", e);
-        String[] errorMessages = e.getMessage().split(",");
-        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST.toString(), errorMessages);
+        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST.toString(), e);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    /**
+     * RequestParam 필수 파라미터 누락된 경우
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    protected ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+        log.error("MissingServletRequestParameterException", e);
+        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST.toString(), e);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
@@ -123,4 +136,3 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }
-
