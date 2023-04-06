@@ -10,6 +10,8 @@ import com.idea5.four_cut_photos_map.domain.shoptitle.service.ShopTitleService;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,7 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.*;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class FavoriteService {
     public static final int MAX_FAVORITE_SHOP_COUNT = 20;
     private final ShopService shopService;
@@ -57,8 +60,7 @@ public class FavoriteService {
 
     // 찜 취소
     @Transactional
-    public long cancel(Long shopId, Long memberId) {
-
+    public boolean cancel(Long shopId, Long memberId) {
         // 1. 데이터 존재 여부 체크
         Favorite favorite = findByShopIdAndMemberId(shopId, memberId);
         if(favorite == null){
@@ -66,13 +68,26 @@ public class FavoriteService {
         }
 
         // 2. 삭제
-        favoriteRepository.deleteByShopIdAndMemberId(shopId, memberId);
+        boolean isNotDeleted = true;
+        try {
+            favoriteRepository.deleteByShopIdAndMemberId(shopId, memberId);
+            isNotDeleted = favoriteRepository.existsById(favorite.getId());
+        } catch (ObjectOptimisticLockingFailureException oe) {
+            log.info("===Retry to delete due to concurrency===");
+            if(isNotDeleted){
+                favoriteRepository.deleteByShopIdAndMemberId(shopId, memberId);
+            } else {
+                throw new BusinessException(DELETED_FAVORITE);
+            }
+        } catch (Exception e) {
+            throw new BusinessException(DELETED_FAVORITE);
+        }
 
-        return favorite.getId();
+        return isNotDeleted == false;
     }
 
-    public void reduceFavoriteCnt(Long favoriteId, Long shopId){
-        if(favoriteRepository.existsById(favoriteId)) {
+    public void reduceFavoriteCnt(boolean isDeleted, Long shopId){
+        if(isDeleted) {
             Shop shop = shopService.findById(shopId);
             shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0 ? 0 : shop.getFavoriteCnt() - 1);
         }
