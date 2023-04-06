@@ -76,6 +76,7 @@ public class ReviewService {
     }
 
     public ResponseReviewDto write(Long memberId, Long shopId, RequestReviewDto reviewDto) {
+        // TODO: 순환참조 해결하기
         Member user = memberService.findById(memberId);
 
         Shop shop = shopService.findById(shopId);

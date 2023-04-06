@@ -106,10 +106,9 @@ public class MemberService {
 
     // 서비스 로그아웃
     public void logout(Long id) {
-        // 1. 회원의 refreshToken 이 있으면 삭제
-        if(redisDao.hasKey(RedisDao.getRtkKey(id))) {
+        // 회원의 refreshToken 이 있으면 삭제
+        if(redisDao.hasKey(RedisDao.getRtkKey(id)))
             redisDao.deleteValues(RedisDao.getRtkKey(id));
-        }
     }
 
     // 회원 삭제

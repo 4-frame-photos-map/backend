@@ -1,6 +1,8 @@
 package com.idea5.four_cut_photos_map.security.jwt;
 
+import com.idea5.four_cut_photos_map.security.jwt.exception.NonTokenException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
@@ -8,8 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.Date;
 
@@ -34,6 +38,11 @@ public class JwtProvider {
     private long refreshTokenValidationSecond;    // accessToken 유효기간(1달)
 
     private final SecretKey jwtSecretKey;   // 비밀키
+
+    private final String BEARER_TOKEN_PREFIX = "Bearer ";   // 토큰 prefix
+
+    @Value("${jwt.atk.header}")
+    private String tokenHeader;
 
     private SecretKey getSecretKey() {
         return jwtSecretKey;
@@ -75,6 +84,18 @@ public class JwtProvider {
         return generateToken(memberId, authorities, REFRESH_TOKEN.getName(), refreshTokenValidationSecond);
     }
 
+    // request Authorization header 의 jwt token 값 꺼내기
+    public String getJwtToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader(tokenHeader);
+        // 1. Authorization 헤더에 값이 없는 경우
+        if(bearerToken == null)
+            throw new NonTokenException();
+        // 2. 공백이나 Bearer 로 시작하지 않는 경우
+        if(!StringUtils.hasText(bearerToken) || !bearerToken.startsWith(BEARER_TOKEN_PREFIX))
+            throw new JwtException("");
+        return bearerToken.substring(BEARER_TOKEN_PREFIX.length());
+    }
+
     // JWT Access JwtToken 검증
     public boolean verify(String accessToken) {
         Jwts.parserBuilder()
@@ -113,5 +134,13 @@ public class JwtProvider {
         Claims claims = parseClaims(accessToken);
         // 남은 유효기간 = 만료일시 - 현재일시
         return claims.getExpiration().getTime() - new Date().getTime();
+    }
+
+    // accessToken 인지 검증
+    public boolean isAccessToken(String accessToken) {
+        String tokenType = getTokenType(accessToken);
+        if(!tokenType.equals(ACCESS_TOKEN.getName()))
+            throw new JwtException("");
+        return true;
     }
 }

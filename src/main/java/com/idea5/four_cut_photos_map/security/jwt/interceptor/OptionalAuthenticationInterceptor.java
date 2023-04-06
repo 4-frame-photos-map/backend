@@ -15,19 +15,24 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * 필수 인증처리 인터셉터
+ * 선택적 인증처리 인터셉터
  * @See <a href="https://mslilsunshine.tistory.com/170">Interceptor 활용한 인가처리 참고</a>
  */
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class AuthenticationInterceptor implements HandlerInterceptor {
+public class OptionalAuthenticationInterceptor implements HandlerInterceptor {
     private final JwtProvider jwtProvider;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        log.info("---AuthenticationInterceptor preHandle()---");
+        log.info("---OptionalAuthenticationInterceptor preHandle()---");
         log.info("requestURI=" + request.getRequestURI());
+        // 1. Authorization Header 에 토큰이 없는 경우 인증 처리X
+        if(request.getHeader("Authorization") == null)
+            return true;
+        log.info("인증 처리");
+        // 2. Authorization Header 에 토큰이 있는 경우 인증 처리O
         // 1. Authorization Header 에서 accessToken 가져오기
         String accessToken = jwtProvider.getJwtToken(request);
         // 2. 토큰이 유효한지 검증
