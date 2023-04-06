@@ -110,6 +110,10 @@ public class ShopService {
         String placeName = apiShop[0];
         String distance = apiShop[1];
 
+        if(distance.equals("unknown")){
+            log.info("====unknown distance====");
+        }
+
         return FavoriteResponse.from(favorite, placeName, distance);
     }
 
