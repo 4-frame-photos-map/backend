@@ -124,7 +124,7 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("회원 탈퇴시 DB 에서 삭제, Redis 의 refreshToken 삭제")
+    @DisplayName("회원 탈퇴시 DB 에서 삭제, Redis 의 kakaoAccessToken, refreshToken 삭제")
     void t3() {
         // given
         memberService.login(
@@ -139,7 +139,8 @@ class MemberServiceTest {
         assertAll(
                 // 1. DB Member 삭제
                 () -> assertThat(memberRepository.count()).isEqualTo(0),
-                // 2. Redis jwtRefreshToken 삭제
+                // 2. Redis kakaoAccessToken, jwtRefreshToken 삭제
+                () -> assertThat(redisDao.getValues(RedisDao.getKakaoAtkKey(member.getId()))).isNull(),
                 () -> assertThat(redisDao.getValues(RedisDao.getRtkKey(member.getId()))).isNull()
         );
     }
@@ -212,7 +213,7 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("회원 로그아웃 시, Redis 의 refreshToken 삭제")
+    @DisplayName("회원 로그아웃 시, Redis 의 kakaoAccessToken, refreshToken 삭제")
     void t7() {
         // given
         memberService.login(
@@ -225,8 +226,9 @@ class MemberServiceTest {
 
         // then
         assertAll(
-                // 1. Redis jwtRefreshToken 삭제
-                () -> assertThat(redisDao.getValues(RedisDao.getRtkKey(member.getId()))).isNull()
+                // 1. Redis kakaoAccessToken, jwtRefreshToken 삭제
+                () -> assertThat(redisDao.getValues(RedisDao.getRtkKey(member.getId()))).isNull(),
+                () -> assertThat(redisDao.getValues(RedisDao.getKakaoAtkKey(member.getId()))).isNull()
         );
     }
 }
