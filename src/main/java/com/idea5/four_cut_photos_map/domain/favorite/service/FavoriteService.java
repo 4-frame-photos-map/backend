@@ -57,19 +57,25 @@ public class FavoriteService {
 
     // 찜 취소
     @Transactional
-    public void cancel(Long shopId, Long memberId) {
+    public long cancel(Long shopId, Long memberId) {
 
-        // 1. 데이터 생성 여부 체크
-        if(findByShopIdAndMemberId(shopId, memberId) == null){
+        // 1. 데이터 존재 여부 체크
+        Favorite favorite = findByShopIdAndMemberId(shopId, memberId);
+        if(favorite == null){
             throw new BusinessException(DELETED_FAVORITE);
         }
 
         // 2. 삭제
         favoriteRepository.deleteByShopIdAndMemberId(shopId, memberId);
 
-        // 3. shop 찜 수 갱신
-        Shop shop = shopService.findById(shopId);
-        shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0? 0 : shop.getFavoriteCnt() - 1);
+        return favorite.getId();
+    }
+
+    public void reduceFavoriteCnt(Long favoriteId, Long shopId){
+        if(favoriteRepository.existsById(favoriteId)) {
+            Shop shop = shopService.findById(shopId);
+            shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0 ? 0 : shop.getFavoriteCnt() - 1);
+        }
     }
 
     public List<FavoriteResponse> getFavoritesList(Long memberId, String criteria, Double longitude, Double latitude) {
