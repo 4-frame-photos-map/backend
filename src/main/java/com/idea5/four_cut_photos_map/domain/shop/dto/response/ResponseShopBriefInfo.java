@@ -20,6 +20,7 @@ public class ResponseShopBriefInfo {
     private String placeUrl;
     private double starRatingAvg;
     private int reviewCnt;
+    private int favoriteCnt;
     private boolean isFavorite;
 
 
@@ -31,6 +32,7 @@ public class ResponseShopBriefInfo {
                 .placeUrl(placeUrl)
                 .starRatingAvg(dbShop.getStarRatingAvg())
                 .reviewCnt(dbShop.getReviewCnt())
+                .favoriteCnt(dbShop.getFavoriteCnt())
                 .build();
     }
 }

@@ -15,8 +15,8 @@ public class FavoriteResponse {
     private Long id;
     private ResponseFavoriteShop shop;
 
-    public static FavoriteResponse from(Favorite favorite) {
-        ResponseFavoriteShop shopDto = ResponseFavoriteShop.from(favorite.getShop());
+    public static FavoriteResponse from(Favorite favorite, String placeName, String distance) {
+        ResponseFavoriteShop shopDto = ResponseFavoriteShop.from(favorite.getShop(), placeName, distance);
 
         return FavoriteResponse.builder()
                 .id(favorite.getId())

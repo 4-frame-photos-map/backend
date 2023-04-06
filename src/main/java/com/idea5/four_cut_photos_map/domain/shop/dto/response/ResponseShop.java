@@ -24,6 +24,7 @@ public class ResponseShop {
     private String placeUrl;
     private double starRatingAvg;
     private int reviewCnt;
+    private int favoriteCnt;
     private boolean isFavorite;
 
     static public ResponseShop of(Shop dbShop, KakaoMapSearchDto apiShop){
@@ -36,6 +37,7 @@ public class ResponseShop {
                 .placeUrl(apiShop.getPlaceUrl())
                 .starRatingAvg(dbShop.getStarRatingAvg())
                 .reviewCnt(dbShop.getReviewCnt())
+                .favoriteCnt(dbShop.getFavoriteCnt())
                 .build();
     }
 }
