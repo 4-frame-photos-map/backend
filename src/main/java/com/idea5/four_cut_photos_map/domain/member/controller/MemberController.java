@@ -10,7 +10,6 @@ import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,26 +29,23 @@ public class MemberController {
     // 회원 기본정보 조회
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/info")
-    public ResponseEntity<RsData> getProfile(@AuthenticationPrincipal MemberContext memberContext) {
+    public ResponseEntity<MemberInfoResp> getProfile(@AuthenticationPrincipal MemberContext memberContext) {
         MemberInfoResp memberInfoResp = memberService.getMemberInfo(memberContext.getId());
-        return new ResponseEntity<>(
-                new RsData<>(true, "회원 정보 조회 성공", memberInfoResp),
-                HttpStatus.OK);
+        return ResponseEntity.ok(memberInfoResp);
     }
 
     // 회원 닉네임 수정
     @PreAuthorize("isAuthenticated()")
     @PatchMapping("/nickname")
-    public ResponseEntity<RsData> updateNickname(
+    public ResponseEntity<Object> updateNickname(
             @AuthenticationPrincipal MemberContext memberContext,
             @RequestBody @Valid MemberUpdateReq memberUpdateReq
     ) {
         memberService.updateNickname(memberContext.getId(), memberUpdateReq);
-        return new ResponseEntity<>(
-                new RsData(true, "회원 닉네임 수정 성공"),
-                HttpStatus.OK);
+        return ResponseEntity.ok(null);
     }
 
+    // 회원 대표 칭호 수정
     @PreAuthorize("isAuthenticated()")
     @PatchMapping("/main-title/{member-title-id}")
     public ResponseEntity<RsData> updateMainMemberTitle(
@@ -60,15 +56,13 @@ public class MemberController {
         // 1. 기존처럼 member 객체를 넘기는 방법
         // 2. memberId 만 넘기고 실질적으로 조회쿼리가 날라가는 memberTitleService.updateMainMemberTitle() 내에서 member 객체를 만들어 사용하는 방식
         memberService.updateMainMemberTitle(memberContext.getMember(), memberTitleId);
-        return new ResponseEntity<>(
-                new RsData(true, "회원 대표 칭호 수정 성공"),
-                HttpStatus.OK);
+        return ResponseEntity.ok(null);
     }
 
     // 회원탈퇴
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("")
-    public ResponseEntity<RsData> deleteMember(
+    public ResponseEntity<MemberWithdrawlResp> deleteMember(
             @RequestHeader("Authorization") String jwtToken,
             @AuthenticationPrincipal MemberContext memberContext
     ) throws JsonProcessingException {
@@ -84,8 +78,6 @@ public class MemberController {
         // 2. 연결 끊기
         kakaoService.disconnect(kakaoAccessToken);
         MemberWithdrawlResp memberWithdrawlResp = memberService.deleteMember(memberContext.getId());
-        return new ResponseEntity<>(
-                new RsData<>(true, "회원탈퇴 성공", memberWithdrawlResp),
-                HttpStatus.OK);
+        return ResponseEntity.ok(memberWithdrawlResp);
     }
 }
