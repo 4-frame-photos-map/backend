@@ -107,20 +107,23 @@ public class MemberService {
 
     // 서비스 로그아웃
     public void logout(Long id) {
-        // 회원의 refreshToken 이 있으면 삭제
+        // Redis 에 회원의 kakaoAccessToken, refreshToken 이 있으면 삭제
         if(redisDao.hasKey(RedisDao.getRtkKey(id)))
             redisDao.deleteValues(RedisDao.getRtkKey(id));
+        if(redisDao.hasKey(RedisDao.getKakaoAtkKey(id)))
+            redisDao.deleteValues(RedisDao.getKakaoAtkKey(id));
     }
 
     // 회원 삭제
     @Transactional
     public MemberWithdrawlResp deleteMember(Long id) {
-        // 1. 회원의 refreshToken 이 있으면 삭제
-        if (redisDao.hasKey(RedisDao.getRtkKey(id))) {
+        // 1. 회원의 kakaoAccessToken, refreshToken 이 있으면 삭제
+        if (redisDao.hasKey(RedisDao.getRtkKey(id)))
             redisDao.deleteValues(RedisDao.getRtkKey(id));
-        }
+        if(redisDao.hasKey(RedisDao.getKakaoAtkKey(id)))
+            redisDao.deleteValues(RedisDao.getKakaoAtkKey(id));
         // TODO: 현재 방식에서 리뷰 삭제시 순환참조 문제 발생, 양방향 매핑으로 변경할지 고민중
-        // Member 삭제하기 전 Member 를 참조하고 있는 엔티티(MemberTitleLog, Favorite, Review) 먼저 삭제하기
+        // 2. Member 삭제하기 전 Member 를 참조하고 있는 엔티티(MemberTitleLog, Favorite, Review) 먼저 삭제하기
         memberTitleService.deleteByMemberId(id);
         favoriteService.deleteByMemberId(id);
         // 3. DB 에서 회원 삭제

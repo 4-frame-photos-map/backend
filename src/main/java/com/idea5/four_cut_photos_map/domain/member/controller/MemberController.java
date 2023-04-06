@@ -62,11 +62,7 @@ public class MemberController {
     // 회원탈퇴
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("")
-    public ResponseEntity<MemberWithdrawlResp> deleteMember(
-            @RequestHeader("Authorization") String jwtToken,
-            @AuthenticationPrincipal MemberContext memberContext
-    ) throws JsonProcessingException {
-        String jwtAccessToken = jwtToken.substring(BEARER_TOKEN_PREFIX.length());
+    public ResponseEntity<MemberWithdrawlResp> deleteMember(@AuthenticationPrincipal MemberContext memberContext) throws JsonProcessingException {
         // Kakao Access Token 은 Redis 에서 가져오기
         String kakaoAccessToken = memberService.getKakaoAccessToken(memberContext.getId());
         // 1. 카카오 토큰 만료시 토큰 갱신하기
