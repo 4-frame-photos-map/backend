@@ -1,7 +1,8 @@
 package com.idea5.four_cut_photos_map.domain.member.service;
 
+import com.idea5.four_cut_photos_map.domain.auth.dto.param.LoginMemberParam;
 import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoTokenResp;
-import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoUserInfoParam;
+import com.idea5.four_cut_photos_map.domain.auth.dto.param.KakaoUserInfoParam;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.member.dto.request.MemberUpdateReq;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberInfoResp;
@@ -40,12 +41,14 @@ public class MemberService {
 
     // 서비스 로그인
     @Transactional
-    public JwtToken login(KakaoUserInfoParam kakaoUserInfoParam, KakaoTokenResp kakaoTokenResp) {
+    public LoginMemberParam login(KakaoUserInfoParam kakaoUserInfoParam, KakaoTokenResp kakaoTokenResp) {
         // 1. Unique 한 값인 kakaoId 로 조회
         Member member = memberRepository.findByKakaoId(kakaoUserInfoParam.getId()).orElse(null);
+        boolean isJoin = false;
         if(member == null) {
             // 2. 신규 사용자는 회원가입
             member = join(kakaoUserInfoParam, kakaoTokenResp);
+            isJoin = true;
         } else {
             // 3. 기존 가입자는 DB 의 kakaoRefreshToken 갱신
             member.updateKakaoRefreshToken(kakaoTokenResp.getRefreshToken());
@@ -56,7 +59,8 @@ public class MemberService {
                 kakaoTokenResp.getAccessToken(),
                 Duration.ofSeconds(kakaoTokenResp.getExpiresIn()));
         // 5. jwt accessToken, refreshToken 발급
-        return jwtService.generateTokens(member);
+        JwtToken jwtToken = jwtService.generateTokens(member);
+        return new LoginMemberParam(member, jwtToken, isJoin);
     }
 
     // 회원가입
