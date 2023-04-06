@@ -19,7 +19,6 @@ import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.global.util.DatabaseCleaner;
 import com.idea5.four_cut_photos_map.job.CollectJob;
 import com.idea5.four_cut_photos_map.security.jwt.JwtService;
-import com.idea5.four_cut_photos_map.security.jwt.dto.response.JwtToken;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -74,12 +73,12 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("새로운 회원이 로그인 요청시 회원가입 처리(DB에 저장), Redis 에 nickname, kakaoAccessToken 저장")
+    @DisplayName("새로운 회원이 로그인 요청시 회원가입 처리(DB에 저장), Redis 에 kakaoAccessToken 저장")
     void t1() {
         // given
 
         // when
-        memberService.getMember(
+        memberService.login(
                 new KakaoUserInfoParam(1111L, "딸기"),
                 new KakaoTokenResp("bearer", "kakao_access_token", 60, "kakao_refresh_token", 86400));
 
@@ -101,13 +100,12 @@ class MemberServiceTest {
     @DisplayName("기존 회원이 로그인 요청시 DB 의 kakaoRefreshToken 수정, Redis 의 kakaoAccessToken 수정")
     void t2() {
         // given
-
-        // when
-        memberService.getMember(
+        memberService.login(
                 new KakaoUserInfoParam(1111L, "딸기"),
                 new KakaoTokenResp("bearer", "kakao_access_token", 60, "kakao_refresh_token", 86400));
 
-        memberService.getMember(
+        // when
+        memberService.login(
                 new KakaoUserInfoParam(1111L, "수박"),
                 new KakaoTokenResp("bearer", "kakao_access_token2", 60, "kakao_refresh_token2", 86400));
 
@@ -126,14 +124,13 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("회원 탈퇴시 DB 에서 삭제, Redis 의 refreshToken 삭제, accessToken 블랙리스트로 등록")
+    @DisplayName("회원 탈퇴시 DB 에서 삭제, Redis 의 refreshToken 삭제")
     void t3() {
         // given
-        Member member = memberService.getMember(
+        memberService.login(
                 new KakaoUserInfoParam(1111L, "딸기"),
                 new KakaoTokenResp("bearer", "kakao_access_token", 60, "kakao_refresh_token", 86400));
-        JwtToken jwtToken = jwtService.generateTokens(member);
-        assertThat(redisDao.getValues(RedisDao.getRtkKey(member.getId()))).isEqualTo(jwtToken.getRefreshToken());
+        Member member = memberRepository.findById(1L).orElse(null);
 
         // when
         memberService.deleteMember(member.getId());
@@ -142,7 +139,7 @@ class MemberServiceTest {
         assertAll(
                 // 1. DB Member 삭제
                 () -> assertThat(memberRepository.count()).isEqualTo(0),
-                // 2. Redis jwtAccessToken 블랙리스트 등록, jwtRefreshToken 삭제
+                // 2. Redis jwtRefreshToken 삭제
                 () -> assertThat(redisDao.getValues(RedisDao.getRtkKey(member.getId()))).isNull()
         );
     }
@@ -151,10 +148,10 @@ class MemberServiceTest {
     @DisplayName("회원 닉네임 수정시 DB 의 Member nickname, Redis 의 nickname 수정")
     void t4() {
         // given
-        Member member = memberService.getMember(
+        memberService.login(
                 new KakaoUserInfoParam(1111L, "딸기"),
                 new KakaoTokenResp("bearer", "kakao_access_token", 60, "kakao_refresh_token", 86400));
-
+        Member member = memberRepository.findById(1L).orElse(null);
         // when
         memberService.updateNickname(member.getId(), new MemberUpdateReq("수박"));
 
@@ -168,10 +165,10 @@ class MemberServiceTest {
     @DisplayName("중복된 닉네임으로 닉네임 수정 불가")
     void t5() {
         // given
-        Member member = memberService.getMember(
+        memberService.login(
                 new KakaoUserInfoParam(1111L, "딸기"),
                 new KakaoTokenResp("bearer", "kakao_access_token", 60, "kakao_refresh_token", 86400));
-
+        Member member = memberRepository.findById(1L).orElse(null);
         // when, then
         BusinessException exception = assertThrows(BusinessException.class, () ->
                 memberService.updateNickname(member.getId(), new MemberUpdateReq(member.getNickname()))
@@ -189,9 +186,10 @@ class MemberServiceTest {
         MemberTitle memberTitle4 = memberTitleRepository.save(new MemberTitle("찜 첫 걸음", "첫번째 찜 추가"));
         MemberTitle memberTitle5 = memberTitleRepository.save(new MemberTitle("찜 홀릭", "찜 3개 이상 추가"));
 
-        Member member = memberService.getMember(
+        memberService.login(
                 new KakaoUserInfoParam(1111L, "딸기"),
                 new KakaoTokenResp("bearer", "kakao_access_token", 60, "kakao_refresh_token", 86400));
+        Member member = memberRepository.findById(1L).orElse(null);
         Shop shop = shopRepository.save(new Shop("인생네컷 성수점", "서울시", 0,0,0.0));
         favoriteRepository.save(new Favorite(member, shop));
 
@@ -214,21 +212,20 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("회원 로그아웃 시, Redis 의 refreshToken 삭제, accessToken 블랙리스트로 등록")
+    @DisplayName("회원 로그아웃 시, Redis 의 refreshToken 삭제")
     void t7() {
         // given
-        Member member = memberService.getMember(
+        memberService.login(
                 new KakaoUserInfoParam(1111L, "딸기"),
                 new KakaoTokenResp("bearer", "kakao_access_token", 60, "kakao_refresh_token", 86400));
-        JwtToken jwtToken = jwtService.generateTokens(member);
-        assertThat(redisDao.getValues(RedisDao.getRtkKey(member.getId()))).isEqualTo(jwtToken.getRefreshToken());
+        Member member = memberRepository.findById(1L).orElse(null);
 
         // when
         memberService.logout(member.getId());
 
         // then
-        // 1. Redis jwtAccessToken 블랙리스트 등록, jwtRefreshToken 삭제
         assertAll(
+                // 1. Redis jwtRefreshToken 삭제
                 () -> assertThat(redisDao.getValues(RedisDao.getRtkKey(member.getId()))).isNull()
         );
     }
