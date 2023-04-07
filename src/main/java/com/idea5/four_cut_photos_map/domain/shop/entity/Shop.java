@@ -3,7 +3,6 @@ package com.idea5.four_cut_photos_map.domain.shop.entity;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.Entity;

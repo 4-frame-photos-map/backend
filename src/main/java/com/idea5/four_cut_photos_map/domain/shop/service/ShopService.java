@@ -123,9 +123,9 @@ public class ShopService {
         return ResponseShopBriefInfo.of(dbShop, placeName, placeUrl, distance);
     }
 
-    @Transactional
     public void reduceFavoriteCnt(Shop shop){
         shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0 ? 0 : shop.getFavoriteCnt() - 1);
+        shopRepository.save(shop);
     }
 
     @Transactional
