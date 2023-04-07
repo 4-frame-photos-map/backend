@@ -35,7 +35,7 @@ public class FavoriteService {
 
     // 찜하기
     @Transactional
-    public void save(Long shopId, Member member) {
+    public Shop save(Long shopId, Member member) {
         // 1. 중복 데이터 생성 불가 -> 기존 데이터 생성 여부 체크
         if(findByShopIdAndMemberId(shopId, member.getId()) != null){
             throw new BusinessException(DUPLICATE_FAVORITE);
@@ -54,8 +54,7 @@ public class FavoriteService {
                 .build();
         favoriteRepository.save(favorite);
 
-        // 4. shop 찜 수 갱신
-        shop.setFavoriteCnt(shop.getFavoriteCnt()+1);
+        return shop;
     }
 
     // 찜 취소
@@ -84,12 +83,7 @@ public class FavoriteService {
         }
     }
 
-    @Transactional
-    public void reduceFavoriteCnt(Long shopId){
-        Shop shop = shopService.findById(shopId);
-        shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0 ? 0 : shop.getFavoriteCnt() - 1);
-    }
-
+    // 찜 목록 조회
     public List<FavoriteResponse> getFavoritesList(Long memberId, String criteria, Double longitude, Double latitude) {
         return switch (criteria) {
             case "placename" -> findByMemberIdOrderByPlaceName(memberId, longitude, latitude);
