@@ -14,10 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 
+@Validated
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -49,7 +52,11 @@ public class MemberController {
     // 회원 닉네임 중복조회
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/nickname")
-    public ResponseEntity<NicknameCheckResp> checkNickname(@RequestParam String nickname) {
+    public ResponseEntity<NicknameCheckResp> checkNickname(
+            @RequestParam
+            @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-zA-Z0-9]{2,10}$",
+                    message = "닉네임은 특수문자를 제외한 2~10자리로 입력 가능합니다.") String nickname
+    ) {
         NicknameCheckResp nicknameCheckResp = memberService.checkDuplicatedNickname(nickname);
         return ResponseEntity.ok(nicknameCheckResp);
     }
