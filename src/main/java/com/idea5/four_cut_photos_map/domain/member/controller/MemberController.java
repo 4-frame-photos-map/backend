@@ -5,6 +5,7 @@ import com.idea5.four_cut_photos_map.domain.auth.service.KakaoService;
 import com.idea5.four_cut_photos_map.domain.member.dto.request.MemberUpdateReq;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberInfoResp;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberWithdrawlResp;
+import com.idea5.four_cut_photos_map.domain.member.dto.response.NicknameCheckResp;
 import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
@@ -43,6 +44,14 @@ public class MemberController {
     ) {
         memberService.updateNickname(memberContext.getId(), memberUpdateReq);
         return ResponseEntity.ok(null);
+    }
+
+    // 회원 닉네임 중복조회
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/nickname")
+    public ResponseEntity<NicknameCheckResp> checkNickname(@RequestParam String nickname) {
+        NicknameCheckResp nicknameCheckResp = memberService.checkDuplicatedNickname(nickname);
+        return ResponseEntity.ok(nicknameCheckResp);
     }
 
     // 회원 대표 칭호 수정

@@ -8,6 +8,7 @@ import com.idea5.four_cut_photos_map.domain.member.dto.request.MemberUpdateReq;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberInfoResp;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberTitleInfoResp;
 import com.idea5.four_cut_photos_map.domain.member.dto.response.MemberWithdrawlResp;
+import com.idea5.four_cut_photos_map.domain.member.dto.response.NicknameCheckResp;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleLog;
@@ -165,5 +166,10 @@ public class MemberService {
 
     public List<Member> findAll() {
         return memberRepository.findAllByOrderByIdAsc();
+    }
+
+    public NicknameCheckResp checkDuplicatedNickname(String nickname) {
+        boolean status = (memberRepository.existsByNickname(nickname) == false);
+        return new NicknameCheckResp(nickname, status);
     }
 }
