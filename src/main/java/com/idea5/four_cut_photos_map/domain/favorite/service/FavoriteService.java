@@ -84,6 +84,7 @@ public class FavoriteService {
         }
     }
 
+    @Transactional
     public void reduceFavoriteCnt(Long shopId){
         Shop shop = shopService.findById(shopId);
         shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0 ? 0 : shop.getFavoriteCnt() - 1);
