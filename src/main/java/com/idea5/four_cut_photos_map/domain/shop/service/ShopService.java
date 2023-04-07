@@ -103,7 +103,9 @@ public class ShopService {
         );
 
         if(apiShop == null) {
+            Shop shopWithInvalidId = favorite.getShop();
             favoriteRepository.deleteById(favorite.getId());
+            shopWithInvalidId.setFavoriteCnt(shopWithInvalidId.getFavoriteCnt() <= 0 ? 0 : shopWithInvalidId.getFavoriteCnt() - 1);
             return null;
         }
 
