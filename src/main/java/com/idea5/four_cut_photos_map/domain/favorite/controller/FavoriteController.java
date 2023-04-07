@@ -3,6 +3,8 @@ package com.idea5.four_cut_photos_map.domain.favorite.controller;
 import com.idea5.four_cut_photos_map.domain.favorite.dto.request.FavoriteRequest;
 import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponse;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
+import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
+import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,7 @@ import java.util.List;
 @Slf4j
 public class FavoriteController {
     private final FavoriteService favoriteService;
+    private final ShopService shopService;
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "")
@@ -44,7 +47,9 @@ public class FavoriteController {
     public void addShopToFavorites(@PathVariable Long shopId,
                                    @AuthenticationPrincipal MemberContext memberContext) {
 
-        favoriteService.save(shopId, memberContext.getMember());
+        Shop shop = favoriteService.save(shopId, memberContext.getMember());
+
+        shopService.increaseFavoriteCnt(shop);
 
         // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
 //        favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크
@@ -55,7 +60,10 @@ public class FavoriteController {
     @DeleteMapping(value = "/{shopId}")
     public void cancelShopFromFavorites(@PathVariable Long shopId,
                                         @AuthenticationPrincipal MemberContext memberContext) {
+
         favoriteService.cancel(shopId, memberContext.getId());
+
+        shopService.reduceFavoriteCnt(shopId);
 
         // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
 //        favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크

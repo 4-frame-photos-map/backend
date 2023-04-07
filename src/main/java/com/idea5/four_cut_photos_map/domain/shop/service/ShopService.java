@@ -15,7 +15,9 @@ import com.idea5.four_cut_photos_map.domain.shop.service.kakao.KakaoMapSearchApi
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.implementation.bytecode.ShiftLeft;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,7 +105,9 @@ public class ShopService {
         );
 
         if(apiShop == null) {
+            Shop shopWithInvalidId = favorite.getShop();
             favoriteRepository.deleteById(favorite.getId());
+            reduceFavoriteCnt(shopWithInvalidId);
             return null;
         }
 
@@ -118,6 +122,23 @@ public class ShopService {
         Shop dbShop = findById(id);
         return ResponseShopBriefInfo.of(dbShop, placeName, placeUrl, distance);
     }
+
+    public void reduceFavoriteCnt(Shop shop){
+        shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0 ? 0 : shop.getFavoriteCnt() - 1);
+        shopRepository.save(shop);
+    }
+
+    @Transactional
+    public void reduceFavoriteCnt(Long shopId){
+        Shop shop = findById(shopId);
+        shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0 ? 0 : shop.getFavoriteCnt() - 1);
+    }
+
+    public void increaseFavoriteCnt(Shop shop){
+        shop.setFavoriteCnt(shop.getFavoriteCnt()+1);
+        shopRepository.save(shop);
+    }
+
 
 
     // 브랜드별 Map Marker
