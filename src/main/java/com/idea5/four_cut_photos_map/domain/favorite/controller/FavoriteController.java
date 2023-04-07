@@ -59,9 +59,9 @@ public class FavoriteController {
     public void cancelShopFromFavorites(@PathVariable Long shopId,
                                         @AuthenticationPrincipal MemberContext memberContext) {
 
-        boolean isDeleted = favoriteService.cancel(shopId, memberContext.getId());
+        favoriteService.cancel(shopId, memberContext.getId());
 
-        favoriteService.reduceFavoriteCnt(isDeleted, shopId);
+        favoriteService.reduceFavoriteCnt(shopId);
 
         // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
 //        favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크

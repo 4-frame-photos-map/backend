@@ -60,37 +60,33 @@ public class FavoriteService {
 
     // 찜 취소
     @Transactional
-    public boolean cancel(Long shopId, Long memberId) {
+    public void cancel(Long shopId, Long memberId) {
         // 1. 데이터 존재 여부 체크
         Favorite favorite = findByShopIdAndMemberId(shopId, memberId);
-        if(favorite == null){
+        if (favorite == null) {
             throw new BusinessException(DELETED_FAVORITE);
         }
 
         // 2. 삭제
-        boolean isNotDeleted = true;
         try {
-            favoriteRepository.deleteByShopIdAndMemberId(shopId, memberId);
-            isNotDeleted = favoriteRepository.existsById(favorite.getId());
-        } catch (ObjectOptimisticLockingFailureException oe) {
-            log.info("===Retry to delete due to concurrency===");
-            if(isNotDeleted){
+            try {
                 favoriteRepository.deleteByShopIdAndMemberId(shopId, memberId);
-            } else {
-                throw new BusinessException(DELETED_FAVORITE);
+            } catch (ObjectOptimisticLockingFailureException oe) {
+                log.info("===Retry to delete due to concurrency===");
+                if (favoriteRepository.existsById(favorite.getId())) {
+                    favoriteRepository.deleteByShopIdAndMemberId(shopId, memberId);
+                } else {
+                    throw oe;
+                }
             }
         } catch (Exception e) {
             throw new BusinessException(DELETED_FAVORITE);
         }
-
-        return isNotDeleted == false;
     }
 
-    public void reduceFavoriteCnt(boolean isDeleted, Long shopId){
-        if(isDeleted) {
-            Shop shop = shopService.findById(shopId);
-            shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0 ? 0 : shop.getFavoriteCnt() - 1);
-        }
+    public void reduceFavoriteCnt(Long shopId){
+        Shop shop = shopService.findById(shopId);
+        shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0 ? 0 : shop.getFavoriteCnt() - 1);
     }
 
     public List<FavoriteResponse> getFavoritesList(Long memberId, String criteria, Double longitude, Double latitude) {
