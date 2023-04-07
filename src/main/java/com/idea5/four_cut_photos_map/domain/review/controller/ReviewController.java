@@ -3,10 +3,7 @@ package com.idea5.four_cut_photos_map.domain.review.controller;
 import com.idea5.four_cut_photos_map.domain.review.dto.request.RequestReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.service.ReviewService;
-import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
-import com.idea5.four_cut_photos_map.global.error.ErrorCode;
-import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +38,7 @@ public class ReviewController {
     public ResponseEntity<RsData> modifyReview(@PathVariable("review-id") Long reviewId,
                                                @AuthenticationPrincipal MemberContext memberContext,
                                                @Valid @RequestBody RequestReviewDto reviewDto) {
-        ResponseReviewDto responseReviewDto = reviewService.modify(memberContext.getId(), reviewId, reviewDto);
+        ResponseReviewDto responseReviewDto = reviewService.modify(memberContext.getMember(), reviewId, reviewDto);
 
         return new ResponseEntity<>(
                 new RsData<>(true, "리뷰 수정 완료"),
@@ -52,7 +49,7 @@ public class ReviewController {
     @DeleteMapping("/{review-id}")
     public ResponseEntity<RsData> deleteReview(@PathVariable("review-id") Long reviewId,
                                                @AuthenticationPrincipal MemberContext memberContext) {
-        reviewService.delete(memberContext.getId(), reviewId);
+        reviewService.delete(memberContext.getMember(), reviewId);
 
         return new ResponseEntity<>(
                 new RsData<>(true, "리뷰 삭제 완료"),
@@ -89,7 +86,7 @@ public class ReviewController {
     public ResponseEntity<RsData> writeReview(@PathVariable("shop-id") Long shopId,
                                               @AuthenticationPrincipal MemberContext memberContext,
                                               @Valid @RequestBody RequestReviewDto reviewDto) {
-        ResponseReviewDto responseReviewDto = reviewService.write(memberContext.getId(), shopId, reviewDto);
+        ResponseReviewDto responseReviewDto = reviewService.write(memberContext.getMember(), shopId, reviewDto);
 
         return new ResponseEntity<>(
                 new RsData<>(true, "상점 리뷰 작성 성공"),

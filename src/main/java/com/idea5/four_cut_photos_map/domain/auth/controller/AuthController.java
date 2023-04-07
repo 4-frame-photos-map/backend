@@ -1,11 +1,13 @@
 package com.idea5.four_cut_photos_map.domain.auth.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.idea5.four_cut_photos_map.domain.auth.dto.param.LoginMemberParam;
 import com.idea5.four_cut_photos_map.domain.auth.dto.request.RefreshTokenReq;
 import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoTokenResp;
-import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoUserInfoParam;
+import com.idea5.four_cut_photos_map.domain.auth.dto.param.KakaoUserInfoParam;
 import com.idea5.four_cut_photos_map.domain.auth.service.KakaoService;
 import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
+import com.idea5.four_cut_photos_map.job.CollectService;
 import com.idea5.four_cut_photos_map.security.jwt.JwtService;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.AccessToken;
@@ -30,6 +32,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final MemberService memberService;
     private final KakaoService kakaoService;
+    private final CollectService collectService;
 
     /**
      * 카카오 로그인
@@ -45,8 +48,11 @@ public class AuthController {
         // 2. 토큰으로 사용자 정보 가져오기 요청
         KakaoUserInfoParam kakaoUserInfoParam = kakaoService.getKakaoUserInfo(kakaoTokenResp);
         // 3. 제공받은 사용자 정보(kakaoId)로 회원 검증(새로운 회원은 회원가입) -> 서비스 로그인
-        JwtToken jwtToken = memberService.login(kakaoUserInfoParam, kakaoTokenResp);
-        return ResponseEntity.ok(jwtToken);
+        LoginMemberParam loginMemberParam = memberService.login(kakaoUserInfoParam, kakaoTokenResp);
+        // 4. 신규 회원은 뉴비 칭호 부여
+        if(loginMemberParam.isJoin())
+            collectService.addJoinTitle(loginMemberParam.getMember());
+        return ResponseEntity.ok(loginMemberParam.getJwtToken());
     }
 
     /**

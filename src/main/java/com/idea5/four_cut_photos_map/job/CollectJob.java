@@ -7,9 +7,9 @@ import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleType;
 import com.idea5.four_cut_photos_map.domain.memberTitle.service.MemberTitleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StopWatch;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class CollectJob {
 
     // 초 분 시 일 월 요일
 //    @Scheduled(cron = "0 * * * * *")      // TODO: 테스트용 매분마다 실행
-//    @Scheduled(cron = "0 0 0 * * *")    // 매일 0시 실행
+    @Scheduled(cron = "0 0 1 * * *")    // 매일 1시 실행
     @Transactional
     public void add() {
         // 인증된 API 요청 -> 로그 남기자
@@ -37,8 +37,8 @@ public class CollectJob {
         log.info("---Before memberService.findAll()---");
         List<Member> members = memberService.findAll();
 
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
+//        StopWatch stopWatch = new StopWatch();
+//        stopWatch.start();
 
         // 회원별로 각 칭호 부여하기
         for(Member member : members) {
@@ -52,13 +52,13 @@ public class CollectJob {
                 // 2. 회원이 보유하지 않은 회원칭호는 부여기준 검사 -> 부여
                 if(collectService.canGiveMemberTitle(member, memberTitle)) {
                     // 회원가입 칭호와 다른 칭호를 같은 날에 부여 받는 경우 회원가입 칭호를 대표 칭호로 설정
-                    boolean isMain = memberTitle.getId() == MemberTitleType.NEWBIE.getCode() ? true : false;
+                    boolean isMain = (memberTitle.getId() == MemberTitleType.NEWBIE.getCode()) ? true : false;
                     collectService.addMemberTitle(member, memberTitle, isMain);
                 }
             }
         }
-        stopWatch.stop();
-        log.info(stopWatch.prettyPrint());
-        log.info(String.valueOf(stopWatch.getTotalTimeSeconds()));
+//        stopWatch.stop();
+//        log.info(stopWatch.prettyPrint());
+//        log.info(String.valueOf(stopWatch.getTotalTimeSeconds()));
     }
 }
