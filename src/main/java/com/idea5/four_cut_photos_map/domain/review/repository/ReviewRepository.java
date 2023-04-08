@@ -26,4 +26,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Double getAverageStarRating(Long shopId);
 
     Long countByWriter(Member writer);
+
+    void deleteByWriterId(Long memberId);
 }

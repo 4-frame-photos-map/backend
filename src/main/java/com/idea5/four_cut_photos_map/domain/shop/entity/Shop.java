@@ -4,6 +4,7 @@ import com.idea5.four_cut_photos_map.domain.brand.entity.Brand;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 
@@ -15,6 +16,7 @@ import javax.persistence.*;
 @SuperBuilder
 @ToString(callSuper = true)
 @Table(indexes = {@Index(name = "idx_shop_address",columnList = "roadAddressName")})
+@DynamicUpdate
 public class Shop extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")

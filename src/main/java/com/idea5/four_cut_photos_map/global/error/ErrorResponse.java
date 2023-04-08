@@ -7,7 +7,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 
 @Getter
@@ -25,14 +27,6 @@ public class ErrorResponse {
                 .build();
     }
 
-    // 에러 정보들을 [field] : msg 로 구조화
-    public static ErrorResponse of(String errorCode, String[] errorMessages){
-        return ErrorResponse.builder()
-                .errorCode(errorCode)
-                .errorMessage(createErrorMessage(errorMessages))
-                .build();
-    }
-
 
     // 에러 정보들을 BindingResult을 통해 처리
     public static ErrorResponse of(String errorCode, BindingResult bindingResult){
@@ -41,6 +35,22 @@ public class ErrorResponse {
                 .errorMessage(createErrorMessage(bindingResult))
                 .build();
 
+    }
+
+    // ConstraintViolationException 정보들을 [field] : msg 로 구조화
+    public static ErrorResponse of(String errorCode, ConstraintViolationException e){
+        return ErrorResponse.builder()
+                .errorCode(errorCode)
+                .errorMessage(createErrorMessage(e))
+                .build();
+    }
+
+    // MissingServletRequestParameterException 정보들을 [field] : msg 로 구조화
+    public static ErrorResponse of(String errorCode, MissingServletRequestParameterException e){
+        return ErrorResponse.builder()
+                .errorCode(errorCode)
+                .errorMessage(createErrorMessage(e))
+                .build();
     }
 
     private static String createErrorMessage(BindingResult bindingResult) {
@@ -65,7 +75,9 @@ public class ErrorResponse {
 
     }
 
-    private static String createErrorMessage(String[] errorMessages) {
+    private static String createErrorMessage(ConstraintViolationException e) {
+        String[] errorMessages = e.getMessage().split(",");
+
         StringBuilder sb = new StringBuilder();
         boolean isFirst = true;
 
@@ -83,6 +95,10 @@ public class ErrorResponse {
             sb.append(errorMessage.split(":")[1]); // error Message
         }
         return sb.toString();
+    }
+
+    private static String createErrorMessage(MissingServletRequestParameterException e) {
+        return "[" + e.getParameterName() + "] " + "필수 파라미터가 누락되었습니다";
     }
 
 }

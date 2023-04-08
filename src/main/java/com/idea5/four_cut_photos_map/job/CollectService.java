@@ -19,6 +19,13 @@ public class CollectService {
     private final FavoriteService favoriteService;
     private final ReviewService reviewService;
 
+    // 대표 칭호 부여
+    @Transactional
+    public void addJoinTitle(Member member) {
+        MemberTitle memberTitle = MemberTitle.builder().id(MemberTitleType.NEWBIE.getCode()).build();
+        addMemberTitle(member, memberTitle, true);
+    }
+
     // 회원에게 칭호 부여
     @Transactional
     public void addMemberTitle(Member member, MemberTitle memberTitle, Boolean isMain) {

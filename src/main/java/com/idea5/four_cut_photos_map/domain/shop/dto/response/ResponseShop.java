@@ -26,6 +26,7 @@ public class ResponseShop {
     private String placeUrl;
     private double starRatingAvg;
     private int reviewCnt;
+    private int favoriteCnt;
     private boolean isFavorite;
     private ResponseBrandDto brand;
 
@@ -39,6 +40,7 @@ public class ResponseShop {
                 .placeUrl(apiShop.getPlaceUrl())
                 .starRatingAvg(dbShop.getStarRatingAvg())
                 .reviewCnt(dbShop.getReviewCnt())
+                .favoriteCnt(dbShop.getFavoriteCnt())
                 .brand(brand)
                 .build();
     }

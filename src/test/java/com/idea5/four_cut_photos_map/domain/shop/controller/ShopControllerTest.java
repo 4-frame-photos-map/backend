@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -61,9 +60,9 @@ class ShopControllerTest {
     }
 
     // todo : 브랜드 검색 api TDD
-    @DisplayName("브랜드 검색")
+    @DisplayName("2km 이내 대표 브랜드 검색")
     @Test
-    void searchByBrand() throws Exception {
+    void searchByBrandWithinRadius() throws Exception {
 
         /**
          * 참고)
@@ -104,21 +103,46 @@ class ShopControllerTest {
         resultActions
                 .andExpect(status().is2xxSuccessful())
                 .andDo(print());
-
     }
 
+    @DisplayName("2km 이내 전체 브랜드 검색")
+    @Test
+    void searchAllBrandsWithinRadius() throws Exception {
+        // given
+        double cur_x = 126.97534763076;
+        double cur_y = 37.534272313844;
 
-    /**
-     * 테스트 내용들은 카카오 API와 통신하여 값을 받아온다.
-     * API 호출의 결과로 document = null 리턴된다.
-     */
+        Brand brand1 = brandRepository.save(new Brand(MajorBrand.LIFEFOURCUTS.getBrandName(), MajorBrand.LIFEFOURCUTS.getFilePath()));
+        Brand brand2 = brandRepository.save(new Brand(MajorBrand.PHOTOISM.getBrandName(), MajorBrand.PHOTOISM.getFilePath()));
+
+        shopRepository.save(new Shop(brand2, "포토이즘박스 해방촌점", "서울 용산구 신흥로 31", 0, 0, 0.0));
+        shopRepository.save(new Shop(brand1, "인생네컷 망리단길점","서울 마포구 포은로 109-1",0,0,0.0 ));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(get("/shops/brand")
+                .param("longitude", String.valueOf(cur_x))
+                .param("latitude", String.valueOf(cur_y))
+                .param("brand", "")
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // then
+        resultActions
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.*", hasSize(2)))
+
+                .andExpect(jsonPath("$[0].place_name", containsString("포토스트리트 숙대입구점")))
+                .andExpect(jsonPath("$[1].place_name", containsString("포토이즘박스 해방촌점")))
+
+                .andDo(print());
+    }
+
     @Test
     @DisplayName("상점 상세보기")
-    void 상점_상세보기() throws Exception{
+    void 상점_상세보기() throws Exception {
 
         // given
         Brand brand = brandRepository.save(new Brand(MajorBrand.LIFEFOURCUTS.getBrandName(), MajorBrand.LIFEFOURCUTS.getFilePath()));
-        Shop shop = shopRepository.save(new Shop(brand, "인생네컷 서울경리단길점", "서울 용산구 녹사평대로46길 23",0,0,0.0));
+        Shop shop = shopRepository.save(new Shop(brand, "인생네컷 홍대점", "서울 마포구 홍익로6길 21", 0, 0, 0.0));
         String distance = "3km";
 
         // when
@@ -129,53 +153,15 @@ class ShopControllerTest {
         // then
         resultActions
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.result.id").value(shop.getId()))
-                .andExpect(jsonPath("$.result.place_name").value(shop.getPlaceName()))
-                .andExpect(jsonPath("$.result.road_address_name").value(shop.getRoadAddressName()))
-                .andExpect(jsonPath("$.result.distance").value(distance))
+                .andExpect(jsonPath("id").value(shop.getId()))
+                .andExpect(jsonPath("distance").value(distance))
                 .andDo(print());
 
     }
 
-
-
-//    @DisplayName("2km 이내 마커 표시")
-//    @Test
-//    void searchMarker() throws Exception {
-//        // given
-//        double x = 127.134898;
-//        double y = 36.833922;
-//        Point point = new Point(127.134898, 36.833922); // 두정동 위치
-//
-//        Brand brand1 = brandRepository.save(new Brand(MajorBrand.LIFEFOURCUTS.getBrandName(), MajorBrand.LIFEFOURCUTS.getFilePath()));
-//        Brand brand2 = brandRepository.save(new Brand(MajorBrand.PHOTOISM.getBrandName(), MajorBrand.PHOTOISM.getFilePath()));
-//        Brand brand3 = brandRepository.save(new Brand(MajorBrand.HARUFILM.getBrandName(), MajorBrand.HARUFILM.getFilePath()));
-//
-//        shopRepository.save(new Shop(brand1, "인생네컷 충남천안두정먹거리공원점", "충남 천안시 서북구 원두정2길 21",0,0,0.0));
-//        shopRepository.save(new Shop(brand2, "포토이즘박스 두정점", "충남 천안시 서북구 원두정2길 21",0,0,0.0));
-//        shopRepository.save(new Shop(brand3, "하루필름 천안점", "충남 천안시 동남구 신부동 459-1",0,0,0.0));
-//
-//
-//        // when
-//        ResultActions resultActions = mockMvc.perform(get("/shops/marker")
-//                .param("longitude", String.valueOf(point.getX()))
-//                .param("latitude", String.valueOf(point.getY()))
-//                .contentType(MediaType.APPLICATION_JSON));
-//
-//
-//
-//        // then
-//        resultActions
-//                .andExpect(status().is2xxSuccessful())
-//                .andExpect(jsonPath("$.result.인생네컷.length()").value(1)) // todo : apiResponse로 감싸면 jsonPath 수정해야 됨
-//                .andExpect(jsonPath("$.result.포토이즘박스.length()").value(1)) // todo : apiResponse로 감싸면 jsonPath 수정해야 됨
-//                .andExpect(jsonPath("$.result.하루필름.length()").value(0)) // todo : apiResponse로 감싸면 jsonPath 수정해야 됨
-//                .andDo(print());
-//    }
-
     @DisplayName("키워드로 조회된 상점 리스트 보여주기, DB에 동일 데이터 존재")
     @Test
-    void showListSearchedByKeyword() throws Exception {
+    void showSearchResultsByKeyword() throws Exception {
         // Given
         String keyword = "마포";
         double cur_x = 126.76819064893;
@@ -183,7 +169,6 @@ class ShopControllerTest {
 
         Brand brand1 = brandRepository.save(new Brand(MajorBrand.LIFEFOURCUTS.getBrandName(), MajorBrand.LIFEFOURCUTS.getFilePath()));
         Brand brand2 = brandRepository.save(new Brand(MajorBrand.HARUFILM.getBrandName(), MajorBrand.HARUFILM.getFilePath()));
-
 
         shopRepository.save(new Shop(brand1, "인생네컷 홍대동교점", "서울 마포구 홍익로6길 21",0,0,0.0));
         shopRepository.save(new Shop(brand2, "하루필름 연남점", "서울 마포구 동교로46길 40",0,0,0.0));
@@ -197,22 +182,19 @@ class ShopControllerTest {
                         .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8)))
                 // Then
                 //.andDo(print())
-                .andExpect(status().is2xxSuccessful())
+                .andExpect(status().isOk())
                 .andExpect(handler().methodName("showSearchResultsByKeyword"))
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("키워드로 지점 조회 성공, 정확도순 정렬"))
-                .andExpect(jsonPath("$.result.*", hasSize(2)))
+                .andExpect(jsonPath("$.*", hasSize(2)))
 
-                .andExpect(jsonPath("$.result[0].place_name", containsString("인생네컷 홍대동교점")))
-                .andExpect(jsonPath("$.result[0].place_url").value("http://place.map.kakao.com/738246186"))
-                .andExpect(jsonPath("$.result[0].longitude").value("126.922894949096"))
-                .andExpect(jsonPath("$.result[0].latitude").value("37.555493447252"))
+                .andExpect(jsonPath("$[0].place_name", containsString("인생네컷 홍대동교점")))
+                .andExpect(jsonPath("$[0].longitude", equalTo("126.922894949096")))
+                .andExpect(jsonPath("$[0].latitude", equalTo("37.555493447252")))
+                .andExpect(jsonPath("$[0].distance", equalTo("18.1km")))
 
-                .andExpect(jsonPath("$.result[1].place_name", containsString("하루필름 연남점")))
-                .andExpect(jsonPath("$.result[1].place_url").value("http://place.map.kakao.com/459560376"))
-                .andExpect(jsonPath("$.result[1].longitude").value("126.926725005048"))
-                .andExpect(jsonPath("$.result[1].latitude").value("37.5621542536479"))
-                .andDo(print());
+                .andExpect(jsonPath("$[1].place_name", containsString("하루필름 연남점")))
+                .andExpect(jsonPath("$[1].longitude", equalTo("126.926725005048")))
+                .andExpect(jsonPath("$[1].latitude", equalTo("37.5621542536479")))
+                .andExpect(jsonPath("$[1].distance", equalTo("17.9km")));
     }
 
     @DisplayName("키워드로 조회된 상점 리스트 보여주기, DB에 동일 데이터 존재하지 않음")
@@ -232,26 +214,8 @@ class ShopControllerTest {
                         .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8)))
                 // Then
                 //.andDo(print())
-                .andExpect(status().is2xxSuccessful())
+                .andExpect(status().isOk())
                 .andExpect(handler().methodName("showSearchResultsByKeyword"))
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message", containsString("키워드(%s)에 해당하는 지점이 존재하지 않습니다.".formatted(keyword))));
-    }
-
-    static class Point{
-        private double x,y;
-
-        public Point(double x, double y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public double getX() {
-            return x;
-        }
-
-        public double getY() {
-            return y;
-        }
+                .andExpect(jsonPath("$.*", hasSize(0)));
     }
 }

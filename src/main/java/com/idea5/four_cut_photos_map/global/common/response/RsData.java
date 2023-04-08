@@ -15,13 +15,16 @@ import lombok.Setter;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RsData<T> {
-    private boolean success; // API 호출 실행 결과 (필수)
+    private Boolean success; // API 호출 실행 결과 (선택)
     private String message;
-
     private ErrorResponse error;       // ErrorResponse 리소스 (선택)
     private T result;       // API 가 응답해야하는 리소스 (선택)
 
     // 성공 응답
+    public RsData(T result) {
+        this.result = result;
+    }
+
     public RsData(boolean success, String message) {
         this.success = success;
         this.message = message;
