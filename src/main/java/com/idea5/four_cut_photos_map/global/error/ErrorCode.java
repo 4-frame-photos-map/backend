@@ -31,6 +31,7 @@ public enum ErrorCode {
     DUPLICATE_SHOP_TITLE(HttpStatus.CONFLICT, "409", "해당 지점은 이미 타이틀을 보유하고 있습니다."),
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "리뷰를 찾을 수 없습니다."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "회원을 찾을 수 없습니다."),
+    BRAND_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "브랜드를 찾을 수 없습니다."),
     WRITER_DOES_NOT_MATCH(HttpStatus.BAD_REQUEST, "400", "작성자가 일치하지 않습니다."),
     DUPLICATE_MEMBER_NICKNAME(HttpStatus.CONFLICT, "409", "중복된 닉네임입니다."),
     FAVORITE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "400", String.format("최대 찜 개수 %d개를 초과하였습니다.", MAX_FAVORITE_SHOP_COUNT));

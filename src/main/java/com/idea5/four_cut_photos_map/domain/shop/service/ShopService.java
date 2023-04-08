@@ -86,6 +86,7 @@ public class ShopService {
         );
     }
 
+
     public Shop findById(Long id) {
         return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
     }

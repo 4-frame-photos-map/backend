@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 
 @Entity
@@ -17,6 +18,6 @@ import javax.persistence.Entity;
 @AllArgsConstructor
 public class Brand extends BaseEntity {
     private String brandName;
+    @Column(columnDefinition = "TEXT")
     private String filePath;
-
 }

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -114,7 +115,9 @@ class ShopControllerTest {
 
         Brand brand1 = brandRepository.save(new Brand(MajorBrand.LIFEFOURCUTS.getBrandName(), MajorBrand.LIFEFOURCUTS.getFilePath()));
         Brand brand2 = brandRepository.save(new Brand(MajorBrand.PHOTOISM.getBrandName(), MajorBrand.PHOTOISM.getFilePath()));
+        Brand brand3 = brandRepository.save(new Brand("기타", "기타 브랜드 이미지 경로"));
 
+        shopRepository.save(new Shop(brand3, "포토스트리트 숙대입구점", "서울 용산구 한강대로87길 6", 0, 0, 0.0));
         shopRepository.save(new Shop(brand2, "포토이즘박스 해방촌점", "서울 용산구 신흥로 31", 0, 0, 0.0));
         shopRepository.save(new Shop(brand1, "인생네컷 망리단길점","서울 마포구 포은로 109-1",0,0,0.0 ));
 
@@ -129,10 +132,8 @@ class ShopControllerTest {
         resultActions
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.*", hasSize(2)))
-
                 .andExpect(jsonPath("$[0].place_name", containsString("포토스트리트 숙대입구점")))
                 .andExpect(jsonPath("$[1].place_name", containsString("포토이즘박스 해방촌점")))
-
                 .andDo(print());
     }
 
@@ -190,7 +191,7 @@ class ShopControllerTest {
                 .andExpect(jsonPath("$[0].longitude", equalTo("126.922894949096")))
                 .andExpect(jsonPath("$[0].latitude", equalTo("37.555493447252")))
                 .andExpect(jsonPath("$[0].distance", equalTo("18.1km")))
-
+                
                 .andExpect(jsonPath("$[1].place_name", containsString("하루필름 연남점")))
                 .andExpect(jsonPath("$[1].longitude", equalTo("126.926725005048")))
                 .andExpect(jsonPath("$[1].latitude", equalTo("37.5621542536479")))
@@ -218,4 +219,5 @@ class ShopControllerTest {
                 .andExpect(handler().methodName("showSearchResultsByKeyword"))
                 .andExpect(jsonPath("$.*", hasSize(0)));
     }
+
 }
