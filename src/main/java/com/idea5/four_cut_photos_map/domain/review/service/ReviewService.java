@@ -1,7 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.review.service;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
-import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
 import com.idea5.four_cut_photos_map.domain.review.dto.request.RequestReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.entity.Review;
@@ -28,7 +27,6 @@ import java.util.stream.Collectors;
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ShopService shopService;
-    private final MemberService memberService;
 
     private boolean actorCanModify(Member member, Review review) {
         return member.getId() == review.getWriter().getId();
@@ -75,32 +73,32 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    public ResponseReviewDto write(Long memberId, Long shopId, RequestReviewDto reviewDto) {
-        Member user = memberService.findById(memberId);
-
+    public ResponseReviewDto write(Member member, Long shopId, RequestReviewDto reviewDto) {
         Shop shop = shopService.findById(shopId);
 
         Review review = reviewDto.toEntity();
-        review.setWriter(user);
+        review.setWriter(member);
         review.setShop(shop);
 
         reviewRepository.save(review);
 
-        return ResponseReviewDto.from(review, user, shop);
+        updateShopReviewStats(review);
+
+        return ResponseReviewDto.from(review, member, shop);
     }
 
-    public ResponseReviewDto modify(Long memberId, Long reviewId, RequestReviewDto reviewDto) {
+    public ResponseReviewDto modify(Member member, Long reviewId, RequestReviewDto reviewDto) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
 
         // 수정 권한 확인
-        Member user = memberService.findById(memberId);
-
-        if(!actorCanModify(user, review)) {
+        if(!actorCanModify(member, review)) {
             throw new BusinessException(ErrorCode.WRITER_DOES_NOT_MATCH);
         }
 
         // Review Entity 수정
         review = updateReview(review, reviewDto);
+
+        updateShopReviewStats(review);
 
         return ResponseReviewDto.from(review);
     }
@@ -115,21 +113,41 @@ public class ReviewService {
         return review;
     }
 
-    public void delete(Long memberId, Long reviewId) {
-        Member user = memberService.findById(memberId);
-
+    public void delete(Member member, Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
         
-        if(!actorCanDelete(user, review)) {
+        if(!actorCanDelete(member, review)) {
             throw new BusinessException(ErrorCode.WRITER_DOES_NOT_MATCH);
         }
 
         reviewRepository.delete(review);
+
+        updateShopReviewStats(review);
+    }
+
+    // Shop 리뷰 관련 통계 컬럼 업데이트
+    public void updateShopReviewStats(Review review) {
+        Shop shop = shopService.findById(review.getShop().getId());
+
+        int reviewCount = reviewRepository.countByShop(shop);
+        shop.setReviewCnt(reviewCount);
+
+        double avgStarRating = 0.0;
+        if(reviewCount != 0) {
+            avgStarRating = reviewRepository.getAverageStarRating(shop.getId());
+            avgStarRating = Double.parseDouble(String.format("%.1f", avgStarRating));
+        }
+        shop.setStarRatingAvg(avgStarRating);
+
     }
 
     // 회원의 리뷰수 조회
     public Long getReviewCntByWriter(Member member) {
         return reviewRepository.countByWriter(member);
+    }
+
+    public void deleteByWriterId(Long memberId) {
+        reviewRepository.deleteByWriterId(memberId);
     }
 }

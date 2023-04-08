@@ -3,6 +3,7 @@ package com.idea5.four_cut_photos_map.domain.shop.entity;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.Entity;
 import javax.persistence.Index;
@@ -15,13 +16,15 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
-@Table(indexes = {@Index(name = "idx_shop_address",columnList = "roadAddressName"),
-        @Index(name = "idx_shop_name",columnList = "roadAddressName")})
+@Table(indexes = {@Index(name = "idx_shop_address",columnList = "roadAddressName")})
+@DynamicUpdate
 public class Shop extends BaseEntity {
 
-    private String placeName; // 상점명
-    private String roadAddressName; // 주소
-    private Integer favoriteCnt; // 찜 수 // MySQL Integer == MySQL int
+    private String placeName;
+    private String roadAddressName;
+    private Integer favoriteCnt; // MySQL Integer == MySQL int
+    private Integer reviewCnt;
+    private Double starRatingAvg;
 
 
     // TODO: 상점 상세페이지뿐만 아니라 상점 리스트 페이지에도 favoriteCnt(찜 수)를 전송해야 할 지? 논의

@@ -2,6 +2,8 @@
 UPDATE shop SET create_date = Now() WHERE create_date IS NULL;
 UPDATE shop SET modify_date = Now() WHERE modify_date IS NULL;
 UPDATE shop SET favorite_cnt = 0 WHERE favorite_cnt IS NULL;
+UPDATE shop SET star_rating_avg = 0 WHERE star_rating_avg IS NULL;
+UPDATE shop SET review_cnt = 0 WHERE review_cnt IS NULL;
 
 -- Shop import 데이터에서 '서울특별시'를 '서울'로 변경
 UPDATE shop SET road_address_name= REPLACE(road_address_name,'서울특별시','서울');
@@ -25,11 +27,11 @@ INSERT INTO shop_title(create_date, modify_date, name, conditions, content) VALU
 INSERT INTO shop_title(create_date, modify_date, name, conditions, content) VALUES (NOW(), NOW(), '소품 양호', '소품 점수 4점 이상', '다양하게 연출하기 좋아요.');
 
 -- 칭호
-INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(), NOW(), '뉴비', '네컷지도 가입');
-INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(), NOW(), '리뷰 첫 걸음', '리뷰 1회 누적');
-INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(), NOW(), '리뷰 홀릭', '리뷰 5회 누적');
-INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(), NOW(), '찜 첫 걸음', '찜 1회 누적');
-INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(), NOW(), '찜 홀릭', '찜 5회 누적');
+INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(), NOW(), '뉴비', '회원가입');
+INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(), NOW(), '리뷰 첫 걸음', '첫번째 리뷰 작성');
+INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(), NOW(), '리뷰 홀릭', '리뷰 3개 작성');
+INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(), NOW(), '찜 첫 걸음', '첫번째 찜 추가');
+INSERT INTO MEMBER_TITLE(create_date, modify_date, name, content) VALUES (NOW(), NOW(), '찜 홀릭', '찜 3개 추가');
 */
 
 -- member(100개)

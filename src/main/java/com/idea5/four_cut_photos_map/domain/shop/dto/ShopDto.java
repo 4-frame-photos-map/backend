@@ -4,7 +4,9 @@ import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
+/**
+ * 브랜드별 Map Marker DTO (현재 미사용)
+ */
 @AllArgsConstructor
 @Getter
 @Builder

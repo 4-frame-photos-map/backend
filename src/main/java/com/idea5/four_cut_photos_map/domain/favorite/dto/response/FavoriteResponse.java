@@ -11,14 +11,14 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @Builder
-public class FavoriteResponseDto {
+public class FavoriteResponse {
     private Long id;
     private ResponseFavoriteShop shop;
 
-    public static FavoriteResponseDto from(Favorite favorite) {
-        ResponseFavoriteShop shopDto = ResponseFavoriteShop.from(favorite.getShop());
+    public static FavoriteResponse from(Favorite favorite, String placeName, String distance) {
+        ResponseFavoriteShop shopDto = ResponseFavoriteShop.from(favorite.getShop(), placeName, distance);
 
-        return FavoriteResponseDto.builder()
+        return FavoriteResponse.builder()
                 .id(favorite.getId())
                 .shop(shopDto)
                 .build();

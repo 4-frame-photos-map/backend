@@ -1,6 +1,6 @@
 //package com.idea5.four_cut_photos_map.domain.favorite.service;
 //
-//import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponseDto;
+//import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponse;
 //import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 //import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
 //import com.idea5.four_cut_photos_map.domain.member.entity.Member;
@@ -66,7 +66,7 @@
 //        long memberId = 1;
 //        String criteria = "created";
 //        // when
-//        List<FavoriteResponseDto> favoriteResponseDtos = favoriteService.getFavoritesList(memberId,criteria);
+//        List<FavoriteResponse> favoriteResponseDtos = favoriteService.getFavoritesList(memberId,criteria);
 //
 //        // then
 //        assertAll(
@@ -83,7 +83,7 @@
 //        long memberId = 1;
 //        String criteria = "placename";
 //        // when
-//        List<FavoriteResponseDto> favoriteResponseDtos = favoriteService.getFavoritesList(memberId,criteria);
+//        List<FavoriteResponse> favoriteResponseDtos = favoriteService.getFavoritesList(memberId,criteria);
 //
 //        // then
 //        assertAll(

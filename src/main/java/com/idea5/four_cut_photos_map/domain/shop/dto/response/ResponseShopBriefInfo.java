@@ -4,22 +4,18 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 /**
- * 키워드 조회, 전체/브랜드별 조회 공통 응답 DTO
+ * 간단 조회 응답 DTO (Map Marker 모달용)
  */
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
+@SuperBuilder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ResponseShop {
-    private Long id;
+public class ResponseShopBriefInfo {
+    private long id;
     private String placeName;
-    private String longitude;
-    private String latitude;
     private String distance;
     private String placeUrl;
     private double starRatingAvg;
@@ -27,14 +23,13 @@ public class ResponseShop {
     private int favoriteCnt;
     private boolean isFavorite;
 
-    static public ResponseShop of(Shop dbShop, KakaoMapSearchDto apiShop){
-        return ResponseShop.builder()
+
+    static public ResponseShopBriefInfo of(Shop dbShop, String placeName, String placeUrl, String distance){
+        return ResponseShopBriefInfo.builder()
                 .id(dbShop.getId())
-                .placeName(apiShop.getPlaceName())
-                .longitude(apiShop.getLongitude())
-                .latitude(apiShop.getLatitude())
-                .distance(apiShop.getDistance())
-                .placeUrl(apiShop.getPlaceUrl())
+                .placeName(placeName)
+                .distance(distance)
+                .placeUrl(placeUrl)
                 .starRatingAvg(dbShop.getStarRatingAvg())
                 .reviewCnt(dbShop.getReviewCnt())
                 .favoriteCnt(dbShop.getFavoriteCnt())
