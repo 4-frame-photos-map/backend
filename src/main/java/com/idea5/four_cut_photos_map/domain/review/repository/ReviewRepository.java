@@ -5,6 +5,7 @@ import com.idea5.four_cut_photos_map.domain.review.entity.Review;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +24,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     int countByShop(Shop shop);
 
     @Query("SELECT AVG(r.starRating) FROM Review r WHERE r.shop.id = :shopId")
-    Double getAverageStarRating(Long shopId);
+    Double getAverageStarRating(@Param("shopId") Long shopId);
 
     Long countByWriter(Member writer);
 
