@@ -37,8 +37,8 @@ public enum ErrorCode {
 
     //
     INVALID_JSON(HttpStatus.BAD_REQUEST, "001", "Request Body JSON 형식이 잘못되었습니다."),
-    INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "002", "파라미터 형식이 잘못되었습니다.");
-
+    INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "002", "파라미터 형식이 잘못되었습니다."),
+    MISSING_PARAMETER(HttpStatus.BAD_REQUEST, "003", "필수 파라미터가 누락되었습니다");
 
     private HttpStatus httpStatus;
     private String errorCode;
