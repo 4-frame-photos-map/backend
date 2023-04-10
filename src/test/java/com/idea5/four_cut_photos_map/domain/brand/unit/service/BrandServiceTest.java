@@ -8,12 +8,13 @@ import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
 import com.idea5.four_cut_photos_map.domain.brand.service.BrandService;
 import com.idea5.four_cut_photos_map.global.error.ErrorCode;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -60,9 +61,9 @@ public class BrandServiceTest {
                 ResponseBrandDto responseBrandDto = brandService.getBrandById(id);
 
                 // then
-                Assertions.assertThat(responseBrandDto.getId()).isEqualTo(id);
-                Assertions.assertThat(responseBrandDto.getBrandName()).isEqualTo(brandName);
-                Assertions.assertThat(responseBrandDto.getFilePath()).isEqualTo(filePath);
+                assertEquals(responseBrandDto.getId(), id);
+                assertEquals(responseBrandDto.getBrandName(), brandName);
+                assertEquals(responseBrandDto.getFilePath(), filePath);
             }
         }
 
@@ -79,9 +80,8 @@ public class BrandServiceTest {
                 when(brandRepository.findById(id)).thenThrow(exception);
 
                 // then
-                Assertions.assertThatThrownBy(() -> brandService.getBrandById(id))
-                        .isInstanceOf(exception.getClass())
-                        .hasMessageContaining(exception.getMessage());
+                BusinessException e = assertThrows(exception.getClass(), () -> brandService.getBrandById(id));
+                assertEquals(ErrorCode.BRAND_NOT_FOUND.getMessage(), e.getMessage());
             }
         }
     }
