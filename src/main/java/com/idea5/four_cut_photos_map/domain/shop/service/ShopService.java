@@ -3,6 +3,9 @@ package com.idea5.four_cut_photos_map.domain.shop.service;
 import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponse;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
+import com.idea5.four_cut_photos_map.domain.brand.dto.response.ResponseBrandDto;
+import com.idea5.four_cut_photos_map.domain.brand.entity.MajorBrand;
+import com.idea5.four_cut_photos_map.domain.brand.service.BrandService;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
@@ -33,8 +36,10 @@ public class ShopService {
     private final ShopRepository shopRepository;
     private final FavoriteRepository favoriteRepository;
     private final KakaoMapSearchApi kakaoMapSearchApi;
+    private final BrandService brandService;
 
 
+    @Transactional(readOnly = true)
     public List<ResponseShop> compareWithDbShops(List<KakaoMapSearchDto> apiShops) {
         List<ResponseShop> resultShop = new ArrayList<>();
         for (KakaoMapSearchDto apiShop: apiShops) {
@@ -44,7 +49,7 @@ public class ShopService {
             Shop dbShop = dbShops.size() == 1 ? dbShops.get(0) : comparePlaceName(apiShop, dbShops);
 
             if(dbShop != null) {
-                ResponseShop responseShop = ResponseShop.of(dbShop, apiShop);
+                ResponseShop responseShop = ResponseShop.of(dbShop, apiShop, dbShop.getBrand());
                 resultShop.add(responseShop);
             }
         }
@@ -80,6 +85,7 @@ public class ShopService {
                 true
         );
     }
+
 
     public Shop findById(Long id) {
         return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));

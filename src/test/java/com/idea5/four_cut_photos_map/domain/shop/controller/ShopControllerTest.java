@@ -1,16 +1,23 @@
 package com.idea5.four_cut_photos_map.domain.shop.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.idea5.four_cut_photos_map.domain.brand.entity.Brand;
+import com.idea5.four_cut_photos_map.domain.brand.entity.MajorBrand;
+import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
+import com.idea5.four_cut_photos_map.global.util.DatabaseCleaner;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -34,10 +41,24 @@ class ShopControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
     private ShopRepository shopRepository;
 
     @Autowired
+    private BrandRepository brandRepository;
+
+    @Autowired
     private ShopService shopService;
+
+    @Autowired
+    private DatabaseCleaner databaseCleaner;
+
+    @AfterEach
+    public void cleanUpDatabase() {
+        databaseCleaner.execute();
+    }
 
     // todo : 브랜드 검색 api TDD
     @DisplayName("2km 이내 대표 브랜드 검색")
@@ -59,13 +80,17 @@ class ShopControllerTest {
 
         RequestBrandSearch requestBrandSearch = new RequestBrandSearch(searchBrand, x, y);
 
+        Brand brand1 = brandRepository.save(new Brand(MajorBrand.LIFEFOURCUTS.getBrandName(), MajorBrand.LIFEFOURCUTS.getFilePath()));
+        Brand brand2 = brandRepository.save(new Brand(MajorBrand.PHOTOISM.getBrandName(), MajorBrand.PHOTOISM.getFilePath()));
+        Brand brand3 = brandRepository.save(new Brand(MajorBrand.HARUFILM.getBrandName(), MajorBrand.HARUFILM.getFilePath()));
+
         shopService.searchKakaoMapByBrand(requestBrandSearch);
-        shopRepository.save(new Shop("인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48", 0, 0, 0.0));
-        shopRepository.save(new Shop("포토이즘박스 성수점", "서울 성동구 서울숲2길 17-2", 0, 0, 0.0));
-        shopRepository.save(new Shop("인생네컷 카페성수로드점", "서울 성동구 서울숲4길 13", 0, 0, 0.0));
-        shopRepository.save(new Shop("하루필름 서울숲점", "서울 성동구 서울숲2길 45", 0, 0, 0.0));
-        shopRepository.save(new Shop("인생네컷 서울숲점", "서울 성동구 서울숲4길 20", 0, 0, 0.0));
-        shopRepository.save(new Shop("인생네컷 충남천안두정먹거리공원점", "충남 천안시 서북구 원두정2길 21", 0, 0, 0.0));
+        shopRepository.save(new Shop(brand1,"인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48",0,0,0.0));
+        shopRepository.save(new Shop(brand2, "포토이즘박스 성수점", "서울 성동구 서울숲2길 17-2",0,0,0.0));
+        shopRepository.save(new Shop(brand1, "인생네컷 카페성수로드점", "서울 성동구 서울숲4길 13",0,0,0.0));
+        shopRepository.save(new Shop(brand3, "하루필름 서울숲점", "서울 성동구 서울숲2길 45",0,0,0.0));
+        shopRepository.save(new Shop(brand1, "인생네컷 서울숲점", "서울 성동구 서울숲4길 20",0,0,0.0));
+        shopRepository.save(new Shop(brand1, "인생네컷 충남천안두정먹거리공원점", "충남 천안시 서북구 원두정2길 21",0,0,0.0));
 
         // when
         ResultActions resultActions = mockMvc.perform(get("/shops/brand")
@@ -88,9 +113,13 @@ class ShopControllerTest {
         double cur_x = 126.97534763076;
         double cur_y = 37.534272313844;
 
-        shopRepository.save(new Shop("포토스트리트 숙대입구점", "서울 용산구 한강대로87길 6", 0, 0, 0.0));
-        shopRepository.save(new Shop("포토이즘박스 해방촌점", "서울 용산구 신흥로 31", 0, 0, 0.0));
-        shopRepository.save(new Shop("인생네컷 망리단길점","서울 마포구 포은로 109-1",0,0,0.0 ));
+        Brand brand1 = brandRepository.save(new Brand(MajorBrand.LIFEFOURCUTS.getBrandName(), MajorBrand.LIFEFOURCUTS.getFilePath()));
+        Brand brand2 = brandRepository.save(new Brand(MajorBrand.PHOTOISM.getBrandName(), MajorBrand.PHOTOISM.getFilePath()));
+        Brand brand3 = brandRepository.save(new Brand("기타", "기타 브랜드 이미지 경로"));
+
+        shopRepository.save(new Shop(brand3, "포토스트리트 숙대입구점", "서울 용산구 한강대로87길 6", 0, 0, 0.0));
+        shopRepository.save(new Shop(brand2, "포토이즘박스 해방촌점", "서울 용산구 신흥로 31", 0, 0, 0.0));
+        shopRepository.save(new Shop(brand1, "인생네컷 망리단길점","서울 마포구 포은로 109-1",0,0,0.0 ));
 
         // when
         ResultActions resultActions = mockMvc.perform(get("/shops/brand")
@@ -103,10 +132,8 @@ class ShopControllerTest {
         resultActions
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.*", hasSize(2)))
-
                 .andExpect(jsonPath("$[0].place_name", containsString("포토스트리트 숙대입구점")))
                 .andExpect(jsonPath("$[1].place_name", containsString("포토이즘박스 해방촌점")))
-
                 .andDo(print());
     }
 
@@ -115,7 +142,8 @@ class ShopControllerTest {
     void 상점_상세보기() throws Exception {
 
         // given
-        Shop shop = shopRepository.save(new Shop("인생네컷 홍대점", "서울 마포구 홍익로6길 21", 0, 0, 0.0));
+        Brand brand = brandRepository.save(new Brand(MajorBrand.LIFEFOURCUTS.getBrandName(), MajorBrand.LIFEFOURCUTS.getFilePath()));
+        Shop shop = shopRepository.save(new Shop(brand, "인생네컷 홍대점", "서울 마포구 홍익로6길 21", 0, 0, 0.0));
         String distance = "3km";
 
         // when
@@ -139,8 +167,12 @@ class ShopControllerTest {
         String keyword = "마포";
         double cur_x = 126.76819064893;
         double cur_y = 37.662161386065;
-        shopRepository.save(new Shop("인생네컷 홍대동교점", "서울 마포구 홍익로6길 21", 0, 0, 0.0));
-        shopRepository.save(new Shop("하루필름 연남점", "서울 마포구 동교로46길 40", 0, 0, 0.0));
+
+        Brand brand1 = brandRepository.save(new Brand(MajorBrand.LIFEFOURCUTS.getBrandName(), MajorBrand.LIFEFOURCUTS.getFilePath()));
+        Brand brand2 = brandRepository.save(new Brand(MajorBrand.HARUFILM.getBrandName(), MajorBrand.HARUFILM.getFilePath()));
+
+        shopRepository.save(new Shop(brand1, "인생네컷 홍대동교점", "서울 마포구 홍익로6길 21",0,0,0.0));
+        shopRepository.save(new Shop(brand2, "하루필름 연남점", "서울 마포구 동교로46길 40",0,0,0.0));
 
         // When
         ResultActions resultActions = mockMvc
@@ -159,7 +191,7 @@ class ShopControllerTest {
                 .andExpect(jsonPath("$[0].longitude", equalTo("126.922894949096")))
                 .andExpect(jsonPath("$[0].latitude", equalTo("37.555493447252")))
                 .andExpect(jsonPath("$[0].distance", equalTo("18.1km")))
-
+                
                 .andExpect(jsonPath("$[1].place_name", containsString("하루필름 연남점")))
                 .andExpect(jsonPath("$[1].longitude", equalTo("126.926725005048")))
                 .andExpect(jsonPath("$[1].latitude", equalTo("37.5621542536479")))
@@ -187,4 +219,5 @@ class ShopControllerTest {
                 .andExpect(handler().methodName("showSearchResultsByKeyword"))
                 .andExpect(jsonPath("$.*", hasSize(0)));
     }
+
 }

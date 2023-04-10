@@ -2,6 +2,9 @@ package com.idea5.four_cut_photos_map.domain.member.service;
 
 import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoTokenResp;
 import com.idea5.four_cut_photos_map.domain.auth.dto.param.KakaoUserInfoParam;
+import com.idea5.four_cut_photos_map.domain.brand.entity.Brand;
+import com.idea5.four_cut_photos_map.domain.brand.entity.MajorBrand;
+import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
 import com.idea5.four_cut_photos_map.domain.member.dto.request.MemberUpdateReq;
@@ -57,6 +60,9 @@ class MemberServiceTest {
 
     @Autowired
     MemberTitleLogRepository memberTitleLogRepository;
+
+    @Autowired
+    BrandRepository brandRepository;
 
     @Autowired
     RedisDao redisDao;
@@ -153,6 +159,7 @@ class MemberServiceTest {
                 new KakaoUserInfoParam(1111L, "딸기"),
                 new KakaoTokenResp("bearer", "kakao_access_token", 60, "kakao_refresh_token", 86400));
         Member member = memberRepository.findById(1L).orElse(null);
+
         // when
         memberService.updateNickname(member.getId(), new MemberUpdateReq("수박"));
 
@@ -170,6 +177,7 @@ class MemberServiceTest {
                 new KakaoUserInfoParam(1111L, "딸기"),
                 new KakaoTokenResp("bearer", "kakao_access_token", 60, "kakao_refresh_token", 86400));
         Member member = memberRepository.findById(1L).orElse(null);
+
         // when, then
         BusinessException exception = assertThrows(BusinessException.class, () ->
                 memberService.updateNickname(member.getId(), new MemberUpdateReq(member.getNickname()))
@@ -187,11 +195,13 @@ class MemberServiceTest {
         MemberTitle memberTitle4 = memberTitleRepository.save(new MemberTitle("찜 첫 걸음", "첫번째 찜 추가"));
         MemberTitle memberTitle5 = memberTitleRepository.save(new MemberTitle("찜 홀릭", "찜 3개 이상 추가"));
 
+        Brand brand = brandRepository.save(new Brand(MajorBrand.LIFEFOURCUTS.getBrandName(), MajorBrand.LIFEFOURCUTS.getFilePath()));
+
         memberService.login(
                 new KakaoUserInfoParam(1111L, "딸기"),
                 new KakaoTokenResp("bearer", "kakao_access_token", 60, "kakao_refresh_token", 86400));
         Member member = memberRepository.findById(1L).orElse(null);
-        Shop shop = shopRepository.save(new Shop("인생네컷 성수점", "서울시", 0,0,0.0));
+        Shop shop = shopRepository.save(new Shop(brand, "인생네컷 성수점", "서울시", 0,0,0.0));
         favoriteRepository.save(new Favorite(member, shop));
 
         collectJob.add();

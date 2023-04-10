@@ -1,13 +1,12 @@
 package com.idea5.four_cut_photos_map.domain.shop.entity;
 
+import com.idea5.four_cut_photos_map.domain.brand.entity.Brand;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicUpdate;
 
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -19,7 +18,9 @@ import javax.persistence.Table;
 @Table(indexes = {@Index(name = "idx_shop_address",columnList = "roadAddressName")})
 @DynamicUpdate
 public class Shop extends BaseEntity {
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id")
+    private Brand brand;
     private String placeName;
     private String roadAddressName;
     private Integer favoriteCnt; // MySQL Integer == MySQL int
