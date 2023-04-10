@@ -17,19 +17,17 @@ public class ResponseShopBriefInfo {
     private long id;
     private String placeName;
     private String distance;
-    private String placeUrl;
     private double starRatingAvg;
     private int reviewCnt;
     private int favoriteCnt;
     private boolean isFavorite;
 
 
-    static public ResponseShopBriefInfo of(Shop dbShop, String placeName, String placeUrl, String distance){
+    static public ResponseShopBriefInfo of(Shop dbShop, String placeName, String distance){
         return ResponseShopBriefInfo.builder()
                 .id(dbShop.getId())
                 .placeName(placeName)
                 .distance(distance)
-                .placeUrl(placeUrl)
                 .starRatingAvg(dbShop.getStarRatingAvg())
                 .reviewCnt(dbShop.getReviewCnt())
                 .favoriteCnt(dbShop.getFavoriteCnt())

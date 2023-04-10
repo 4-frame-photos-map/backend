@@ -19,7 +19,6 @@ import lombok.Setter;
 public class ResponseFavoriteShop {
     private Long id;
     private String placeName;
-    private String roadAddressName;
     private String distance;
     private double starRatingAvg;
     private int reviewCnt;
@@ -29,7 +28,6 @@ public class ResponseFavoriteShop {
         return ResponseFavoriteShop.builder()
                 .id(shop.getId())
                 .placeName(placeName)
-                .roadAddressName(shop.getRoadAddressName())
                 .distance(distance)
                 .starRatingAvg(shop.getStarRatingAvg())
                 .reviewCnt(shop.getReviewCnt())

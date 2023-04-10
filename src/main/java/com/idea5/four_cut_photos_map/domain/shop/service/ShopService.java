@@ -56,6 +56,7 @@ public class ShopService {
         return resultShop;
     }
 
+    @Transactional(readOnly = true)
     private List<Shop> compareRoadAddressName(KakaoMapSearchDto apiShop) {
         List<Shop> dbShops = shopRepository.findDistinctByRoadAddressName(apiShop.getRoadAddressName());
         return dbShops;
@@ -86,7 +87,7 @@ public class ShopService {
         );
     }
 
-
+    @Transactional(readOnly = true)
     public Shop findById(Long id) {
         return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
     }
@@ -124,9 +125,10 @@ public class ShopService {
     }
 
 
-    public ResponseShopBriefInfo setResponseDto (long id, String placeName, String placeUrl, String distance) {
+    @Transactional(readOnly = true)
+    public ResponseShopBriefInfo setResponseDto (long id, String placeName, String distance) {
         Shop dbShop = findById(id);
-        return ResponseShopBriefInfo.of(dbShop, placeName, placeUrl, distance);
+        return ResponseShopBriefInfo.of(dbShop, placeName, distance);
     }
 
     public void reduceFavoriteCnt(Shop shop){
