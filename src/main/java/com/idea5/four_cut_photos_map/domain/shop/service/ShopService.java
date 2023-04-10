@@ -57,7 +57,7 @@ public class ShopService {
     }
 
     @Transactional(readOnly = true)
-    private List<Shop> compareRoadAddressName(KakaoMapSearchDto apiShop) {
+    public List<Shop> compareRoadAddressName(KakaoMapSearchDto apiShop) {
         List<Shop> dbShops = shopRepository.findDistinctByRoadAddressName(apiShop.getRoadAddressName());
         return dbShops;
     }
@@ -79,6 +79,7 @@ public class ShopService {
     }
 
     public List<KakaoMapSearchDto> searchKakaoMapByBrand(RequestBrandSearch brandSearch) {
+        if(brandSearch.getBrand()==null) brandSearch.setBrand("");
         return kakaoMapSearchApi.searchByQueryWord (
                 brandSearch.getBrand(),
                 brandSearch.getLongitude(),
