@@ -20,6 +20,7 @@ import java.util.List;
 public class ResponseShopDetail extends ResponseShopBriefInfo {
     private String longitude;
     private String latitude;
+    private String placeUrl;
     private List<ResponseReviewDto> recentReviews;
 
 
