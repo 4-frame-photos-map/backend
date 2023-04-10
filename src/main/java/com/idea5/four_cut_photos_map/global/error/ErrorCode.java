@@ -33,7 +33,10 @@ public enum ErrorCode {
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "회원을 찾을 수 없습니다."),
     WRITER_DOES_NOT_MATCH(HttpStatus.BAD_REQUEST, "400", "작성자가 일치하지 않습니다."),
     DUPLICATE_MEMBER_NICKNAME(HttpStatus.CONFLICT, "409", "중복된 닉네임입니다."),
-    FAVORITE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "400", String.format("최대 찜 개수 %d개를 초과하였습니다.", MAX_FAVORITE_SHOP_COUNT));
+    FAVORITE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "400", String.format("최대 찜 개수 %d개를 초과하였습니다.", MAX_FAVORITE_SHOP_COUNT)),
+
+    //
+    INVALID_JSON(HttpStatus.BAD_REQUEST, "001", "Request Body JSON 형식이 잘못되었습니다.");
 
     private HttpStatus httpStatus;
     private String errorCode;
