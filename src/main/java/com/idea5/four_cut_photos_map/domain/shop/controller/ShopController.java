@@ -148,7 +148,6 @@ public class ShopController {
         ResponseShopBriefInfo responseShopBriefInfo = shopService.setResponseDto(
                 id,
                 requestShopBriefInfo.getPlaceName(),
-                requestShopBriefInfo.getPlaceUrl(),
                 requestShopBriefInfo.getDistance()
         );
 

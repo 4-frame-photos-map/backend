@@ -124,9 +124,9 @@ public class ShopService {
     }
 
 
-    public ResponseShopBriefInfo setResponseDto (long id, String placeName, String placeUrl, String distance) {
+    public ResponseShopBriefInfo setResponseDto (long id, String placeName, String distance) {
         Shop dbShop = findById(id);
-        return ResponseShopBriefInfo.of(dbShop, placeName, placeUrl, distance);
+        return ResponseShopBriefInfo.of(dbShop, placeName, distance);
     }
 
     public void reduceFavoriteCnt(Shop shop){
