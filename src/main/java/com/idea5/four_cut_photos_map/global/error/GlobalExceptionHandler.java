@@ -26,11 +26,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BindException.class)
     protected ResponseEntity<ErrorResponse> handleBindException(BindException e) {
         log.error("handleBindException", e);
-        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST.toString(),
-                e.getBindingResult());
+        ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.INVALID_PARAMETER.getErrorCode(), e.getBindingResult());
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(errorResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
     /**
      * 주로 @RequestParam enum으로 binding 못했을 경우 발생
