@@ -18,7 +18,6 @@ import java.util.List;
 @SuperBuilder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ResponseShopDetail extends ResponseShopBriefInfo {
-    private String roadAddressName;
     private String longitude;
     private String latitude;
     private List<ResponseReviewDto> recentReviews;
@@ -28,7 +27,6 @@ public class ResponseShopDetail extends ResponseShopBriefInfo {
         return ResponseShopDetail.builder()
                 .id(dbShop.getId())
                 .placeName(placeName)
-                .roadAddressName(dbShop.getRoadAddressName())
                 .longitude(longitude)
                 .latitude(latitude)
                 .distance(distance)
