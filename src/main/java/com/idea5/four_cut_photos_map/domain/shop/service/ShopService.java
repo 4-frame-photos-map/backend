@@ -39,6 +39,7 @@ public class ShopService {
     private final BrandService brandService;
 
 
+    @Transactional(readOnly = true)
     public List<ResponseShop> compareWithDbShops(List<KakaoMapSearchDto> apiShops) {
         List<ResponseShop> resultShop = new ArrayList<>();
         for (KakaoMapSearchDto apiShop: apiShops) {
@@ -48,15 +49,15 @@ public class ShopService {
             Shop dbShop = dbShops.size() == 1 ? dbShops.get(0) : comparePlaceName(apiShop, dbShops);
 
             if(dbShop != null) {
-                ResponseBrandDto brandDto = brandService.getBrandById(dbShop.getBrand().getId());
-                ResponseShop responseShop = ResponseShop.of(dbShop, apiShop, brandDto);
+                ResponseShop responseShop = ResponseShop.of(dbShop, apiShop, dbShop.getBrand());
                 resultShop.add(responseShop);
             }
         }
         return resultShop;
     }
 
-    private List<Shop> compareRoadAddressName(KakaoMapSearchDto apiShop) {
+    @Transactional(readOnly = true)
+    public List<Shop> compareRoadAddressName(KakaoMapSearchDto apiShop) {
         List<Shop> dbShops = shopRepository.findDistinctByRoadAddressName(apiShop.getRoadAddressName());
         return dbShops;
     }
@@ -78,6 +79,7 @@ public class ShopService {
     }
 
     public List<KakaoMapSearchDto> searchKakaoMapByBrand(RequestBrandSearch brandSearch) {
+        if(brandSearch.getBrand()==null) brandSearch.setBrand("");
         return kakaoMapSearchApi.searchByQueryWord (
                 brandSearch.getBrand(),
                 brandSearch.getLongitude(),
@@ -86,7 +88,7 @@ public class ShopService {
         );
     }
 
-
+    @Transactional(readOnly = true)
     public Shop findById(Long id) {
         return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
     }
@@ -124,9 +126,10 @@ public class ShopService {
     }
 
 
-    public ResponseShopBriefInfo setResponseDto (long id, String placeName, String placeUrl, String distance) {
+    @Transactional(readOnly = true)
+    public ResponseShopBriefInfo setResponseDto (long id, String placeName, String distance) {
         Shop dbShop = findById(id);
-        return ResponseShopBriefInfo.of(dbShop, placeName, placeUrl, distance);
+        return ResponseShopBriefInfo.of(dbShop, placeName, distance);
     }
 
     public void reduceFavoriteCnt(Shop shop){

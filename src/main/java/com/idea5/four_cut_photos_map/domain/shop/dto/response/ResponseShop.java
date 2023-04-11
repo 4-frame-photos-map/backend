@@ -30,7 +30,13 @@ public class ResponseShop {
     private boolean isFavorite;
     private ResponseBrandDto brand;
 
-    static public ResponseShop of(Shop dbShop, KakaoMapSearchDto apiShop, ResponseBrandDto brand){
+    static public ResponseShop of(Shop dbShop, KakaoMapSearchDto apiShop, Brand brand){
+        ResponseBrandDto brandDto = ResponseBrandDto.builder()
+                .id(brand.getId())
+                .brandName(brand.getBrandName())
+                .filePath(brand.getFilePath())
+                .build();
+
         return ResponseShop.builder()
                 .id(dbShop.getId())
                 .placeName(apiShop.getPlaceName())
@@ -41,7 +47,7 @@ public class ResponseShop {
                 .starRatingAvg(dbShop.getStarRatingAvg())
                 .reviewCnt(dbShop.getReviewCnt())
                 .favoriteCnt(dbShop.getFavoriteCnt())
-                .brand(brand)
+                .brand(brandDto)
                 .build();
     }
 }
