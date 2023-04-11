@@ -23,7 +23,9 @@ import java.util.List;
 public class KakaoMapSearchApi {
 
     @Value("${REST_API_KEY}")
-    private String REST_API_KEY;
+    private String FIRST_API_KEY;
+    @Value("${oauth2.kakao.client-id}")
+    private String SECOND_API_KEY;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     public final int radius= 2000;
@@ -35,7 +37,7 @@ public class KakaoMapSearchApi {
 
         // 1. header 설정
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "KakaoAK " + REST_API_KEY);
+        headers.set("Authorization", "KakaoAK " + FIRST_API_KEY);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         // 2. 요청 URL 정의
@@ -60,7 +62,7 @@ public class KakaoMapSearchApi {
     public String[] searchByRoadAddressName(String roadAddressName) {
         // 1. header 설정
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "KakaoAK " + REST_API_KEY);
+        headers.set("Authorization", "KakaoAK " + FIRST_API_KEY);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         // 2. 요청 URL 정의
@@ -88,7 +90,7 @@ public class KakaoMapSearchApi {
     public String[] searchByRoadAddressName(String roadAddressName, Double curLnt, Double curLat) {
         // 1. header 설정
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "KakaoAK " + REST_API_KEY);
+        headers.set("Authorization", "KakaoAK " + SECOND_API_KEY);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         // 2. 요청 URL 정의
