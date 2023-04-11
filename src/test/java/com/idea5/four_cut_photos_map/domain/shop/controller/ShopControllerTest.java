@@ -41,9 +41,6 @@ class ShopControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
     private ShopRepository shopRepository;
 
     @Autowired
@@ -60,11 +57,9 @@ class ShopControllerTest {
         databaseCleaner.execute();
     }
 
-    // todo : 브랜드 검색 api TDD
     @DisplayName("2km 이내 대표 브랜드 검색")
     @Test
-    void searchByBrandWithinRadius() throws Exception {
-
+    void showSearchResultsByBrand() throws Exception {
         /**
          * 참고)
          *   String expectByBrand = "$.[?(@.brand == '%s')]";
@@ -73,7 +68,6 @@ class ShopControllerTest {
          *  .andExpect(jsonPath("$[0].brand").value(equalTo(keyword)))
          */
         // given
-
         String searchBrand = "인생네컷";
         double x = 127.134898;
         double y = 36.833922;
@@ -99,7 +93,6 @@ class ShopControllerTest {
                 .param("latitude", String.valueOf(y))
                 .contentType(MediaType.APPLICATION_JSON));
 
-
         // then
         resultActions
                 .andExpect(status().is2xxSuccessful())
@@ -107,8 +100,7 @@ class ShopControllerTest {
     }
 
     @DisplayName("2km 이내 전체 브랜드 검색")
-    @Test
-    void searchAllBrandsWithinRadius() throws Exception {
+    @Test void showSearchResultsForAllBrands() throws Exception {
         // given
         double cur_x = 126.97534763076;
         double cur_y = 37.534272313844;
@@ -139,7 +131,7 @@ class ShopControllerTest {
 
     @Test
     @DisplayName("상점 상세보기")
-    void 상점_상세보기() throws Exception {
+    void showDetail() throws Exception {
 
         // given
         Brand brand = brandRepository.save(new Brand(MajorBrand.LIFEFOURCUTS.getBrandName(), MajorBrand.LIFEFOURCUTS.getFilePath()));
@@ -191,7 +183,7 @@ class ShopControllerTest {
                 .andExpect(jsonPath("$[0].longitude", equalTo("126.922894949096")))
                 .andExpect(jsonPath("$[0].latitude", equalTo("37.555493447252")))
                 .andExpect(jsonPath("$[0].distance", equalTo("18.1km")))
-                
+
                 .andExpect(jsonPath("$[1].place_name", containsString("하루필름 연남점")))
                 .andExpect(jsonPath("$[1].longitude", equalTo("126.926725005048")))
                 .andExpect(jsonPath("$[1].latitude", equalTo("37.5621542536479")))
