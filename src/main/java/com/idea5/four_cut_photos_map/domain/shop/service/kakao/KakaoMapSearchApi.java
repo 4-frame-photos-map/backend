@@ -31,7 +31,7 @@ public class KakaoMapSearchApi {
     private final RestTemplate restTemplate;
     private final RedisDao redisDao;
     private final ObjectMapper objectMapper;
-    public final int radius= 2000;
+    public final int radius = 2000;
     public static final String DEFAULT_QUERY_WORD = "즉석사진";
 
 
@@ -78,27 +78,21 @@ public class KakaoMapSearchApi {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         String apiURL = "https://dapi.kakao.com/v2/local/search/keyword.JSON?"
-                + "query=" + roadAddressName + DEFAULT_QUERY_WORD
-                + "&size=1"; // 정확도순 상위 하나의 지점만 응답받도록 제한
+                + "query=" + roadAddressName + DEFAULT_QUERY_WORD;
 
         // 3. API 호출
         JsonNode document = restTemplate.exchange(apiURL, HttpMethod.GET, entity, JsonNode.class)
                 .getBody()
-                .get("documents")
-                .get(0);
+                .get("documents");
 
         // 4. JSON -> String 역직렬화
-        // 100% 일치 결과 없으면 유사도 제일 높은 장소 받아오기 때문에
-        // 요청 도로명 주소와 완전히 일치하는지 검사 필요
-        if(document.get("road_address_name").asText().equals(roadAddressName)){
-            String[] result = new String[] {
-                    document.get("place_name").asText(), document.get("place_url").asText(),
-                    document.get("x").asText(), document.get("y").asText()
-            };
-
+        // 도로명주소와 DEFAULT_QUERY_WORD로 검색 시
+        // 100% 일치하는 데이터가 항상 상단에 노출되지 않음
+        // 따라서, 여러 데이터 중 요청 도로명 주소와 일치하는 데이터 1개만 찾아서 반환
+        String[] result = matchAndDeserialize(document,roadAddressName);
+        if(result != null){
             // 5. Redis에 데이터 저장
-            redisDao.setValues(cacheKey, String.join(",", result), Duration.ofDays(5));
-
+            redisDao.setValues(cacheKey, String.join(",", result), Duration.ofDays(1));
             return result;
         } else {
             return null;
@@ -114,22 +108,19 @@ public class KakaoMapSearchApi {
         String apiURL = "https://dapi.kakao.com/v2/local/search/keyword.JSON?"
                 + "query=" + roadAddressName + DEFAULT_QUERY_WORD
                 + "&x=" + curLnt
-                + "&y=" + curLat
-                + "&size=1"; // 정확도순 상위 하나의 지점만 응답받도록 제한
+                + "&y=" + curLat;
 
         // 2. API 호출
         JsonNode document = restTemplate.exchange(apiURL, HttpMethod.GET, entity, JsonNode.class)
                 .getBody()
-                .get("documents")
-                .get(0);
+                .get("documents");
 
         // 3. JSON -> String 역직렬화
-        // 100% 일치 결과 없으면 유사도 제일 높은 장소 받아오기 때문에
-        // 요청 도로명 주소와 완전히 일치하는지 검사 필요
-        if(document.get("road_address_name").asText().equals(roadAddressName))
-            return new String[] {
-                    document.get("place_name").asText(), Util.distanceFormatting(document.get("distance").asText())
-        };
+        // 도로명주소와 DEFAULT_QUERY_WORD로 검색 시
+        // 100% 일치하는 데이터가 항상 상단에 노출되지 않음
+        // 따라서, 여러 데이터 중 요청 도로명 주소와 일치하는 데이터 1개만 찾아서 반환
+        String[] result = matchAndDeserializeWithCurLocation(document,roadAddressName);
+        if(result != null) return result;
         else return null;
     }
 
@@ -145,5 +136,30 @@ public class KakaoMapSearchApi {
             }
         }
         return resultList;
+    }
+
+    private String[] matchAndDeserialize(JsonNode documents, String roadAddressName) {
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        for (JsonNode document : documents) {
+            if (document.get("road_address_name").asText().equals(roadAddressName)) {
+                return new String[]{
+                        document.get("place_name").asText(), document.get("place_url").asText(),
+                        document.get("x").asText(), document.get("y").asText()
+                };
+            }
+        }
+        return null;
+    }
+
+    private String[] matchAndDeserializeWithCurLocation(JsonNode documents, String roadAddressName) {
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        for (JsonNode document : documents) {
+            if (document.get("road_address_name").asText().equals(roadAddressName)) {
+                return new String[]{
+                        document.get("place_name").asText(), Util.distanceFormatting(document.get("distance").asText())
+                };
+            }
+        }
+        return null;
     }
 }
