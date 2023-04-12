@@ -3,10 +3,12 @@ package com.idea5.four_cut_photos_map.domain.review.service;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.review.dto.request.RequestReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
+import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseShopReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.entity.Review;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.ItemScore;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.PurityScore;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.RetouchScore;
+import com.idea5.four_cut_photos_map.domain.review.mapper.ReviewMapper;
 import com.idea5.four_cut_photos_map.domain.review.repository.ReviewRepository;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
@@ -41,17 +43,17 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
 
-        return ResponseReviewDto.from(review);
+        return ReviewMapper.toResponseReviewDto(review);
     }
 
     @Transactional(readOnly = true)
-    public List<ResponseReviewDto> getAllShopReviews(Long shopId) {
+    public List<ResponseShopReviewDto> getAllShopReviews(Long shopId) {
         Shop shop = shopService.findById(shopId);
 
         List<Review> reviews = reviewRepository.findAllByShopIdOrderByCreateDateDesc(shopId);   // 최신 작성순
 
         return reviews.stream()
-                .map(review -> ResponseReviewDto.from(review))
+                .map(review -> ReviewMapper.toResponseShopReviewDto(review))
                 .collect(Collectors.toList());
     }
 
@@ -60,16 +62,16 @@ public class ReviewService {
         List<Review> reviews = reviewRepository.findAllByWriterIdOrderByCreateDateDesc(memberId);
 
         return reviews.stream()
-                .map(review -> ResponseReviewDto.from(review))
+                .map(review -> ReviewMapper.toResponseReviewDto(review))
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public List<ResponseReviewDto> getTop3ShopReviews(Long shopId) {
+    public List<ResponseShopReviewDto> getTop3ShopReviews(Long shopId) {
         List<Review> reviews = reviewRepository.findTop3ByShopIdOrderByCreateDateDesc(shopId);
 
         return reviews.stream()
-                .map(review -> ResponseReviewDto.from(review))
+                .map(review -> ReviewMapper.toResponseShopReviewDto(review))
                 .collect(Collectors.toList());
     }
 
@@ -84,7 +86,7 @@ public class ReviewService {
 
         updateShopReviewStats(review);
 
-        return ResponseReviewDto.from(review, member, shop);
+        return ReviewMapper.toResponseReviewDto(review);
     }
 
     public ResponseReviewDto modify(Member member, Long reviewId, RequestReviewDto reviewDto) {
@@ -100,7 +102,7 @@ public class ReviewService {
 
         updateShopReviewStats(review);
 
-        return ResponseReviewDto.from(review);
+        return ReviewMapper.toResponseReviewDto(review);
     }
 
     private Review updateReview(Review review, RequestReviewDto dto) {

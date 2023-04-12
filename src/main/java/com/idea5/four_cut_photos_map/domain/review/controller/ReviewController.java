@@ -2,6 +2,7 @@ package com.idea5.four_cut_photos_map.domain.review.controller;
 
 import com.idea5.four_cut_photos_map.domain.review.dto.request.RequestReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
+import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseShopReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.service.ReviewService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
@@ -74,8 +75,8 @@ public class ReviewController {
      * 지점 전체 리뷰 조회
      */
     @GetMapping("/shop/{shop-id}")
-    public ResponseEntity<List<ResponseReviewDto>> getShopReviews(@PathVariable("shop-id") Long shopId) {
-        List<ResponseReviewDto> reviews = reviewService.getAllShopReviews(shopId);
+    public ResponseEntity<List<ResponseShopReviewDto>> getShopReviews(@PathVariable("shop-id") Long shopId) {
+        List<ResponseShopReviewDto> reviews = reviewService.getAllShopReviews(shopId);
 
         return ResponseEntity.ok(reviews);
     }
