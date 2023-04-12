@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfig {
 
-    @Value("${REST_API_KEY}")
+    @Value("5477d91c6be1de32a9055f5aa071a304")
     public String FIRST_API_KEY;
     @Value("${oauth2.kakao.client-id}")
     public String SECOND_API_KEY;
@@ -18,7 +18,7 @@ public class WebClientConfig {
     public WebClient firstWebClient() {
         return WebClient.builder()
                 .baseUrl("https://dapi.kakao.com")
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "KakaoAK " + FIRST_API_KEY)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "KakaoAK " + SECOND_API_KEY)
                 .build();
     }
     @Bean
