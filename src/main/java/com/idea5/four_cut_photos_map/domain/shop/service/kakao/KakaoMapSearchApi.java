@@ -9,15 +9,10 @@ import com.idea5.four_cut_photos_map.global.util.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -28,10 +23,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class KakaoMapSearchApi {
 
-    @Value("${REST_API_KEY}")
-    private String FIRST_API_KEY;
-    @Value("${oauth2.kakao.client-id}")
-    private String SECOND_API_KEY;
+
+    private final WebClient firstWebClient;
+    private final WebClient secondWebClient;
     private final RedisDao redisDao;
     private final ObjectMapper objectMapper;
     public final int radius = 2000;
@@ -40,12 +34,8 @@ public class KakaoMapSearchApi {
 
     public List<KakaoMapSearchDto> searchByQueryWord(String queryWord, Double longitude, Double latitude, boolean hasRadius) {
         List<KakaoMapSearchDto> resultList = new ArrayList<>();
-        // 1. API 호출을 위한 요청 설정
-        WebClient webClient = WebClient.builder()
-                .baseUrl("https://dapi.kakao.com")
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "KakaoAK " + FIRST_API_KEY)
-                .build();
 
+        // 1. API 호출을 위한 요청 설정
         String apiPath = "/v2/local/search/keyword.json";
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
                 .queryParam("query", queryWord + DEFAULT_QUERY_WORD)
@@ -60,7 +50,7 @@ public class KakaoMapSearchApi {
         String apiUrl = uriBuilder.build().toString();
 
         // 2. API 호출
-        JsonNode documents = webClient.get()
+        JsonNode documents = firstWebClient.get()
                 .uri(apiUrl)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
@@ -85,11 +75,6 @@ public class KakaoMapSearchApi {
         log.info("=====RoadAddressName Cache Miss=====");
 
         // 2. API 호출을 위한 요청 설정
-        WebClient webClient = WebClient.builder()
-                .baseUrl("https://dapi.kakao.com")
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "KakaoAK " + FIRST_API_KEY)
-                .build();
-
         String apiPath = "/v2/local/search/keyword.json";
         String apiUrl = UriComponentsBuilder.fromPath(apiPath)
                 .queryParam("query", roadAddressName + DEFAULT_QUERY_WORD)
@@ -97,7 +82,7 @@ public class KakaoMapSearchApi {
                 .toString();
 
         // 3. API 호출
-        JsonNode documents = webClient.get()
+        JsonNode documents = firstWebClient.get()
                 .uri(apiUrl)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
@@ -121,11 +106,6 @@ public class KakaoMapSearchApi {
 
     public String[] searchByRoadAddressName(String roadAddressName, Double curLnt, Double curLat) {
         // 1. API 호출을 위한 요청 설정
-        WebClient webClient = WebClient.builder()
-                .baseUrl("https://dapi.kakao.com")
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "KakaoAK " + SECOND_API_KEY)
-                .build();
-
         String apiPath = "/v2/local/search/keyword.json";
         String apiUrl = UriComponentsBuilder.fromPath(apiPath)
                 .queryParam("query", roadAddressName + DEFAULT_QUERY_WORD)
@@ -135,7 +115,7 @@ public class KakaoMapSearchApi {
                 .toString();
 
         // 2. API 호출
-        JsonNode documents = webClient.get()
+        JsonNode documents = secondWebClient.get()
                 .uri(apiUrl)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
