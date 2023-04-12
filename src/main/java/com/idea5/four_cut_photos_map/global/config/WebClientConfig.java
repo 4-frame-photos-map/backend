@@ -8,17 +8,20 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class WebClientConfig {
-
-    @Value("5477d91c6be1de32a9055f5aa071a304")
-    public String FIRST_API_KEY;
-    @Value("${oauth2.kakao.client-id}")
-    public String SECOND_API_KEY;
+    @Value("${map.kakao.first-key}")
+    private String FIRST_API_KEY;
+    @Value("${map.kakao.second-key}")
+    private String SECOND_API_KEY;
+    @Value("${map.kakao.third-key}")
+    private String THIRD_API_KEY;
+    @Value("${map.kakao.fourth-key}")
+    private String FOURTH_API_KEY;
 
     @Bean
     public WebClient firstWebClient() {
         return WebClient.builder()
                 .baseUrl("https://dapi.kakao.com")
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "KakaoAK " + SECOND_API_KEY)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "KakaoAK " + FIRST_API_KEY)
                 .build();
     }
     @Bean
@@ -28,6 +31,23 @@ public class WebClientConfig {
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "KakaoAK " + SECOND_API_KEY)
                 .build();
     }
+
+    @Bean
+    public WebClient thirdWebClient() {
+        return WebClient.builder()
+                .baseUrl("https://dapi.kakao.com")
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "KakaoAK " + THIRD_API_KEY)
+                .build();
+    }
+
+    @Bean
+    public WebClient fourthWebClient() {
+        return WebClient.builder()
+                .baseUrl("https://dapi.kakao.com")
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "KakaoAK " + FOURTH_API_KEY)
+                .build();
+    }
+
     @Bean
     public WebClient webClient() {
         return WebClient.builder()

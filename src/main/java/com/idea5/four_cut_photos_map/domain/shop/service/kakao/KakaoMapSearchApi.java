@@ -23,6 +23,8 @@ import java.util.List;
 public class KakaoMapSearchApi {
     private final WebClient firstWebClient;
     private final WebClient secondWebClient;
+    private final WebClient thirdWebClient;
+    private final WebClient fourthWebClient;
     private final RedisDao redisDao;
     private final ObjectMapper objectMapper;
     public final int radius = 2000;
@@ -47,7 +49,7 @@ public class KakaoMapSearchApi {
         String apiUrl = uriBuilder.build().toString();
 
         // 2. API 호출
-        JsonNode documents = firstWebClient.get()
+        JsonNode documents = secondWebClient.get()
                 .uri(apiUrl)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
@@ -79,7 +81,7 @@ public class KakaoMapSearchApi {
                 .toString();
 
         // 3. API 호출
-        JsonNode documents = firstWebClient.get()
+        JsonNode documents = thirdWebClient.get()
                 .uri(apiUrl)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
@@ -112,7 +114,7 @@ public class KakaoMapSearchApi {
                 .toString();
 
         // 2. API 호출
-        JsonNode documents = secondWebClient.get()
+        JsonNode documents = fourthWebClient.get()
                 .uri(apiUrl)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
