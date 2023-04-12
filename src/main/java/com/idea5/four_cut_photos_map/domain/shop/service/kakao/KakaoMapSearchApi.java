@@ -8,7 +8,6 @@ import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import com.idea5.four_cut_photos_map.global.util.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -22,8 +21,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class KakaoMapSearchApi {
-
-
     private final WebClient firstWebClient;
     private final WebClient secondWebClient;
     private final RedisDao redisDao;
@@ -135,12 +132,14 @@ public class KakaoMapSearchApi {
     private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
-            try {
-                KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
-                dto.setDistance(Util.distanceFormatting(dto.getDistance()));
-                resultList.add(dto);
-            } catch (Exception e) {
-                log.error(e.getMessage());
+            if(document.get("category_name").asText().contains(DEFAULT_QUERY_WORD)) {
+                try {
+                    KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
+                    dto.setDistance(Util.distanceFormatting(dto.getDistance()));
+                    resultList.add(dto);
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                }
             }
         }
         return resultList;
