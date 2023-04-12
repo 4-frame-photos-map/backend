@@ -23,16 +23,24 @@ public class Shop extends BaseEntity {
     private Brand brand;
     private String placeName;
     private String roadAddressName;
-    private Integer favoriteCnt; // MySQL Integer == MySQL int
+    private Integer favoriteCnt;
     private Integer reviewCnt;
     private Double starRatingAvg;
 
 
-    // TODO: 상점 상세페이지뿐만 아니라 상점 리스트 페이지에도 favoriteCnt(찜 수)를 전송해야 할 지? 논의
-    // 상점 리스팅에도 찜 수가 들어가야 한다면 shop 생성자 인수에 favoriteCnt도 추가 필요
-    // 찜 수 기준으로도 리스팅 정렬이 필요하다면 리스팅 페이지에 찜 수 필드도 추가 필요할 것으로 생각됨
     public Shop(String placeName, String roadAddressName) {
         this.placeName = placeName;
         this.roadAddressName = roadAddressName;
+    }
+
+    public Shop(Long id, int favoriteCnt) {
+        super.setId(id);
+        this.favoriteCnt = favoriteCnt;
+    }
+
+    public Shop(Long id, int reviewCnt, double starRatingAvg) {
+        super.setId(id);
+        this.reviewCnt = reviewCnt;
+        this.starRatingAvg = starRatingAvg;
     }
 }

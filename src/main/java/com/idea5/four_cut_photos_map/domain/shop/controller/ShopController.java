@@ -8,10 +8,7 @@ import com.idea5.four_cut_photos_map.domain.review.service.ReviewService;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestShopBriefInfo;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopBriefInfo;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
@@ -24,7 +21,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,16 +42,16 @@ public class ShopController {
      * 키워드 조회, 정확도순 정렬
      */
     @GetMapping(value = "")
-    public ResponseEntity<List<ResponseShop>> showSearchResultsByKeyword (@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch,
+    public ResponseEntity<List<ResponseShopKeyword>> showSearchResultsByKeyword (@ModelAttribute @Valid RequestKeywordSearch requestKeywordSearch,
                                                                             @AuthenticationPrincipal MemberContext memberContext) {
-        List<ResponseShop> resultShops = new ArrayList<>();
+        List<ResponseShopKeyword> resultShops = new ArrayList<>();
 
         List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByKeyword(requestKeywordSearch);
         if(apiShop.isEmpty()) {
             return ResponseEntity.ok(resultShops);
         }
 
-        resultShops = shopService.compareWithDbShops(apiShop);
+        resultShops = shopService.compareWithDbShops(apiShop, ResponseShopKeyword.class);
         if(resultShops.isEmpty()) {
             return ResponseEntity.ok(resultShops);
         }
@@ -75,16 +71,16 @@ public class ShopController {
      * 브랜드별 조회, 거리순 정렬
      */
     @GetMapping("/brand")
-    public ResponseEntity<List<ResponseShop>> showSearchResultsByBrand (@ModelAttribute @Valid RequestBrandSearch requestBrandSearch,
-                                                                               @AuthenticationPrincipal MemberContext memberContext) {
-        List<ResponseShop> resultShops = new ArrayList<>();
+    public ResponseEntity<List<ResponseShopBrand>> showSearchResultsByBrand (@ModelAttribute @Valid RequestBrandSearch requestBrandSearch,
+                                                                             @AuthenticationPrincipal MemberContext memberContext) {
+        List<ResponseShopBrand> resultShops = new ArrayList<>();
 
         List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByBrand(requestBrandSearch);
         if(apiShop.isEmpty()) {
             return ResponseEntity.ok(resultShops);
         }
 
-        resultShops = shopService.compareWithDbShops(apiShop);
+        resultShops = shopService.compareWithDbShops(apiShop, ResponseShopBrand.class);
         if(resultShops.isEmpty()) {
             return ResponseEntity.ok(resultShops);
         }

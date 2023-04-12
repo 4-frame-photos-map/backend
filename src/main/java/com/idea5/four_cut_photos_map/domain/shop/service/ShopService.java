@@ -8,10 +8,7 @@ import com.idea5.four_cut_photos_map.domain.brand.entity.MajorBrand;
 import com.idea5.four_cut_photos_map.domain.brand.service.BrandService;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShop;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopBriefInfo;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.domain.shop.service.kakao.KakaoMapSearchApi;
@@ -40,8 +37,8 @@ public class ShopService {
 
 
     @Transactional(readOnly = true)
-    public List<ResponseShop> compareWithDbShops(List<KakaoMapSearchDto> apiShops) {
-        List<ResponseShop> resultShop = new ArrayList<>();
+    public <T extends ResponseShop> List<T> compareWithDbShops(List<KakaoMapSearchDto> apiShops, Class<T> responseClass) {
+        List<T> resultShop = new ArrayList<>();
         for (KakaoMapSearchDto apiShop: apiShops) {
             List<Shop> dbShops = compareRoadAddressName(apiShop);
             if (dbShops.isEmpty()) continue;
@@ -49,8 +46,13 @@ public class ShopService {
             Shop dbShop = dbShops.size() == 1 ? dbShops.get(0) : comparePlaceName(apiShop, dbShops);
 
             if(dbShop != null) {
-                ResponseShop responseShop = ResponseShop.of(dbShop, apiShop, dbShop.getBrand());
-                resultShop.add(responseShop);
+                if(responseClass.equals(ResponseShopKeyword.class)) {
+                    ResponseShopKeyword responseShop = ResponseShopKeyword.of(dbShop, apiShop, dbShop.getBrand());
+                    resultShop.add(responseClass.cast(responseShop));
+                } else if(responseClass.equals(ResponseShopBrand.class)){
+                    ResponseShopBrand responseShop = ResponseShopBrand.of(dbShop, apiShop, dbShop.getBrand());
+                    resultShop.add(responseClass.cast(responseShop));
+                }
             }
         }
         return resultShop;
