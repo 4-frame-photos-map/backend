@@ -35,6 +35,7 @@ public enum ErrorCode {
     WRITER_DOES_NOT_MATCH(HttpStatus.BAD_REQUEST, "400", "작성자가 일치하지 않습니다."),
     DUPLICATE_MEMBER_NICKNAME(HttpStatus.CONFLICT, "409", "중복된 닉네임입니다."),
     FAVORITE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "400", String.format("최대 찜 개수 %d개를 초과하였습니다.", MAX_FAVORITE_SHOP_COUNT)),
+    TOO_MANY_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, "500", "일일 카카오 API 호출 한도가 초과되었습니다. 관리자에게 문의 바랍니다."),
 
     // Request Parameter, Body 관련 오류(0번대)
     INVALID_JSON(HttpStatus.BAD_REQUEST, "001", "Request Body JSON 형식이 잘못되었습니다."),

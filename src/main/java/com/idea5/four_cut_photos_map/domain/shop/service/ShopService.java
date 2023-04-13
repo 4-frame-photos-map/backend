@@ -72,22 +72,12 @@ public class ShopService {
     }
 
     public List<KakaoMapSearchDto> searchKakaoMapByKeyword(RequestKeywordSearch keywordSearch) {
-        return kakaoMapSearchApi.searchByQueryWord (
-                keywordSearch.getKeyword(),
-                keywordSearch.getLongitude(),
-                keywordSearch.getLatitude(),
-                false
-        );
+        return kakaoMapSearchApi.searchByQueryWord (keywordSearch);
     }
 
     public List<KakaoMapSearchDto> searchKakaoMapByBrand(RequestBrandSearch brandSearch) {
         if(brandSearch.getBrand()==null) brandSearch.setBrand("");
-        return kakaoMapSearchApi.searchByQueryWord (
-                brandSearch.getBrand(),
-                brandSearch.getLongitude(),
-                brandSearch.getLatitude(),
-                true
-        );
+        return kakaoMapSearchApi.searchByQueryWord (brandSearch);
     }
 
     @Transactional(readOnly = true)
