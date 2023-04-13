@@ -7,17 +7,21 @@ import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
+import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.global.util.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.TOO_MANY_REQUESTS;
 
 @Slf4j
 @Service
@@ -46,7 +50,7 @@ public class KakaoMapSearchApi {
         String apiUrl = uriBuilder.build().toString();
 
         // 2. API 호출
-        JsonNode documents = secondWebClient.get()
+        JsonNode documents = firstWebClient.get()
                 .uri(apiUrl)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
@@ -74,14 +78,12 @@ public class KakaoMapSearchApi {
         String apiUrl = uriBuilder.build().toString();
 
         // 2. API 호출
-        JsonNode documents = secondWebClient.get()
-                .uri(apiUrl)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(JsonNode.class)
-                .block()
-                .get("documents");
-
+        JsonNode documents = null;
+        try {
+            documents = getDocuments(apiUrl);
+        } catch (Exception e) {
+            throw new BusinessException(TOO_MANY_REQUESTS);
+        }
 
         // 3. JSON -> DTO 역직렬화
         return deserialize(resultList, documents);
@@ -106,13 +108,12 @@ public class KakaoMapSearchApi {
                 .toString();
 
         // 3. API 호출
-        JsonNode documents = thirdWebClient.get()
-                .uri(apiUrl)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(JsonNode.class)
-                .block()
-                .get("documents");
+        JsonNode documents = null;
+        try {
+            documents = getDocuments(apiUrl);
+        } catch (Exception e) {
+            throw new BusinessException(TOO_MANY_REQUESTS);
+        }
 
         // 4. JSON -> String 역직렬화
         // 도로명주소와 DEFAULT_QUERY_WORD로 검색 시
@@ -139,13 +140,12 @@ public class KakaoMapSearchApi {
                 .toString();
 
         // 2. API 호출
-        JsonNode documents = fourthWebClient.get()
-                .uri(apiUrl)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(JsonNode.class)
-                .block()
-                .get("documents");
+        JsonNode documents = null;
+        try {
+            documents = getDocuments(apiUrl);
+        } catch (Exception e) {
+            throw new BusinessException(TOO_MANY_REQUESTS);
+        }
 
         // 3. JSON -> String 역직렬화
         // 도로명주소와 DEFAULT_QUERY_WORD로 검색 시
@@ -195,5 +195,56 @@ public class KakaoMapSearchApi {
             }
         }
         return null;
+    }
+    private JsonNode getDocuments(String apiUrl) throws Exception {
+        WebClient webClient = firstWebClient;
+
+        try {
+            return webClient.get()
+                    .uri(apiUrl)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(JsonNode.class)
+                    .block()
+                    .get("documents");
+        } catch (WebClientResponseException e) {
+            webClient = secondWebClient;
+        }
+
+        try {
+            return webClient.get()
+                    .uri(apiUrl)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(JsonNode.class)
+                    .block()
+                    .get("documents");
+        } catch (WebClientResponseException e) {
+            webClient = thirdWebClient;
+        }
+
+        try {
+            return webClient.get()
+                    .uri(apiUrl)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(JsonNode.class)
+                    .block()
+                    .get("documents");
+        } catch (WebClientResponseException e) {
+            webClient = fourthWebClient;
+        }
+
+        try {
+            return webClient.get()
+                    .uri(apiUrl)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(JsonNode.class)
+                    .block()
+                    .get("documents");
+        } catch (WebClientResponseException e) {
+            throw new BusinessException(TOO_MANY_REQUESTS);
+        }
     }
 }
