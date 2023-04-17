@@ -30,12 +30,15 @@ public class KakaoService {
     @Value("${oauth2.kakao.client-id}")
     private String clientId;
 
+    @Value("${oauth2.kakao.redirect-uri}")
+    private String redirectURI;
+
     /**
      * 인가코드로 토큰 받기
      * @param code 인가코드
      * @return kakao AccessToken
      */
-    public KakaoTokenResp getKakaoTokens(String code, String kakaoLoginRedirectURI) throws JsonProcessingException {
+    public KakaoTokenResp getKakaoTokens(String code) throws JsonProcessingException {
         log.info("인가코드로 카카오 토큰 발급 요청");
         String url = "https://kauth.kakao.com/oauth/token";
         // header 생성
@@ -45,7 +48,7 @@ public class KakaoService {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", clientId);
-        params.add("redirect_uri", kakaoLoginRedirectURI);
+        params.add("redirect_uri", redirectURI);
         params.add("code", code);
         // header + body 를 합쳐 request 생성
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
