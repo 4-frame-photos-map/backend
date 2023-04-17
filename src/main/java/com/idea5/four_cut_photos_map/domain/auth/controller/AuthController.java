@@ -45,12 +45,12 @@ public class AuthController {
     public ResponseEntity<JwtToken> kakaoLogin(@RequestParam String code, HttpContext httpContext, HttpServletRequest request) throws JsonProcessingException {
         log.info("카카오 로그인 콜백 요청");
         log.info("code = " + code);
+        log.info("origin = " + request.getHeader("Origin"));
         log.info("referer = " + request.getHeader("referer"));
         log.info("X-Forwarded-For = " + request.getHeader("X-Forwarded-For"));
         log.info("Remote Addr = " + request.getRemoteAddr());
         log.info("Remote Host = " + request.getRemoteHost());
-        String clientIpAddr = Util.getClientIpAddr(request);
-        log.info("client ip = " + clientIpAddr);
+        log.info("client ip = " + Util.getClientIpAddr(request));
         // 1. 인가 코드로 토큰 발급 요청
         KakaoTokenResp kakaoTokenResp = kakaoService.getKakaoTokens(code);
         // 2. 토큰으로 사용자 정보 가져오기 요청

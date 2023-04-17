@@ -125,4 +125,18 @@ public class Util {
         return ip;
 
     }
+
+//    @Value("${oauth2.kakao.dev-redirect-uri}")
+//    private String devRedirectURI;
+//
+//    @Value("${oauth2.kakao.front-redirect-uri}")
+//    private String frontRedirectURI;
+//
+//    @Value("${oauth2.kakao.prod-redirect-uri}")
+//    private String ProdRedirectURI;
+//
+//    public static String getRedirectURI(HttpServletRequest httpServletRequest) {
+//        String referer = httpServletRequest.getHeader("referer");
+//        return referer;
+//    }
 }
