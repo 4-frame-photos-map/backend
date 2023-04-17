@@ -7,6 +7,7 @@ import com.idea5.four_cut_photos_map.domain.auth.dto.request.RefreshTokenReq;
 import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoTokenResp;
 import com.idea5.four_cut_photos_map.domain.auth.service.KakaoService;
 import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
+import com.idea5.four_cut_photos_map.global.util.Util;
 import com.idea5.four_cut_photos_map.job.CollectService;
 import com.idea5.four_cut_photos_map.security.jwt.JwtService;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
@@ -43,9 +44,10 @@ public class AuthController {
     public ResponseEntity<JwtToken> kakaoLogin(@RequestParam String code, HttpServletRequest httpServletRequest) throws JsonProcessingException {
         log.info("카카오 로그인 콜백 요청");
         log.info("code = " + code);
-        log.info("Referer = " + httpServletRequest.getHeader("Referer"));
         log.info("Remote Addr = " + httpServletRequest.getRemoteAddr());
         log.info("Remote Host = " + httpServletRequest.getRemoteHost());
+        String clientIpAddr = Util.getClientIpAddr(httpServletRequest);
+        log.info("client ip = " + clientIpAddr);
         // 1. 인가 코드로 토큰 발급 요청
         KakaoTokenResp kakaoTokenResp = kakaoService.getKakaoTokens(code);
         // 2. 토큰으로 사용자 정보 가져오기 요청
