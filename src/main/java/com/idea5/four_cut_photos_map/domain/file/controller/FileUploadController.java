@@ -2,6 +2,7 @@ package com.idea5.four_cut_photos_map.domain.file.controller;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.idea5.four_cut_photos_map.domain.file.AwsS3Service;
 import com.idea5.four_cut_photos_map.domain.file.dto.response.UploadImageResp;
 import com.idea5.four_cut_photos_map.global.error.ErrorCode;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
@@ -25,6 +26,7 @@ import java.io.IOException;
 public class FileUploadController {
 
     private final AmazonS3Client amazonS3Client;
+    private final AwsS3Service awsS3Service;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -38,13 +40,18 @@ public class FileUploadController {
                 throw new BusinessException(ErrorCode.NOT_IMAGE_FILE);
             }
             String fileName = file.getOriginalFilename();
-            System.out.println(fileName);
             String fileUrl = "https://" + bucket + "/test" + fileName;
+            String fileFormatName = file.getContentType().substring(file.getContentType().lastIndexOf("/") + 1);
+
+            //
+            MultipartFile resizedFile = awsS3Service.resizeImage(fileName, fileFormatName, file, 768);
+
             ObjectMetadata metadata= new ObjectMetadata();
             metadata.setContentType(file.getContentType());
-            metadata.setContentLength(file.getSize());
+            metadata.setContentLength(resizedFile.getSize());
+
             // s3 파일 업로드
-            amazonS3Client.putObject(bucket,fileName, file.getInputStream(), metadata);
+            amazonS3Client.putObject(bucket, fileName, resizedFile.getInputStream(), metadata);
             // s3 객체 URL 조회
             String uploadImageUrl = amazonS3Client.getUrl(bucket, fileName).toString();
             return ResponseEntity.ok(new UploadImageResp(uploadImageUrl));
