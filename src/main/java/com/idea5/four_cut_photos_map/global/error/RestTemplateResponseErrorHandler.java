@@ -20,7 +20,9 @@ public class RestTemplateResponseErrorHandler extends DefaultResponseErrorHandle
     public boolean hasError(ClientHttpResponse response) throws IOException {
         HttpStatus statusCode = response.getStatusCode();
         log.info("statusCode=" + statusCode);
+        log.info(response.getBody().toString());
         // 5xx 만 오류로 간주
-        return (statusCode.series() == HttpStatus.Series.SERVER_ERROR);
+        return (statusCode.series() == HttpStatus.Series.SERVER_ERROR
+                || statusCode.series() == HttpStatus.Series.CLIENT_ERROR);
     }
 }
