@@ -65,12 +65,28 @@ public class KakaoService {
         // header + body 를 합쳐 request 생성
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
         // post 요청, 응답
-        KakaoTokenResp kakaoTokenResp = restTemplate.postForObject(
+//        KakaoTokenResp kakaoTokenResp = restTemplate.postForObject(
+//                url,
+//                request,
+//                KakaoTokenResp.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(
                 url,
                 request,
-                KakaoTokenResp.class);
-        log.info(kakaoTokenResp.toString());
-        return kakaoTokenResp;
+                String.class);
+        JsonNode jsonNode = objectMapper.readValue(response.getBody(), JsonNode.class);
+        if(!response.getStatusCode().equals(HttpStatus.OK)) {
+            // 에러 응답 예외처리
+            String msg = jsonNode.get("error").asText();
+            throw new RuntimeException(msg);
+        }
+//        log.info(kakaoTokenResp.toString());
+        return KakaoTokenResp.builder()
+                .tokenType(jsonNode.get("token_type").asText())
+                .accessToken(jsonNode.get("access_token").asText())
+                .expiresIn(jsonNode.get("expires_in").asInt())
+                .refreshToken(jsonNode.get("refresh_token").asText())
+                .refreshTokenExpiresIn(jsonNode.get("refresh_token_expires_in").asInt())
+                .build();
     }
 
     /**
