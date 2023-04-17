@@ -15,6 +15,7 @@ import com.idea5.four_cut_photos_map.security.jwt.dto.response.AccessToken;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.JwtToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.protocol.HttpContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -41,12 +42,14 @@ public class AuthController {
      */
     @PreAuthorize("isAnonymous()")
     @GetMapping("/login/kakao")
-    public ResponseEntity<JwtToken> kakaoLogin(@RequestParam String code, HttpServletRequest httpServletRequest) throws JsonProcessingException {
+    public ResponseEntity<JwtToken> kakaoLogin(@RequestParam String code, HttpContext httpContext, HttpServletRequest request) throws JsonProcessingException {
         log.info("카카오 로그인 콜백 요청");
         log.info("code = " + code);
-        log.info("Remote Addr = " + httpServletRequest.getRemoteAddr());
-        log.info("Remote Host = " + httpServletRequest.getRemoteHost());
-        String clientIpAddr = Util.getClientIpAddr(httpServletRequest);
+        log.info("referer = " + request.getHeader("referer"));
+        log.info("X-Forwarded-For = " + request.getHeader("X-Forwarded-For"));
+        log.info("Remote Addr = " + request.getRemoteAddr());
+        log.info("Remote Host = " + request.getRemoteHost());
+        String clientIpAddr = Util.getClientIpAddr(request);
         log.info("client ip = " + clientIpAddr);
         // 1. 인가 코드로 토큰 발급 요청
         KakaoTokenResp kakaoTokenResp = kakaoService.getKakaoTokens(code);
