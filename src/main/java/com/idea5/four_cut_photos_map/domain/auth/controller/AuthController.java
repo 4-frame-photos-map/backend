@@ -52,6 +52,7 @@ public class AuthController {
         log.info("client ip = " + Util.getClientIpAddr(request));
         // 1. 인가 코드로 토큰 발급 요청
         String redirectURI = kakaoService.getRedirectURI(request);
+        log.info("redirectURI = " + redirectURI);
         KakaoTokenResp kakaoTokenResp = kakaoService.getKakaoTokens(code, redirectURI);
         // 2. 토큰으로 사용자 정보 가져오기 요청
         KakaoUserInfoParam kakaoUserInfoParam = kakaoService.getKakaoUserInfo(kakaoTokenResp);
