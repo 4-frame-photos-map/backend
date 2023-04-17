@@ -15,7 +15,6 @@ import com.idea5.four_cut_photos_map.security.jwt.dto.response.AccessToken;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.JwtToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.protocol.HttpContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -42,7 +41,7 @@ public class AuthController {
      */
     @PreAuthorize("isAnonymous()")
     @GetMapping("/login/kakao")
-    public ResponseEntity<JwtToken> kakaoLogin(@RequestParam String code, HttpContext httpContext, HttpServletRequest request) throws JsonProcessingException {
+    public ResponseEntity<JwtToken> kakaoLogin(@RequestParam String code, HttpServletRequest request) throws JsonProcessingException {
         log.info("카카오 로그인 콜백 요청");
         log.info("code = " + code);
         log.info("origin = " + request.getHeader("Origin"));
@@ -52,7 +51,9 @@ public class AuthController {
         log.info("Remote Host = " + request.getRemoteHost());
         log.info("client ip = " + Util.getClientIpAddr(request));
         // 1. 인가 코드로 토큰 발급 요청
-        KakaoTokenResp kakaoTokenResp = kakaoService.getKakaoTokens(code);
+        String redirectURI = kakaoService.getRedirectURI(request);
+        log.info("redirectURI = " + redirectURI);
+        KakaoTokenResp kakaoTokenResp = kakaoService.getKakaoTokens(code, redirectURI);
         // 2. 토큰으로 사용자 정보 가져오기 요청
         KakaoUserInfoParam kakaoUserInfoParam = kakaoService.getKakaoUserInfo(kakaoTokenResp);
         // 3. 제공받은 사용자 정보(kakaoId)로 회원 검증(새로운 회원은 회원가입) -> 서비스 로그인
