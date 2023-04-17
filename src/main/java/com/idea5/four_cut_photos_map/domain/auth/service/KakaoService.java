@@ -15,6 +15,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @See <a href="https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api">kakao rest api</a>
  * @See <a href="https://juntcom.tistory.com/141">restTemplate 메서드</a>
@@ -33,12 +35,22 @@ public class KakaoService {
     @Value("${oauth2.kakao.redirect-uri}")
     private String redirectURI;
 
+    @Value("${oauth2.kakao.dev-redirect-uri}")
+    private String devRedirectURI;
+
+    // 요청 origin 에 따른 redirect-uri 조회
+    public String getRedirectURI(HttpServletRequest request) {
+        String origin = request.getHeader("Origin");
+        if(origin == null) return devRedirectURI;
+        return origin + redirectURI;
+    }
+
     /**
      * 인가코드로 토큰 받기
      * @param code 인가코드
      * @return kakao AccessToken
      */
-    public KakaoTokenResp getKakaoTokens(String code) throws JsonProcessingException {
+    public KakaoTokenResp getKakaoTokens(String code, String redirectURI) throws JsonProcessingException {
         log.info("인가코드로 카카오 토큰 발급 요청");
         String url = "https://kauth.kakao.com/oauth/token";
         // header 생성

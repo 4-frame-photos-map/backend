@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idea5.four_cut_photos_map.AppConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.LinkedHashMap;
@@ -88,7 +89,7 @@ public class Util {
     }
 
     //
-    public static String getClientIpAddr(HttpServletRequest request){
+    public static String getClientIpAddr(HttpServletRequest request) {
 
         String ip = request.getHeader("X-Forwarded-For");
 
@@ -125,18 +126,4 @@ public class Util {
         return ip;
 
     }
-
-//    @Value("${oauth2.kakao.dev-redirect-uri}")
-//    private String devRedirectURI;
-//
-//    @Value("${oauth2.kakao.front-redirect-uri}")
-//    private String frontRedirectURI;
-//
-//    @Value("${oauth2.kakao.prod-redirect-uri}")
-//    private String ProdRedirectURI;
-//
-//    public static String getRedirectURI(HttpServletRequest httpServletRequest) {
-//        String referer = httpServletRequest.getHeader("referer");
-//        return referer;
-//    }
 }
