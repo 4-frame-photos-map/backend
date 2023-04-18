@@ -70,7 +70,7 @@ public class ShopService {
     }
 
     public ResponseShopDetail renameShopAndSetResponseDto(Shop dbShop, String distance) {
-        String[] apiShop = kakaoMapSearchApi.searchByRoadAddressName(dbShop.getRoadAddressName());
+        String[] apiShop = kakaoMapSearchApi.searchByRoadAddressName(dbShop.getRoadAddressName(), dbShop.getPlaceName());
 
         if(apiShop == null) throw new BusinessException(INVALID_SHOP_ID);
         String placeName = apiShop[0];
@@ -84,6 +84,7 @@ public class ShopService {
     public FavoriteResponse renameShopAndSetResponseDto(Favorite favorite, Double curLnt, Double curLat) {
         String[] apiShop = kakaoMapSearchApi.searchByRoadAddressName(
                 favorite.getShop().getRoadAddressName(),
+                favorite.getShop().getPlaceName(),
                 curLnt,
                 curLat
         );
