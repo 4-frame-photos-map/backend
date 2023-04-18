@@ -56,7 +56,7 @@ public class ShopController {
         if (memberContext != null) {
             resultShops.forEach(resultShop -> {
                 Favorite favorite = favoriteService.findByShopIdAndMemberId(resultShop.getId(), memberContext.getId());
-                resultShop.setFavorite(favorite == null);
+                resultShop.setFavorite(favorite != null);
                     }
             );
         }
@@ -87,7 +87,7 @@ public class ShopController {
         if (memberContext != null) {
             resultShops.forEach(resultShop -> {
                         Favorite favorite = favoriteService.findByShopIdAndMemberId(resultShop.getId(), memberContext.getId());
-                        resultShop.setFavorite(favorite == null);
+                        resultShop.setFavorite(favorite != null);
                     }
             );
         }
@@ -106,17 +106,12 @@ public class ShopController {
         Shop dbShop = shopService.findById(id);
         ResponseShopDetail shopDetailDto = shopService.renameShopAndSetResponseDto(dbShop, distance);
 
-        if (memberContext != null) {
-            Favorite favorite = favoriteService.findByShopIdAndMemberId(shopDetailDto.getId(), memberContext.getId());
-            shopDetailDto.setFavorite(favorite == null);
-        }
-
         List<ResponseReviewDto> recentReviews = reviewService.getTop3ShopReviews(shopDetailDto.getId());
         shopDetailDto.setRecentReviews(recentReviews);
 
         if (memberContext != null) {
             Favorite favorite = favoriteService.findByShopIdAndMemberId(shopDetailDto.getId(), memberContext.getId());
-            shopDetailDto.setFavorite(favorite == null);
+            shopDetailDto.setFavorite(favorite != null);
         }
 
         // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
@@ -141,7 +136,7 @@ public class ShopController {
 
         if (memberContext != null) {
             Favorite favorite = favoriteService.findByShopIdAndMemberId(responseShopBriefInfo.getId(), memberContext.getId());
-            responseShopBriefInfo.setFavorite(favorite == null);
+            responseShopBriefInfo.setFavorite(favorite != null);
         }
 
         return ResponseEntity.ok(responseShopBriefInfo);
