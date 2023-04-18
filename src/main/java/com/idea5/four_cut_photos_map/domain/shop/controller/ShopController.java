@@ -68,7 +68,7 @@ public class ShopController {
      * 브랜드별 조회, 거리순 정렬
      */
     @GetMapping("/brand")
-    public ResponseEntity<List<ResponseShopBrand>> showSearchResultsByBrand (@RequestParam String brand,
+    public ResponseEntity<List<ResponseShopBrand>> showSearchResultsByBrand (@RequestParam(required = false, defaultValue = "") String brand,
                                                                              @RequestParam @NotNull Double latitude,
                                                                              @RequestParam @NotNull Double longitude,
                                                                              @AuthenticationPrincipal MemberContext memberContext) {

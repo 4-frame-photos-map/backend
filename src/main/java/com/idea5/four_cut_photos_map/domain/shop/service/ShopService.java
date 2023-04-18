@@ -71,7 +71,6 @@ public class ShopService {
     }
 
     public List<KakaoMapSearchDto> searchKakaoMapByBrand(String brand, Double latitude, Double longitude) {
-        if(brand == null) brand = "";
         return kakaoMapSearchApi.searchByQueryWord (brand, latitude, longitude);
     }
 
