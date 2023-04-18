@@ -2,16 +2,14 @@ package com.idea5.four_cut_photos_map.domain.auth.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * 토큰 받기 API 응답 DTO
  * @See<a href="https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-token-response">응답 API</>
  * @See<a href="https://zzang9ha.tistory.com/380">@JsonNaming</>
  */
+@Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
