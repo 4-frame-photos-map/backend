@@ -92,13 +92,13 @@ public class ErrorResponse {
             sb.append("[");
             sb.append((errorMessage.split(":")[0])); // error Field
             sb.append("] ");
-            sb.append(errorMessage.split(":")[1]); // error Message
+            sb.append(errorMessage.split(":")[1].trim()); // error Message
         }
         return sb.toString();
     }
 
     private static String createErrorMessage(MissingServletRequestParameterException e) {
-        return "[" + e.getParameterName() + "] " + "필수 파라미터가 누락되었습니다";
+        return "[" + e.getParameterName() + "] " + ErrorCode.MISSING_PARAMETER.getMessage();
     }
 
 }
