@@ -1,6 +1,5 @@
 package com.idea5.four_cut_photos_map.domain.favorite.controller;
 
-import com.idea5.four_cut_photos_map.domain.favorite.dto.request.FavoriteRequest;
 import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponse;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
@@ -13,7 +12,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
