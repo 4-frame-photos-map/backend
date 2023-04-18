@@ -1,13 +1,57 @@
--- MySQL에 JSON 파일 Shop 테이블에 import 후 create_date, modify_date, favorite_cnt 초기화하기
+-- [JSON 파일 Shop 테이블에 import 후 필수작업 1] create_date, modify_date, favorite_cnt 초기화하기
 UPDATE shop SET create_date = Now() WHERE create_date IS NULL;
 UPDATE shop SET modify_date = Now() WHERE modify_date IS NULL;
 UPDATE shop SET favorite_cnt = 0 WHERE favorite_cnt IS NULL;
 UPDATE shop SET star_rating_avg = 0 WHERE star_rating_avg IS NULL;
 UPDATE shop SET review_cnt = 0 WHERE review_cnt IS NULL;
 
--- Shop import 데이터에서 '서울특별시'를 '서울'로 변경
+-- [JSON 파일 Shop 테이블에 import 후 필수작업 2] '서울특별시'를 '서울'로 변경, '경기도'를 경기'로 변경
 UPDATE shop SET road_address_name= REPLACE(road_address_name,'서울특별시','서울');
+UPDATE shop SET road_address_name= REPLACE(road_address_name,'경기도','경기');
 
+
+-- [JSON 파일 Shop 테이블에 import 후 필수작업 3] brand_id 설정하기
+UPDATE shop SET brand_id = 1 WHERE place_name LIKE '%인생네컷%';
+UPDATE shop SET brand_id = 2 WHERE place_name LIKE '%하루필름%';
+UPDATE shop SET brand_id = 3 WHERE place_name LIKE '%포토이즘%';
+UPDATE shop SET brand_id = 4 WHERE place_name LIKE '%포토그레이%';
+UPDATE shop SET brand_id = 5 WHERE place_name NOT LIKE '%인생네컷%'
+                               AND place_name NOT LIKE '%하루필름%'
+                               AND place_name NOT LIKE '%포토이즘%'
+                               AND place_name NOT LIKE '%포토그레이%';
+
+-- [JSON 파일 Shop 테이블에 import 후 필수작업 4] 즉석사진이 아닌 업종 제거하기
+DELETE FROM shop WHERE place_name not like '%인생네컷%'
+                   AND place_name not like '%그믐달%'
+                   AND place_name not like '%나랑한컷%'
+                   AND place_name not like '%비룸%'
+                   AND place_name not like '%모노맨션%'
+                   AND place_name not like '%셀픽스%'
+                   AND place_name not like '%썸컷%'
+                   AND place_name not like '%스냅치즈%'
+                   AND place_name not like '%스위치%'
+                   AND place_name not like '%시현하다%'
+                   AND place_name not like '%인생사진%'
+                   AND place_name not like '%인스포토%'
+                   AND place_name not like '%인싸포토%'
+                   AND place_name not like '%추억사진관%'
+                   AND place_name not like '%포토그레이%'
+                   AND place_name not like '%포토스트리트%'
+                   AND place_name not like '%포토아이브%'
+                   AND place_name not like '%포토드링크%'
+                   AND place_name not like '%포토랩플러스%'
+                   AND place_name not like '%포토매틱%'
+                   AND place_name not like '%포토시그니처%'
+                   AND place_name not like '%포토이즘%'
+                   AND place_name not like '%포토인더박스%'
+                   AND place_name not like '%포토카드%'
+                   AND place_name not like '%포토하임%'
+                   AND place_name not like '%폴라스튜디오%'
+                   AND place_name not like '%플립폴리%'
+                   AND place_name not like '%플레이인더박스%'
+                   AND place_name not like '%하루필름%'
+                   AND place_name not like '%해리포토%'
+                   AND place_name not like '%홍대네컷%';
 /*
 INSERT INTO SHOP(create_date, modify_date, road_address_name, place_name, brand, favorite_cnt)VALUES (NOW(), NOW(), '서울 성동구 서울숲2길 48', '인생네컷 서울숲노가리마트로드점', '인생네컷', 0);
 INSERT INTO SHOP(create_date, modify_date, road_address_name, place_name, brand, favorite_cnt) VALUES(NOW(), NOW(), '서울 성동구 서울숲2길 17-2', '포토이즘박스 성수점', '포토이즘박스', 0);

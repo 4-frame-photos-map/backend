@@ -1,6 +1,5 @@
 package com.idea5.four_cut_photos_map.domain.shop.service;
 
-import com.idea5.four_cut_photos_map.domain.brand.service.BrandService;
 import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponse;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
@@ -28,17 +27,13 @@ public class ShopService {
     private final ShopRepository shopRepository;
     private final FavoriteRepository favoriteRepository;
     private final KakaoMapSearchApi kakaoMapSearchApi;
-    private final BrandService brandService;
 
 
     @Transactional(readOnly = true)
     public <T extends ResponseShop> List<T> compareWithDbShops(List<KakaoMapSearchDto> apiShops, Class<T> responseClass) {
         List<T> resultShop = new ArrayList<>();
         for (KakaoMapSearchDto apiShop: apiShops) {
-            List<Shop> dbShops = compareRoadAddressName(apiShop);
-            if (dbShops.isEmpty()) continue;
-
-            Shop dbShop = dbShops.size() == 1 ? dbShops.get(0) : comparePlaceName(apiShop, dbShops);
+            Shop dbShop = compareRoadAddressNameAndPlaceName(apiShop);
 
             if(dbShop != null) {
                 if(responseClass.equals(ResponseShopKeyword.class)) {
@@ -54,16 +49,11 @@ public class ShopService {
     }
 
     @Transactional(readOnly = true)
-    public List<Shop> compareRoadAddressName(KakaoMapSearchDto apiShop) {
-        List<Shop> dbShops = shopRepository.findDistinctByRoadAddressName(apiShop.getRoadAddressName());
-        return dbShops;
-    }
-
-    private Shop comparePlaceName(KakaoMapSearchDto apiShop, List<Shop> dbShops) {
-        return dbShops.stream()
-                .filter(dbShop -> apiShop.getPlaceName().contains(dbShop.getPlaceName()))
-                .findFirst()
-                .orElse(null);
+    public Shop compareRoadAddressNameAndPlaceName(KakaoMapSearchDto apiShop) {
+        return shopRepository.findDistinctByRoadAddressNameAndPlaceNameContaining(
+                apiShop.getRoadAddressName(),
+                apiShop.getPlaceName().split(" ")[0]
+        ).orElse(null);
     }
 
     public List<KakaoMapSearchDto> searchKakaoMapByKeyword(String keyword, Double latitude, Double longitude) {
