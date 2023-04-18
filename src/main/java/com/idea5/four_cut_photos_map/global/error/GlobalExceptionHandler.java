@@ -105,7 +105,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException e) {
         log.error("ConstraintViolationException", e);
-        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST.toString(), e);
+        ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.INVALID_PARAMETER.getErrorCode(), e);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
