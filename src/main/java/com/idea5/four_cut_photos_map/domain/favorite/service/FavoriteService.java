@@ -84,25 +84,8 @@ public class FavoriteService {
     }
 
     // 찜 목록 조회
-    public List<FavoriteResponse> getFavoritesList(Long memberId, String criteria, Double longitude, Double latitude) {
-        return switch (criteria) {
-            case "placename" -> findByMemberIdOrderByPlaceName(memberId, longitude, latitude);
-            default -> findByMemberIdOrderByCreateDateDesc(memberId, longitude, latitude);
-        };
-    }
-
-    public List<FavoriteResponse> findByMemberIdOrderByCreateDateDesc(Long memberId, Double longitude, Double latitude) {
+    public List<FavoriteResponse> getFavoritesList(Long memberId, Double longitude, Double latitude) {
         List<Favorite> favorites = favoriteRepository.findByMemberIdOrderByCreateDateDesc(memberId);
-
-        return  favorites
-                .stream()
-                .map(favorite -> shopService.renameShopAndSetResponseDto(favorite, longitude, latitude))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-    }
-
-    public List<FavoriteResponse> findByMemberIdOrderByPlaceName(Long memberId, Double longitude, Double latitude) {
-        List<Favorite> favorites = favoriteRepository.findByMemberIdOrderByShop_PlaceName(memberId);
 
         return  favorites
                 .stream()
