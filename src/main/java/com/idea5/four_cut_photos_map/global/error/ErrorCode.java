@@ -13,8 +13,7 @@ import static com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteServ
 public enum ErrorCode {
     TEST(HttpStatus.INTERNAL_SERVER_ERROR, "001", "business Error"),
     SHOP_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "조회한 지점이 존재하지 않습니다."),
-    DISTANCE_IS_EMPTY(HttpStatus.BAD_REQUEST, "400", "[distance] 거리가 빈 공백이거나 누락되었습니다."),
-    INVALID_SHOP_ID(HttpStatus.BAD_REQUEST, "400", "[id] 해당 id는 셀프 즉석사진관에 해당하는 id가 아닙니다. DB에 저장된 데이터 중 다른 업종에 속한 id 입니다."),
+    INVALID_SHOP_ID(HttpStatus.BAD_REQUEST, "400", "[id] 도로명주소나 브랜드명 불일치로 카카오맵에서 일치하는 데이터가 없는 id 입니다. 다른 id로 요청해주세요."),
 
     // 인증 관련 오류
     NON_TOKEN(HttpStatus.UNAUTHORIZED, "100", "HTTP Authorization header 에 토큰을 담아 요청해주세요."),
