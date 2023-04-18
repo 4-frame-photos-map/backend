@@ -67,11 +67,11 @@ public class ShopService {
     }
 
     public List<KakaoMapSearchDto> searchKakaoMapByKeyword(String keyword, Double latitude, Double longitude) {
-        return kakaoMapSearchApi.searchByQueryWord (keyword, latitude, longitude);
+        return kakaoMapSearchApi.searchByQueryWord (keyword, latitude, longitude, false);
     }
 
     public List<KakaoMapSearchDto> searchKakaoMapByBrand(String brand, Double latitude, Double longitude) {
-        return kakaoMapSearchApi.searchByQueryWord (brand, latitude, longitude);
+        return kakaoMapSearchApi.searchByQueryWord (brand, latitude, longitude, true);
     }
 
     @Transactional(readOnly = true)

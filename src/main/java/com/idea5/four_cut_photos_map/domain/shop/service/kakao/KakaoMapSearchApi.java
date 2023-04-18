@@ -35,17 +35,20 @@ public class KakaoMapSearchApi {
     public static final String DEFAULT_QUERY_WORD = "즉석사진";
 
 
-    public List<KakaoMapSearchDto> searchByQueryWord(String queryWord, Double latitude, Double longitude) {
+    public List<KakaoMapSearchDto> searchByQueryWord(String queryWord, Double latitude, Double longitude, boolean hasRadius) {
         List<KakaoMapSearchDto> resultList = new ArrayList<>();
 
         // 1. API 호출을 위한 요청 설정
         String apiPath = "/v2/local/search/keyword.json";
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
                 .queryParam("query", queryWord + DEFAULT_QUERY_WORD)
-                .queryParam("x", latitude)
-                .queryParam("y", longitude)
-                .queryParam("sort", "distance")
-                .queryParam("radius", radius);
+                .queryParam("x", longitude)
+                .queryParam("y", latitude);
+
+        if (hasRadius) {
+            uriBuilder.queryParam("sort", "distance")
+                    .queryParam("radius", radius);
+        }
 
         String apiUrl = uriBuilder.build().toString();
 
