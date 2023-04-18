@@ -12,7 +12,7 @@ import static com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteServ
 @NoArgsConstructor
 public enum ErrorCode {
     TEST(HttpStatus.INTERNAL_SERVER_ERROR, "001", "business Error"),
-    SHOP_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "조회한 지점이 존재하지 않습니다"),
+    SHOP_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "조회한 지점이 존재하지 않습니다."),
     DISTANCE_IS_EMPTY(HttpStatus.BAD_REQUEST, "400", "[distance] 거리가 빈 공백이거나 누락되었습니다."),
     INVALID_SHOP_ID(HttpStatus.BAD_REQUEST, "400", "[id] 해당 id는 셀프 즉석사진관에 해당하는 id가 아닙니다. DB에 저장된 데이터 중 다른 업종에 속한 id 입니다."),
 

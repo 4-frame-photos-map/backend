@@ -93,6 +93,7 @@ public class ErrorResponse {
             sb.append((errorMessage.split(":")[0])); // error Field
             sb.append("] ");
             sb.append(errorMessage.split(":")[1].trim()); // error Message
+            sb.append(".");
         }
         return sb.toString();
     }
