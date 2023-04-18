@@ -1,13 +1,9 @@
 package com.idea5.four_cut_photos_map.domain.shop.service;
 
+import com.idea5.four_cut_photos_map.domain.brand.service.BrandService;
 import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponse;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
-import com.idea5.four_cut_photos_map.domain.brand.dto.response.ResponseBrandDto;
-import com.idea5.four_cut_photos_map.domain.brand.entity.MajorBrand;
-import com.idea5.four_cut_photos_map.domain.brand.service.BrandService;
-import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
-import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
@@ -15,7 +11,6 @@ import com.idea5.four_cut_photos_map.domain.shop.service.kakao.KakaoMapSearchApi
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.implementation.bytecode.ShiftLeft;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,13 +66,12 @@ public class ShopService {
                 .orElse(null);
     }
 
-    public List<KakaoMapSearchDto> searchKakaoMapByKeyword(RequestKeywordSearch keywordSearch) {
-        return kakaoMapSearchApi.searchByQueryWord (keywordSearch);
+    public List<KakaoMapSearchDto> searchKakaoMapByKeyword(String keyword, Double latitude, Double longitude) {
+        return kakaoMapSearchApi.searchByQueryWord (keyword, latitude, longitude);
     }
 
-    public List<KakaoMapSearchDto> searchKakaoMapByBrand(RequestBrandSearch brandSearch) {
-        if(brandSearch.getBrand()==null) brandSearch.setBrand("");
-        return kakaoMapSearchApi.searchByQueryWord (brandSearch);
+    public List<KakaoMapSearchDto> searchKakaoMapByBrand(String brand, Double latitude, Double longitude) {
+        return kakaoMapSearchApi.searchByQueryWord (brand, latitude, longitude);
     }
 
     @Transactional(readOnly = true)

@@ -105,13 +105,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException e) {
         log.error("ConstraintViolationException", e);
-        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST.toString(), e);
+        ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.INVALID_PARAMETER.getErrorCode(), e);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     /**
-     * RequestParam 필수 파라미터 누락된 경우
+     * RequestParam 필수 파라미터 누락된 경우 (null인 경우 포함)
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
     protected ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {

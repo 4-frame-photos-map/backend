@@ -3,8 +3,6 @@ package com.idea5.four_cut_photos_map.domain.shop.service.kakao;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestBrandSearch;
-import com.idea5.four_cut_photos_map.domain.shop.dto.request.RequestKeywordSearch;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
@@ -37,48 +35,22 @@ public class KakaoMapSearchApi {
     public static final String DEFAULT_QUERY_WORD = "즉석사진";
 
 
-    public List<KakaoMapSearchDto> searchByQueryWord(RequestKeywordSearch requestKeywordSearch) {
+    public List<KakaoMapSearchDto> searchByQueryWord(String queryWord, Double latitude, Double longitude) {
         List<KakaoMapSearchDto> resultList = new ArrayList<>();
 
         // 1. API 호출을 위한 요청 설정
         String apiPath = "/v2/local/search/keyword.json";
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
-                .queryParam("query", requestKeywordSearch.getKeyword() + DEFAULT_QUERY_WORD)
-                .queryParam("x", requestKeywordSearch.getLongitude())
-                .queryParam("y", requestKeywordSearch.getLatitude());
-
-        String apiUrl = uriBuilder.build().toString();
-
-        // 2. API 호출
-        JsonNode documents = firstWebClient.get()
-                .uri(apiUrl)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(JsonNode.class)
-                .block()
-                .get("documents");
-
-
-        // 3. JSON -> DTO 역직렬화
-        return deserialize(resultList, documents);
-    }
-
-    public List<KakaoMapSearchDto> searchByQueryWord(RequestBrandSearch requestBrandSearch) {
-        List<KakaoMapSearchDto> resultList = new ArrayList<>();
-
-        // 1. API 호출을 위한 요청 설정
-        String apiPath = "/v2/local/search/keyword.json";
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
-                .queryParam("query", requestBrandSearch.getBrand() + DEFAULT_QUERY_WORD)
-                .queryParam("x", requestBrandSearch.getLongitude())
-                .queryParam("y", requestBrandSearch.getLatitude())
+                .queryParam("query", queryWord + DEFAULT_QUERY_WORD)
+                .queryParam("x", latitude)
+                .queryParam("y", longitude)
                 .queryParam("sort", "distance")
-                .queryParam("radius", radius);;
+                .queryParam("radius", radius);
 
         String apiUrl = uriBuilder.build().toString();
 
         // 2. API 호출
-        JsonNode documents = null;
+        JsonNode documents;
         try {
             documents = getDocuments(apiUrl);
         } catch (Exception e) {
@@ -108,7 +80,7 @@ public class KakaoMapSearchApi {
                 .toString();
 
         // 3. API 호출
-        JsonNode documents = null;
+        JsonNode documents;
         try {
             documents = getDocuments(apiUrl);
         } catch (Exception e) {
@@ -140,7 +112,7 @@ public class KakaoMapSearchApi {
                 .toString();
 
         // 2. API 호출
-        JsonNode documents = null;
+        JsonNode documents;
         try {
             documents = getDocuments(apiUrl);
         } catch (Exception e) {
@@ -152,8 +124,7 @@ public class KakaoMapSearchApi {
         // 100% 일치하는 데이터가 항상 상단에 노출되지 않음
         // 따라서, 여러 데이터 중 요청 도로명 주소와 일치하는 데이터 1개만 찾아서 반환
         String[] result = matchAndDeserializeWithCurLocation(documents, roadAddressName);
-        if(result != null) return result;
-        else return null;
+        return result;
     }
 
     private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents) {
@@ -196,7 +167,7 @@ public class KakaoMapSearchApi {
         }
         return null;
     }
-    private JsonNode getDocuments(String apiUrl) throws Exception {
+    private JsonNode getDocuments(String apiUrl) {
         WebClient webClient = firstWebClient;
 
         try {

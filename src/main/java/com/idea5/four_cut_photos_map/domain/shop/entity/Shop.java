@@ -15,8 +15,10 @@ import javax.persistence.*;
 @NoArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
-@Table(indexes = {@Index(name = "idx_shop_address",columnList = "roadAddressName")})
 @DynamicUpdate
+@Table(indexes = {
+        @Index(name ="idx_shop_address", columnList ="roadAddressName"),
+        @Index(name="idx_shop_brand", columnList="brand_id")})
 public class Shop extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
