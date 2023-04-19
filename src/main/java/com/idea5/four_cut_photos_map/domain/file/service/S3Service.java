@@ -30,27 +30,35 @@ public class S3Service {
         List<String> imageUrls = new ArrayList<>();
         for(MultipartFile file : files) {
             // 1. 이미지 파일이 아닌 경우 예외처리
-            if(file.getContentType().startsWith("image") == false) {
-                log.error("this file is not image type");
-                throw new BusinessException(ErrorCode.NOT_IMAGE_FILE);
-            }
-            // 1. 객체 키 생성(키 이름 중복 방지)
+            validImageFile(file);
+            // 2. 객체 키 생성(키 이름 중복 방지)
             String key = Util.generateS3ObjectKey(category, file.getOriginalFilename());
-            log.info("key=" + key);
-            // 2.
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType(file.getContentType());
-            metadata.setContentLength(file.getSize());
-            // 3. s3 파일 업로드
-            try {
-                amazonS3Client.putObject(bucket, key, file.getInputStream(), metadata);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            // 4. s3 객체 URL 조회
-            String imageUrl = amazonS3Client.getUrl(bucket, key).toString();
+            // 3. 파일 업로드
+            String imageUrl = putS3(key, file);
             imageUrls.add(imageUrl);
         }
         return new UploadImageResp(imageUrls);
+    }
+
+    // 이미지 파일인지 검사
+    public void validImageFile(MultipartFile file) {
+        if(file.getContentType().startsWith("image") == false) {
+            throw new BusinessException(ErrorCode.NOT_IMAGE_FILE);
+        }
+    }
+
+    // S3 객체 생성
+    public String putS3(String key, MultipartFile file) {
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType(file.getContentType());
+        metadata.setContentLength(file.getSize());
+        // 1. s3 파일 업로드
+        try {
+            amazonS3Client.putObject(bucket, key, file.getInputStream(), metadata);
+        } catch (IOException e) {
+            throw new RuntimeException("파일 업로드에 실패했습니다.");
+        }
+        // 2. s3 객체 URL 조회
+        return amazonS3Client.getUrl(bucket, key).toString();
     }
 }
