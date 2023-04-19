@@ -5,6 +5,7 @@ import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +17,6 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     List<Favorite> findByMemberIdOrderByShop_PlaceName(Long memberId);
     List<Favorite> findByShopId(Long shopId);
     List<Favorite> findByMember(Member member);
-
     Long countByMember(Member member);
+    List<Favorite> findByCreateDateAfter(LocalDateTime minusMonths);
 }
