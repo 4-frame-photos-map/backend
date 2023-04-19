@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/upload")
@@ -19,7 +21,7 @@ public class FileUploadController {
     private final S3Service s3Service;
 
     @PostMapping
-    public ResponseEntity<UploadImageResp> uploadFile(@RequestParam String category, @RequestParam MultipartFile file) {
+    public ResponseEntity<UploadImageResp> uploadFile(@RequestParam String category, @RequestParam List<MultipartFile> files) {
 //        try {
 //            // 1. 이미지 파일이 아닌 경우 예외처리
 //            if(file.getContentType().startsWith("image") == false) {
@@ -46,7 +48,7 @@ public class FileUploadController {
 //            e.printStackTrace();
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 //        }
-        String uploadImageUrl = s3Service.uploadImageFile(category, file);
-        return ResponseEntity.ok(new UploadImageResp(uploadImageUrl));
+        UploadImageResp uploadImageResp = s3Service.uploadImageFile(category, files);
+        return ResponseEntity.ok(uploadImageResp);
     }
 }

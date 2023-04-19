@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.List;
+
 /**
  * 이미지 업로드 응답
  */
@@ -12,5 +14,5 @@ import lombok.Getter;
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UploadImageResp {
-    private String uploadImageUrl;
+    private List<String> imageUrls;
 }
