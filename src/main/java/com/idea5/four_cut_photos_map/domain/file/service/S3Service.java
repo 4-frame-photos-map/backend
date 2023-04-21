@@ -25,6 +25,9 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    @Value("${cloud.aws.cloudFront.domainName}")
+    private String cloudFront;
+
     // 이미지 파일 업로드
     public UploadImageResp uploadImageFile(String category, List<MultipartFile> files) {
         List<String> imageUrls = new ArrayList<>();
@@ -33,6 +36,7 @@ public class S3Service {
             validImageFile(file);
             // 2. 객체 키 생성(키 이름 중복 방지)
             String key = Util.generateS3ObjectKey(category, file.getOriginalFilename());
+            log.info("key = " + key);
             // 3. 파일 업로드
             String imageUrl = putS3(key, file);
             imageUrls.add(imageUrl);
@@ -58,7 +62,13 @@ public class S3Service {
         } catch (IOException e) {
             throw new RuntimeException("파일 업로드에 실패했습니다.");
         }
-        // 2. s3 객체 URL 조회
-        return amazonS3Client.getUrl(bucket, key).toString();
+        // 2. 업로드한 이미지 URL 리턴
+        return getImageUrl(key);
+    }
+
+    // 이미지 URL 조회
+    private String getImageUrl(String key) {
+        // cloudFront 도메인 URL 로 리턴
+        return "https://" + cloudFront + "/" + key;
     }
 }
