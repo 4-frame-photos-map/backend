@@ -131,13 +131,13 @@ public class KakaoMapSearchApi {
         }
     }
 
-    public String[] searchByRoadAddressName(String roadAddressName, String placeName, Double curLnt, Double curLat) {
+    public String[] searchByRoadAddressName(String roadAddressName, String placeName, Double userLat, Double userLng) {
         // 1. API 호출을 위한 요청 설정
         String apiPath = "/v2/local/search/keyword.json";
         String apiUrl = UriComponentsBuilder.fromPath(apiPath)
                 .queryParam("query", roadAddressName + DEFAULT_QUERY_WORD)
-                .queryParam("x",curLnt)
-                .queryParam("y",curLat)
+                .queryParam("x",userLng)
+                .queryParam("y",userLat)
                 .build()
                 .toString();
 
@@ -176,16 +176,14 @@ public class KakaoMapSearchApi {
     private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents, Double userLat, Double userLng) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
-            if(document.get("category_name").asText().contains(DEFAULT_QUERY_WORD)) {
+            if (document.get("category_name").asText().contains(DEFAULT_QUERY_WORD)) {
                 try {
                     KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
-log.info("카카오="+Util.distanceFormatting(dto.getDistance()));
+
                     // 사용자 중심좌표를 기준으로 지점으로부터의 거리 갱신
-                    Double shopLng = document.get("x").asDouble();
-                    Double shopLat = document.get("y").asDouble();
-                    dto.setDistance(Util.calculateDist(shopLat, shopLng, userLat, userLng));
-                    log.info("계산="+dto.getDistance());
-                    log.info("두번째계산="+Util.calculateDist(shopLat, shopLng, userLat, userLng));
+                    Double placeLng = document.get("x").asDouble();
+                    Double placeLat = document.get("y").asDouble();
+                    dto.setDistance(Util.calculateDist(placeLat, placeLng, userLat, userLng));
 
                     resultList.add(dto);
                 } catch (Exception e) {
