@@ -39,8 +39,8 @@ public class ShopService {
                 if(responseClass.equals(ResponseShopKeyword.class)) {
                     ResponseShopKeyword responseShop = ResponseShopKeyword.of(dbShop, apiShop, dbShop.getBrand());
                     resultShop.add(responseClass.cast(responseShop));
-                } else {
-                    ResponseShop responseShop = ResponseShop.of(dbShop, apiShop, dbShop.getBrand());
+                } else if(responseClass.equals(ResponseShopBrand.class)){
+                    ResponseShopBrand responseShop = ResponseShopBrand.of(dbShop, apiShop, dbShop.getBrand());
                     resultShop.add(responseClass.cast(responseShop));
                 }
             }
