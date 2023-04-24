@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ResponseShopKeyword extends ResponseShop {
-    private String roadAddressName;
+    private String placeAddress;
 
     static public ResponseShopKeyword of(Shop dbShop, KakaoMapSearchDto apiShop, Brand brand){
         ResponseBrandDto brandDto = ResponseBrandDto.builder()
@@ -37,7 +37,7 @@ public class ResponseShopKeyword extends ResponseShop {
                 .starRatingAvg(dbShop.getStarRatingAvg())
                 .reviewCnt(dbShop.getReviewCnt())
                 .favoriteCnt(dbShop.getFavoriteCnt())
-                .roadAddressName(apiShop.getRoadAddressName())
+                .placeAddress(apiShop.getRoadAddressName())
                 .brand(brandDto)
                 .build();
     }

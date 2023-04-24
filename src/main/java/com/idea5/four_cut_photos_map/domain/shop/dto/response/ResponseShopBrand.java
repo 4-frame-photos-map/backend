@@ -18,6 +18,7 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ResponseShopBrand extends ResponseShop {
+    String mapCenterAddress;
 
     static public ResponseShopBrand of(Shop dbShop, KakaoMapSearchDto apiShop, Brand brand){
         ResponseBrandDto brandDto = ResponseBrandDto.builder()
