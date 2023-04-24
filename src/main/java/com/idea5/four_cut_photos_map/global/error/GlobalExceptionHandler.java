@@ -94,7 +94,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ExpiredJwtException.class)
     protected ResponseEntity<ErrorResponse> handleExpiredToken(ExpiredJwtException e) {
         log.error("ExpiredJwtException", e);
-        ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.EXPIRED_TOKEN.getErrorCode(), ErrorCode.EXPIRED_TOKEN.getMessage());
+        ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.EXPIRED_ATK.getErrorCode(), ErrorCode.EXPIRED_ATK.getMessage());
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }

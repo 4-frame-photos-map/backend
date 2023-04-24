@@ -18,7 +18,8 @@ public enum ErrorCode {
     // 인증 관련 오류
     NON_TOKEN(HttpStatus.UNAUTHORIZED, "100", "HTTP Authorization header 에 토큰을 담아 요청해주세요."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "101", "유효하지 않은 토큰입니다."),
-    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED,"102", "만료된 토큰입니다."),
+    EXPIRED_ATK(HttpStatus.UNAUTHORIZED,"102", "만료된 액세스 토큰입니다."),
+    EXPIRED_RTK(HttpStatus.UNAUTHORIZED,"103", "만료된 리프레쉬 토큰입니다."),
 
     DUPLICATE_FAVORITE(HttpStatus.CONFLICT, "409", "해당 지점은 이미 찜 되어있습니다."),
     DELETED_FAVORITE(HttpStatus.CONFLICT, "409", "해당 지점은 이미 찜 되어있지 않습니다."),
