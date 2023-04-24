@@ -1,5 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.idea5.four_cut_photos_map.domain.brand.dto.response.ResponseBrandDto;
@@ -18,7 +19,6 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ResponseShopBrand extends ResponseShop {
-    String mapCenterAddress;
 
     static public ResponseShopBrand of(Shop dbShop, KakaoMapSearchDto apiShop, Brand brand){
         ResponseBrandDto brandDto = ResponseBrandDto.builder()

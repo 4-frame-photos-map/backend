@@ -18,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.TOO_MANY_REQUESTS;
 
@@ -155,6 +156,33 @@ public class KakaoMapSearchApi {
         // 따라서, 여러 데이터 중 요청 도로명 주소와 일치하는 데이터 1개만 찾아서 반환
         String[] result = matchAndDeserializeWithCurLocation(documents, roadAddressName, placeName);
         return result;
+    }
+
+    public String convertCoordinateToAddress(Double mapLat, Double mapLng) {
+        // 1. API 호출을 위한 요청 설정
+        String apiPath = "/v2/local/geo/coord2address.json";
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
+                .queryParam("x", mapLng)
+                .queryParam("y", mapLat);
+
+        String apiUrl = uriBuilder.build().toString();
+
+        // 2. API 호출
+        JsonNode documents;
+        try {
+            documents = getDocuments(apiUrl);
+        } catch (Exception e) {
+            throw new BusinessException(TOO_MANY_REQUESTS);
+        }
+        log.info(documents.size()+"이거="+documents);
+
+        // 3. JSON -> DTO 역직렬화
+        String roadAddressName = Optional.ofNullable(documents.get(0).get("road_address"))
+                .map(jsonNode -> jsonNode.get("address_name"))
+                .map(JsonNode::asText)
+                .orElse("");
+
+        return roadAddressName;
     }
 
     private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents) {

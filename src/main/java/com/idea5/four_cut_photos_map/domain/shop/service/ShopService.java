@@ -130,6 +130,9 @@ public class ShopService {
         shopRepository.save(shop);
     }
 
+    public String convertMapCenterCoordToAddress(Double mapLat, Double mapLng) {
+        return kakaoMapSearchApi.convertCoordinateToAddress(mapLat, mapLng);
+    }
 
 
     // 브랜드별 Map Marker
