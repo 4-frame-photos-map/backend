@@ -70,27 +70,23 @@ public class ShopController {
      * 브랜드별 조회, 거리순 정렬
      */
     @GetMapping("/brand")
-    public ResponseEntity<Map<String, Object>> showSearchResultsByBrand (@RequestParam(required = false, defaultValue = "") String brand,
+    public ResponseEntity<ResponseShopBrand> showSearchResultsByBrand (@RequestParam(required = false, defaultValue = "") String brand,
                                                                              @RequestParam @NotNull Double userLat,
                                                                              @RequestParam @NotNull Double userLng,
                                                                              @RequestParam @NotNull Double mapLat,
                                                                              @RequestParam @NotNull Double mapLng,
                                                                              @AuthenticationPrincipal MemberContext memberContext) {
-        List<ResponseShopBrand> resultShops = new ArrayList<>();
-        String mapCenterAddress = shopService.convertMapCenterCoordToAddress(mapLat, mapLng);
-
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("address", mapCenterAddress);
-        responseMap.put("shops", resultShops);
+        ResponseShopBrand response = new ResponseShopBrand();
+        response.setMapCenterAddress(shopService.convertMapCenterCoordToAddress(mapLat, mapLng));
 
         List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByBrand(brand, userLat, userLng, mapLat, mapLng);
         if(apiShop.isEmpty()) {
-            return ResponseEntity.ok(responseMap);
+            return ResponseEntity.ok(response);
         }
 
-        resultShops = shopService.compareWithDbShops(apiShop, ResponseShopBrand.class);
+        List<ResponseShop> resultShops = shopService.compareWithDbShops(apiShop, ResponseShop.class);
         if(resultShops.isEmpty()) {
-            return ResponseEntity.ok(responseMap);
+            return ResponseEntity.ok(response);
         }
 
         if (memberContext != null) {
@@ -101,9 +97,9 @@ public class ShopController {
             );
         }
 
-        responseMap.put("shops", resultShops);
+        response.setShops(resultShops);
 
-        return ResponseEntity.ok(responseMap);
+        return ResponseEntity.ok(response);
     }
 
     /**
