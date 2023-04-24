@@ -38,12 +38,12 @@ public class ShopController {
      */
     @GetMapping(value = "")
     public ResponseEntity<List<ResponseShopKeyword>> showSearchResultsByKeyword (@RequestParam @NotBlank String keyword,
-                                                                            @RequestParam @NotNull Double latitude,
-                                                                            @RequestParam @NotNull Double longitude,
+                                                                            @RequestParam @NotNull Double userLat,
+                                                                            @RequestParam @NotNull Double userLng,
                                                                             @AuthenticationPrincipal MemberContext memberContext) {
         List<ResponseShopKeyword> resultShops = new ArrayList<>();
 
-        List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByKeyword(keyword, latitude, longitude);
+        List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByKeyword(keyword, userLat, userLng);
         if(apiShop.isEmpty()) {
             return ResponseEntity.ok(resultShops);
         }
@@ -69,12 +69,14 @@ public class ShopController {
      */
     @GetMapping("/brand")
     public ResponseEntity<List<ResponseShopBrand>> showSearchResultsByBrand (@RequestParam(required = false, defaultValue = "") String brand,
-                                                                             @RequestParam @NotNull Double latitude,
-                                                                             @RequestParam @NotNull Double longitude,
+                                                                             @RequestParam @NotNull Double userLat,
+                                                                             @RequestParam @NotNull Double userLng,
+                                                                             @RequestParam @NotNull Double mapLat,
+                                                                             @RequestParam @NotNull Double mapLng,
                                                                              @AuthenticationPrincipal MemberContext memberContext) {
         List<ResponseShopBrand> resultShops = new ArrayList<>();
 
-        List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByBrand(brand, latitude, longitude);
+        List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByBrand(brand, userLat, userLng, mapLat, mapLng);
         if(apiShop.isEmpty()) {
             return ResponseEntity.ok(resultShops);
         }

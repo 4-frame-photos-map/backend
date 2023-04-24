@@ -57,11 +57,16 @@ public class ShopService {
     }
 
     public List<KakaoMapSearchDto> searchKakaoMapByKeyword(String keyword, Double latitude, Double longitude) {
-        return kakaoMapSearchApi.searchByQueryWord (keyword, latitude, longitude, false);
+        return kakaoMapSearchApi.searchByQueryWord (keyword, latitude, longitude);
     }
 
-    public List<KakaoMapSearchDto> searchKakaoMapByBrand(String brand, Double latitude, Double longitude) {
-        return kakaoMapSearchApi.searchByQueryWord (brand, latitude, longitude, true);
+    public List<KakaoMapSearchDto> searchKakaoMapByBrand(String brand, Double userLat, Double userLng, Double mapLat, Double mapLng) {
+        if (userLat == mapLat && userLng == mapLng) {
+            return kakaoMapSearchApi.searchByQueryWord (brand, userLat, userLng);
+        }
+        else {
+            return kakaoMapSearchApi.searchByQueryWord (brand, userLat, userLng, mapLat, mapLng);
+        }
     }
 
     @Transactional(readOnly = true)
