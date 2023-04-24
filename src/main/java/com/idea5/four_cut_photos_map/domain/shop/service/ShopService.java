@@ -114,12 +114,6 @@ public class ShopService {
         shopRepository.save(shop);
     }
 
-    @Transactional
-    public void reduceFavoriteCnt(Long shopId){
-        Shop shop = findById(shopId);
-        shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0 ? 0 : shop.getFavoriteCnt() - 1);
-    }
-
     public void increaseFavoriteCnt(Shop shop){
         shop.setFavoriteCnt(shop.getFavoriteCnt()+1);
         shopRepository.save(shop);

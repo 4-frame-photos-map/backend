@@ -12,9 +12,7 @@ import java.util.Optional;
 @Repository
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     Optional<Favorite> findByShopIdAndMemberId(Long shopId, Long memberId);
-    void deleteByShopIdAndMemberId(Long shopId, Long memberId);
     List<Favorite> findByMemberIdOrderByCreateDateDesc(Long memberId);
-    List<Favorite> findByMemberIdOrderByShop_PlaceName(Long memberId);
     List<Favorite> findByShopId(Long shopId);
     List<Favorite> findByMember(Member member);
     Long countByMember(Member member);

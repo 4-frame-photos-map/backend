@@ -59,7 +59,7 @@ public class FavoriteService {
 
     // 찜 취소
     @Transactional
-    public void cancel(Long shopId, Long memberId) {
+    public Shop cancel(Long shopId, Long memberId) {
         // 1. 데이터 존재 여부 체크
         Favorite favorite = findByShopIdAndMemberId(shopId, memberId);
         if (favorite == null) {
@@ -69,11 +69,11 @@ public class FavoriteService {
         // 2. 삭제
         try {
             try {
-                favoriteRepository.deleteByShopIdAndMemberId(shopId, memberId);
+                favoriteRepository.deleteById(favorite.getId());
             } catch (ObjectOptimisticLockingFailureException oe) {
                 log.info("===Retry to delete due to concurrency===");
                 if (favoriteRepository.existsById(favorite.getId())) {
-                    favoriteRepository.deleteByShopIdAndMemberId(shopId, memberId);
+                    favoriteRepository.deleteById(favorite.getId());
                 } else {
                     throw oe;
                 }
@@ -81,6 +81,8 @@ public class FavoriteService {
         } catch (Exception e) {
             throw new BusinessException(DELETED_FAVORITE);
         }
+
+        return favorite.getShop();
     }
 
     // 찜 목록 조회

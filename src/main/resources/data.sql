@@ -1,14 +1,15 @@
--- [JSON 파일 Shop 테이블에 import 후 필수작업 1] create_date, modify_date, favorite_cnt 초기화하기
+-- [JSON 파일 Shop 테이블에 import 후 필수작업 1] create_date, modify_date, favorite_cnt, review_cnt 초기화하기
 UPDATE shop SET create_date = Now() WHERE create_date IS NULL;
 UPDATE shop SET modify_date = Now() WHERE modify_date IS NULL;
 UPDATE shop SET favorite_cnt = 0 WHERE favorite_cnt IS NULL;
 UPDATE shop SET star_rating_avg = 0 WHERE star_rating_avg IS NULL;
 UPDATE shop SET review_cnt = 0 WHERE review_cnt IS NULL;
 
--- [JSON 파일 Shop 테이블에 import 후 필수작업 2] '서울특별시'를 '서울'로 변경, '경기도'를 경기'로 변경
+-- [JSON 파일 Shop 테이블에 import 후 필수작업 2] 카카오맵 데이터와 비교할 수 있는 지역명으로 수정
 UPDATE shop SET road_address_name= REPLACE(road_address_name,'서울특별시','서울');
 UPDATE shop SET road_address_name= REPLACE(road_address_name,'경기도','경기');
-
+UPDATE shop SET road_address_name= REPLACE(road_address_name,'강원도','강원');
+UPDATE shop SET road_address_name= REPLACE(road_address_name,'경상북도','경북');
 
 -- [JSON 파일 Shop 테이블에 import 후 필수작업 3] brand_id 설정하기
 UPDATE shop SET brand_id = 1 WHERE place_name LIKE '%인생네컷%';
