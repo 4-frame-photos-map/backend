@@ -3,7 +3,7 @@ package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
+import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseShopReviewDto;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -21,7 +21,7 @@ public class ResponseShopDetail extends ResponseShopBriefInfo {
     private String longitude;
     private String latitude;
     private String placeUrl;
-    private List<ResponseReviewDto> recentReviews;
+    private List<ResponseShopReviewDto> recentReviews;
 
 
     public static ResponseShopDetail of(Shop dbShop, String placeName, String placeUrl, String placeLng, String placeLat,  String distance){

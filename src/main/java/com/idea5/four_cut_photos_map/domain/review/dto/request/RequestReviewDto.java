@@ -1,5 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.review.dto.request;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
@@ -19,7 +20,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@JsonNaming(value = PropertyNamingStrategy.SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RequestReviewDto {
     @Max(value = 5, message = "별점을 1 ~ 5점으로 선택해주세요.")
     @Min(value = 1, message = "별점을 1 ~ 5점으로 선택해주세요.")
