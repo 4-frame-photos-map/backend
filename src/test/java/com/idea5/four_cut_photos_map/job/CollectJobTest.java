@@ -1,5 +1,8 @@
 package com.idea5.four_cut_photos_map.job;
 
+import com.idea5.four_cut_photos_map.domain.brand.entity.Brand;
+import com.idea5.four_cut_photos_map.domain.brand.entity.MajorBrand;
+import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
@@ -57,6 +60,9 @@ class CollectJobTest {
     private ReviewRepository reviewRepository;
 
     @Autowired
+    private BrandRepository brandRepository;
+
+    @Autowired
     private DatabaseCleaner databaseCleaner;
 
     @BeforeEach
@@ -68,9 +74,12 @@ class CollectJobTest {
         memberTitleRepository.save(new MemberTitle("찜 첫 걸음", "첫번째 찜 추가"));
         memberTitleRepository.save(new MemberTitle("찜 홀릭", "찜 3개 이상 추가"));
 
-        shopRepository.save(new Shop("인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48",0,0,0.0));
-        shopRepository.save(new Shop("포토이즘박스 성수점", "서울 성동구 서울숲2길 17-2",0,0,0.0));
-        shopRepository.save(new Shop("인생네컷 카페성수로드점", "서울 성동구 서울숲4길 13",0,0,0.0));
+        Brand brand1 = brandRepository.save(new Brand(MajorBrand.LIFEFOURCUTS.getBrandName(), MajorBrand.LIFEFOURCUTS.getFilePath()));
+        Brand brand2 = brandRepository.save(new Brand(MajorBrand.PHOTOISM.getBrandName(), MajorBrand.PHOTOISM.getFilePath()));
+
+        shopRepository.save(new Shop(brand1, "인생네컷 서울숲노가리마트로드점", "서울 성동구 서울숲2길 48",0,0,0.0));
+        shopRepository.save(new Shop(brand2, "포토이즘박스 성수점", "서울 성동구 서울숲2길 17-2",0,0,0.0));
+        shopRepository.save(new Shop(brand1, "인생네컷 카페성수로드점", "서울 성동구 서울숲4길 13",0,0,0.0));
     }
 
     @AfterEach

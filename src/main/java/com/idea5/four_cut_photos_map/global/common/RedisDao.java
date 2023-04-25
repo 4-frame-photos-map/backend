@@ -63,4 +63,5 @@ public class RedisDao {
     public static String getBlackListAtkKey(String accessToken) {
         return "jwt_black_list:" + accessToken;
     }
+    public String getRoadAddressKey(String roadAddressName) {return "search:" + roadAddressName;}
 }

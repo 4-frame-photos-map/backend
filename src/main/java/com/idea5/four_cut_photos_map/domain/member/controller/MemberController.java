@@ -18,7 +18,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
 
 @Validated
 @Slf4j
@@ -52,11 +51,7 @@ public class MemberController {
     // 회원 닉네임 중복조회
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/nickname")
-    public ResponseEntity<NicknameCheckResp> checkNickname(
-            @RequestParam
-            @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-zA-Z0-9]{2,10}$",
-                    message = "닉네임은 특수문자를 제외한 2~10자리로 입력 가능합니다.") String nickname
-    ) {
+    public ResponseEntity<NicknameCheckResp> checkNickname(@RequestParam String nickname) {
         NicknameCheckResp nicknameCheckResp = memberService.checkDuplicatedNickname(nickname);
         return ResponseEntity.ok(nicknameCheckResp);
     }

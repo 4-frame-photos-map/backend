@@ -3,9 +3,8 @@ package com.idea5.four_cut_photos_map.domain.auth.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoTokenResp;
 import com.idea5.four_cut_photos_map.domain.auth.dto.param.KakaoUserInfoParam;
-import com.idea5.four_cut_photos_map.global.common.RedisDao;
+import com.idea5.four_cut_photos_map.domain.auth.dto.response.KakaoTokenResp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @See <a href="https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api">kakao rest api</a>
@@ -27,20 +28,29 @@ import org.springframework.web.client.RestTemplate;
 public class KakaoService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
-    private final RedisDao redisDao;
 
     @Value("${oauth2.kakao.client-id}")
     private String clientId;
 
     @Value("${oauth2.kakao.redirect-uri}")
-    private String redirectUri;
+    private String redirectURI;
+
+    @Value("${oauth2.kakao.dev-redirect-uri}")
+    private String devRedirectURI;
+
+    // 요청 origin 에 따른 redirect-uri 조회
+    public String getRedirectURI(HttpServletRequest request) {
+        String origin = request.getHeader("Origin");
+        if(origin == null) return devRedirectURI;
+        return origin + redirectURI;
+    }
 
     /**
      * 인가코드로 토큰 받기
      * @param code 인가코드
      * @return kakao AccessToken
      */
-    public KakaoTokenResp getKakaoTokens(String code) throws JsonProcessingException {
+    public KakaoTokenResp getKakaoTokens(String code, String redirectURI) throws JsonProcessingException {
         log.info("인가코드로 카카오 토큰 발급 요청");
         String url = "https://kauth.kakao.com/oauth/token";
         // header 생성
@@ -50,17 +60,33 @@ public class KakaoService {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", clientId);
-        params.add("redirect_uri", redirectUri);
+        params.add("redirect_uri", redirectURI);
         params.add("code", code);
         // header + body 를 합쳐 request 생성
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
         // post 요청, 응답
-        KakaoTokenResp kakaoTokenResp = restTemplate.postForObject(
+//        KakaoTokenResp kakaoTokenResp = restTemplate.postForObject(
+//                url,
+//                request,
+//                KakaoTokenResp.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(
                 url,
                 request,
-                KakaoTokenResp.class);
-        log.info(kakaoTokenResp.toString());
-        return kakaoTokenResp;
+                String.class);
+        JsonNode jsonNode = objectMapper.readValue(response.getBody(), JsonNode.class);
+        if(!response.getStatusCode().equals(HttpStatus.OK)) {
+            // 에러 응답 예외처리
+            String msg = jsonNode.get("error").asText();
+            throw new RuntimeException(msg);
+        }
+//        log.info(kakaoTokenResp.toString());
+        return KakaoTokenResp.builder()
+                .tokenType(jsonNode.get("token_type").asText())
+                .accessToken(jsonNode.get("access_token").asText())
+                .expiresIn(jsonNode.get("expires_in").asInt())
+                .refreshToken(jsonNode.get("refresh_token").asText())
+                .refreshTokenExpiresIn(jsonNode.get("refresh_token_expires_in").asInt())
+                .build();
     }
 
     /**

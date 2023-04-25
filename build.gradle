@@ -40,7 +40,6 @@ dependencies {
 
     // spring security
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 
     // jwt
@@ -67,6 +66,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.awaitility/awaitility
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.2.0'
 
+    // web client
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
     // 암호화
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
