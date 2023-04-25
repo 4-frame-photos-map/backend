@@ -9,7 +9,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 /**
- * 키워드 조회, 전체/브랜드별 조회 공통 응답 DTO
+ * 키워드 조회 응답 DTO
  */
 @Getter
 @Setter
@@ -17,8 +17,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @ToString
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ResponseShopKeyword extends ResponseShop{
-    private String roadAddressName;
+public class ResponseShopKeyword extends ResponseShop {
+    private String placeAddress;
 
     static public ResponseShopKeyword of(Shop dbShop, KakaoMapSearchDto apiShop, Brand brand){
         ResponseBrandDto brandDto = ResponseBrandDto.builder()
@@ -37,7 +37,7 @@ public class ResponseShopKeyword extends ResponseShop{
                 .starRatingAvg(dbShop.getStarRatingAvg())
                 .reviewCnt(dbShop.getReviewCnt())
                 .favoriteCnt(dbShop.getFavoriteCnt())
-                .roadAddressName(apiShop.getRoadAddressName())
+                .placeAddress(apiShop.getRoadAddressName())
                 .brand(brandDto)
                 .build();
     }

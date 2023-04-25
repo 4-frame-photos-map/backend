@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RequestMapping("/shops")
@@ -39,48 +41,17 @@ public class ShopController {
      */
     @GetMapping(value = "")
     public ResponseEntity<List<ResponseShopKeyword>> showSearchResultsByKeyword (@RequestParam @NotBlank String keyword,
-                                                                            @RequestParam @NotNull Double latitude,
-                                                                            @RequestParam @NotNull Double longitude,
-                                                                            @AuthenticationPrincipal MemberContext memberContext) {
+                                                                                 @RequestParam @NotNull Double userLat,
+                                                                                 @RequestParam @NotNull Double userLng,
+                                                                                 @AuthenticationPrincipal MemberContext memberContext) {
         List<ResponseShopKeyword> resultShops = new ArrayList<>();
 
-        List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByKeyword(keyword, latitude, longitude);
+        List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByKeyword(keyword, userLat, userLng);
         if(apiShop.isEmpty()) {
             return ResponseEntity.ok(resultShops);
         }
 
         resultShops = shopService.compareWithDbShops(apiShop, ResponseShopKeyword.class);
-        if(resultShops.isEmpty()) {
-            return ResponseEntity.ok(resultShops);
-        }
-
-        if (memberContext != null) {
-            resultShops.forEach(resultShop -> {
-                Favorite favorite = favoriteService.findByShopIdAndMemberId(resultShop.getId(), memberContext.getId());
-                resultShop.setFavorite(favorite != null);
-                    }
-            );
-        }
-
-        return ResponseEntity.ok(resultShops);
-    }
-
-    /**
-     * 브랜드별 조회, 거리순 정렬
-     */
-    @GetMapping("/brand")
-    public ResponseEntity<List<ResponseShopBrand>> showSearchResultsByBrand (@RequestParam(required = false, defaultValue = "") String brand,
-                                                                             @RequestParam @NotNull Double latitude,
-                                                                             @RequestParam @NotNull Double longitude,
-                                                                             @AuthenticationPrincipal MemberContext memberContext) {
-        List<ResponseShopBrand> resultShops = new ArrayList<>();
-
-        List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByBrand(brand, latitude, longitude);
-        if(apiShop.isEmpty()) {
-            return ResponseEntity.ok(resultShops);
-        }
-
-        resultShops = shopService.compareWithDbShops(apiShop, ResponseShopBrand.class);
         if(resultShops.isEmpty()) {
             return ResponseEntity.ok(resultShops);
         }
@@ -97,12 +68,52 @@ public class ShopController {
     }
 
     /**
+     * 브랜드별 조회, 거리순 정렬
+     */
+    @GetMapping("/brand")
+    public ResponseEntity<Map<String, Object>> showSearchResultsByBrand (@RequestParam(required = false, defaultValue = "") String brand,
+                                                                         @RequestParam @NotNull Double userLat,
+                                                                         @RequestParam @NotNull Double userLng,
+                                                                         @RequestParam @NotNull Double mapLat,
+                                                                         @RequestParam @NotNull Double mapLng,
+                                                                         @AuthenticationPrincipal MemberContext memberContext) {
+        List<ResponseShopBrand> resultShops = new ArrayList<>();
+        String mapCenterAddress = shopService.convertMapCenterCoordToAddress(mapLat, mapLng);
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("address", mapCenterAddress);
+        responseMap.put("shops", resultShops);
+
+        List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByBrand(brand, userLat, userLng, mapLat, mapLng);
+        if(apiShop.isEmpty()) {
+            return ResponseEntity.ok(responseMap);
+        }
+
+        resultShops = shopService.compareWithDbShops(apiShop, ResponseShopBrand.class);
+        if(resultShops.isEmpty()) {
+            return ResponseEntity.ok(responseMap);
+        }
+
+        if (memberContext != null) {
+            resultShops.forEach(resultShop -> {
+                        Favorite favorite = favoriteService.findByShopIdAndMemberId(resultShop.getId(), memberContext.getId());
+                        resultShop.setFavorite(favorite != null);
+                    }
+            );
+        }
+
+        responseMap.put("shops", resultShops);
+
+        return ResponseEntity.ok(responseMap);
+    }
+
+    /**
      * 상세 조회
      */
     @GetMapping("/{shop-id}")
     public ResponseEntity<ResponseShopDetail> showDetail (@PathVariable(name = "shop-id") Long id,
-                                                             @RequestParam @NotBlank String distance,
-                                                             @AuthenticationPrincipal MemberContext memberContext) {
+                                                          @RequestParam @NotBlank String distance,
+                                                          @AuthenticationPrincipal MemberContext memberContext) {
 
         Shop dbShop = shopService.findById(id);
         ResponseShopDetail shopDetailDto = shopService.renameShopAndSetResponseDto(dbShop, distance);
@@ -129,9 +140,9 @@ public class ShopController {
      */
     @GetMapping("/{shop-id}/info")
     public ResponseEntity<ResponseShopBriefInfo> showBriefInfo (@PathVariable(name = "shop-id") Long id,
-                                                                        @RequestParam @NotBlank String placeName,
-                                                                        @RequestParam @NotBlank String distance,
-                                                                        @AuthenticationPrincipal MemberContext memberContext) {
+                                                                @RequestParam @NotBlank String placeName,
+                                                                @RequestParam @NotBlank String distance,
+                                                                @AuthenticationPrincipal MemberContext memberContext) {
 
         ResponseShopBriefInfo responseShopBriefInfo = shopService.setResponseDto(id, placeName, distance);
 

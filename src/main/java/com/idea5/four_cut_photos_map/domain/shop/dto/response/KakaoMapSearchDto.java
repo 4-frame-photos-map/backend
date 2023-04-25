@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 /**
- * 카카오맵 API 공통 응답 DTO (키워드 조회, 전체/브랜드별 조회)
+ * 카카오맵 API 공통 응답 DTO
  */
 @Builder
 @Getter
