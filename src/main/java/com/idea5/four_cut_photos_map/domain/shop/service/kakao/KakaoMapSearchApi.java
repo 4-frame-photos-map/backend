@@ -174,13 +174,12 @@ public class KakaoMapSearchApi {
         } catch (Exception e) {
             throw new BusinessException(TOO_MANY_REQUESTS);
         }
-        log.info(documents.size()+"이거="+documents);
 
         // 3. JSON -> DTO 역직렬화
         String roadAddressName = Optional.ofNullable(documents.get(0).get("road_address"))
                 .map(jsonNode -> jsonNode.get("address_name"))
                 .map(JsonNode::asText)
-                .orElse("");
+                .orElse(documents.get(0).get("address").get("address_name").asText());
 
         return roadAddressName;
     }
