@@ -2,6 +2,7 @@ package com.idea5.four_cut_photos_map.domain.review.service;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.review.dto.request.RequestReviewDto;
+import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseMemberReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseShopReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.entity.Review;
@@ -58,11 +59,11 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public List<ResponseReviewDto> getAllMemberReviews(Long memberId) {
+    public List<ResponseMemberReviewDto> getAllMemberReviews(Long memberId) {
         List<Review> reviews = reviewRepository.findAllByWriterIdOrderByCreateDateDesc(memberId);
 
         return reviews.stream()
-                .map(review -> ReviewMapper.toResponseReviewDto(review))
+                .map(review -> ReviewMapper.toResponseMemberReviewDto(review))
                 .collect(Collectors.toList());
     }
 

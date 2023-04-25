@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.review.controller;
 
 import com.idea5.four_cut_photos_map.domain.review.dto.request.RequestReviewDto;
+import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseMemberReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseShopReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.service.ReviewService;
@@ -65,8 +66,8 @@ public class ReviewController {
      */
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/member")
-    public ResponseEntity<List<ResponseReviewDto>> getMemberReviews(@AuthenticationPrincipal MemberContext memberContext) {
-        List<ResponseReviewDto> reviews = reviewService.getAllMemberReviews(memberContext.getId());
+    public ResponseEntity<List<ResponseMemberReviewDto>> getMemberReviews(@AuthenticationPrincipal MemberContext memberContext) {
+        List<ResponseMemberReviewDto> reviews = reviewService.getAllMemberReviews(memberContext.getId());
 
         return ResponseEntity.ok(reviews);
     }
