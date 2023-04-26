@@ -8,6 +8,7 @@ import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,6 +23,7 @@ public class ResponseShopDetail extends ResponseShopBriefInfo {
     private String latitude;
     private String placeUrl;
     private List<ResponseShopReviewDto> recentReviews;
+    private List<String> shopTitles;
 
 
     public static ResponseShopDetail of(Shop dbShop, String placeName, String placeUrl, String placeLng, String placeLat,  String distance){

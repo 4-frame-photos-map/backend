@@ -9,6 +9,7 @@ import com.idea5.four_cut_photos_map.domain.review.service.ReviewService;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
+import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ public class ShopController {
     private final ShopService shopService;
     private final FavoriteService favoriteService;
     private final ReviewService reviewService;
+    private final ShopTitleLogService shopTitleLogService;
 
 
     /**
@@ -126,11 +128,10 @@ public class ShopController {
             shopDetailDto.setFavorite(favorite != null);
         }
 
-        // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
-//        if (shopTitleLogService.existShopTitles(id)) {
-//            List<String> shopTitles = shopTitleLogService.getShopTitles(id);
-//            shopDetailDto.setShopTitles(shopTitles);
-//        }
+        if (shopTitleLogService.existShopTitles(id)) {
+            List<String> shopTitles = shopTitleLogService.getShopTitles(id);
+            shopDetailDto.setShopTitles(shopTitles);
+        }
 
         return ResponseEntity.ok(shopDetailDto);
     }
