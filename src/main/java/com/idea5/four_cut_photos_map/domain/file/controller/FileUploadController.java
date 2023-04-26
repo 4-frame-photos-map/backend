@@ -20,35 +20,17 @@ import java.util.List;
 public class FileUploadController {
     private final S3Service s3Service;
 
-    @PostMapping
-    public ResponseEntity<UploadImageResp> uploadFile(@RequestParam String category, @RequestParam List<MultipartFile> files) {
-//        try {
-//            // 1. 이미지 파일이 아닌 경우 예외처리
-//            if(file.getContentType().startsWith("image") == false) {
-//                log.error("this file is not image type");
-//                throw new BusinessException(ErrorCode.NOT_IMAGE_FILE);
-//            }
-//            String fileName = file.getOriginalFilename();
-//            String fileUrl = "https://" + bucket + "/test" + fileName;
-//            String fileFormatName = file.getContentType().substring(file.getContentType().lastIndexOf("/") + 1);
-//
-//            //
-//            MultipartFile resizedFile = awsS3Service.resizeImage(fileName, fileFormatName, file, 768);
-//
-//            ObjectMetadata metadata= new ObjectMetadata();
-//            metadata.setContentType(file.getContentType());
-//            metadata.setContentLength(resizedFile.getSize());
-//
-//            // s3 파일 업로드
-//            amazonS3Client.putObject(bucket, fileName, resizedFile.getInputStream(), metadata);
-//            // s3 객체 URL 조회
-//            String uploadImageUrl = amazonS3Client.getUrl(bucket, fileName).toString();
-//            return ResponseEntity.ok(new UploadImageResp(uploadImageUrl));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-        UploadImageResp uploadImageResp = s3Service.uploadImageFile(category, files);
+    // 단일 이미지 업로드
+    @PostMapping("/image")
+    public ResponseEntity<UploadImageResp> uploadImage(@RequestParam String category, @RequestParam MultipartFile file) {
+        UploadImageResp uploadImageResp = s3Service.uploadImage(category, file);
         return ResponseEntity.ok(uploadImageResp);
+    }
+
+    // 다중 이미지 업로드
+    @PostMapping("/images")
+    public ResponseEntity<List<UploadImageResp>> uploadImages(@RequestParam String category, @RequestParam List<MultipartFile> files) {
+        List<UploadImageResp> uploadImageResps = s3Service.uploadImages(category, files);
+        return ResponseEntity.ok(uploadImageResps);
     }
 }

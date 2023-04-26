@@ -28,20 +28,25 @@ public class S3Service {
     @Value("${cloud.aws.cloudFront.domainName}")
     private String cloudFront;
 
-    // 이미지 파일 업로드
-    public UploadImageResp uploadImageFile(String category, List<MultipartFile> files) {
-        List<String> imageUrls = new ArrayList<>();
+    // 단일 이미지 파일 업로드
+    public UploadImageResp uploadImage(String category, MultipartFile file) {
+        // 1. 이미지 파일이 아닌 경우 예외처리
+        validImageFile(file);
+        // 2. 객체 키 생성(키 이름 중복 방지)
+        String key = Util.generateS3ObjectKey(category, file.getOriginalFilename());
+        log.info("key = " + key);
+        // 3. 파일 업로드
+        String imageUrl = putS3(key, file);
+        return new UploadImageResp(imageUrl);
+    }
+
+    // 다중 이미지 파일 업로드
+    public List<UploadImageResp> uploadImages(String category, List<MultipartFile> files) {
+        List<UploadImageResp> images = new ArrayList<>();
         for(MultipartFile file : files) {
-            // 1. 이미지 파일이 아닌 경우 예외처리
-            validImageFile(file);
-            // 2. 객체 키 생성(키 이름 중복 방지)
-            String key = Util.generateS3ObjectKey(category, file.getOriginalFilename());
-            log.info("key = " + key);
-            // 3. 파일 업로드
-            String imageUrl = putS3(key, file);
-            imageUrls.add(imageUrl);
+            images.add(uploadImage(category, file));
         }
-        return new UploadImageResp(imageUrls);
+        return images;
     }
 
     // 이미지 파일인지 검사
