@@ -62,7 +62,7 @@ public class ShopTitleCollectJob {
         // 1. 이전 달 ShopTitleLog 테이블 데이터 전체 삭제
         shopTitleLogRepository.deleteOldShopTitles(lastMonthStart.plusDays(1)); // 지난 달 2일 이전 생성된 데이터 제거
 
-        // 2. 저번 달 리뷰 개수와 청결도 평균을 기준으로 이번 달 깨끗한 지점 칭호 부여
+        // 2. 저번 달 리뷰 개수와 청결도 평균을 기준으로 이번 달 청결한 지점 칭호 부여
         List<Review> reviews = reviewRepository.findLastMonthReviewsWithGoodOrBadPurity(lastMonthStart, lastMonthEnd);
 
         Map<Long, List<Review>> reviewMap = reviews.stream()

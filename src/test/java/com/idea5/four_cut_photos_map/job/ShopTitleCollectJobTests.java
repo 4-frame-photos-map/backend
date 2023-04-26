@@ -27,7 +27,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
@@ -115,7 +114,7 @@ public class ShopTitleCollectJobTests {
         assertThat(shopTitleLog2.getShopTitleName()).isEqualTo(HOT_PLACE.getName());
     }
 
-    @DisplayName("저번 달 리뷰 개수 3개 이상, 평균 0.8 이상이면 깨끗한 지점 칭호를 부여한다.")
+    @DisplayName("저번 달 리뷰 개수 3개 이상, 평균 0.8 이상이면 청결한 지점 칭호를 부여한다.")
     @Test
     void collectGoodCleanlinessTitle() {
         // given
@@ -178,7 +177,7 @@ public class ShopTitleCollectJobTests {
         assertThat(shopTitleLog2.getShopTitleName()).isEqualTo(GOOD_CLEANLINESS.getName());
     }
 
-    @DisplayName("핫플레이스 칭호와 깨끗한 지점 칭호 부여 작업을 연속해서 진행")
+    @DisplayName("핫플레이스 칭호와 청결한 지점 칭호 부여 작업을 연속해서 진행")
     @Test
     void collectHotPlaceAndGoodCleanlinessTitle() {
         // given
@@ -232,7 +231,7 @@ public class ShopTitleCollectJobTests {
             shopTitleLogService.save(shopId, HOT_PLACE.getId());
         }
 
-        // 깨끗한 지점 칭호 부여
+        // 청결한 지점 칭호 부여
         shopTitleLogRepository.deleteOldShopTitles(lastMonthStart.plusDays(1));
 
         List<Review> reviews = reviewRepository.findLastMonthReviewsWithGoodOrBadPurity(lastMonthStart, now);
@@ -258,6 +257,7 @@ public class ShopTitleCollectJobTests {
 
         assertThat(shopTitleDto1.size()).isEqualTo(1);
         assertThat(shopTitleDto1.get(0).getName()).isEqualTo(HOT_PLACE.getName());
+
         assertThat(shopTitleDto2.size()).isEqualTo(2);
         assertThat(shopTitleDto2.get(0).getName()).isEqualTo(HOT_PLACE.getName());
         assertThat(shopTitleDto2.get(1).getName()).isEqualTo(GOOD_CLEANLINESS.getName());
