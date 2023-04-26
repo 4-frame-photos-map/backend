@@ -29,10 +29,6 @@ public class FavoriteService {
     private final ShopService shopService;
     private final FavoriteRepository favoriteRepository;
 
-    private final ShopTitleLogService shopTitleLogService;
-    private final ShopTitleService shopTitleService;
-
-
     // 찜하기
     @Transactional
     public Shop save(Long shopId, Member member) {
@@ -99,21 +95,6 @@ public class FavoriteService {
     public Favorite findByShopIdAndMemberId(Long shopId, Long memberId) {
         return favoriteRepository.findByShopIdAndMemberId(shopId, memberId).orElse(null);
     }
-
-    // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
-//    @Transactional
-//    public boolean isHotPlace(Long shopId) {
-//        // Favorite DB에 저장된 Shop 찾기
-//        List<Favorite> list = favoriteRepository.findByShopId(shopId);
-//
-//        // 찜수가 5개 이상이면 칭호부여
-//        if (list.size() >= 5) {
-//            shopTitleLogService.save(shopId, HOT_PLACE.getId());
-//            return true;
-//        }
-//
-//        return false;
-//    }
 
     public void deleteByMemberId(Long memberId) {
         List<Favorite> favorites = favoriteRepository.findByMember(Member.builder().id(memberId).build());
