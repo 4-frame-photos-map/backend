@@ -32,4 +32,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     void deleteByWriterId(Long memberId);
 
     List<Review> findByModifyDateAfter(LocalDateTime minusMonths);
+
+    @Query("SELECT r FROM Review r WHERE r.createDate BETWEEN :startDate AND :endDate AND (r.purity = 'GOOD' OR r.purity = 'BAD')")
+    List<Review> findLastMonthReviewsWithGoodOrBadPurity(@Param("startDate") LocalDateTime startDate,
+                                                         @Param("endDate") LocalDateTime endDate);
 }
