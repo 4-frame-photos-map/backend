@@ -37,8 +37,8 @@ public class ShopTitleCollectJob {
         LocalDateTime lastMonthStart = now.withDayOfMonth(1).minusMonths(1);
         LocalDateTime lastMonthEnd = now.withDayOfMonth(1).minusDays(1);
 
-        // 1. 칭호 부여 전 ShopTitleLog 테이블 데이터 전체 삭제
-        shopTitleLogRepository.deleteAll();
+        // 1. 이전 달 ShopTitleLog 테이블 데이터 전체 삭제
+        shopTitleLogRepository.deleteOldShopTitles(lastMonthStart.plusDays(1)); // 지난 달 2일 이전 생성된 데이터 제거
 
         // 2. 저번 달 찜 개수 기준으로 이번 달 핫플레이스 칭호 부여
         List<Long> ids = favoriteRepository.findShopIdsWithMoreThanThreeFavorites(lastMonthStart, lastMonthEnd);
@@ -59,8 +59,8 @@ public class ShopTitleCollectJob {
         LocalDateTime lastMonthStart = now.withDayOfMonth(1).minusMonths(1);
         LocalDateTime lastMonthEnd = now.withDayOfMonth(1).minusDays(1);
 
-        // 1. 칭호 부여 전 ShopTitleLog 테이블 데이터 전체 삭제
-        shopTitleLogRepository.deleteAll();
+        // 1. 이전 달 ShopTitleLog 테이블 데이터 전체 삭제
+        shopTitleLogRepository.deleteOldShopTitles(lastMonthStart.plusDays(1)); // 지난 달 2일 이전 생성된 데이터 제거
 
         // 2. 저번 달 리뷰 개수와 청결도 평균을 기준으로 이번 달 깨끗한 지점 칭호 부여
         List<Review> reviews = reviewRepository.findLastMonthReviewsWithGoodOrBadPurity(lastMonthStart, lastMonthEnd);
