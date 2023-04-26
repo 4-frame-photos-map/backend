@@ -18,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.TOO_MANY_REQUESTS;
 
@@ -35,20 +36,15 @@ public class KakaoMapSearchApi {
     public static final String DEFAULT_QUERY_WORD = "즉석사진";
 
 
-    public List<KakaoMapSearchDto> searchByQueryWord(String queryWord, Double latitude, Double longitude, boolean hasRadius) {
+    public List<KakaoMapSearchDto> searchByQueryWord(String queryWord, Double userLat, Double userLng) {
         List<KakaoMapSearchDto> resultList = new ArrayList<>();
 
         // 1. API 호출을 위한 요청 설정
         String apiPath = "/v2/local/search/keyword.json";
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
                 .queryParam("query", queryWord + DEFAULT_QUERY_WORD)
-                .queryParam("x", longitude)
-                .queryParam("y", latitude);
-
-        if (hasRadius) {
-            uriBuilder.queryParam("sort", "distance")
-                    .queryParam("radius", radius);
-        }
+                .queryParam("x", userLng)
+                .queryParam("y", userLat);
 
         String apiUrl = uriBuilder.build().toString();
 
@@ -62,6 +58,34 @@ public class KakaoMapSearchApi {
 
         // 3. JSON -> DTO 역직렬화
         return deserialize(resultList, documents);
+    }
+
+
+    // 사용자의 현재
+    public List<KakaoMapSearchDto> searchByQueryWord(String queryWord, Double userLat, Double userLng, Double mapLat, Double mapLng) {
+        List<KakaoMapSearchDto> resultList = new ArrayList<>();
+
+        // 1. API 호출을 위한 요청 설정
+        String apiPath = "/v2/local/search/keyword.json";
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
+                .queryParam("query", queryWord + DEFAULT_QUERY_WORD)
+                .queryParam("x", mapLng)
+                .queryParam("y", mapLat)
+                .queryParam("sort", "distance")
+                .queryParam("radius", radius);
+
+        String apiUrl = uriBuilder.build().toString();
+
+        // 2. API 호출
+        JsonNode documents;
+        try {
+            documents = getDocuments(apiUrl);
+        } catch (Exception e) {
+            throw new BusinessException(TOO_MANY_REQUESTS);
+        }
+
+        // 3. JSON -> DTO 역직렬화
+        return deserialize(resultList, documents, userLat, userLng);
     }
 
     public String[] searchByRoadAddressName(String roadAddressName, String placeName) {
@@ -108,13 +132,13 @@ public class KakaoMapSearchApi {
         }
     }
 
-    public String[] searchByRoadAddressName(String roadAddressName, String placeName, Double curLnt, Double curLat) {
+    public String[] searchByRoadAddressName(String roadAddressName, String placeName, Double userLat, Double userLng) {
         // 1. API 호출을 위한 요청 설정
         String apiPath = "/v2/local/search/keyword.json";
         String apiUrl = UriComponentsBuilder.fromPath(apiPath)
                 .queryParam("query", roadAddressName + DEFAULT_QUERY_WORD)
-                .queryParam("x",curLnt)
-                .queryParam("y",curLat)
+                .queryParam("x",userLng)
+                .queryParam("y",userLat)
                 .build()
                 .toString();
 
@@ -134,6 +158,32 @@ public class KakaoMapSearchApi {
         return result;
     }
 
+    public String convertCoordinateToAddress(Double mapLat, Double mapLng) {
+        // 1. API 호출을 위한 요청 설정
+        String apiPath = "/v2/local/geo/coord2address.json";
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
+                .queryParam("x", mapLng)
+                .queryParam("y", mapLat);
+
+        String apiUrl = uriBuilder.build().toString();
+
+        // 2. API 호출
+        JsonNode documents;
+        try {
+            documents = getDocuments(apiUrl);
+        } catch (Exception e) {
+            throw new BusinessException(TOO_MANY_REQUESTS);
+        }
+
+        // 3. JSON -> DTO 역직렬화
+        String roadAddressName = Optional.ofNullable(documents.get(0).get("road_address"))
+                .map(jsonNode -> jsonNode.get("address_name"))
+                .map(JsonNode::asText)
+                .orElse(documents.get(0).get("address").get("address_name").asText());
+
+        return roadAddressName;
+    }
+
     private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
@@ -141,6 +191,27 @@ public class KakaoMapSearchApi {
                 try {
                     KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
                     dto.setDistance(Util.distanceFormatting(dto.getDistance()));
+                    resultList.add(dto);
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                }
+            }
+        }
+        return resultList;
+    }
+
+    private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents, Double userLat, Double userLng) {
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        for (JsonNode document : documents) {
+            if (document.get("category_name").asText().contains(DEFAULT_QUERY_WORD)) {
+                try {
+                    KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
+
+                    // 사용자 중심좌표를 기준으로 지점으로부터의 거리 갱신
+                    Double placeLng = document.get("x").asDouble();
+                    Double placeLat = document.get("y").asDouble();
+                    dto.setDistance(Util.calculateDist(placeLat, placeLng, userLat, userLng));
+
                     resultList.add(dto);
                 } catch (Exception e) {
                     log.error(e.getMessage());

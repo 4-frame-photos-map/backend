@@ -27,11 +27,11 @@ public class FavoriteController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "")
     public ResponseEntity<List<FavoriteResponse>> showFavoritesList(@AuthenticationPrincipal MemberContext memberContext,
-                                                                    @RequestParam @NotNull Double latitude,
-                                                                    @RequestParam @NotNull Double longitude
+                                                                    @RequestParam @NotNull Double userLat,
+                                                                    @RequestParam @NotNull Double userLng
                                                                     ) {
 
-        List<FavoriteResponse> favoriteResponses = favoriteService.getFavoritesList(memberContext.getId(), longitude, latitude);
+        List<FavoriteResponse> favoriteResponses = favoriteService.getFavoritesList(memberContext.getId(), userLat, userLng);
 
         return ResponseEntity.ok(favoriteResponses);
     }

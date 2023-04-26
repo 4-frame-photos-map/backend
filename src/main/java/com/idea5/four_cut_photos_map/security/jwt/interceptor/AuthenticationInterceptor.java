@@ -9,10 +9,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 
 /**
  * 필수 인증처리 인터셉터
@@ -28,6 +30,14 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         log.info("---AuthenticationInterceptor preHandle()---");
         log.info("requestURI=" + request.getRequestURI());
+
+        HandlerMethod handlerMethod = (HandlerMethod) handler;
+        Method method = handlerMethod.getMethod();
+               
+        if (method.getName().equals("getReview") || method.getName().equals("getShopReviews")) {
+            return true;
+        }
+
         // 1. Authorization Header 에서 accessToken 가져오기
         String accessToken = jwtProvider.getJwtToken(request);
         // 2. 토큰이 유효한지 검증

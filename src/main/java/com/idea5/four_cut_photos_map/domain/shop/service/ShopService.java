@@ -56,12 +56,17 @@ public class ShopService {
         ).orElse(null);
     }
 
-    public List<KakaoMapSearchDto> searchKakaoMapByKeyword(String keyword, Double latitude, Double longitude) {
-        return kakaoMapSearchApi.searchByQueryWord (keyword, latitude, longitude, false);
+    public List<KakaoMapSearchDto> searchKakaoMapByKeyword(String keyword, Double userLat, Double userLng) {
+        return kakaoMapSearchApi.searchByQueryWord (keyword, userLat, userLng);
     }
 
-    public List<KakaoMapSearchDto> searchKakaoMapByBrand(String brand, Double latitude, Double longitude) {
-        return kakaoMapSearchApi.searchByQueryWord (brand, latitude, longitude, true);
+    public List<KakaoMapSearchDto> searchKakaoMapByBrand(String brand, Double userLat, Double userLng, Double mapLat, Double mapLng) {
+        if (userLat == mapLat && userLng == mapLng) {
+            return kakaoMapSearchApi.searchByQueryWord (brand, userLat, userLng);
+        }
+        else {
+            return kakaoMapSearchApi.searchByQueryWord (brand, userLat, userLng, mapLat, mapLng);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -75,18 +80,18 @@ public class ShopService {
         if(apiShop == null) throw new BusinessException(INVALID_SHOP_ID);
         String placeName = apiShop[0];
         String placeUrl = apiShop[1];
-        String longitude = apiShop[2];
-        String latitude = apiShop[3];
+        String placeLng = apiShop[2];
+        String placeLat = apiShop[3];
 
-        return ResponseShopDetail.of(dbShop, placeName, placeUrl, longitude, latitude, distance);
+        return ResponseShopDetail.of(dbShop, placeName, placeUrl, placeLng, placeLat, distance);
     }
 
-    public FavoriteResponse renameShopAndSetResponseDto(Favorite favorite, Double curLnt, Double curLat) {
+    public FavoriteResponse renameShopAndSetResponseDto(Favorite favorite, Double userLat, Double userLng) {
         String[] apiShop = kakaoMapSearchApi.searchByRoadAddressName(
                 favorite.getShop().getRoadAddressName(),
                 favorite.getShop().getPlaceName(),
-                curLnt,
-                curLat
+                userLat,
+                userLng
         );
 
         if(apiShop == null) {
@@ -119,6 +124,9 @@ public class ShopService {
         shopRepository.save(shop);
     }
 
+    public String convertMapCenterCoordToAddress(Double mapLat, Double mapLng) {
+        return kakaoMapSearchApi.convertCoordinateToAddress(mapLat, mapLng);
+    }
 
 
     // 브랜드별 Map Marker

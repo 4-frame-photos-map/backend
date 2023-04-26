@@ -86,12 +86,12 @@ public class FavoriteService {
     }
 
     // 찜 목록 조회
-    public List<FavoriteResponse> getFavoritesList(Long memberId, Double longitude, Double latitude) {
+    public List<FavoriteResponse> getFavoritesList(Long memberId, Double userLat, Double userLng) {
         List<Favorite> favorites = favoriteRepository.findByMemberIdOrderByCreateDateDesc(memberId);
 
         return  favorites
                 .stream()
-                .map(favorite -> shopService.renameShopAndSetResponseDto(favorite, longitude, latitude))
+                .map(favorite -> shopService.renameShopAndSetResponseDto(favorite, userLat, userLng))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
