@@ -25,5 +25,27 @@ public class CrawlService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println();
+    }
+
+    public void lifefourcutsCrawl() {
+        int cnt = 0;
+        for(int i = 1; i <= 49; i++) {
+            String url = "https://lifefourcuts.com/Store01/?sort=UPDATE&keyword_type=all&page=" + i;
+            Connection conn = Jsoup.connect(url);
+
+            try {
+                Document document = conn.get();
+                Elements titles = document.select(".head > div.tit");
+
+                for (Element element : titles) {
+                    System.out.println(element.text());
+                    cnt++;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("cnt = " + cnt);
     }
 }
