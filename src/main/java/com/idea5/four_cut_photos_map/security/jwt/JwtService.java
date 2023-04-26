@@ -2,8 +2,11 @@ package com.idea5.four_cut_photos_map.security.jwt;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
+import com.idea5.four_cut_photos_map.global.error.ErrorCode;
+import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.AccessToken;
 import com.idea5.four_cut_photos_map.security.jwt.dto.response.JwtToken;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,7 +47,12 @@ public class JwtService {
     // accessToken 재발급
     public AccessToken reissueAccessToken(String refreshToken) {
         // 1. refreshToken 으로부터 memberId 조회
-        Long memberId = jwtProvider.getId(refreshToken);
+        Long memberId;
+        try {
+            memberId = jwtProvider.getId(refreshToken);
+        } catch (ExpiredJwtException e) {
+            throw new BusinessException(ErrorCode.EXPIRED_RTK);
+        }
         // 2. redis 에서 memberId(key)로 refreshToken 조회
         String redisRefreshToken = redisDao.getValues(RedisDao.getRtkKey(memberId));
         // 3. redis 에 저장된 refreshToken 과 요청 헤더로 전달된 refreshToken 값이 일치하는지 확인

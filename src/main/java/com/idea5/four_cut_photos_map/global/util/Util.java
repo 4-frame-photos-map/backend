@@ -78,6 +78,24 @@ public class Util {
         return String.format("%.0fkm", dkm);
     }
 
+    // 두 좌표간의 거리 계산
+    public static String calculateDist(double lat1, double lng1, double lat2, double lng2) {
+        final int R = 6371; // 지구 반지름(km)
+
+        // 두 지점 사이의 위도와 경도 차이를 라디안 단위로 계산
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLng = Math.toRadians(lng2 - lng1);
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distanceInMeters = R * c * 1000;
+
+        return distanceFormatting((String.format("%.0f", distanceInMeters)));
+    }
+
+
     // 난수 생성
     public static String generateRandomNumber(int length) {
         Random random = new Random();

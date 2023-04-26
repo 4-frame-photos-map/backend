@@ -35,7 +35,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 // 브라우저에서 http 요청날릴 때 자동으로 /favicon.ico 요청이 실행되어 /error 로 리다이렉트 될 때 인터셉터 preHandle() 실행되는 문제 해결
                 .excludePathPatterns("/favicon.ico", "/error")
-                .excludePathPatterns("/auth/login/kakao", "/shops/**", "/auth/token", "/reviews/{review-id}", "/reviews/shop/{shop-id}");  // 인가작업을 제외할 API 경로 설정
+                .excludePathPatterns("/auth/login/kakao", "/shops/**", "/auth/token");  // 인가작업을 제외할 API 경로 설정
         registry.addInterceptor(optionalAuthenticationInterceptor)
                 .addPathPatterns("/shops/**");
     }
