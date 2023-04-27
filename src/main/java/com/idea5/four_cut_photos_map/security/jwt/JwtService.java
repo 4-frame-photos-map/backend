@@ -61,7 +61,7 @@ public class JwtService {
         String redisRefreshToken = redisDao.getValues(RedisDao.getRtkKey(memberId));
         // 3. redis 에 저장된 refreshToken 과 요청 헤더로 전달된 refreshToken 값이 일치하는지 확인
         if(!refreshToken.equals(redisRefreshToken)) {
-            throw new RuntimeException("refreshToken 불일치");
+            throw new BusinessException(ErrorCode.INVALID_RTK);
         }
         // 4. member 객체 생성
         Member member = Member.builder()
