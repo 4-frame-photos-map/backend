@@ -9,6 +9,7 @@ import com.idea5.four_cut_photos_map.security.jwt.dto.response.JwtToken;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,9 @@ public class JwtService {
     private final JwtProvider jwtProvider;
     private final RedisDao redisDao;
 
+    @Value("${jwt.rtk.expiration}")
+    private long refreshTokenValidationSecond;    // accessToken 유효기간(1달)
+
     // accessToken, refreshToken 발급
     @Transactional
     public JwtToken generateTokens(Member member) {
@@ -35,7 +39,7 @@ public class JwtService {
         redisDao.setValues(
                 RedisDao.getRtkKey(member.getId()),
                 refreshToken,
-                Duration.ofMillis(60 * 60 * 24 * 30L));
+                Duration.ofSeconds(refreshTokenValidationSecond));
 
         return JwtToken.builder()
                 .accessToken(accessToken)
