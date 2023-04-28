@@ -287,7 +287,6 @@ public class EtcBrandCrawlerJob {
         }
     }
 
-//  @Scheduled(cron = "0 * * * * *")
     @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
     public void getPlayInTheBoxHubInfo() {
         log.info("====Start PlayInTheBox Crawling===");
@@ -337,6 +336,52 @@ public class EtcBrandCrawlerJob {
                 }
             }
             log.info("====End PlayInTheBox Crawling===");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+//      @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
+    public void getHarryPhotoHubInfo() {
+        log.info("====Start HarryPhoto Crawling===");
+
+        try {
+            String url = "http://www.harryphoto.co.kr/";
+                Document  doc = Jsoup.connect(url).get();
+                Elements elements = doc.select("dl");
+                for (Element element : elements) {
+                    String placeName = element.select("dt").text();
+                    if (placeName.endsWith("점")) {
+                        String roadAddressName = element.selectFirst("dd").text();
+
+                        Shop oldShop = shopRepository.findByPlaceName(placeName).orElse(null);
+                        if (oldShop == null) {
+                            Shop shop = Shop.builder()
+                                    .brand(brandRepository.findByBrandName("기타").get())
+                                    .placeName(placeName)
+                                    .roadAddressName(roadAddressName)
+                                    .favoriteCnt(0)
+                                    .reviewCnt(0)
+                                    .starRatingAvg(0.0)
+                                    .build();
+                            shopRepository.save(shop);
+                            log.info("persist >> placeName:{}, roadAddressName:{}", placeName, roadAddressName);
+                        } else {
+                            String changedFields = "";
+                            if (!oldShop.getRoadAddressName().equals(roadAddressName)) {
+                                oldShop.setRoadAddressName(roadAddressName);
+                                changedFields += "roadAddressName, ";
+                            }
+                            if (!changedFields.equals("")) {
+                                changedFields = changedFields.substring(0, changedFields.length() - 2);
+                                shopRepository.save(oldShop);
+                                log.info("merge >> id:{}, changed fields: {}", oldShop.getId(), changedFields);
+                            }
+                        }
+                    }
+                }
+            log.info("====End HarryPhoto Crawling===");
         } catch (Exception e) {
             e.printStackTrace();
         }
