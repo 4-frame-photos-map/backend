@@ -227,7 +227,6 @@ public class EtcBrandCrawlerJob {
         }
     }
 
-//        @Scheduled(cron = "0 * * * * *")
     @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
     public void getPhotoLapPlusHubInfo() {
         log.info("====Start PhotoLapPlus Crawling===");
@@ -283,6 +282,61 @@ public class EtcBrandCrawlerJob {
                 }
             }
             log.info("====End PhotoLapPlus Crawling===");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+//  @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
+    public void getPlayInTheBoxHubInfo() {
+        log.info("====Start PlayInTheBox Crawling===");
+
+        try {
+            int maxPageNum = 3;
+            String baseUrl = "https://www.playinthebox.co.kr/39/?sort=NAME&keyword_type=all&page=";
+
+            for (int pageNum = 1; pageNum <= maxPageNum; pageNum++) {
+                String url = baseUrl + pageNum;
+                Document  doc = Jsoup.connect(url).get();
+                Elements elements = doc.select("div.map_contents.inline-blocked");
+                for (Element element : elements) {
+                    String placeName = element.select("a.map_link.blocked div.head div.tit").text();
+                    if (placeName.endsWith("점")) {
+                        String roadAddressName = element.selectFirst("div.p_group p").text();
+
+                        // 상세주소 제거(마지막 숫자 이후 문자열 제거)
+                        int lastIndex = roadAddressName.replaceAll("[^\\d]+$", "").length();
+                        roadAddressName = roadAddressName.substring(0, lastIndex);
+
+                        Shop oldShop = shopRepository.findByPlaceName(placeName).orElse(null);
+                        if (oldShop == null) {
+                            Shop shop = Shop.builder()
+                                    .brand(brandRepository.findByBrandName("기타").get())
+                                    .placeName(placeName)
+                                    .roadAddressName(roadAddressName)
+                                    .favoriteCnt(0)
+                                    .reviewCnt(0)
+                                    .starRatingAvg(0.0)
+                                    .build();
+                            shopRepository.save(shop);
+                            log.info("persist >> placeName:{}, roadAddressName:{}", placeName, roadAddressName);
+                        } else {
+                            String changedFields = "";
+                            if (!oldShop.getRoadAddressName().equals(roadAddressName)) {
+                                oldShop.setRoadAddressName(roadAddressName);
+                                changedFields += "roadAddressName, ";
+                            }
+                            if (!changedFields.equals("")) {
+                                changedFields = changedFields.substring(0, changedFields.length() - 2);
+                                shopRepository.save(oldShop);
+                                log.info("merge >> id:{}, changed fields: {}", oldShop.getId(), changedFields);
+                            }
+                        }
+                    }
+                }
+            }
+            log.info("====End PlayInTheBox Crawling===");
         } catch (Exception e) {
             e.printStackTrace();
         }
