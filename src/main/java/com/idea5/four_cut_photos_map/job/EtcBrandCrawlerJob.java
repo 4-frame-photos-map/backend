@@ -108,7 +108,6 @@ public class EtcBrandCrawlerJob {
         }
     }
 
-//    @Scheduled(cron = "0 * * * * *")
     @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
     public void getPhotostreetHubInfo(){
         log.info("====Start Photostreet Crawling===");
@@ -159,6 +158,70 @@ public class EtcBrandCrawlerJob {
                 }
             }
             log.info("====End Photostreet Crawling===");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+//    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
+    public void getPhotodrinkHubInfo() {
+        log.info("====Start Photodrink Crawling===");
+
+        try {
+            String url = "https://photodrink.com/LOCATION";
+            Document doc = Jsoup.connect(url).get();
+            Elements elements = doc.select("div.text-table div");
+
+            for (Element element : elements) {
+                Elements pElement = element.select("p");
+                String placeName = pElement.get(0).select("span").text();
+
+                if (placeName.endsWith("점")) {
+                    String roadAddressName = pElement.get(1).select("span").text();
+                    roadAddressName = roadAddressName.contains(",") ? roadAddressName.split(",")[0] : roadAddressName;
+
+                    // 두번째 공백이 있다면 첫번째 공백 이후부터 두번째 공백 시작까지 제거
+                    // 세번째 공백이 있다면 세번째 공백 제거
+                    int firstIndex = placeName.indexOf(" ");
+                    if (firstIndex != -1) {
+                        int secondIndex = placeName.indexOf(" ", firstIndex + 1);
+                        if (secondIndex != -1) {
+                            placeName = placeName.substring(0, firstIndex + 1) + placeName.substring(secondIndex + 1);
+                            int thirdIndex = placeName.indexOf(" ", secondIndex + 1);
+                            if (thirdIndex != -1) {
+                                placeName = placeName.substring(0, secondIndex + 1) + placeName.substring(thirdIndex + 1);
+                            }
+                        }
+
+                        Shop oldShop = shopRepository.findByPlaceName(placeName).orElse(null);
+                        if (oldShop == null) {
+                            Shop shop = Shop.builder()
+                                    .brand(brandRepository.findByBrandName("기타").get())
+                                    .placeName(placeName)
+                                    .roadAddressName(roadAddressName)
+                                    .favoriteCnt(0)
+                                    .reviewCnt(0)
+                                    .starRatingAvg(0.0)
+                                    .build();
+                            shopRepository.save(shop);
+                            log.info("persist >> placeName:{}, roadAddressName:{}", placeName, roadAddressName);
+                        } else {
+                            String changedFields = "";
+                            if (!oldShop.getRoadAddressName().equals(roadAddressName)) {
+                                oldShop.setRoadAddressName(roadAddressName);
+                                changedFields += "roadAddressName, ";
+                            }
+                            if (!changedFields.equals("")) {
+                                changedFields = changedFields.substring(0, changedFields.length() - 2);
+                                shopRepository.save(oldShop);
+                                log.info("merge >> id:{}, changed fields: {}", oldShop.getId(), changedFields);
+                            }
+                        }
+                    }
+                }
+            }
+            log.info("====End Photodrink Crawling===");
         } catch (Exception e) {
             e.printStackTrace();
         }
