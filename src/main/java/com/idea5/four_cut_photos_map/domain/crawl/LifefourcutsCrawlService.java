@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.crawl;
 
 import com.idea5.four_cut_photos_map.domain.brand.entity.Brand;
+import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +19,12 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class LifefourcutsCrawlService implements CrawlService {
     private final ShopRepository shopRepository;
+    private final BrandRepository brandRepository;
 
     @Transactional
     public void crawl() {
         int page = 49;
-        Brand brand = Brand.builder().id(1L).build();
+        Brand brand = brandRepository.findById(1L).orElse(null);
         for(int i = 1; i <= page; i++) {
             String url = "https://lifefourcuts.com/Store01/?sort=TIME&keyword_type=all&page=" + i;
             Connection conn = Jsoup.connect(url);
