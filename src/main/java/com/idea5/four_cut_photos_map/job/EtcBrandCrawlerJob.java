@@ -37,8 +37,8 @@ public class EtcBrandCrawlerJob {
 
                 String placeName = spanElement.text();
                 String roadAddressName = element.select("span:last-child").text();
-                placeName = roadAddressName.split(",")[1] + " " + placeName;
-                roadAddressName = roadAddressName.split(",")[0];
+                placeName = roadAddressName.split(",")[1] + " " + placeName; // 브랜드명 추가
+                roadAddressName = roadAddressName.split(",")[0]; // 상세주소 제거
 
                 Shop oldShop = shopRepository.findByPlaceName(placeName).orElse(null);
                 if (oldShop == null) {
@@ -51,9 +51,18 @@ public class EtcBrandCrawlerJob {
                             .starRatingAvg(0.0)
                             .build();
                     shopRepository.save(shop);
+                    log.info("persist >> placeName:{}, roadAddressName:{}", placeName, roadAddressName);
                 } else {
-                    oldShop.setRoadAddressName(roadAddressName);
-                    shopRepository.save(oldShop);
+                    String changedFields = "";
+                    if (!oldShop.getRoadAddressName().equals(roadAddressName)) {
+                        oldShop.setRoadAddressName(roadAddressName);
+                        changedFields += "roadAddressName, ";
+                    }
+                    if (!changedFields.equals("")) {
+                        changedFields = changedFields.substring(0, changedFields.length() - 2); // 마지막 쉼표 제거
+                        shopRepository.save(oldShop);
+                        log.info("merge >> id:{}, changed fields: {}", oldShop.getId(), changedFields);
+                    }
                 }
             }
             log.info("====End Insphoto Crawling===");
