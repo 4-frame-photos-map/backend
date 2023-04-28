@@ -12,6 +12,7 @@ import java.io.IOException;
 @Service
 public class CrawlService {
     public void harufilmCrawl() {
+        int cnt = 0;
         for(int i = 202; i <= 209; i++) {
             String url = "http://harufilm.com/" + i;
             Connection conn = Jsoup.connect(url);
@@ -24,29 +25,33 @@ public class CrawlService {
                     String address = element.select("span.body").text();
                     String placeNameAddress = element.text();
 //                    String placeName = (placeNameAddress.substring(0, placeNameAddress.length() - address.length()));
-                    String placeName = "인생네컷 " + element.text().replace(address, "").trim();
+                    String placeName = "하루필름 " + element.text().replace(address, "").trim();
                     System.out.println(address);
                     System.out.println(placeName);
+                    cnt++;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        System.out.println();
+        System.out.println("cnt = " + cnt);
     }
 
     public void lifefourcutsCrawl() {
         int cnt = 0;
         for(int i = 1; i <= 49; i++) {
-            String url = "https://lifefourcuts.com/Store01/?sort=UPDATE&keyword_type=all&page=" + i;
+            String url = "https://lifefourcuts.com/Store01/?sort=TIME&keyword_type=all&page=" + i;
             Connection conn = Jsoup.connect(url);
 
             try {
                 Document document = conn.get();
-                Elements titles = document.select(".head > div.tit");
+                Elements titles = document.select("div.map_contents.inline-blocked");
 
-                for (Element element : titles) {
-                    System.out.println(element.text());
+                for (Element e : titles) {
+                    String placeName = "인생네컷 " + e.select("div.tit").text();
+                    System.out.println(placeName);
+                    String address = e.select("p.adress").text();
+                    System.out.println(address);
                     cnt++;
                 }
             } catch (IOException e) {
