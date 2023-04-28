@@ -60,4 +60,35 @@ public class CrawlService {
         }
         System.out.println("cnt = " + cnt);
     }
+
+    public void photoismCrawl() {
+        // [지점코드, 페이지]
+        int[][] infos = {
+                {279, 32}, // 포토이즘 박스
+                {280, 6},   // 포토이즘 컬러드
+        };
+        for(int[] info : infos) {
+            int cnt = 0;
+            for(int i = 1; i <= info[1]; i++) {
+                String url = "https://photoism.co.kr/" + info[0] + "/?sort=TIME&keyword_type=all&page=" + i;
+                Connection conn = Jsoup.connect(url);
+
+                try {
+                    Document document = conn.get();
+                    Elements titles = document.select("div.map_container.clearfix.map-inner._map_container");
+
+                    for (Element e : titles) {
+                        String placeName = e.select("div.tit").text();
+                        System.out.println(placeName);
+                        String address = e.select("p.adress").text();
+                        System.out.println(address);
+                        cnt++;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println("cnt = " + cnt);
+        }
+    }
 }

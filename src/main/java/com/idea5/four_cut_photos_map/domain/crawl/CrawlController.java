@@ -13,7 +13,8 @@ public class CrawlController {
 
     @GetMapping
     public void crawl() {
-        crawlService.lifefourcutsCrawl();
-        crawlService.harufilmCrawl();
+//        crawlService.lifefourcutsCrawl();
+//        crawlService.harufilmCrawl();
+        crawlService.photoismCrawl();
     }
 }
