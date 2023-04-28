@@ -22,7 +22,7 @@ public class CrawlService {
                 Elements titles = document.select("p.title");
 
                 for (Element element : titles) {
-                    String address = element.select("span.body").text();
+                    String address = element.select("span.body").text().trim();
                     String placeNameAddress = element.text();
 //                    String placeName = (placeNameAddress.substring(0, placeNameAddress.length() - address.length()));
                     String placeName = "하루필름 " + element.text().replace(address, "").trim();
@@ -48,9 +48,9 @@ public class CrawlService {
                 Elements titles = document.select("div.map_contents.inline-blocked");
 
                 for (Element e : titles) {
-                    String placeName = "인생네컷 " + e.select("div.tit").text();
+                    String placeName = "인생네컷 " + e.select("div.tit").text().trim();
                     System.out.println(placeName);
-                    String address = e.select("p.adress").text();
+                    String address = e.select("p.adress").text().trim();
                     System.out.println(address);
                     cnt++;
                 }
@@ -78,9 +78,9 @@ public class CrawlService {
                     Elements titles = document.select("div.map_container.clearfix.map-inner._map_container");
 
                     for (Element e : titles) {
-                        String placeName = e.select("div.tit").text();
+                        String placeName = e.select("div.tit").text().trim();
                         System.out.println(placeName);
-                        String address = e.select("p.adress").text();
+                        String address = e.select("p.adress").text().trim();
                         System.out.println(address);
                         cnt++;
                     }
@@ -90,5 +90,29 @@ public class CrawlService {
             }
             System.out.println("cnt = " + cnt);
         }
+    }
+
+    public void photograyCrawl() {
+        int cnt = 0;
+        for(int i = 1; i <= 2; i++) {
+            String url = "http://photogray.com/bbs/board.php?bo_table=store&page=" + i;
+            Connection conn = Jsoup.connect(url);
+
+            try {
+                Document document = conn.get();
+                Elements titles = document.select("div.addr");
+
+                for (Element e : titles) {
+                    String placeName = "포토그레이 " + e.select("div.title").text().trim();
+                    System.out.println(placeName);
+                    String address = e.select("div.st_info").text().trim();
+                    System.out.println(address);
+                    cnt++;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("cnt = " + cnt);
     }
 }

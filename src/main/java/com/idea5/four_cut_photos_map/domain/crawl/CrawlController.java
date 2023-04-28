@@ -15,6 +15,7 @@ public class CrawlController {
     public void crawl() {
 //        crawlService.lifefourcutsCrawl();
 //        crawlService.harufilmCrawl();
-        crawlService.photoismCrawl();
+//        crawlService.photoismCrawl();
+        crawlService.photograyCrawl();
     }
 }
