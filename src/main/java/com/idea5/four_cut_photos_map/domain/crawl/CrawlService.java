@@ -13,8 +13,9 @@ import java.io.IOException;
 public class CrawlService {
     public void harufilmCrawl() {
         int cnt = 0;
-        for(int i = 202; i <= 209; i++) {
-            String url = "http://harufilm.com/" + i;
+        int[] codes = {202, 203, 204, 205, 206, 207, 208, 209};
+        for(int code : codes) {
+            String url = "http://harufilm.com/" + code;
             Connection conn = Jsoup.connect(url);
 
             try {
@@ -39,7 +40,8 @@ public class CrawlService {
 
     public void lifefourcutsCrawl() {
         int cnt = 0;
-        for(int i = 1; i <= 49; i++) {
+        int page = 49;
+        for(int i = 1; i <= page; i++) {
             String url = "https://lifefourcuts.com/Store01/?sort=TIME&keyword_type=all&page=" + i;
             Connection conn = Jsoup.connect(url);
 
@@ -94,7 +96,8 @@ public class CrawlService {
 
     public void photograyCrawl() {
         int cnt = 0;
-        for(int i = 1; i <= 2; i++) {
+        int page = 2;
+        for(int i = 1; i <= page; i++) {
             String url = "http://photogray.com/bbs/board.php?bo_table=store&page=" + i;
             Connection conn = Jsoup.connect(url);
 
