@@ -70,4 +70,39 @@ public class EtcBrandCrawlerJob {
             e.printStackTrace();
         }
     }
+
+//    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
+    public void getSelpixHubInfo(){
+        log.info("====Start Selpix Crawling===");
+        try {
+            String url = "http://m.selpix.co.kr/shop_add_page/index.htm?page_code=page16&me_popup=1";
+            Document doc = Jsoup.connect(url).get();
+            Elements elements = doc.select("span.subject");
+
+            for (Element element : elements) {
+                if (element.text().endsWith("점")) {
+                    String placeName = element.text();
+                    placeName = placeName.contains(" ")? placeName.split(" ")[1] : placeName; // 지역명 분리
+                    placeName = "셀픽스" + " " + placeName; // 브랜드명 추가
+
+                    if (!shopRepository.existsByPlaceName(placeName)) {
+                        Shop shop = Shop.builder()
+                                .brand(brandRepository.findByBrandName("기타").get())
+                                .placeName(placeName)
+                                .roadAddressName(null)
+                                .favoriteCnt(0)
+                                .reviewCnt(0)
+                                .starRatingAvg(0.0)
+                                .build();
+                        shopRepository.save(shop);
+                        log.info("persist >> placeName:{}, roadAddressName:{}", placeName, null);
+                    }
+                }
+            }
+            log.info("====End Selpix Crawling===");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
