@@ -33,7 +33,7 @@ public class ShopService {
     public <T extends ResponseShop> List<T> compareWithDbShops(List<KakaoMapSearchDto> apiShops, Class<T> responseClass) {
         List<T> resultShop = new ArrayList<>();
         for (KakaoMapSearchDto apiShop: apiShops) {
-            Shop dbShop = compareRoadAddressNameAndPlaceName(apiShop);
+            Shop dbShop = compareWithRoadAddressNameOrPlaceName(apiShop);
 
             if(dbShop != null) {
                 if(responseClass.equals(ResponseShopKeyword.class)) {
@@ -49,8 +49,8 @@ public class ShopService {
     }
 
     @Transactional(readOnly = true)
-    public Shop compareRoadAddressNameAndPlaceName(KakaoMapSearchDto apiShop) {
-        return shopRepository.findDistinctByRoadAddressNameAndPlaceNameContaining(
+    public Shop compareWithRoadAddressNameOrPlaceName(KakaoMapSearchDto apiShop) {
+        return shopRepository.findDistinctByPlaceNameOrRoadAddressNameContaining(
                 apiShop.getRoadAddressName(),
                 apiShop.getPlaceName().split(" ")[0]
         ).orElse(null);
