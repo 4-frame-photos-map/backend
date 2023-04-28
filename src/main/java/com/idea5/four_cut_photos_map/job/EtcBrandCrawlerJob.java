@@ -26,7 +26,7 @@ public class EtcBrandCrawlerJob {
     private final ShopRepository shopRepository;
     private final BrandRepository brandRepository;
 
-    @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
+    @Scheduled(cron = "0 0 3 2 5,11 *") // 매년 5월과 11월 2일 새벽 3시 실행
     public void crawlShopInfo() {
         // InsPhoto 크롤링
         String url = "https://insphoto.co.kr/locations/";
@@ -80,9 +80,8 @@ public class EtcBrandCrawlerJob {
                 if (placeName.endsWith("점")) {
                     placeName = "인스포토" + " " + placeName; // 브랜드명 추가
                     String roadAddressName = element.selectFirst("span:last-child").text();
-                    roadAddressName = roadAddressName.split(",")[0]; // 상세주소 제거
 
-                    saveOrUpdateShop(placeName, roadAddressName);
+                    saveOrUpdateShop(placeName, formatAddress(roadAddressName));
                 }
             }
             log.info("====End InsPhoto Crawling===");
@@ -192,7 +191,6 @@ public class EtcBrandCrawlerJob {
 
                 if (placeName.endsWith("점")) {
                     String roadAddressName = pElement.get(1).select("span").text();
-                    roadAddressName = roadAddressName.contains(",") ? roadAddressName.split(",")[0] : roadAddressName;
 
                     // 두번째 공백이 있다면 첫번째 공백 이후부터 두번째 공백 시작까지 제거
                     // 세번째 공백이 있다면 세번째 공백 제거
@@ -206,7 +204,8 @@ public class EtcBrandCrawlerJob {
                                 placeName = placeName.substring(0, secondIndex + 1) + placeName.substring(thirdIndex + 1);
                             }
                         }
-                        saveOrUpdateShop(placeName, roadAddressName);
+
+                        saveOrUpdateShop(placeName, formatAddress(roadAddressName));
                     }
                 }
             }
@@ -245,9 +244,7 @@ public class EtcBrandCrawlerJob {
                     String placeName = element.select("h2 span.wixui-rich-text__text").text();
                     if (placeName.endsWith("점")) {
                         String roadAddressName = element.select("p span.wixui-rich-text__text").text();
-                        roadAddressName = roadAddressName.contains("대한민국 ") ? roadAddressName.replace("대한민국 ", "") : roadAddressName;
-
-                       saveOrUpdateShop(placeName, roadAddressName);
+                        saveOrUpdateShop(placeName, formatAddress(roadAddressName));
                     }
                 }
             }
@@ -281,11 +278,7 @@ public class EtcBrandCrawlerJob {
                     if (placeName.endsWith("점")) {
                         String roadAddressName = element.selectFirst("div.p_group p").text();
 
-                        // 상세주소 제거(마지막 숫자 이후 문자열 제거)
-                        int lastIndex = roadAddressName.replaceAll("[^\\d]+$", "").length();
-                        roadAddressName = roadAddressName.substring(0, lastIndex);
-
-                        saveOrUpdateShop(placeName, roadAddressName);
+                        saveOrUpdateShop(placeName, formatAddress(roadAddressName));
                     }
                 }
             }
@@ -325,6 +318,25 @@ public class EtcBrandCrawlerJob {
         } catch (Exception e) {
             log.error("An error occurred during the crawling process: {}", e.getMessage());
         }
+    }
+
+    private String formatAddress(String roadAddressName) {
+        if(roadAddressName.contains("대한민국 ")) {
+            roadAddressName.replace("대한민국 ", "");
+        }
+
+        if(roadAddressName.contains(",")) {
+            roadAddressName = roadAddressName.split(",")[0];
+        }
+
+
+        if (roadAddressName.matches(".*\\d.*")) {
+            // 마지막 숫자 이후 문자열 제거
+            int lastIndex = roadAddressName.replaceAll("[^\\d]+$", "").length();
+            roadAddressName = roadAddressName.substring(0, lastIndex);
+        }
+
+        return roadAddressName;
     }
 
     private void saveOrUpdateShop(String placeName, String roadAddressName) {
