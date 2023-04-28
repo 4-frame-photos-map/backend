@@ -5,6 +5,7 @@ import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -226,7 +227,7 @@ public class EtcBrandCrawlerJob {
         }
     }
 
-    //    @Scheduled(cron = "0 * * * * *")
+//        @Scheduled(cron = "0 * * * * *")
     @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
     public void getPhotoLapPlusHubInfo() {
         log.info("====Start PhotoLapPlus Crawling===");
@@ -236,8 +237,15 @@ public class EtcBrandCrawlerJob {
             String baseUrl = "https://www.photolabplus.co.kr/";
 
             for (int pageNum = 1; pageNum <= maxPageNum; pageNum++) {
-                String url = pageNum != 6 ? baseUrl + "location1-" + pageNum : baseUrl + "1-" + pageNum;
-                Document doc = Jsoup.connect(url).get();
+                String url = baseUrl + "location1-" + pageNum;
+                Document doc = null;
+
+                try {
+                    doc = Jsoup.connect(url).get();
+                } catch (HttpStatusException e) {
+                    url = baseUrl + "1-" + pageNum;
+                    doc = Jsoup.connect(url).get();
+                }
                 Elements elements = doc.select("div.Zc7IjY");
 
                 for (Element element : elements) {
