@@ -20,8 +20,8 @@ public class CrawlController {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-        lifefourcutsCrawlService.crawl();
-//        harufilmCrawlService.crawl();
+//        lifefourcutsCrawlService.crawl();
+        harufilmCrawlService.crawl();
 //        photoismCrawlService.crawl();
 //        photograyCrawlService.crawl();
 

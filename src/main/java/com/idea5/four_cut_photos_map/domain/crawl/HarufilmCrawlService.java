@@ -1,5 +1,10 @@
 package com.idea5.four_cut_photos_map.domain.crawl;
 
+import com.idea5.four_cut_photos_map.domain.brand.entity.Brand;
+import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
+import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
+import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
+import lombok.RequiredArgsConstructor;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -10,10 +15,15 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 
 @Service
+@RequiredArgsConstructor
 public class HarufilmCrawlService implements CrawlService {
+    private final ShopRepository shopRepository;
+    private final BrandRepository brandRepository;
+
     public void crawl() {
-        int cnt = 0;
         int[] codes = {202, 203, 204, 205, 206, 207, 208, 209};
+        Brand brand = brandRepository.findById(2L).orElse(null);
+
         for(int code : codes) {
             String url = "http://harufilm.com/" + code;
             Connection conn = Jsoup.connect(url);
@@ -24,17 +34,22 @@ public class HarufilmCrawlService implements CrawlService {
 
                 for (Element element : titles) {
                     String address = element.select("span.body").text().trim();
-                    String placeNameAddress = element.text();
-//                    String placeName = (placeNameAddress.substring(0, placeNameAddress.length() - address.length()));
                     String placeName = "하루필름 " + element.text().replace(address, "").trim();
-                    System.out.println(address);
-                    System.out.println(placeName);
-                    cnt++;
+                    // 지점명으로 중복 검사
+                    if (shopRepository.existsByPlaceName(placeName)) continue;
+                    Shop shop = Shop.builder()
+                            .placeName(placeName)
+                            .roadAddressName(address)
+                            .brand(brand)
+                            .favoriteCnt(0)
+                            .reviewCnt(0)
+                            .starRatingAvg(0.0)
+                            .build();
+                    shopRepository.save(shop);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        System.out.println("cnt = " + cnt);
     }
 }
