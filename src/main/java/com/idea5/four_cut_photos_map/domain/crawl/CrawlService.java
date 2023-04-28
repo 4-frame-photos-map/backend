@@ -11,19 +11,26 @@ import java.io.IOException;
 
 @Service
 public class CrawlService {
-    public void htmlCrawl() {
-        String url = "http://harufilm.com/202";
-        Connection conn = Jsoup.connect(url);
+    public void harufilmCrawl() {
+        for(int i = 202; i <= 209; i++) {
+            String url = "http://harufilm.com/" + i;
+            Connection conn = Jsoup.connect(url);
 
-        try {
-            Document document = conn.get();
-            Elements titles = document.select("p.title");
+            try {
+                Document document = conn.get();
+                Elements titles = document.select("p.title");
 
-            for (Element element : titles) {
-                System.out.println(element.text());
+                for (Element element : titles) {
+                    String address = element.select("span.body").text();
+                    String placeNameAddress = element.text();
+//                    String placeName = (placeNameAddress.substring(0, placeNameAddress.length() - address.length()));
+                    String placeName = "인생네컷 " + element.text().replace(address, "").trim();
+                    System.out.println(address);
+                    System.out.println(placeName);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         System.out.println();
     }
