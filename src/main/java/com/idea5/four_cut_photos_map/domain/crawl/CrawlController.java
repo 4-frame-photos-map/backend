@@ -21,8 +21,8 @@ public class CrawlController {
         stopWatch.start();
 
 //        lifefourcutsCrawlService.crawl();
-        harufilmCrawlService.crawl();
-//        photoismCrawlService.crawl();
+//        harufilmCrawlService.crawl();
+        photoismCrawlService.crawl();
 //        photograyCrawlService.crawl();
 
         stopWatch.stop();

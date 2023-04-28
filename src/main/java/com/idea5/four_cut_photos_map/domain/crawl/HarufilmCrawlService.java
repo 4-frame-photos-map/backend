@@ -11,6 +11,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
@@ -20,6 +21,7 @@ public class HarufilmCrawlService implements CrawlService {
     private final ShopRepository shopRepository;
     private final BrandRepository brandRepository;
 
+    @Transactional
     public void crawl() {
         int[] codes = {202, 203, 204, 205, 206, 207, 208, 209};
         Brand brand = brandRepository.findById(2L).orElse(null);
