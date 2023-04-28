@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,152 +27,164 @@ public class EtcBrandCrawlerJob {
     private final BrandRepository brandRepository;
 
     @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
-    public void getInsPhotoHubInfo() {
+    public void crawlShopInfo() {
+        // InsPhoto 크롤링
+        String url = "https://insphoto.co.kr/locations/";
+        crawlInsPhotoShopInfo(url);
+
+        // Selpix 크롤링
+        url = "http://m.selpix.co.kr/shop_add_page/index.htm?page_code=page16&me_popup=1";
+        crawlSelpixShopInfo(url);
+
+        // PhotoStreet 크롤링
+        int maxPageNum = 5;
+        String baseUrl = "https://photostreet.co.kr/?page_id=930&mode=list&board_page=";
+        crawlPhotoStreetShopInfo(baseUrl, maxPageNum);
+
+        // PhotoDrink 크롤링
+        url = "https://photodrink.com/LOCATION";
+        crawlPhotoDrinkShopInfo(url);
+
+        // PhotoLapPlus 크롤링
+        maxPageNum = 8;
+        baseUrl = "https://www.photolabplus.co.kr/";
+        crawlPhotoLapPlusShopInfo(baseUrl, maxPageNum);
+
+        // PlayInTheBox 크롤링
+        maxPageNum = 3;
+        baseUrl = "https://www.playinthebox.co.kr/39/?sort=NAME&keyword_type=all&page=";
+        crawlPlayInTheBoxShopInfo(baseUrl, maxPageNum);
+
+        // HarryPhoto 크롤링
+        url = "http://www.harryphoto.co.kr/";
+        crawlHarryPhotoShopInfo(url);
+    }
+
+    private void crawlInsPhotoShopInfo(String url) {
         log.info("====Start InsPhoto Crawling===");
         try {
-            String url = "https://insphoto.co.kr/locations/";
             Document doc = Jsoup.connect(url).get();
-            Elements elements = doc.select("div.container div p");
+            if (doc == null) {
+                log.error("Failed to parse the document from the URL: {}", url);
+                return;
+            }
+
+            Elements elements = doc.select("div.container div p:has(span:first-child)");
+            if (elements == null || elements.isEmpty()) {
+                log.error("No elements were found with the specified selector: {}", url);
+                return;
+            }
 
             for (Element element : elements) {
-                Element spanElement = element.selectFirst("span");
-                if (spanElement == null || spanElement.text().isEmpty()) {
-                    break;
-                }
+                String placeName = element.selectFirst("span").text();
+                if (placeName.endsWith("점")) {
+                    placeName = "인스포토" + " " + placeName; // 브랜드명 추가
+                    String roadAddressName = element.selectFirst("span:last-child").text();
+                    roadAddressName = roadAddressName.split(",")[0]; // 상세주소 제거
 
-                String placeName = spanElement.text();
-                String roadAddressName = element.select("span:last-child").text();
-                placeName = roadAddressName.split(",")[1] + " " + placeName; // 브랜드명 추가
-                roadAddressName = roadAddressName.split(",")[0]; // 상세주소 제거
-
-                Shop oldShop = shopRepository.findByPlaceName(placeName).orElse(null);
-                if (oldShop == null) {
-                    Shop shop = Shop.builder()
-                            .brand(brandRepository.findByBrandName("기타").get())
-                            .placeName(placeName)
-                            .roadAddressName(roadAddressName)
-                            .favoriteCnt(0)
-                            .reviewCnt(0)
-                            .starRatingAvg(0.0)
-                            .build();
-                    shopRepository.save(shop);
-                    log.info("persist >> placeName:{}, roadAddressName:{}", placeName, roadAddressName);
-                } else {
-                    String changedFields = "";
-                    if (!oldShop.getRoadAddressName().equals(roadAddressName)) {
-                        oldShop.setRoadAddressName(roadAddressName);
-                        changedFields += "roadAddressName, ";
-                    }
-                    if (!changedFields.equals("")) {
-                        changedFields = changedFields.substring(0, changedFields.length() - 2); // 마지막 쉼표 제거
-                        shopRepository.save(oldShop);
-                        log.info("merge >> id:{}, changed fields: {}", oldShop.getId(), changedFields);
-                    }
+                    saveOrUpdateShop(placeName, roadAddressName);
                 }
             }
             log.info("====End InsPhoto Crawling===");
+        } catch (IOException e) {
+            log.error("Failed to connect to the URL: {}", e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("An error occurred during the crawling process: {}", e.getMessage());
         }
     }
 
-    @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
-    public void getSelpixHubInfo() {
+    private void crawlSelpixShopInfo(String url) {
         log.info("====Start Selpix Crawling===");
         try {
-            String url = "http://m.selpix.co.kr/shop_add_page/index.htm?page_code=page16&me_popup=1";
             Document doc = Jsoup.connect(url).get();
+            if (doc == null) {
+                log.error("Failed to parse the document from the URL: {}", url);
+                return;
+            }
+
             Elements elements = doc.select("span.subject");
+            if (elements == null || elements.isEmpty()) {
+                log.warn("No elements were found with the specified selector: {}", url);
+                return;
+            }
 
             for (Element element : elements) {
-                if (element.text().endsWith("점")) {
-                    String placeName = element.text();
+                String placeName = element.text();
+                if (placeName.endsWith("점")) {
                     placeName = placeName.contains(" ") ? placeName.split(" ")[1] : placeName; // 지역명 분리
                     placeName = "셀픽스" + " " + placeName; // 브랜드명 추가
 
-                    if (!shopRepository.existsByPlaceName(placeName)) {
-                        Shop shop = Shop.builder()
-                                .brand(brandRepository.findByBrandName("기타").get())
-                                .placeName(placeName)
-                                .roadAddressName(null)
-                                .favoriteCnt(0)
-                                .reviewCnt(0)
-                                .starRatingAvg(0.0)
-                                .build();
-                        shopRepository.save(shop);
-                        log.info("persist >> placeName:{}, roadAddressName:{}", placeName, null);
-                    }
+                    createShopIfNotExists(placeName);
                 }
             }
             log.info("====End Selpix Crawling===");
+        } catch (IOException e) {
+            log.error("Failed to connect to the URL: {}", e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("An error occurred during the crawling process: {}", e.getMessage());
         }
     }
 
-    @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
-    public void getPhotoStreetHubInfo() {
+    private void crawlPhotoStreetShopInfo(String baseUrl, int maxPageNum) {
         log.info("====Start PhotoStreet Crawling===");
-
         try {
-            int maxPageNum = 5;
-            String baseUrl = "https://photostreet.co.kr/?page_id=930&mode=list&board_page=";
-
             for (int pageNum = 1; pageNum <= maxPageNum; pageNum++) {
                 String url = baseUrl + pageNum;
                 Document doc = Jsoup.connect(url).get();
+                if (doc == null) {
+                    log.error("Failed to parse the document from the URL: {}", url);
+                    return;
+                }
+
                 Elements elements = doc.select("td.text-left a span");
+                if (elements == null || elements.isEmpty()) {
+                    log.warn("No elements were found with the specified selector: {}", url);
+                    continue;
+                }
 
                 for (Element element : elements) {
                     String placeName = element.text();
-                    if (placeName.endsWith("점") && !placeName.endsWith("호점")) {
+                    placeName = placeName.contains("(") ? placeName.split("\\(")[0] : placeName;
+
+                    if (!placeName.contains("오픈예정")) {
                         // 지역명과 점포번호 분리
-                        String[] patterns = {"\\d+호\\s+(.*)", "\\d+호점\\s+(.*)"};
-                        Pattern[] regexes = new Pattern[patterns.length];
-                        for (int i = 0; i < patterns.length; i++) {
-                            regexes[i] = Pattern.compile(patterns[i]);
-                        }
+                        Pattern[] regexes = {
+                                Pattern.compile("\\d+호\\s+(.*)"),
+                                Pattern.compile("\\d+호점\\s+(.*)")
+                        };
                         for (Pattern regex : regexes) {
                             Matcher matcher = regex.matcher(placeName);
                             if (matcher.find()) {
-                                placeName = matcher.group(1);
+                                placeName = "포토스트리트 " + matcher.group(1);
+                                createShopIfNotExists(placeName);
                                 break;
-                            }
-                        }
-                        // 공백이나 대괄호 포함하는 경우 제외
-                        if (placeName.matches("^[^\\[\\]\\s]+$")) {
-                            placeName = "포토스트리트" + " " + placeName; // 브랜드명 추가
-
-                            if (!shopRepository.existsByPlaceName(placeName)) {
-                                Shop shop = Shop.builder()
-                                        .brand(brandRepository.findByBrandName("기타").get())
-                                        .placeName(placeName)
-                                        .roadAddressName(null)
-                                        .favoriteCnt(0)
-                                        .reviewCnt(0)
-                                        .starRatingAvg(0.0)
-                                        .build();
-                                shopRepository.save(shop);
-                                log.info("persist >> placeName:{}, roadAddressName:{}", placeName, null);
                             }
                         }
                     }
                 }
             }
             log.info("====End PhotoStreet Crawling===");
+        } catch (IOException e) {
+            log.error("Failed to connect to the URL: {}", e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("An error occurred during the crawling process: {}", e.getMessage());
         }
     }
 
-    @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
-    public void getPhotoDrinkHubInfo() {
+    private void crawlPhotoDrinkShopInfo(String url) {
         log.info("====Start PhotoDrink Crawling===");
-
         try {
-            String url = "https://photodrink.com/LOCATION";
             Document doc = Jsoup.connect(url).get();
+            if (doc == null) {
+                log.error("Failed to parse the document from the URL: {}", url);
+                return;
+            }
+
             Elements elements = doc.select("div.text-table div");
+            if (elements == null || elements.isEmpty()) {
+                log.warn("No elements were found with the specified selector: {}", url);
+                return;
+            }
 
             for (Element element : elements) {
                 Elements pElement = element.select("p");
@@ -193,112 +206,76 @@ public class EtcBrandCrawlerJob {
                                 placeName = placeName.substring(0, secondIndex + 1) + placeName.substring(thirdIndex + 1);
                             }
                         }
-
-                        Shop oldShop = shopRepository.findByPlaceName(placeName).orElse(null);
-                        if (oldShop == null) {
-                            Shop shop = Shop.builder()
-                                    .brand(brandRepository.findByBrandName("기타").get())
-                                    .placeName(placeName)
-                                    .roadAddressName(roadAddressName)
-                                    .favoriteCnt(0)
-                                    .reviewCnt(0)
-                                    .starRatingAvg(0.0)
-                                    .build();
-                            shopRepository.save(shop);
-                            log.info("persist >> placeName:{}, roadAddressName:{}", placeName, roadAddressName);
-                        } else {
-                            String changedFields = "";
-                            if (!oldShop.getRoadAddressName().equals(roadAddressName)) {
-                                oldShop.setRoadAddressName(roadAddressName);
-                                changedFields += "roadAddressName, ";
-                            }
-                            if (!changedFields.equals("")) {
-                                changedFields = changedFields.substring(0, changedFields.length() - 2);
-                                shopRepository.save(oldShop);
-                                log.info("merge >> id:{}, changed fields: {}", oldShop.getId(), changedFields);
-                            }
-                        }
+                        saveOrUpdateShop(placeName, roadAddressName);
                     }
                 }
             }
             log.info("====End PhotoDrink Crawling===");
+        } catch (IOException e) {
+            log.error("Failed to connect to the URL: {}", e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("An error occurred during the crawling process: {}", e.getMessage());
         }
     }
 
-    @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
-    public void getPhotoLapPlusHubInfo() {
+    private void crawlPhotoLapPlusShopInfo(String baseUrl, int maxPageNum) {
         log.info("====Start PhotoLapPlus Crawling===");
-
         try {
-            int maxPageNum = 8;
-            String baseUrl = "https://www.photolabplus.co.kr/";
-
             for (int pageNum = 1; pageNum <= maxPageNum; pageNum++) {
                 String url = baseUrl + "location1-" + pageNum;
                 Document doc = null;
-
                 try {
                     doc = Jsoup.connect(url).get();
+                    if (doc == null) {
+                        log.error("Failed to parse the document from the URL: {}", url);
+                        return;
+                    }
                 } catch (HttpStatusException e) {
                     url = baseUrl + "1-" + pageNum;
                     doc = Jsoup.connect(url).get();
                 }
+
                 Elements elements = doc.select("div.Zc7IjY");
+                if (elements == null || elements.isEmpty()) {
+                    log.warn("No elements were found with the specified selector: {}", url);
+                    continue;
+                }
 
                 for (Element element : elements) {
                     String placeName = element.select("h2 span.wixui-rich-text__text").text();
-
                     if (placeName.endsWith("점")) {
                         String roadAddressName = element.select("p span.wixui-rich-text__text").text();
                         roadAddressName = roadAddressName.contains("대한민국 ") ? roadAddressName.replace("대한민국 ", "") : roadAddressName;
 
-                        Shop oldShop = shopRepository.findByPlaceName(placeName).orElse(null);
-                        if (oldShop == null) {
-                            Shop shop = Shop.builder()
-                                    .brand(brandRepository.findByBrandName("기타").get())
-                                    .placeName(placeName)
-                                    .roadAddressName(roadAddressName)
-                                    .favoriteCnt(0)
-                                    .reviewCnt(0)
-                                    .starRatingAvg(0.0)
-                                    .build();
-                            shopRepository.save(shop);
-                            log.info("persist >> placeName:{}, roadAddressName:{}", placeName, roadAddressName);
-                        } else {
-                            String changedFields = "";
-                            if (!oldShop.getRoadAddressName().equals(roadAddressName)) {
-                                oldShop.setRoadAddressName(roadAddressName);
-                                changedFields += "roadAddressName, ";
-                            }
-                            if (!changedFields.equals("")) {
-                                changedFields = changedFields.substring(0, changedFields.length() - 2);
-                                shopRepository.save(oldShop);
-                                log.info("merge >> id:{}, changed fields: {}", oldShop.getId(), changedFields);
-                            }
-                        }
+                       saveOrUpdateShop(placeName, roadAddressName);
                     }
                 }
             }
             log.info("====End PhotoLapPlus Crawling===");
+        } catch (IOException e) {
+            log.error("Failed to connect to the URL: {}", e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("An error occurred during the crawling process: {}", e.getMessage());
         }
     }
 
-    @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
-    public void getPlayInTheBoxHubInfo() {
+    private void crawlPlayInTheBoxShopInfo(String baseUrl, int maxPageNum) {
         log.info("====Start PlayInTheBox Crawling===");
-
         try {
-            int maxPageNum = 3;
-            String baseUrl = "https://www.playinthebox.co.kr/39/?sort=NAME&keyword_type=all&page=";
-
             for (int pageNum = 1; pageNum <= maxPageNum; pageNum++) {
                 String url = baseUrl + pageNum;
                 Document  doc = Jsoup.connect(url).get();
+                if (doc == null) {
+                    log.error("Failed to parse the document from the URL: {}", url);
+                    return;
+                }
+
                 Elements elements = doc.select("div.map_contents.inline-blocked");
+                if (elements == null || elements.isEmpty()) {
+                    log.warn("No elements were found with the specified selector: {}", url);
+                    continue;
+                }
+
                 for (Element element : elements) {
                     String placeName = element.select("a.map_link.blocked div.head div.tit").text();
                     if (placeName.endsWith("점")) {
@@ -308,82 +285,87 @@ public class EtcBrandCrawlerJob {
                         int lastIndex = roadAddressName.replaceAll("[^\\d]+$", "").length();
                         roadAddressName = roadAddressName.substring(0, lastIndex);
 
-                        Shop oldShop = shopRepository.findByPlaceName(placeName).orElse(null);
-                        if (oldShop == null) {
-                            Shop shop = Shop.builder()
-                                    .brand(brandRepository.findByBrandName("기타").get())
-                                    .placeName(placeName)
-                                    .roadAddressName(roadAddressName)
-                                    .favoriteCnt(0)
-                                    .reviewCnt(0)
-                                    .starRatingAvg(0.0)
-                                    .build();
-                            shopRepository.save(shop);
-                            log.info("persist >> placeName:{}, roadAddressName:{}", placeName, roadAddressName);
-                        } else {
-                            String changedFields = "";
-                            if (!oldShop.getRoadAddressName().equals(roadAddressName)) {
-                                oldShop.setRoadAddressName(roadAddressName);
-                                changedFields += "roadAddressName, ";
-                            }
-                            if (!changedFields.equals("")) {
-                                changedFields = changedFields.substring(0, changedFields.length() - 2);
-                                shopRepository.save(oldShop);
-                                log.info("merge >> id:{}, changed fields: {}", oldShop.getId(), changedFields);
-                            }
-                        }
+                        saveOrUpdateShop(placeName, roadAddressName);
                     }
                 }
             }
             log.info("====End PlayInTheBox Crawling===");
+        } catch (IOException e) {
+            log.error("Failed to connect to the URL: {}", e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("An error occurred during the crawling process: {}", e.getMessage());
         }
     }
 
-//      @Scheduled(cron = "0 * * * * *")
-    @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
-    public void getHarryPhotoHubInfo() {
+    private void crawlHarryPhotoShopInfo(String url) {
         log.info("====Start HarryPhoto Crawling===");
-
         try {
-            String url = "http://www.harryphoto.co.kr/";
-                Document  doc = Jsoup.connect(url).get();
-                Elements elements = doc.select("dl");
-                for (Element element : elements) {
-                    String placeName = element.select("dt").text();
-                    if (placeName.endsWith("점")) {
-                        String roadAddressName = element.selectFirst("dd").text();
+            Document  doc = Jsoup.connect(url).get();
+            if (doc == null) {
+                log.error("Failed to parse the document from the URL: {}", url);
+                return;
+            }
 
-                        Shop oldShop = shopRepository.findByPlaceName(placeName).orElse(null);
-                        if (oldShop == null) {
-                            Shop shop = Shop.builder()
-                                    .brand(brandRepository.findByBrandName("기타").get())
-                                    .placeName(placeName)
-                                    .roadAddressName(roadAddressName)
-                                    .favoriteCnt(0)
-                                    .reviewCnt(0)
-                                    .starRatingAvg(0.0)
-                                    .build();
-                            shopRepository.save(shop);
-                            log.info("persist >> placeName:{}, roadAddressName:{}", placeName, roadAddressName);
-                        } else {
-                            String changedFields = "";
-                            if (!oldShop.getRoadAddressName().equals(roadAddressName)) {
-                                oldShop.setRoadAddressName(roadAddressName);
-                                changedFields += "roadAddressName, ";
-                            }
-                            if (!changedFields.equals("")) {
-                                changedFields = changedFields.substring(0, changedFields.length() - 2);
-                                shopRepository.save(oldShop);
-                                log.info("merge >> id:{}, changed fields: {}", oldShop.getId(), changedFields);
-                            }
-                        }
-                    }
+            Elements elements = doc.select("dl");
+            if (elements == null || elements.isEmpty()) {
+                log.warn("No elements were found with the specified selector: {}", url);
+                return;
+            }
+
+            for (Element element : elements) {
+                String placeName = element.select("dt").text();
+                if (placeName.endsWith("점")) {
+                    String roadAddressName = element.selectFirst("dd").text();
+                    saveOrUpdateShop(placeName, roadAddressName);
                 }
+            }
             log.info("====End HarryPhoto Crawling===");
+        } catch (IOException e) {
+            log.error("Failed to connect to the URL: {}", e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("An error occurred during the crawling process: {}", e.getMessage());
+        }
+    }
+
+    private void saveOrUpdateShop(String placeName, String roadAddressName) {
+        Shop oldShop = shopRepository.findByPlaceName(placeName).orElse(null);
+        if (oldShop == null) {
+            Shop shop = Shop.builder()
+                    .brand(brandRepository.findByBrandName("기타").get())
+                    .placeName(placeName)
+                    .roadAddressName(roadAddressName)
+                    .favoriteCnt(0)
+                    .reviewCnt(0)
+                    .starRatingAvg(0.0)
+                    .build();
+            shopRepository.save(shop);
+            log.info("persist >> placeName:{}, roadAddressName:{}", placeName, roadAddressName);
+        } else {
+            String changedFields = "";
+            if (!oldShop.getRoadAddressName().equals(roadAddressName)) {
+                oldShop.setRoadAddressName(roadAddressName);
+                changedFields += "roadAddressName, ";
+            }
+            if (!changedFields.equals("")) {
+                changedFields = changedFields.substring(0, changedFields.length() - 2); // 마지막 쉼표 제거
+                shopRepository.save(oldShop);
+                log.info("merge >> id:{}, changed fields: {}", oldShop.getId(), changedFields);
+            }
+        }
+    }
+
+    private void createShopIfNotExists(String placeName) {
+        if (!shopRepository.existsByPlaceName(placeName)) {
+            Shop shop = Shop.builder()
+                    .brand(brandRepository.findByBrandName("기타").get())
+                    .placeName(placeName)
+                    .roadAddressName(null)
+                    .favoriteCnt(0)
+                    .reviewCnt(0)
+                    .starRatingAvg(0.0)
+                    .build();
+            shopRepository.save(shop);
+            log.info("persist >> placeName:{}, roadAddressName:{}", placeName, null);
         }
     }
 }
