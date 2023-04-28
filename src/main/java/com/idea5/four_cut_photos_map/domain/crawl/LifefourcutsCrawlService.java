@@ -36,6 +36,7 @@ public class LifefourcutsCrawlService implements CrawlService {
                 for (Element e : titles) {
                     String placeName = "인생네컷 " + e.select("div.tit").text().trim();
                     String address = e.select("p.adress").text().trim();
+//                    String address = Util.getRoadAddressName(e.select("p.adress").text());
                     // 지점명으로 중복 검사
                     if (shopRepository.existsByPlaceName(placeName)) continue;
                     Shop shop = Shop.builder()
