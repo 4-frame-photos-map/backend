@@ -25,8 +25,8 @@ public class EtcBrandCrawlerJob {
     private final BrandRepository brandRepository;
 
     @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
-    public void getInsphotoHubInfo() {
-        log.info("====Start Insphoto Crawling===");
+    public void getInsPhotoHubInfo() {
+        log.info("====Start InsPhoto Crawling===");
         try {
             String url = "https://insphoto.co.kr/locations/";
             Document doc = Jsoup.connect(url).get();
@@ -68,14 +68,14 @@ public class EtcBrandCrawlerJob {
                     }
                 }
             }
-            log.info("====End Insphoto Crawling===");
+            log.info("====End InsPhoto Crawling===");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
-    public void getSelpixHubInfo(){
+    public void getSelpixHubInfo() {
         log.info("====Start Selpix Crawling===");
         try {
             String url = "http://m.selpix.co.kr/shop_add_page/index.htm?page_code=page16&me_popup=1";
@@ -85,7 +85,7 @@ public class EtcBrandCrawlerJob {
             for (Element element : elements) {
                 if (element.text().endsWith("점")) {
                     String placeName = element.text();
-                    placeName = placeName.contains(" ")? placeName.split(" ")[1] : placeName; // 지역명 분리
+                    placeName = placeName.contains(" ") ? placeName.split(" ")[1] : placeName; // 지역명 분리
                     placeName = "셀픽스" + " " + placeName; // 브랜드명 추가
 
                     if (!shopRepository.existsByPlaceName(placeName)) {
@@ -109,8 +109,8 @@ public class EtcBrandCrawlerJob {
     }
 
     @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
-    public void getPhotostreetHubInfo(){
-        log.info("====Start Photostreet Crawling===");
+    public void getPhotoStreetHubInfo() {
+        log.info("====Start PhotoStreet Crawling===");
 
         try {
             int maxPageNum = 5;
@@ -157,16 +157,15 @@ public class EtcBrandCrawlerJob {
                     }
                 }
             }
-            log.info("====End Photostreet Crawling===");
+            log.info("====End PhotoStreet Crawling===");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-//    @Scheduled(cron = "0 * * * * *")
     @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
-    public void getPhotodrinkHubInfo() {
-        log.info("====Start Photodrink Crawling===");
+    public void getPhotoDrinkHubInfo() {
+        log.info("====Start PhotoDrink Crawling===");
 
         try {
             String url = "https://photodrink.com/LOCATION";
@@ -221,7 +220,61 @@ public class EtcBrandCrawlerJob {
                     }
                 }
             }
-            log.info("====End Photodrink Crawling===");
+            log.info("====End PhotoDrink Crawling===");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    //    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 3 2 6,12 *") // 매년 6월과 12월 2일 새벽 3시 실행
+    public void getPhotoLapPlusHubInfo() {
+        log.info("====Start PhotoLapPlus Crawling===");
+
+        try {
+            int maxPageNum = 8;
+            String baseUrl = "https://www.photolabplus.co.kr/";
+
+            for (int pageNum = 1; pageNum <= maxPageNum; pageNum++) {
+                String url = pageNum != 6 ? baseUrl + "location1-" + pageNum : baseUrl + "1-" + pageNum;
+                Document doc = Jsoup.connect(url).get();
+                Elements elements = doc.select("div.Zc7IjY");
+
+                for (Element element : elements) {
+                    String placeName = element.select("h2 span.wixui-rich-text__text").text();
+
+                    if (placeName.endsWith("점")) {
+                        String roadAddressName = element.select("p span.wixui-rich-text__text").text();
+                        roadAddressName = roadAddressName.contains("대한민국 ") ? roadAddressName.replace("대한민국 ", "") : roadAddressName;
+
+                        Shop oldShop = shopRepository.findByPlaceName(placeName).orElse(null);
+                        if (oldShop == null) {
+                            Shop shop = Shop.builder()
+                                    .brand(brandRepository.findByBrandName("기타").get())
+                                    .placeName(placeName)
+                                    .roadAddressName(roadAddressName)
+                                    .favoriteCnt(0)
+                                    .reviewCnt(0)
+                                    .starRatingAvg(0.0)
+                                    .build();
+                            shopRepository.save(shop);
+                            log.info("persist >> placeName:{}, roadAddressName:{}", placeName, roadAddressName);
+                        } else {
+                            String changedFields = "";
+                            if (!oldShop.getRoadAddressName().equals(roadAddressName)) {
+                                oldShop.setRoadAddressName(roadAddressName);
+                                changedFields += "roadAddressName, ";
+                            }
+                            if (!changedFields.equals("")) {
+                                changedFields = changedFields.substring(0, changedFields.length() - 2);
+                                shopRepository.save(oldShop);
+                                log.info("merge >> id:{}, changed fields: {}", oldShop.getId(), changedFields);
+                            }
+                        }
+                    }
+                }
+            }
+            log.info("====End PhotoLapPlus Crawling===");
         } catch (Exception e) {
             e.printStackTrace();
         }
