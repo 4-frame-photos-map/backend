@@ -47,7 +47,7 @@ public class EtcBrandCrawlerJob {
 
         // PhotoLapPlus 크롤링
         maxPageNum = 8;
-        baseUrl = "https://www.photolabplus.co.kr/";
+        baseUrl = "https://www.photolabplus.co.kr/location1-";
         crawlPhotoLapPlusShopInfo(baseUrl, maxPageNum);
 
         // PlayInTheBox 크롤링
@@ -63,30 +63,19 @@ public class EtcBrandCrawlerJob {
     private void crawlInsPhotoShopInfo(String url) {
         log.info("====Start InsPhoto Crawling===");
         try {
-            Document doc = Jsoup.connect(url).get();
-            if (doc == null) {
-                log.error("Failed to parse the document from the URL: {}", url);
-                return;
-            }
-
-            Elements elements = doc.select("div.container div p:has(span:first-child)");
-            if (elements == null || elements.isEmpty()) {
-                log.error("No elements were found with the specified selector: {}", url);
-                return;
-            }
+            Document doc = connectToUrl(url);
+            Elements elements = selectElements(doc, "div.container div p:has(span:first-child)", url);
 
             for (Element element : elements) {
                 String placeName = element.selectFirst("span").text();
                 if (placeName.endsWith("점")) {
-                    placeName = "인스포토" + " " + placeName; // 브랜드명 추가
+                    placeName = "인스포토 " + placeName;
                     String roadAddressName = element.selectFirst("span:last-child").text();
 
                     saveOrUpdateShop(placeName, formatAddress(roadAddressName));
                 }
             }
             log.info("====End InsPhoto Crawling===");
-        } catch (IOException e) {
-            log.error("Failed to connect to the URL: {}", e.getMessage());
         } catch (Exception e) {
             log.error("An error occurred during the crawling process: {}", e.getMessage());
         }
@@ -95,30 +84,19 @@ public class EtcBrandCrawlerJob {
     private void crawlSelpixShopInfo(String url) {
         log.info("====Start Selpix Crawling===");
         try {
-            Document doc = Jsoup.connect(url).get();
-            if (doc == null) {
-                log.error("Failed to parse the document from the URL: {}", url);
-                return;
-            }
-
-            Elements elements = doc.select("span.subject");
-            if (elements == null || elements.isEmpty()) {
-                log.warn("No elements were found with the specified selector: {}", url);
-                return;
-            }
+            Document doc = connectToUrl(url);
+            Elements elements = selectElements(doc, "span.subject", url);
 
             for (Element element : elements) {
                 String placeName = element.text();
                 if (placeName.endsWith("점")) {
                     placeName = placeName.contains(" ") ? placeName.split(" ")[1] : placeName; // 지역명 분리
-                    placeName = "셀픽스" + " " + placeName; // 브랜드명 추가
+                    placeName = "셀픽스 " + placeName;
 
                     createShopIfNotExists(placeName);
                 }
             }
             log.info("====End Selpix Crawling===");
-        } catch (IOException e) {
-            log.error("Failed to connect to the URL: {}", e.getMessage());
         } catch (Exception e) {
             log.error("An error occurred during the crawling process: {}", e.getMessage());
         }
@@ -129,17 +107,8 @@ public class EtcBrandCrawlerJob {
         try {
             for (int pageNum = 1; pageNum <= maxPageNum; pageNum++) {
                 String url = baseUrl + pageNum;
-                Document doc = Jsoup.connect(url).get();
-                if (doc == null) {
-                    log.error("Failed to parse the document from the URL: {}", url);
-                    return;
-                }
-
-                Elements elements = doc.select("td.text-left a span");
-                if (elements == null || elements.isEmpty()) {
-                    log.warn("No elements were found with the specified selector: {}", url);
-                    continue;
-                }
+                Document doc = connectToUrl(url);
+                Elements elements = selectElements(doc, "td.text-left a span", url);
 
                 for (Element element : elements) {
                     String placeName = element.text();
@@ -163,8 +132,6 @@ public class EtcBrandCrawlerJob {
                 }
             }
             log.info("====End PhotoStreet Crawling===");
-        } catch (IOException e) {
-            log.error("Failed to connect to the URL: {}", e.getMessage());
         } catch (Exception e) {
             log.error("An error occurred during the crawling process: {}", e.getMessage());
         }
@@ -173,17 +140,8 @@ public class EtcBrandCrawlerJob {
     private void crawlPhotoDrinkShopInfo(String url) {
         log.info("====Start PhotoDrink Crawling===");
         try {
-            Document doc = Jsoup.connect(url).get();
-            if (doc == null) {
-                log.error("Failed to parse the document from the URL: {}", url);
-                return;
-            }
-
-            Elements elements = doc.select("div.text-table div");
-            if (elements == null || elements.isEmpty()) {
-                log.warn("No elements were found with the specified selector: {}", url);
-                return;
-            }
+            Document doc = connectToUrl(url);
+            Elements elements = selectElements(doc, "div.text-table div", url);
 
             for (Element element : elements) {
                 Elements pElement = element.select("p");
@@ -204,14 +162,11 @@ public class EtcBrandCrawlerJob {
                                 placeName = placeName.substring(0, secondIndex + 1) + placeName.substring(thirdIndex + 1);
                             }
                         }
-
                         saveOrUpdateShop(placeName, formatAddress(roadAddressName));
                     }
                 }
             }
             log.info("====End PhotoDrink Crawling===");
-        } catch (IOException e) {
-            log.error("Failed to connect to the URL: {}", e.getMessage());
         } catch (Exception e) {
             log.error("An error occurred during the crawling process: {}", e.getMessage());
         }
@@ -221,24 +176,9 @@ public class EtcBrandCrawlerJob {
         log.info("====Start PhotoLapPlus Crawling===");
         try {
             for (int pageNum = 1; pageNum <= maxPageNum; pageNum++) {
-                String url = baseUrl + "location1-" + pageNum;
-                Document doc = null;
-                try {
-                    doc = Jsoup.connect(url).get();
-                    if (doc == null) {
-                        log.error("Failed to parse the document from the URL: {}", url);
-                        return;
-                    }
-                } catch (HttpStatusException e) {
-                    url = baseUrl + "1-" + pageNum;
-                    doc = Jsoup.connect(url).get();
-                }
-
-                Elements elements = doc.select("div.Zc7IjY");
-                if (elements == null || elements.isEmpty()) {
-                    log.warn("No elements were found with the specified selector: {}", url);
-                    continue;
-                }
+                String url = baseUrl + pageNum;
+                Document doc = connectToUrl(url);
+                Elements elements = selectElements(doc,"div.Zc7IjY", url);
 
                 for (Element element : elements) {
                     String placeName = element.select("h2 span.wixui-rich-text__text").text();
@@ -249,8 +189,6 @@ public class EtcBrandCrawlerJob {
                 }
             }
             log.info("====End PhotoLapPlus Crawling===");
-        } catch (IOException e) {
-            log.error("Failed to connect to the URL: {}", e.getMessage());
         } catch (Exception e) {
             log.error("An error occurred during the crawling process: {}", e.getMessage());
         }
@@ -261,17 +199,8 @@ public class EtcBrandCrawlerJob {
         try {
             for (int pageNum = 1; pageNum <= maxPageNum; pageNum++) {
                 String url = baseUrl + pageNum;
-                Document  doc = Jsoup.connect(url).get();
-                if (doc == null) {
-                    log.error("Failed to parse the document from the URL: {}", url);
-                    return;
-                }
-
-                Elements elements = doc.select("div.map_contents.inline-blocked");
-                if (elements == null || elements.isEmpty()) {
-                    log.warn("No elements were found with the specified selector: {}", url);
-                    continue;
-                }
+                Document doc = connectToUrl(url);
+                Elements elements = selectElements(doc, "div.map_contents.inline-blocked", url);
 
                 for (Element element : elements) {
                     String placeName = element.select("a.map_link.blocked div.head div.tit").text();
@@ -283,8 +212,6 @@ public class EtcBrandCrawlerJob {
                 }
             }
             log.info("====End PlayInTheBox Crawling===");
-        } catch (IOException e) {
-            log.error("Failed to connect to the URL: {}", e.getMessage());
         } catch (Exception e) {
             log.error("An error occurred during the crawling process: {}", e.getMessage());
         }
@@ -293,17 +220,8 @@ public class EtcBrandCrawlerJob {
     private void crawlHarryPhotoShopInfo(String url) {
         log.info("====Start HarryPhoto Crawling===");
         try {
-            Document  doc = Jsoup.connect(url).get();
-            if (doc == null) {
-                log.error("Failed to parse the document from the URL: {}", url);
-                return;
-            }
-
-            Elements elements = doc.select("dl");
-            if (elements == null || elements.isEmpty()) {
-                log.warn("No elements were found with the specified selector: {}", url);
-                return;
-            }
+            Document  doc = connectToUrl(url);
+            Elements elements = selectElements(doc, "dl", url);
 
             for (Element element : elements) {
                 String placeName = element.select("dt").text();
@@ -313,11 +231,41 @@ public class EtcBrandCrawlerJob {
                 }
             }
             log.info("====End HarryPhoto Crawling===");
-        } catch (IOException e) {
-            log.error("Failed to connect to the URL: {}", e.getMessage());
         } catch (Exception e) {
             log.error("An error occurred during the crawling process: {}", e.getMessage());
         }
+    }
+
+    private Document connectToUrl(String url) {
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(url).get();
+            if (doc == null) {
+                log.error("Failed to parse the document from the URL: {}", url);
+            }
+        } catch (HttpStatusException e) {
+            try {
+                if(url.contains("photolapplus")) {
+                    url = url.replaceFirst("/location\\d+-", "/1-");
+                    doc = Jsoup.connect(url).get();
+                } else {
+                    log.error("Failed to connect to the URL: {}", e.getMessage());
+                }
+            } catch (IOException ex) {
+                log.error("Failed to connect to the URL: {}", ex.getMessage());
+            }
+        } catch (IOException e) {
+            log.error("Failed to connect to the URL: {}", e.getMessage());
+        }
+        return doc;
+    }
+
+    private Elements selectElements(Document doc, String selector, String url) {
+        Elements elements = doc.select(selector);
+        if (elements == null || elements.isEmpty()) {
+            log.warn("No elements were found with the specified selector: {}", url);
+        }
+        return elements;
     }
 
     private String formatAddress(String roadAddressName) {
