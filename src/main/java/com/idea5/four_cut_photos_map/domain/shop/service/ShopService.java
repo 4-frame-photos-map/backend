@@ -5,7 +5,7 @@ import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
-import com.idea5.four_cut_photos_map.domain.shop.entity.ShopPriority;
+import com.idea5.four_cut_photos_map.domain.shop.entity.ShopMatchPriority;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.domain.shop.service.kakao.KakaoMapSearchApi;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_SHOP_ID;
@@ -59,16 +60,12 @@ public class ShopService {
         if (dbShops.size() == 1) {
             return dbShops.get(0);
         } else {
-            ShopPriority[] priorities = ShopPriority.values();
-            for (ShopPriority priority : priorities) {
-                for (Shop dbShop : dbShops) {
-                    if (priority.isMatchedShop(dbShop, apiShop)) {
-                        return dbShop;
-                    }
-                }
-            }
+            return Arrays.stream(ShopMatchPriority.values())
+                    .flatMap(priority -> dbShops.stream()
+                            .filter(dbShop -> priority.isMatchedShop(dbShop, apiShop)))
+                    .findFirst()
+                    .orElse(null);
         }
-        return null;
     }
 
     public List<KakaoMapSearchDto> searchKakaoMapByKeyword(String keyword, Double userLat, Double userLng) {
