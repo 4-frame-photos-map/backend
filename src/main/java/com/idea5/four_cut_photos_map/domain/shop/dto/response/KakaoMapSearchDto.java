@@ -14,6 +14,8 @@ import lombok.*;
 public class KakaoMapSearchDto {
         @JsonProperty("place_name")
         public String placeName;
+        @JsonProperty("address_name")
+        public String addressName;
         @JsonProperty("road_address_name")
         public String roadAddressName;
         @JsonProperty("x")

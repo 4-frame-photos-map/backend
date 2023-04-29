@@ -51,7 +51,7 @@ public class ShopController {
             return ResponseEntity.ok(resultShops);
         }
 
-        resultShops = shopService.compareWithDbShops(apiShop, ResponseShopKeyword.class);
+        resultShops = shopService.findMatchingShops(apiShop, ResponseShopKeyword.class);
         if(resultShops.isEmpty()) {
             return ResponseEntity.ok(resultShops);
         }
@@ -89,7 +89,7 @@ public class ShopController {
             return ResponseEntity.ok(responseMap);
         }
 
-        resultShops = shopService.compareWithDbShops(apiShop, ResponseShopBrand.class);
+        resultShops = shopService.findMatchingShops(apiShop, ResponseShopBrand.class);
         if(resultShops.isEmpty()) {
             return ResponseEntity.ok(responseMap);
         }

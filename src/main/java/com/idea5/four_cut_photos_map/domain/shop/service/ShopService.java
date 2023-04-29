@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_SHOP_ID;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUND;
@@ -32,12 +33,18 @@ public class ShopService {
 
 
     @Transactional(readOnly = true)
-    public <T extends ResponseShop> List<T> compareWithDbShops(List<KakaoMapSearchDto> apiShops, Class<T> responseClass) {
+    public <T extends ResponseShop> List<T> findMatchingShops(List<KakaoMapSearchDto> apiShops, Class<T> responseClass) {
         List<T> resultShop = new ArrayList<>();
         for (KakaoMapSearchDto apiShop: apiShops) {
-            Shop dbShop = compareWithPlaceNameOrRoadAddressName(apiShop);
+            // 도로명주소 비교로 반환하는 지점 없을 시, 지번주소로 비교
+            Shop dbShop = compareWithPlaceNameOrAddress(apiShop, apiShop.getRoadAddressName(), apiShop.getAddressName());
 
             if(dbShop != null) {
+                log.info("Comparison target: DB shop ({} - {}), Kakao API shop ({} - {} - {})",
+                        dbShop.getPlaceName(), dbShop.getRoadAddressName(), apiShop.getPlaceName(),
+                        apiShop.getRoadAddressName(), apiShop.getAddressName()
+                );
+
                 if(responseClass.equals(ResponseShopKeyword.class)) {
                     ResponseShopKeyword responseShop = ResponseShopKeyword.of(dbShop, apiShop, dbShop.getBrand());
                     resultShop.add(responseClass.cast(responseShop));
@@ -50,22 +57,25 @@ public class ShopService {
         return resultShop;
     }
 
-    @Transactional(readOnly = true)
-    public Shop compareWithPlaceNameOrRoadAddressName(KakaoMapSearchDto apiShop) {
-        List<Shop> dbShops = shopRepository.findDistinctByPlaceNameOrRoadAddressNameContaining(
-                apiShop.getPlaceName(),
-                apiShop.getRoadAddressName()
-        );
-
-        if (dbShops.size() == 1) {
-            return dbShops.get(0);
-        } else {
-            return Arrays.stream(ShopMatchPriority.values())
-                    .flatMap(priority -> dbShops.stream()
-                            .filter(dbShop -> priority.isMatchedShop(dbShop, apiShop)))
-                    .findFirst()
-                    .orElse(null);
+    public Shop compareWithPlaceNameOrAddress(KakaoMapSearchDto apiShop, String... addresses) {
+        for (String address : addresses) {
+            List<Shop> dbShops = shopRepository.findDistinctByPlaceNameOrRoadAddressNameContaining(
+                    apiShop.getPlaceName(),
+                    address
+            );
+            if (dbShops.size() == 1) {
+                return dbShops.get(0);
+            } else if (dbShops.size() > 1) {
+                Optional<Shop> matchedShop = Arrays.stream(ShopMatchPriority.values())
+                        .flatMap(priority -> dbShops.stream()
+                                .filter(dbShop -> priority.isMatchedShop(dbShop, apiShop)))
+                        .findFirst();
+                if (matchedShop.isPresent()) {
+                    return matchedShop.get();
+                }
+            }
         }
+        return null;
     }
 
     public List<KakaoMapSearchDto> searchKakaoMapByKeyword(String keyword, Double userLat, Double userLng) {
