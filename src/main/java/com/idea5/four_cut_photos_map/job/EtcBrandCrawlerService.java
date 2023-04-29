@@ -118,15 +118,32 @@ public class EtcBrandCrawlerService {
             roadAddressName.replace("대한민국 ", "");
         }
 
+        // 상세주소 제거 방법 (1)
         if (roadAddressName.contains(",")) {
             roadAddressName = roadAddressName.split(",")[0];
         }
 
-
+        // 상세주소 제거 방법 (2)
+        // '로[공백], 길[공백]으로 끝나는 문자열 + 그 다음 숫자(ex.61, 68-1)' 형태로 주소가 끝나도록 가공
         if (roadAddressName.matches(".*\\d.*")) {
-            // 마지막 숫자 이후 문자열 제거
-            int lastIndex = roadAddressName.replaceAll("[^\\d]+$", "").length();
-            roadAddressName = roadAddressName.substring(0, lastIndex);
+            String[] roadSuffixes = {"로 ", "길 "};
+            for (String suffix : roadSuffixes) {
+                int idx = roadAddressName.lastIndexOf(suffix);
+                if (idx != -1) {
+                    String numAfterSuffix = "";
+                    String suffixPart = roadAddressName.substring(idx + suffix.length());
+                    String[] tokens = suffixPart.split(" ");
+                    for (String token : tokens) {
+                        if (token.matches("\\d+.*")) {
+                            numAfterSuffix = token;
+                            if(numAfterSuffix.endsWith("-"))
+                            break;
+                        }
+                    }
+                    roadAddressName = roadAddressName.substring(0, idx + suffix.length()) + numAfterSuffix;
+                    break;
+                }
+            }
         }
 
         return roadAddressName;
