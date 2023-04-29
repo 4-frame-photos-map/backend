@@ -33,7 +33,7 @@ public class KakaoMapSearchApi {
     private final RedisDao redisDao;
     private final ObjectMapper objectMapper;
     public final int radius = 2000;
-    public static final String DEFAULT_QUERY_WORD = "즉석사진";
+    public static final String DEFAULT_QUERY_WORD = "사진";
 
 
     public List<KakaoMapSearchDto> searchByQueryWord(String queryWord, Double userLat, Double userLng) {
