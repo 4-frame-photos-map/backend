@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.crawl.service;
 
 import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
+import com.idea5.four_cut_photos_map.domain.crawl.Entity.CrawlTarget;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
@@ -18,9 +19,9 @@ public class SelpixCrawlService extends EtcBrandCrawlService {
 
     @Override
     public void crawl() {
-        log.info("====Start Selpix Crawling===");
+        log.info("=======Start Selpix Crawling=======");
         try {
-            String url = SELPIX_URL;
+            String url = CrawlTarget.SELPIX.getUrl();
             Document doc = connectToUrl(url);
             Elements elements = selectElements(doc, "span.subject", url);
 
@@ -31,7 +32,7 @@ public class SelpixCrawlService extends EtcBrandCrawlService {
                     createShopIfNotExists(placeName);
                 }
             }
-            log.info("====End Selpix Crawling===");
+            log.info("=======End Selpix Crawling=======");
         } catch (Exception e) {
             log.error("An error occurred during the crawling process: {}", e.getMessage());
         }

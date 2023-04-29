@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.crawl.service;
 
 import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
+import com.idea5.four_cut_photos_map.domain.crawl.Entity.CrawlTarget;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
@@ -18,9 +19,9 @@ public class PhotodrinkCrawlService extends EtcBrandCrawlService {
 
     @Override
     public void crawl() {
-        log.info("====Start PhotoDrink Crawling===");
+        log.info("=======Start PhotoDrink Crawling=======");
         try {
-            String url = PHOTO_DRINK_URL;
+            String url = CrawlTarget.PHOTO_DRINK.getUrl();
             Document doc = connectToUrl(url);
             Elements elements = selectElements(doc, "div.text-table div", url);
 
@@ -37,7 +38,7 @@ public class PhotodrinkCrawlService extends EtcBrandCrawlService {
                     saveOrUpdateShop(placeName, roadAddressName);
                 }
             }
-            log.info("====End PhotoDrink Crawling===");
+            log.info("=======End PhotoDrink Crawling=======");
         } catch (Exception e) {
             log.error("An error occurred during the crawling process: {}", e.getMessage());
         }

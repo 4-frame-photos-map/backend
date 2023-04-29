@@ -24,16 +24,6 @@ import java.io.IOException;
 abstract class EtcBrandCrawlService {
     private final ShopRepository shopRepository;
     private final BrandRepository brandRepository;
-    public static final int PHOTO_STREET_TOTAL_PAGE = 5;
-    public static final int PHOTO_LAP_PLUS_TOTAL_PAGE = 8;
-    public static final int PLAY_IN_THE_BOX_TOTAL_PAGE = 3;
-    public static final String INS_PHOTO_URL = "https://insphoto.co.kr/locations/";
-    public static final String SELPIX_URL = "http://m.selpix.co.kr/shop_add_page/index.htm?page_code=page16&me_popup=1";
-    public static final String PHOTO_STREET_URL = "https://photostreet.co.kr/?page_id=930&mode=list&board_page=";
-    public static final String PHOTO_DRINK_URL = "https://photodrink.com/LOCATION";
-    public static final String PHOTO_LAP_PLUS_URL = "https://www.photolabplus.co.kr/location1-";
-    public static final String PLAY_IN_THE_BOX_URL = "https://www.playinthebox.co.kr/39/?sort=NAME&keyword_type=all&page=";
-    public static final String HARRY_PHOTO_URL = "http://www.harryphoto.co.kr/";
 
     protected abstract void crawl();
     public Document connectToUrl(String url) {

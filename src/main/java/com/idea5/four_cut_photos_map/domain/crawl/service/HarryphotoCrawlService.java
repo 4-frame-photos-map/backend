@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.crawl.service;
 
 import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
+import com.idea5.four_cut_photos_map.domain.crawl.Entity.CrawlTarget;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
@@ -22,9 +23,9 @@ public class HarryphotoCrawlService extends EtcBrandCrawlService {
 
     @Override
     public void crawl() {
-        log.info("====Start HarryPhoto Crawling===");
+        log.info("=======Start HarryPhoto Crawling=======");
         try {
-            String url = HARRY_PHOTO_URL;
+            String url = CrawlTarget.HARRY_PHOTO.getUrl();
             Document doc = connectToUrl(url);
             Elements elements = selectElements(doc, "dl", url);
             for (Element element : elements) {
@@ -33,8 +34,8 @@ public class HarryphotoCrawlService extends EtcBrandCrawlService {
                     String roadAddressName = element.selectFirst("dd").text();
                     saveOrUpdateShop(placeName, roadAddressName);
                 }
-                log.info("====End HarryPhoto Crawling===");
             }
+            log.info("=======End HarryPhoto Crawling=======");
         } catch(Exception e){
             log.error("An error occurred during the crawling process: {}", e.getMessage());
             }

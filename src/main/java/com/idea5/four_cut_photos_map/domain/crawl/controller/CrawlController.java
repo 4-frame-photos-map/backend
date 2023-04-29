@@ -31,7 +31,7 @@ class CrawlController {
         playintheboxCrawlService.crawl();
         selpixCrawlService.crawl();
 
-        return ResponseEntity.ok("Inspohto crawled successfully");
+        return ResponseEntity.ok("All etc brands crawled successfully");
     }
 
     @PostMapping("/insphoto/shops")

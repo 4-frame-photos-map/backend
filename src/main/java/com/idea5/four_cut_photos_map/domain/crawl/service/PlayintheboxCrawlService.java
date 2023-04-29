@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.crawl.service;
 
 import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
+import com.idea5.four_cut_photos_map.domain.crawl.Entity.CrawlTarget;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
@@ -18,10 +19,10 @@ public class PlayintheboxCrawlService extends EtcBrandCrawlService {
 
     @Override
     public void crawl() {
-        log.info("====Start PlayInTheBox Crawling===");
+        log.info("=======Start PlayInTheBox Crawling=======");
         try {
-            String baseUrl = PLAY_IN_THE_BOX_URL;
-            int maxPageNum = PLAY_IN_THE_BOX_TOTAL_PAGE;
+            String baseUrl = CrawlTarget.PLAY_IN_THE_BOX.getUrl();
+            int maxPageNum = CrawlTarget.PLAY_IN_THE_BOX.getTotalPage();
 
             for (int pageNum = 1; pageNum <= maxPageNum; pageNum++) {
                 String url = baseUrl + pageNum;
@@ -38,7 +39,7 @@ public class PlayintheboxCrawlService extends EtcBrandCrawlService {
                     }
                 }
             }
-            log.info("====End PlayInTheBox Crawling===");
+            log.info("=======End PlayInTheBox Crawling=======");
         } catch (Exception e) {
             log.error("An error occurred during the crawling process: {}", e.getMessage());
         }
