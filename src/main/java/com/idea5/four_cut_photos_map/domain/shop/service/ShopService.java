@@ -5,6 +5,7 @@ import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
+import com.idea5.four_cut_photos_map.domain.shop.entity.ShopPriority;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.domain.shop.service.kakao.KakaoMapSearchApi;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
@@ -33,7 +34,7 @@ public class ShopService {
     public <T extends ResponseShop> List<T> compareWithDbShops(List<KakaoMapSearchDto> apiShops, Class<T> responseClass) {
         List<T> resultShop = new ArrayList<>();
         for (KakaoMapSearchDto apiShop: apiShops) {
-            Shop dbShop = compareWithRoadAddressNameOrPlaceName(apiShop);
+            Shop dbShop = compareWithRoadAddressNameOrBrandName(apiShop);
 
             if(dbShop != null) {
                 if(responseClass.equals(ResponseShopKeyword.class)) {
@@ -49,11 +50,25 @@ public class ShopService {
     }
 
     @Transactional(readOnly = true)
-    public Shop compareWithRoadAddressNameOrPlaceName(KakaoMapSearchDto apiShop) {
-        return shopRepository.findDistinctByPlaceNameOrRoadAddressNameContaining(
-                apiShop.getRoadAddressName(),
-                apiShop.getPlaceName().split(" ")[0]
-        ).orElse(null);
+    public Shop compareWithRoadAddressNameOrBrandName(KakaoMapSearchDto apiShop) {
+        List<Shop> dbShops = shopRepository.findDistinctByPlaceNameOrRoadAddressNameContaining(
+                apiShop.getPlaceName().split(" ")[0],
+                apiShop.getRoadAddressName()
+        );
+
+        if (dbShops.size() == 1) {
+            return dbShops.get(0);
+        } else {
+            ShopPriority[] priorities = ShopPriority.values();
+            for (ShopPriority priority : priorities) {
+                for (Shop dbShop : dbShops) {
+                    if (priority.isMatchedShop(dbShop, apiShop)) {
+                        return dbShop;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     public List<KakaoMapSearchDto> searchKakaoMapByKeyword(String keyword, Double userLat, Double userLng) {
