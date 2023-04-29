@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface ShopRepository extends JpaRepository<Shop, Long> {
-    List<Shop> findDistinctByPlaceNameOrRoadAddressNameContaining(String brandName, String roadAddressName);
+    List<Shop> findDistinctByPlaceNameOrRoadAddressNameContaining(String placeName, String roadAddressName);
     Optional<Shop> findByPlaceName(String placeName);
     boolean existsByPlaceName(String placeName);
 }
