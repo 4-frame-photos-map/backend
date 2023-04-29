@@ -43,7 +43,7 @@ public class EtcBrandCrawlerJob {
 
             for (Element element : elements) {
                 String placeName = element.selectFirst("span").text();
-                if (placeName.endsWith("점")) {
+                if (etcBrandCrawlerService.isBranchNameWithSuffix(placeName)) {
                     String roadAddressName = element.selectFirst("span:last-child").text();
 
                     placeName = etcBrandCrawlerService.formatPlaceName(placeName, url);
@@ -66,7 +66,7 @@ public class EtcBrandCrawlerJob {
 
             for (Element element : elements) {
                 String placeName = element.text();
-                if (placeName.endsWith("점")) {
+                if (etcBrandCrawlerService.isBranchNameWithSuffix(placeName)) {
                     placeName = etcBrandCrawlerService.formatPlaceName(placeName, url);
                     etcBrandCrawlerService.createShopIfNotExists(placeName);
                 }
@@ -106,7 +106,7 @@ public class EtcBrandCrawlerJob {
                 Elements pElement = element.select("p");
                 String placeName = pElement.get(0).select("span").text();
 
-                if (placeName.endsWith("점")) {
+                if (etcBrandCrawlerService.isBranchNameWithSuffix(placeName)) {
                     String roadAddressName = pElement.get(1).select("span").text();
 
                     placeName = etcBrandCrawlerService.formatPlaceName(placeName, url);
@@ -131,7 +131,7 @@ public class EtcBrandCrawlerJob {
 
                 for (Element element : elements) {
                     String placeName = element.select("h2 span.wixui-rich-text__text").text();
-                    if (placeName.endsWith("점")) {
+                    if (etcBrandCrawlerService.isBranchNameWithSuffix(placeName)) {
                         String roadAddressName = element.select("p span.wixui-rich-text__text").text();
                         roadAddressName = etcBrandCrawlerService.formatAddress(roadAddressName);
 
@@ -155,7 +155,7 @@ public class EtcBrandCrawlerJob {
 
                 for (Element element : elements) {
                     String placeName = element.select("a.map_link.blocked div.head div.tit").text();
-                    if (placeName.endsWith("점")) {
+                    if (etcBrandCrawlerService.isBranchNameWithSuffix(placeName)) {
                         String roadAddressName = element.selectFirst("div.p_group p").text();
                         roadAddressName = etcBrandCrawlerService.formatAddress(roadAddressName);
 
@@ -177,7 +177,7 @@ public class EtcBrandCrawlerJob {
 
             for (Element element : elements) {
                 String placeName = element.select("dt").text();
-                if (placeName.endsWith("점")) {
+                if (etcBrandCrawlerService.isBranchNameWithSuffix(placeName)) {
                     String roadAddressName = element.selectFirst("dd").text();
                     etcBrandCrawlerService.saveOrUpdateShop(placeName, roadAddressName);
                 }

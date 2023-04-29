@@ -167,4 +167,8 @@ public class EtcBrandCrawlerService {
             log.info("persist >> placeName:{}, roadAddressName:{}", placeName, null);
         }
     }
+
+    public boolean isBranchNameWithSuffix(String placeName) {
+        return placeName.endsWith("점");
+    }
 }
