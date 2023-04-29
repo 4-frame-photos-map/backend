@@ -4,9 +4,6 @@ import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
 import com.idea5.four_cut_photos_map.domain.crawl.Entity.CrawlTarget;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,30 +15,16 @@ public class PhotodrinkCrawlService extends EtcBrandCrawlService {
     }
 
     @Override
-    public void crawl() {
+    public void crawl(){
         log.info("=======Start PhotoDrink Crawling=======");
-        try {
-            String url = CrawlTarget.PHOTO_DRINK.getUrl();
-            Document doc = connectToUrl(url);
-            Elements elements = selectElements(doc, "div.text-table div", url);
+        runCrawler(
+                CrawlTarget.PHOTO_DRINK.getUrl(),
+                "div.text-table div",
+                "p:first-child span",
+                "p:nth-of-type(2) span"
 
-            for (Element element : elements) {
-                Elements pElement = element.select("p");
-                String placeName = pElement.get(0).select("span").text();
-
-                if (isBranchNameWithSuffix(placeName)) {
-                    String roadAddressName = pElement.get(1).select("span").text();
-
-                    placeName = formatPlaceName(placeName);
-                    roadAddressName = formatAddress(roadAddressName);
-
-                    saveOrUpdateShop(placeName, roadAddressName);
-                }
-            }
-            log.info("=======End PhotoDrink Crawling=======");
-        } catch (Exception e) {
-            log.error("An error occurred during the crawling process: {}", e.getMessage());
-        }
+        );
+        log.info("=======End PhotoDrink Crawling=======");
     }
 
     @Override

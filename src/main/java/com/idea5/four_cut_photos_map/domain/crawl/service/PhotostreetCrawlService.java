@@ -22,27 +22,15 @@ public class PhotostreetCrawlService extends EtcBrandCrawlService {
     }
 
     @Override
-    public void crawl() {
+    public void crawl(){
         log.info("=======Start PhotoStreet Crawling=======");
-        try {
-            String baseUrl = CrawlTarget.PHOTO_STREET.getUrl();
-            int maxPageNum = CrawlTarget.PHOTO_STREET.getTotalPage();
-
-            for (int pageNum = 1; pageNum <= maxPageNum; pageNum++) {
-                String url = baseUrl + pageNum;
-                Document doc = connectToUrl(url);
-                Elements elements = selectElements(doc, "td.text-left a span", url);
-
-                for (Element element : elements) {
-                    String placeName = element.text();
-                    formatPlaceName(placeName);
-                }
-            }
-            log.info("=======End PhotoStreet Crawling=======");
-        } catch (Exception e) {
-            log.error("An error occurred during the crawling process: {}", e.getMessage());
-        }
-
+        runCrawler(
+                CrawlTarget.PHOTO_STREET.getUrl(),
+                CrawlTarget.PHOTO_STREET.getTotalPage(),
+                "td.text-left a",
+                "span"
+        );
+        log.info("=======End PhotoStreet Crawling=======");
     }
 
     @Override

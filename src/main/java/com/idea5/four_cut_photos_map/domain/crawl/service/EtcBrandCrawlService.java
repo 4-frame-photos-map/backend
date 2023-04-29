@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,114 @@ abstract class EtcBrandCrawlService {
     private final BrandRepository brandRepository;
 
     protected abstract void crawl();
+
+    /**
+     * 요청 페이지: 1
+     * 크롤링 항목: 장소명
+     * @param url
+     * @param elementsSelector
+     * @param placeNameSelector
+     */
+    public void runCrawler(String url, String elementsSelector, String placeNameSelector) {
+        try {
+            Document doc = connectToUrl(url);
+            Elements elements = selectElements(doc, elementsSelector, url);
+            for (Element element : elements) {
+                String placeName = element.select(placeNameSelector).text();
+                if (isBranchNameWithSuffix(placeName)) {
+                    placeName = formatPlaceName(placeName);
+                    createShopIfNotExists(placeName);
+                }
+            }
+        } catch (Exception e) {
+            log.error("An error occurred during the crawling process: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * 요청 페이지: 1
+     * 크롤링 항목: 장소명, 주소
+     * @param url
+     * @param elementsSelector
+     * @param placeNameSelector
+     * @param addressSelector
+     */
+    public void runCrawler(String url, String elementsSelector, String placeNameSelector, String addressSelector) {
+        try {
+            Document doc = connectToUrl(url);
+            Elements elements = selectElements(doc, elementsSelector, url);
+            for (Element element : elements) {
+                String placeName = element.selectFirst(placeNameSelector).text();
+                if (isBranchNameWithSuffix(placeName)) {
+                    String roadAddressName = element.select(addressSelector).text();
+                    roadAddressName = formatAddress(roadAddressName);
+                    placeName = formatPlaceName(placeName);
+                    saveOrUpdateShop(placeName, roadAddressName);
+                }
+            }
+        } catch (Exception e) {
+            log.error("An error occurred during the crawling process: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * 요청 페이지: 다수
+     * 크롤링 항목: 장소명, 주소
+     * @param baseUrl
+     * @param maxPageNum
+     * @param elementsSelector
+     * @param placeNameSelector
+     * @param addressSelector
+     */
+    public void runCrawler(String baseUrl, int maxPageNum, String elementsSelector, String placeNameSelector, String addressSelector) {
+        try {
+            for (int pageNum = 1; pageNum <= maxPageNum; pageNum++) {
+                String url = baseUrl + pageNum;
+                Document doc = connectToUrl(url);
+                Elements elements = selectElements(doc,elementsSelector, url);
+
+                for (Element element : elements) {
+                    String placeName = element.select(placeNameSelector).text();
+                    if (isBranchNameWithSuffix(placeName)) {
+                        String roadAddressName = element.select(addressSelector).text();
+                        roadAddressName = formatAddress(roadAddressName);
+                        placeName = formatPlaceName(placeName);
+                        saveOrUpdateShop(placeName, roadAddressName);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("An error occurred during the crawling process: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * 요청 페이지: 다수
+     * 크롤링 항목: 장소명
+     * @param baseUrl
+     * @param maxPageNum
+     * @param elementsSelector
+     * @param placeNameSelector
+     */
+    public void runCrawler(String baseUrl, int maxPageNum, String elementsSelector, String placeNameSelector) {
+        try {
+            for (int pageNum = 1; pageNum <= maxPageNum; pageNum++) {
+                String url = baseUrl + pageNum;
+                Document doc = connectToUrl(url);
+                Elements elements = selectElements(doc,elementsSelector, url);
+                for (Element element : elements) {
+                    String placeName = element.selectFirst(placeNameSelector).text();
+                    if (isBranchNameWithSuffix(placeName)) {
+                        placeName = formatPlaceName(placeName);
+                        createShopIfNotExists(placeName);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("An error occurred during the crawling process: {}", e.getMessage());
+        }
+    }
+
     public Document connectToUrl(String url) {
         Document doc = null;
         try {
@@ -35,11 +144,11 @@ abstract class EtcBrandCrawlService {
             }
         } catch (HttpStatusException e) {
             try {
-                if (url.contains("photolapplus")) {
+                if (url.contains("photolabplus")) {
                     url = url.replaceFirst("/location\\d+-", "/1-");
                     doc = Jsoup.connect(url).get();
                 } else {
-                    log.error("Failed to connect to the URL: {}", e.getMessage());
+                    log.warn("Failed to connect to the URL: {}", e.getMessage());
                 }
             } catch (IOException ex) {
                 log.error("Failed to connect to the URL: {}", ex.getMessage());
@@ -59,8 +168,8 @@ abstract class EtcBrandCrawlService {
     }
 
     public String formatAddress(String roadAddressName) {
-        if (roadAddressName.contains("대한민국 ")) {
-            roadAddressName.replace("대한민국 ", "");
+        if (roadAddressName.startsWith("대한민국")) {
+            roadAddressName = roadAddressName.replace("대한민국 ", "");
         }
 
         // 상세주소 제거 방법 (1)
@@ -69,22 +178,13 @@ abstract class EtcBrandCrawlService {
         }
 
         // 상세주소 제거 방법 (2)
-        // '로[공백], 길[공백]으로 끝나는 문자열 + 그 다음 숫자(ex.61, 68-1)' 형태로 주소가 끝나도록 가공
+        // '로[공백], 길[공백]으로 끝나는 문자열 + 그 다음 공백 문자열(번호)' 형태로 주소가 끝나도록 가공
         if (roadAddressName.matches(".*\\d.*")) {
-            String[] roadSuffixes = {"로 ", "길 "};
+            String[] roadSuffixes = {"로 ", "길 ", "동 "};
             for (String suffix : roadSuffixes) {
                 int idx = roadAddressName.lastIndexOf(suffix);
                 if (idx != -1) {
-                    String numAfterSuffix = "";
-                    String suffixPart = roadAddressName.substring(idx + suffix.length());
-                    String[] tokens = suffixPart.split(" ");
-                    for (String token : tokens) {
-                        if (token.matches("\\d+.*")) {
-                            numAfterSuffix = token;
-                            if(numAfterSuffix.endsWith("-"))
-                                break;
-                        }
-                    }
+                    String numAfterSuffix = roadAddressName.substring(idx + suffix.length()).split(" ")[0];
                     roadAddressName = roadAddressName.substring(0, idx + suffix.length()) + numAfterSuffix;
                     break;
                 }

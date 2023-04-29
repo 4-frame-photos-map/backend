@@ -15,7 +15,7 @@ class CrawlController {
     private final HarryphotoCrawlService harryphotoCrawlService;
     private final InsphotoCrawlService insphotoCrawlService;
     private final PhotodrinkCrawlService photodrinkCrawlService;
-    private final PhotolapplusCrawlService photolapplusCrawlService;
+    private final PhotolabplusCrawlService photolabplusCrawlService;
     private final PhotostreetCrawlService photostreetCrawlService;
     private final PlayintheboxCrawlService playintheboxCrawlService;
     private final SelpixCrawlService selpixCrawlService;
@@ -26,7 +26,7 @@ class CrawlController {
         harryphotoCrawlService.crawl();
         insphotoCrawlService.crawl();
         photodrinkCrawlService.crawl();
-        photolapplusCrawlService.crawl();
+        photolabplusCrawlService.crawl();
         photostreetCrawlService.crawl();
         playintheboxCrawlService.crawl();
         selpixCrawlService.crawl();
@@ -52,27 +52,27 @@ class CrawlController {
         return ResponseEntity.ok("Photodrink crawled successfully");
     }
 
-    @PostMapping("/photolapplus/shops")
-    public ResponseEntity<String> crawlPhotolapplusShops() {
-        photolapplusCrawlService.crawl();
-        return ResponseEntity.ok("Photolapplus crawled successfully");
+    @PostMapping("/photolabplus/shops")
+    public ResponseEntity<String> crawlPhotolabplusShops() {
+        photolabplusCrawlService.crawl();
+        return ResponseEntity.ok("Photolabplus crawled successfully");
     }
 
     @PostMapping("/photostreet/shops")
     public ResponseEntity<String> crawlPhotostreetShops() {
         photostreetCrawlService.crawl();
-        return ResponseEntity.ok("Photostreet brands crawled successfully");
+        return ResponseEntity.ok("Photostreet crawled successfully");
     }
 
     @PostMapping("/playinthebox/shops")
     public ResponseEntity<String> crawlPlayintheboxShops() {
         playintheboxCrawlService.crawl();
-        return ResponseEntity.ok("Playinthebox brands crawled successfully");
+        return ResponseEntity.ok("Playinthebox crawled successfully");
     }
 
     @PostMapping("/selpix/shops")
     public ResponseEntity<String> crawlSelpixShops() {
         selpixCrawlService.crawl();
-        return ResponseEntity.ok("Selpix brands crawled successfully");
+        return ResponseEntity.ok("Selpix crawled successfully");
     }
 }

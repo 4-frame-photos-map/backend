@@ -4,9 +4,6 @@ import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
 import com.idea5.four_cut_photos_map.domain.crawl.Entity.CrawlTarget;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,26 +17,16 @@ public class HarryphotoCrawlService extends EtcBrandCrawlService {
         super(shopRepository, brandRepository);
     }
 
-
     @Override
     public void crawl() {
         log.info("=======Start HarryPhoto Crawling=======");
-        try {
-            String url = CrawlTarget.HARRY_PHOTO.getUrl();
-            Document doc = connectToUrl(url);
-            Elements elements = selectElements(doc, "dl", url);
-            for (Element element : elements) {
-                String placeName = element.select("dt").text();
-                if (isBranchNameWithSuffix(placeName)) {
-                    String roadAddressName = element.selectFirst("dd").text();
-                    saveOrUpdateShop(placeName, roadAddressName);
-                }
-            }
-            log.info("=======End HarryPhoto Crawling=======");
-        } catch(Exception e){
-            log.error("An error occurred during the crawling process: {}", e.getMessage());
-            }
-        }
+        runCrawler(
+                CrawlTarget.HARRY_PHOTO.getUrl(),
+                "dl",
+                "dt",
+                "dd");
+        log.info("=======End HarryPhoto Crawling=======");
+    }
 
     @Override
     protected String formatPlaceName(String placeName) {

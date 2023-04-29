@@ -6,28 +6,30 @@ import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+
 @Service
 @Slf4j
-public class InsphotoCrawlService extends EtcBrandCrawlService {
+public class PhotolabplusCrawlService extends EtcBrandCrawlService {
 
-    public InsphotoCrawlService(ShopRepository shopRepository, BrandRepository brandRepository) {
+    public PhotolabplusCrawlService(ShopRepository shopRepository, BrandRepository brandRepository) {
         super(shopRepository, brandRepository);
     }
 
     @Override
     public void crawl(){
-        log.info("=======Start InsPhoto Crawling=======");
+        log.info("=======Start PhotoLabPlus Crawling=======");
         runCrawler(
-                CrawlTarget.INS_PHOTO.getUrl(),
-                "section div.container div p",
-                "span",
-                "span:last-child"
+                CrawlTarget.PHOTO_LAB_PLUS.getUrl(),
+                CrawlTarget.PHOTO_LAB_PLUS.getTotalPage(),
+                "div.Zc7IjY",
+                "h2 span.wixui-rich-text__text",
+                "p span.wixui-rich-text__text"
         );
-        log.info("=======End InsPhoto Crawling=======");
+        log.info("=======End PhotoLabPlus Crawling=======");
     }
 
     @Override
     protected String formatPlaceName(String placeName) {
-        return "인스포토 " + placeName;
+        return "포토랩플러스 " + placeName;
     }
 }
