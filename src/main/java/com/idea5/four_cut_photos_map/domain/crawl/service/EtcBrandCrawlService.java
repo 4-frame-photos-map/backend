@@ -1,9 +1,10 @@
-package com.idea5.four_cut_photos_map.job;
+package com.idea5.four_cut_photos_map.domain.crawl.service;
 
 import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
@@ -13,14 +14,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 @Service
-@Transactional
-@RequiredArgsConstructor
 @Slf4j
-public class EtcBrandCrawlerService {
+@RequiredArgsConstructor
+@SuperBuilder
+@Transactional
+abstract class EtcBrandCrawlService {
     private final ShopRepository shopRepository;
     private final BrandRepository brandRepository;
     public static final int PHOTO_STREET_TOTAL_PAGE = 5;
@@ -34,7 +35,7 @@ public class EtcBrandCrawlerService {
     public static final String PLAY_IN_THE_BOX_URL = "https://www.playinthebox.co.kr/39/?sort=NAME&keyword_type=all&page=";
     public static final String HARRY_PHOTO_URL = "http://www.harryphoto.co.kr/";
 
-
+    protected abstract void crawl();
     public Document connectToUrl(String url) {
         Document doc = null;
         try {
@@ -67,52 +68,6 @@ public class EtcBrandCrawlerService {
         return elements;
     }
 
-    public String formatPlaceName(String placeName, String baseUrl) {
-        switch (baseUrl) {
-            case INS_PHOTO_URL -> placeName = "인스포토 " + placeName;
-            case SELPIX_URL -> {
-                // 지역명 분리
-                placeName = placeName.contains(" ") ? placeName.split(" ")[1] : placeName;
-                placeName = "셀픽스 " + placeName;
-            }
-            case PHOTO_STREET_URL -> {
-                placeName = placeName.contains("(") ? placeName.split("\\(")[0] : placeName;
-
-                // 지역명과 점포번호 분리
-                if (!placeName.contains("오픈예정")) {
-                    Pattern[] regexes = {
-                            Pattern.compile("\\d+호\\s+(.*)"),
-                            Pattern.compile("\\d+호점\\s+(.*)")
-                    };
-                    for (Pattern regex : regexes) {
-                        Matcher matcher = regex.matcher(placeName);
-                        if (matcher.find()) {
-                            placeName = "포토스트리트 " + matcher.group(1);
-                            createShopIfNotExists(placeName);
-                            break;
-                        }
-                    }
-                }
-            }
-            case PHOTO_DRINK_URL -> {
-                // 두번째 공백이 있다면 첫번째 공백 이후부터 두번째 공백 시작까지 제거
-                // 세번째 공백이 있다면 세번째 공백 제거
-                int firstIndex = placeName.indexOf(" ");
-                if (firstIndex != -1) {
-                    int secondIndex = placeName.indexOf(" ", firstIndex + 1);
-                    if (secondIndex != -1) {
-                        placeName = placeName.substring(0, firstIndex + 1) + placeName.substring(secondIndex + 1);
-                        int thirdIndex = placeName.indexOf(" ", secondIndex + 1);
-                        if (thirdIndex != -1) {
-                            placeName = placeName.substring(0, secondIndex + 1) + placeName.substring(thirdIndex + 1);
-                        }
-                    }
-                }
-            }
-        }
-        return placeName;
-    }
-
     public String formatAddress(String roadAddressName) {
         if (roadAddressName.contains("대한민국 ")) {
             roadAddressName.replace("대한민국 ", "");
@@ -137,7 +92,7 @@ public class EtcBrandCrawlerService {
                         if (token.matches("\\d+.*")) {
                             numAfterSuffix = token;
                             if(numAfterSuffix.endsWith("-"))
-                            break;
+                                break;
                         }
                     }
                     roadAddressName = roadAddressName.substring(0, idx + suffix.length()) + numAfterSuffix;
@@ -148,6 +103,8 @@ public class EtcBrandCrawlerService {
 
         return roadAddressName;
     }
+
+    protected abstract String formatPlaceName(String placeName);
 
     public void saveOrUpdateShop(String placeName, String roadAddressName) {
         Shop oldShop = shopRepository.findByPlaceName(placeName).orElse(null);
