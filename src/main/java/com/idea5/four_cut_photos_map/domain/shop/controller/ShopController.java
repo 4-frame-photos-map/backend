@@ -116,7 +116,7 @@ public class ShopController {
                                                           @AuthenticationPrincipal MemberContext memberContext) {
 
         Shop dbShop = shopService.findById(id);
-        ResponseShopDetail shopDetailDto = shopService.renameShopAndSetResponseDto(dbShop, distance);
+        ResponseShopDetail shopDetailDto = shopService.setResponseDto(dbShop, distance);
 
         List<ResponseShopReviewDto> recentReviews = reviewService.getTop3ShopReviews(shopDetailDto.getId());
         shopDetailDto.setRecentReviews(recentReviews);

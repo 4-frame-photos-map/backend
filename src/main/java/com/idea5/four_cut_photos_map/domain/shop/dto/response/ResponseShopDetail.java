@@ -24,10 +24,10 @@ public class ResponseShopDetail extends ResponseShopBriefInfo {
     private List<ResponseShopReviewDto> recentReviews;
 
 
-    public static ResponseShopDetail of(Shop dbShop, String placeName, String placeUrl, String placeLng, String placeLat,  String distance){
+    public static ResponseShopDetail of(Shop dbShop, String placeUrl, String placeLng, String placeLat,  String distance){
         return ResponseShopDetail.builder()
                 .id(dbShop.getId())
-                .placeName(placeName)
+                .placeName(dbShop.getPlaceName())
                 .longitude(placeLng)
                 .latitude(placeLat)
                 .distance(distance)

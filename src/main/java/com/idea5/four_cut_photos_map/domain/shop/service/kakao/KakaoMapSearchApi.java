@@ -88,20 +88,17 @@ public class KakaoMapSearchApi {
         return deserialize(resultList, documents, userLat, userLng);
     }
 
-    public String[] searchByRoadAddressName(String roadAddressName, String placeName) {
+    public String[] searchByRoadAddressName(long shopId, String roadAddressName, String placeName) {
         // 1-1. Redis에서 조회
-        String cacheKey = redisDao.getRoadAddressKey(roadAddressName);
+        String cacheKey = redisDao.getShopInfoKey(shopId);
         String cachedData = redisDao.getValues(cacheKey);
 
         if (cachedData != null) {
             String[] cached = cachedData.split((","));
-            // 1-2. apiShop의 brand명이 dbShop의 placeName에 포함되는지 확인
-            if(placeName.contains(cached[0].split(" ")[0])) {
-                log.info("=====RoadAddressName Cache Hit=====");
-                return cachedData.split(",");
-            }
+            log.info("=======Shop Info Cache Hit=======");
+            return cachedData.split(",");
         }
-        log.info("=====RoadAddressName Cache Miss=====");
+        log.info("=======Shop Info Cache Miss=======");
 
         // 2. API 호출을 위한 요청 설정
         String apiPath = "/v2/local/search/keyword.json";
@@ -121,15 +118,8 @@ public class KakaoMapSearchApi {
         // 4. JSON -> String 역직렬화
         // 도로명주소와 DEFAULT_QUERY_WORD로 검색 시
         // 100% 일치하는 데이터가 항상 상단에 노출되지 않음
-        // 따라서, 여러 데이터 중 요청 도로명 주소와 일치하는 데이터 1개만 찾아서 반환
-        String[] result = matchAndDeserialize(documents, roadAddressName, placeName);
-        if(result != null){
-            // 5. Redis에 데이터 저장
-            redisDao.setValues(cacheKey, String.join(",", result), Duration.ofDays(1));
-            return result;
-        } else {
-            return null;
-        }
+        // 따라서, 여러 데이터 중 요청 도로명 주소와 브랜드명으로 비교하여 일치하는 데이터 1개만 찾아서 반환
+        return matchAndDeserialize(documents, roadAddressName, placeName);
     }
 
     public String[] searchByRoadAddressName(String roadAddressName, String placeName, Double userLat, Double userLng) {
@@ -224,12 +214,12 @@ public class KakaoMapSearchApi {
     private String[] matchAndDeserialize(JsonNode documents, String roadAddressName, String placeName) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
-            if (document.get("road_address_name").asText().equals(roadAddressName)) {
+            if (roadAddressName.contains(document.get("road_address_name").asText())) {
                 if(placeName.contains(document.get("place_name").asText().split(" ")[0])) {
                     return new String[]{
-                            document.get("place_name").asText(), document.get("place_url").asText(),
-                            document.get("x").asText(), document.get("y").asText()
-                    };
+                            document.get("place_url").asText(),
+                            document.get("x").asText(),
+                            document.get("y").asText()};
                 }
             }
         }

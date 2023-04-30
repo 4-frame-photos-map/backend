@@ -8,12 +8,14 @@ import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.entity.ShopMatchPriority;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.domain.shop.service.kakao.KakaoMapSearchApi;
+import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,6 +32,7 @@ public class ShopService {
     private final ShopRepository shopRepository;
     private final FavoriteRepository favoriteRepository;
     private final KakaoMapSearchApi kakaoMapSearchApi;
+    private final RedisDao redisDao;
 
 
     @Transactional(readOnly = true)
@@ -44,6 +47,8 @@ public class ShopService {
                         dbShop.getPlaceName(), dbShop.getRoadAddressName(), apiShop.getPlaceName(),
                         apiShop.getRoadAddressName(), apiShop.getAddressName()
                 );
+
+                cacheShopInfoById(dbShop, apiShop);
 
                 if(responseClass.equals(ResponseShopKeyword.class)) {
                     ResponseShopKeyword responseShop = ResponseShopKeyword.of(dbShop, apiShop, dbShop.getBrand());
@@ -66,16 +71,31 @@ public class ShopService {
             if (dbShops.size() == 1) {
                 return dbShops.get(0);
             } else if (dbShops.size() > 1) {
-                Optional<Shop> matchedShop = Arrays.stream(ShopMatchPriority.values())
-                        .flatMap(priority -> dbShops.stream()
-                                .filter(dbShop -> priority.isMatchedShop(dbShop, apiShop)))
-                        .findFirst();
-                if (matchedShop.isPresent()) {
-                    return matchedShop.get();
-                }
+                Shop matchedShop = compareMatchingShops(apiShop, dbShops);
+                if (matchedShop != null) return matchedShop;
             }
         }
         return null;
+    }
+
+    private static Shop compareMatchingShops(KakaoMapSearchDto apiShop, List<Shop> dbShops) {
+        Optional<Shop> matchedShop = Arrays.stream(ShopMatchPriority.values())
+                .flatMap(priority -> dbShops.stream()
+                        .filter(dbShop -> priority.isMatchedShop(dbShop, apiShop)))
+                .findFirst();
+        if (matchedShop.isPresent()) {
+            return matchedShop.get();
+        }
+        return null;
+    }
+
+    private void cacheShopInfoById(Shop dbShop, KakaoMapSearchDto apiShop) {
+        String cacheKey = redisDao.getShopInfoKey(dbShop.getId());
+        redisDao.setValues(
+                cacheKey,
+                String.join(",", apiShop.getPlaceUrl(), apiShop.getLatitude(), apiShop.getLongitude()),
+                Duration.ofDays(1)
+        );
     }
 
     public List<KakaoMapSearchDto> searchKakaoMapByKeyword(String keyword, Double userLat, Double userLng) {
@@ -96,16 +116,15 @@ public class ShopService {
         return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
     }
 
-    public ResponseShopDetail renameShopAndSetResponseDto(Shop dbShop, String distance) {
-        String[] apiShop = kakaoMapSearchApi.searchByRoadAddressName(dbShop.getRoadAddressName(), dbShop.getPlaceName());
+    public ResponseShopDetail setResponseDto(Shop dbShop, String distance) {
+        String[] apiShop = kakaoMapSearchApi.searchByRoadAddressName(dbShop.getId(), dbShop.getRoadAddressName(), dbShop.getPlaceName());
 
         if(apiShop == null) throw new BusinessException(INVALID_SHOP_ID);
-        String placeName = apiShop[0];
-        String placeUrl = apiShop[1];
-        String placeLng = apiShop[2];
-        String placeLat = apiShop[3];
+        String placeUrl = apiShop[0];
+        String placeLng = apiShop[1];
+        String placeLat = apiShop[2];
 
-        return ResponseShopDetail.of(dbShop, placeName, placeUrl, placeLng, placeLat, distance);
+        return ResponseShopDetail.of(dbShop, placeUrl, placeLng, placeLat, distance);
     }
 
     public FavoriteResponse renameShopAndSetResponseDto(Favorite favorite, Double userLat, Double userLng) {
