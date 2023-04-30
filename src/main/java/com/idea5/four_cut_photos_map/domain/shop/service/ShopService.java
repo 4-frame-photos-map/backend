@@ -19,7 +19,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_SHOP_ID;
@@ -45,7 +44,7 @@ public class ShopService {
 
             if (dbShop != null) {
                 log.info("Matched: DB shop ({} - {}), Kakao API shop ({} - {} - {})",
-                        dbShop.getPlaceName(), dbShop.getRoadAddressName(), apiShop.getPlaceName(),
+                        dbShop.getPlaceName(), dbShop.getAddress(), apiShop.getPlaceName(),
                         apiShop.getRoadAddressName(), apiShop.getAddressName()
                 );
 
@@ -73,7 +72,7 @@ public class ShopService {
     @Transactional(readOnly = true)
     public Shop compareWithPlaceNameOrAddress(String placeName, String... addresses) {
         for (String address : addresses) {
-            List<Shop> matchedShops = shopRepository.findDistinctByPlaceNameOrRoadAddressNameContaining(
+            List<Shop> matchedShops = shopRepository.findDistinctByPlaceNameOrAddressContaining(
                     placeName,
                     address
             );
@@ -85,7 +84,7 @@ public class ShopService {
             }
             log.info("Not Matched: DB shops ({} - {}), Kakao API shop ({} - {})",
                     matchedShops.stream().map(Shop::getPlaceName).collect(Collectors.toList()),
-                    matchedShops.stream().map(Shop::getRoadAddressName).collect(Collectors.toList()),
+                    matchedShops.stream().map(Shop::getAddress).collect(Collectors.toList()),
                     placeName,
                     address
             );

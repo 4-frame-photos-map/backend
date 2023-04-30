@@ -14,15 +14,15 @@ public class ShopDto {
 
     private Long id;
     private String placeName;// 장소명
-    private String roadAddressName; // 도로명 주소
+    private String address; // 도로명 주소
     private double latitude; // 위도
     private double longitude; // 경도
     private String distance; // 중심좌표까지의 거리
 
 
-    public ShopDto(String placeName, String roadAddressName, double latitude, double longitude, String distance) {
+    public ShopDto(String placeName, String address, double latitude, double longitude, String distance) {
         this.placeName = placeName;
-        this.roadAddressName = roadAddressName;
+        this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
         this.distance = distance;
@@ -32,7 +32,7 @@ public class ShopDto {
         return ShopDto.builder()
                 .id(shop.getId())
                 .placeName(shop.getPlaceName())
-                .roadAddressName(shop.getRoadAddressName())
+                .address(shop.getAddress())
                 .build();
     }
 

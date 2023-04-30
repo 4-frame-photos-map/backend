@@ -16,7 +16,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -92,7 +91,7 @@ public class KakaoMapSearchApi {
         String[] cachedArr = getShopInfoFromCacheAndCalculateDist(dbShop, userLat, userLng);
         if (cachedArr != null) {return cachedArr;}
 
-        String[] queryWords = {dbShop.getPlaceName(), dbShop.getRoadAddressName()};
+        String[] queryWords = {dbShop.getPlaceName(), dbShop.getAddress()};
         for (String queryWord : queryWords) {
             // 2. API 호출을 위한 요청 설정
             String apiPath = "/v2/local/search/keyword.json";
@@ -116,7 +115,7 @@ public class KakaoMapSearchApi {
             // 도로명주소와 DEFAULT_QUERY_WORD로 검색 시
             // 100% 일치하는 데이터가 항상 상단에 노출되지 않음
             // 따라서, 여러 데이터 중 요청 도로명 주소와 브랜드명으로 비교하여 일치하는 데이터 1개만 찾아서 반환
-            String[] results = matchAndDeserialize(documents, dbShop.getRoadAddressName(), dbShop.getPlaceName());
+            String[] results = matchAndDeserialize(documents, dbShop.getAddress(), dbShop.getPlaceName());
             if(results != null) {return results;}
         }
         return null;
@@ -141,12 +140,12 @@ public class KakaoMapSearchApi {
 
         // 3. JSON -> DTO 역직렬화
         // 도로명 주소가 없다면 지번 주소 반환
-        String roadAddressName = Optional.ofNullable(documents.get(0).get("road_address"))
+        String address = Optional.ofNullable(documents.get(0).get("road_address"))
                 .map(jsonNode -> jsonNode.get("address_name"))
                 .map(JsonNode::asText)
                 .orElse(documents.get(0).get("address").get("address_name").asText());
 
-        return roadAddressName;
+        return address;
     }
 
     private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents) {
@@ -186,7 +185,7 @@ public class KakaoMapSearchApi {
         return resultList;
     }
 
-    private String[] matchAndDeserialize(JsonNode documents, String roadAddressName, String placeName) {
+    private String[] matchAndDeserialize(JsonNode documents, String dbAddress, String dbPlaceName) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
             try {
@@ -196,8 +195,8 @@ public class KakaoMapSearchApi {
                 String apiRoadAddressName = dto.getRoadAddressName();
                 String apiAddressName = dto.getAddressName();
 
-                if (isMatchedShop(placeName, apiPlaceName, roadAddressName, apiRoadAddressName) ||
-                        isMatchedShop(placeName, apiPlaceName, roadAddressName, apiAddressName)) {
+                if (isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiRoadAddressName) ||
+                        isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiAddressName)) {
                     return new String[]{
                             dto.getPlaceUrl(),
                             dto.getLatitude(),

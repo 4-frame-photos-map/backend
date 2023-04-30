@@ -66,10 +66,10 @@ abstract class EtcBrandCrawlService {
             for (Element element : elements) {
                 String placeName = element.selectFirst(placeNameSelector).text();
                 if (isBranchNameWithSuffix(placeName)) {
-                    String roadAddressName = element.select(addressSelector).text();
-                    roadAddressName = formatAddress(roadAddressName);
+                    String address = element.select(addressSelector).text();
+                    address = formatAddress(address);
                     placeName = formatPlaceName(placeName);
-                    saveOrUpdateShop(placeName, roadAddressName);
+                    saveOrUpdateShop(placeName, address);
                 }
             }
         } catch (Exception e) {
@@ -96,10 +96,10 @@ abstract class EtcBrandCrawlService {
                 for (Element element : elements) {
                     String placeName = element.select(placeNameSelector).text();
                     if (isBranchNameWithSuffix(placeName)) {
-                        String roadAddressName = element.select(addressSelector).text();
-                        roadAddressName = formatAddress(roadAddressName);
+                        String address = element.select(addressSelector).text();
+                        address = formatAddress(address);
                         placeName = formatPlaceName(placeName);
-                        saveOrUpdateShop(placeName, roadAddressName);
+                        saveOrUpdateShop(placeName, address);
                     }
                 }
             }
@@ -167,52 +167,52 @@ abstract class EtcBrandCrawlService {
         return elements;
     }
 
-    public String formatAddress(String roadAddressName) {
-        if (roadAddressName.startsWith("대한민국")) {
-            roadAddressName = roadAddressName.replace("대한민국 ", "");
+    public String formatAddress(String address) {
+        if (address.startsWith("대한민국")) {
+            address = address.replace("대한민국 ", "");
         }
 
         // 상세주소 제거 방법 (1)
-        if (roadAddressName.contains(",")) {
-            roadAddressName = roadAddressName.split(",")[0];
+        if (address.contains(",")) {
+            address = address.split(",")[0];
         }
 
         // 상세주소 제거 방법 (2)
         // '로[공백], 길[공백]으로 끝나는 문자열 + 그 다음 공백 문자열(번호)' 형태로 주소가 끝나도록 가공
-        if (roadAddressName.matches(".*\\d.*")) {
-            String[] roadSuffixes = {"로 ", "길 ", "동 "};
-            for (String suffix : roadSuffixes) {
-                int idx = roadAddressName.lastIndexOf(suffix);
+        if (address.matches(".*\\d.*")) {
+            String[] addressSuffixes = {"로 ", "길 ", "동 "};
+            for (String suffix : addressSuffixes) {
+                int idx = address.lastIndexOf(suffix);
                 if (idx != -1) {
-                    String numAfterSuffix = roadAddressName.substring(idx + suffix.length()).split(" ")[0];
-                    roadAddressName = roadAddressName.substring(0, idx + suffix.length()) + numAfterSuffix;
+                    String numAfterSuffix = address.substring(idx + suffix.length()).split(" ")[0];
+                    address = address.substring(0, idx + suffix.length()) + numAfterSuffix;
                     break;
                 }
             }
         }
 
-        return roadAddressName;
+        return address;
     }
 
     protected abstract String formatPlaceName(String placeName);
 
-    public void saveOrUpdateShop(String placeName, String roadAddressName) {
+    public void saveOrUpdateShop(String placeName, String address) {
         Shop oldShop = shopRepository.findByPlaceName(placeName).orElse(null);
         if (oldShop == null) {
             Shop shop = Shop.builder()
                     .brand(brandRepository.findByBrandName("기타").get())
                     .placeName(placeName)
-                    .roadAddressName(roadAddressName)
+                    .address(address)
                     .favoriteCnt(0)
                     .reviewCnt(0)
                     .starRatingAvg(0.0)
                     .build();
             shopRepository.save(shop);
-            log.info("persist >> placeName:{}, roadAddressName:{}", placeName, roadAddressName);
+            log.info("persist >> placeName:{}, address:{}", placeName, address);
         } else {
-            if (!oldShop.getRoadAddressName().equals(roadAddressName)) {
-                oldShop.setRoadAddressName(roadAddressName);
-                log.info("merge >> id:{}, changed fields: {}", oldShop.getId(), roadAddressName);
+            if (!oldShop.getAddress().equals(address)) {
+                oldShop.setAddress(address);
+                log.info("merge >> id:{}, changed fields: {}", oldShop.getId(), address);
             }
         }
     }
@@ -222,13 +222,13 @@ abstract class EtcBrandCrawlService {
             Shop shop = Shop.builder()
                     .brand(brandRepository.findByBrandName("기타").get())
                     .placeName(placeName)
-                    .roadAddressName(null)
+                    .address(null)
                     .favoriteCnt(0)
                     .reviewCnt(0)
                     .starRatingAvg(0.0)
                     .build();
             shopRepository.save(shop);
-            log.info("persist >> placeName:{}, roadAddressName:{}", placeName, null);
+            log.info("persist >> placeName:{}, address:{}", placeName, null);
         }
     }
 
