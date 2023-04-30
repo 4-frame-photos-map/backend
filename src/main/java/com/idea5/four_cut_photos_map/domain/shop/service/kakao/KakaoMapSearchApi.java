@@ -89,7 +89,7 @@ public class KakaoMapSearchApi {
 
     public String[] searchSingleShopByQueryWord(Shop dbShop, Double userLat, Double userLng) {
         // 1. Redis에서 조회
-        String[] cachedArr = getShopInfoFromCache(dbShop, userLat, userLng);
+        String[] cachedArr = getShopInfoFromCacheAndCalculateDist(dbShop, userLat, userLng);
         if (cachedArr != null) {return cachedArr;}
 
         String[] queryWords = {dbShop.getPlaceName(), dbShop.getRoadAddressName()};
@@ -120,51 +120,6 @@ public class KakaoMapSearchApi {
             if(results != null) {return results;}
         }
         return null;
-    }
-
-    private String[] getShopInfoFromCache(Shop dbShop, Double userLat, Double userLng) {
-        String cacheKey = redisDao.getShopInfoKey(dbShop.getId());
-        String cachedData = redisDao.getValues(cacheKey);
-
-        if (cachedData != null) {
-            String[] cachedArr = cachedData.split(",");
-            log.info("=======Shop Info Cache Hit=======");
-            String distance = Util.calculateDist(
-                    Double.parseDouble(cachedArr[1]), // placeLat
-                    Double.parseDouble(cachedArr[2]), // placeLng
-                    userLat,
-                    userLng
-            );
-            return new String[]{cachedArr[0], cachedArr[1], cachedArr[2], distance};
-        }
-        log.info("=======Shop Info Cache Miss=======");
-        return null;
-    }
-
-    public String[] searchByRoadAddressName(String roadAddressName, String placeName, Double userLat, Double userLng) {
-        // 1. API 호출을 위한 요청 설정
-        String apiPath = "/v2/local/search/keyword.json";
-        String apiUrl = UriComponentsBuilder.fromPath(apiPath)
-                .queryParam("query", roadAddressName + DEFAULT_QUERY_WORD)
-                .queryParam("y",userLat)
-                .queryParam("x",userLng)
-                .build()
-                .toString();
-
-        // 2. API 호출
-        JsonNode documents;
-        try {
-            documents = getDocuments(apiUrl);
-        } catch (Exception e) {
-            throw new BusinessException(TOO_MANY_REQUESTS);
-        }
-
-        // 3. JSON -> String 역직렬화
-        // 도로명주소와 DEFAULT_QUERY_WORD로 검색 시
-        // 100% 일치하는 데이터가 항상 상단에 노출되지 않음
-        // 따라서, 여러 데이터 중 요청 도로명 주소와 일치하는 데이터 1개만 찾아서 반환
-        String[] result = matchAndDeserializeWithCurLocation(documents, roadAddressName, placeName);
-        return result;
     }
 
     public String convertCoordinateToAddress(Double mapLat, Double mapLng) {
@@ -257,17 +212,29 @@ public class KakaoMapSearchApi {
         return null;
     }
 
-    private String[] matchAndDeserializeWithCurLocation(JsonNode documents, String roadAddressName, String placeName) {
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        for (JsonNode document : documents) {
-            if (document.get("road_address_name").asText().equals(roadAddressName)) {
-                if(placeName.contains(document.get("place_name").asText().split(" ")[0])) {
-                    return new String[]{
-                            document.get("place_name").asText(), Util.distanceFormatting(document.get("distance").asText())
-                    };
-                }
-            }
+    /**
+     * Redis에서 지점 정보 가져와서 지점으로부터 현재 위치까지의 거리 계산하기
+     * @param dbShop
+     * @param userLat
+     * @param userLng
+     * @return placeUrl, placeLat, placeLng, distance
+     */
+    private String[] getShopInfoFromCacheAndCalculateDist(Shop dbShop, Double userLat, Double userLng) {
+        String cacheKey = redisDao.getShopInfoKey(dbShop.getId());
+        String cachedData = redisDao.getValues(cacheKey);
+
+        if (cachedData != null) {
+            String[] cachedArr = cachedData.split(",");
+            log.info("=======Shop Info Cache Hit=======");
+            String distance = Util.calculateDist(
+                    Double.parseDouble(cachedArr[1]), // placeLat
+                    Double.parseDouble(cachedArr[2]), // placeLng
+                    userLat,
+                    userLng
+            );
+            return new String[]{cachedArr[0], cachedArr[1], cachedArr[2], distance};
         }
+        log.info("=======Shop Info Cache Miss=======");
         return null;
     }
 

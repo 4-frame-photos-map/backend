@@ -41,7 +41,7 @@ public class ShopService {
         List<T> resultShop = new ArrayList<>();
         for (KakaoMapSearchDto apiShop : apiShops) {
             // 도로명주소 비교로 반환하는 지점 없을 시, 지번주소로 비교
-            Shop dbShop = compareWithPlaceNameOrAddress(apiShop, apiShop.getRoadAddressName(), apiShop.getAddressName());
+            Shop dbShop = compareWithPlaceNameOrAddress(apiShop.getPlaceName(), apiShop.getRoadAddressName(), apiShop.getAddressName());
 
             if (dbShop != null) {
                 log.info("Matched: DB shop ({} - {}), Kakao API shop ({} - {} - {})",
@@ -63,35 +63,42 @@ public class ShopService {
         return resultShop;
     }
 
-    public Shop compareWithPlaceNameOrAddress(KakaoMapSearchDto apiShop, String... addresses) {
+    /**
+     * 지점명 일치여부나 주소명 포함여부로 비교하여 Kakao API Shop과 일치하는 DB Shop 객체 반환
+     * 중복 발생 시 주소 중복일 확률이 높으므로, 지점명과 브랜드명을 기준으로 우선순위를 결정함
+     * @param placeName (카카오 API 지점명)
+     * @param addresses (카카오 API 도로명주소, 지번주소)
+     * @return DB Shop
+     */
+    @Transactional(readOnly = true)
+    public Shop compareWithPlaceNameOrAddress(String placeName, String... addresses) {
         for (String address : addresses) {
-            List<Shop> dbShops = shopRepository.findDistinctByPlaceNameOrRoadAddressNameContaining(
-                    apiShop.getPlaceName(),
+            List<Shop> matchedShops = shopRepository.findDistinctByPlaceNameOrRoadAddressNameContaining(
+                    placeName,
                     address
             );
-            if (dbShops.size() == 1) {
-                return dbShops.get(0);
-            } else if (dbShops.size() > 1) {
-                Shop matchedShop = compareMatchingShops(apiShop, dbShops);
+            if (matchedShops.size() == 1) {
+                return matchedShops.get(0);
+            } else if (matchedShops.size() > 1) {
+                Shop matchedShop = compareMatchingShops(placeName, matchedShops);
                 if (matchedShop != null) return matchedShop;
             }
-            log.info("Not Matched: DB shops ({} - {}), Kakao API shop ({} - {} - {})",
-                    dbShops.stream().map(Shop::getPlaceName).collect(Collectors.toList()),
-                    dbShops.stream().map(Shop::getRoadAddressName).collect(Collectors.toList()),
-                    apiShop.getPlaceName(), apiShop.getRoadAddressName(), apiShop.getAddressName());
+            log.info("Not Matched: DB shops ({} - {}), Kakao API shop ({} - {})",
+                    matchedShops.stream().map(Shop::getPlaceName).collect(Collectors.toList()),
+                    matchedShops.stream().map(Shop::getRoadAddressName).collect(Collectors.toList()),
+                    placeName,
+                    address
+            );
         }
         return null;
     }
 
-    private static Shop compareMatchingShops(KakaoMapSearchDto apiShop, List<Shop> dbShops) {
-        Optional<Shop> matchedShop = Arrays.stream(ShopMatchPriority.values())
+    private Shop compareMatchingShops(String apiPlaceName, List<Shop> dbShops) {
+        return Arrays.stream(ShopMatchPriority.values())
                 .flatMap(priority -> dbShops.stream()
-                        .filter(dbShop -> priority.isMatchedShop(dbShop, apiShop)))
-                .findFirst();
-        if (matchedShop.isPresent()) {
-            return matchedShop.get();
-        }
-        return null;
+                        .filter(dbShop -> priority.isMatchedShop(dbShop, apiPlaceName)))
+                .findFirst()
+                .orElse(null);
     }
 
     private void cacheShopInfoById(Shop dbShop, KakaoMapSearchDto apiShop) {
@@ -137,13 +144,9 @@ public class ShopService {
         return ResponseShopDetail.of(dbShop, placeUrl, placeLat, placeLng, distance);
     }
 
-    public FavoriteResponse renameShopAndSetResponseDto(Favorite favorite, Double userLat, Double userLng) {
-        String[] apiShop = kakaoMapSearchApi.searchByRoadAddressName(
-                favorite.getShop().getRoadAddressName(),
-                favorite.getShop().getPlaceName(),
-                userLat,
-                userLng
-        );
+    public FavoriteResponse setResponseDto(Favorite favorite, Double userLat, Double userLng) {
+        // 지점명으로 반환하는 지점 없을 시, 주소로 비교
+        String[] apiShop = searchSingleShopByQueryWord(favorite.getShop(), userLat, userLng);
 
         if (apiShop == null) {
             Shop shopWithInvalidId = favorite.getShop();
@@ -152,10 +155,9 @@ public class ShopService {
             return null;
         }
 
-        String placeName = apiShop[0];
-        String distance = apiShop[1];
+        String distance = apiShop[3];
 
-        return FavoriteResponse.from(favorite, placeName, distance);
+        return FavoriteResponse.from(favorite, distance);
     }
 
 
