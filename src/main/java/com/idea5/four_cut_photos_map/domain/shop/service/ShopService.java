@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_SHOP_ID;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUND;
@@ -43,10 +44,11 @@ public class ShopService {
             Shop dbShop = compareWithPlaceNameOrAddress(apiShop, apiShop.getRoadAddressName(), apiShop.getAddressName());
 
             if (dbShop != null) {
-                log.info("Comparison target: DB shop ({} - {}), Kakao API shop ({} - {} - {})",
+                log.info("Matched: DB shop ({} - {}), Kakao API shop ({} - {} - {})",
                         dbShop.getPlaceName(), dbShop.getRoadAddressName(), apiShop.getPlaceName(),
                         apiShop.getRoadAddressName(), apiShop.getAddressName()
                 );
+
                 cacheShopInfoById(dbShop, apiShop);
 
                 if (responseClass.equals(ResponseShopKeyword.class)) {
@@ -73,6 +75,10 @@ public class ShopService {
                 Shop matchedShop = compareMatchingShops(apiShop, dbShops);
                 if (matchedShop != null) return matchedShop;
             }
+            log.info("Not Matched: DB shops ({} - {}), Kakao API shop ({} - {} - {})",
+                    dbShops.stream().map(Shop::getPlaceName).collect(Collectors.toList()),
+                    dbShops.stream().map(Shop::getRoadAddressName).collect(Collectors.toList()),
+                    apiShop.getPlaceName(), apiShop.getRoadAddressName(), apiShop.getAddressName());
         }
         return null;
     }
