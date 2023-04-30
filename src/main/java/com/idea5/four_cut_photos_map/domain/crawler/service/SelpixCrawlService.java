@@ -1,7 +1,7 @@
-package com.idea5.four_cut_photos_map.domain.crawl.service;
+package com.idea5.four_cut_photos_map.domain.crawler.service;
 
 import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
-import com.idea5.four_cut_photos_map.domain.crawl.Entity.CrawlTarget;
+import com.idea5.four_cut_photos_map.domain.crawler.enums.CrawlTarget;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

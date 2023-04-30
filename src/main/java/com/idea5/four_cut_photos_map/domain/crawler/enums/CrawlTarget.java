@@ -1,4 +1,4 @@
-package com.idea5.four_cut_photos_map.domain.crawl.Entity;
+package com.idea5.four_cut_photos_map.domain.crawler.enums;
 
 import lombok.AllArgsConstructor;
 

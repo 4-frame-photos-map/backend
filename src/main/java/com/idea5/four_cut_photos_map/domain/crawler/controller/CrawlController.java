@@ -1,6 +1,6 @@
-package com.idea5.four_cut_photos_map.domain.crawl.controller;
+package com.idea5.four_cut_photos_map.domain.crawler.controller;
 
-import com.idea5.four_cut_photos_map.domain.crawl.service.*;
+import com.idea5.four_cut_photos_map.domain.crawler.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
