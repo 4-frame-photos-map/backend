@@ -18,18 +18,18 @@ import java.util.List;
 @SuperBuilder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ResponseShopDetail extends ResponseShopBriefInfo {
-    private String longitude;
     private String latitude;
+    private String longitude;
     private String placeUrl;
     private List<ResponseShopReviewDto> recentReviews;
 
 
-    public static ResponseShopDetail of(Shop dbShop, String placeUrl, String placeLng, String placeLat,  String distance){
+    public static ResponseShopDetail of(Shop dbShop, String placeUrl, String placeLat, String placeLng,  String distance){
         return ResponseShopDetail.builder()
                 .id(dbShop.getId())
                 .placeName(dbShop.getPlaceName())
-                .longitude(placeLng)
                 .latitude(placeLat)
+                .longitude(placeLng)
                 .distance(distance)
                 .placeUrl(placeUrl)
                 .starRatingAvg(dbShop.getStarRatingAvg())

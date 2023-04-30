@@ -38,22 +38,21 @@ public class ShopService {
     @Transactional(readOnly = true)
     public <T extends ResponseShop> List<T> findMatchingShops(List<KakaoMapSearchDto> apiShops, Class<T> responseClass) {
         List<T> resultShop = new ArrayList<>();
-        for (KakaoMapSearchDto apiShop: apiShops) {
+        for (KakaoMapSearchDto apiShop : apiShops) {
             // 도로명주소 비교로 반환하는 지점 없을 시, 지번주소로 비교
             Shop dbShop = compareWithPlaceNameOrAddress(apiShop, apiShop.getRoadAddressName(), apiShop.getAddressName());
 
-            if(dbShop != null) {
+            if (dbShop != null) {
                 log.info("Comparison target: DB shop ({} - {}), Kakao API shop ({} - {} - {})",
                         dbShop.getPlaceName(), dbShop.getRoadAddressName(), apiShop.getPlaceName(),
                         apiShop.getRoadAddressName(), apiShop.getAddressName()
                 );
-
                 cacheShopInfoById(dbShop, apiShop);
 
-                if(responseClass.equals(ResponseShopKeyword.class)) {
+                if (responseClass.equals(ResponseShopKeyword.class)) {
                     ResponseShopKeyword responseShop = ResponseShopKeyword.of(dbShop, apiShop, dbShop.getBrand());
                     resultShop.add(responseClass.cast(responseShop));
-                } else if(responseClass.equals(ResponseShopBrand.class)){
+                } else if (responseClass.equals(ResponseShopBrand.class)) {
                     ResponseShopBrand responseShop = ResponseShopBrand.of(dbShop, apiShop, dbShop.getBrand());
                     resultShop.add(responseClass.cast(responseShop));
                 }
@@ -99,16 +98,19 @@ public class ShopService {
     }
 
     public List<KakaoMapSearchDto> searchKakaoMapByKeyword(String keyword, Double userLat, Double userLng) {
-        return kakaoMapSearchApi.searchByQueryWord (keyword, userLat, userLng);
+        return kakaoMapSearchApi.searchByQueryWord(keyword, userLat, userLng);
     }
 
     public List<KakaoMapSearchDto> searchKakaoMapByBrand(String brand, Double userLat, Double userLng, Double mapLat, Double mapLng) {
         if (userLat == mapLat && userLng == mapLng) {
-            return kakaoMapSearchApi.searchByQueryWord (brand, userLat, userLng);
+            return kakaoMapSearchApi.searchByQueryWord(brand, userLat, userLng);
+        } else {
+            return kakaoMapSearchApi.searchByQueryWord(brand, userLat, userLng, mapLat, mapLng);
         }
-        else {
-            return kakaoMapSearchApi.searchByQueryWord (brand, userLat, userLng, mapLat, mapLng);
-        }
+    }
+
+    public String[] searchSingleShopByQueryWord(Shop dbShop, Double userLat, Double userLng) {
+        return kakaoMapSearchApi.searchSingleShopByQueryWord(dbShop, userLat, userLng);
     }
 
     @Transactional(readOnly = true)
@@ -116,15 +118,17 @@ public class ShopService {
         return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
     }
 
-    public ResponseShopDetail setResponseDto(Shop dbShop, String distance) {
-        String[] apiShop = kakaoMapSearchApi.searchByRoadAddressName(dbShop.getId(), dbShop.getRoadAddressName(), dbShop.getPlaceName());
+    public ResponseShopDetail setResponseDto(Shop dbShop, Double userLat, Double userLng) {
+        // 지점명으로 반환하는 지점 없을 시, 주소로 비교
+        String[] apiShop = searchSingleShopByQueryWord(dbShop, userLat, userLng);
 
-        if(apiShop == null) throw new BusinessException(INVALID_SHOP_ID);
+        if (apiShop == null) throw new BusinessException(INVALID_SHOP_ID);
         String placeUrl = apiShop[0];
-        String placeLng = apiShop[1];
-        String placeLat = apiShop[2];
+        String placeLat = apiShop[1];
+        String placeLng = apiShop[2];
+        String distance = apiShop[3];
 
-        return ResponseShopDetail.of(dbShop, placeUrl, placeLng, placeLat, distance);
+        return ResponseShopDetail.of(dbShop, placeUrl, placeLat, placeLng, distance);
     }
 
     public FavoriteResponse renameShopAndSetResponseDto(Favorite favorite, Double userLat, Double userLng) {
@@ -135,7 +139,7 @@ public class ShopService {
                 userLng
         );
 
-        if(apiShop == null) {
+        if (apiShop == null) {
             Shop shopWithInvalidId = favorite.getShop();
             favoriteRepository.deleteById(favorite.getId());
             reduceFavoriteCnt(shopWithInvalidId);
@@ -150,24 +154,24 @@ public class ShopService {
 
 
     @Transactional(readOnly = true)
-    public ResponseShopBriefInfo setResponseDto (long id, String placeName, String distance) {
+    public ResponseShopBriefInfo setResponseDto(long id, String placeName, String distance) {
         Shop dbShop = findById(id);
         return ResponseShopBriefInfo.of(dbShop, placeName, distance);
     }
 
-    public void reduceFavoriteCnt(Shop shop){
+    public void reduceFavoriteCnt(Shop shop) {
         shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0 ? 0 : shop.getFavoriteCnt() - 1);
         shopRepository.save(shop);
     }
 
     @Transactional
-    public void reduceFavoriteCnt(Long shopId){
+    public void reduceFavoriteCnt(Long shopId) {
         Shop shop = findById(shopId);
         shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0 ? 0 : shop.getFavoriteCnt() - 1);
     }
 
-    public void increaseFavoriteCnt(Shop shop){
-        shop.setFavoriteCnt(shop.getFavoriteCnt()+1);
+    public void increaseFavoriteCnt(Shop shop) {
+        shop.setFavoriteCnt(shop.getFavoriteCnt() + 1);
         shopRepository.save(shop);
     }
 

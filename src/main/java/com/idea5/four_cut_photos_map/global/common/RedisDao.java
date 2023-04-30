@@ -64,6 +64,6 @@ public class RedisDao {
         return "jwt_black_list:" + accessToken;
     }
 
-    // 지점 정보를 저장하는 key
+    // 지점 정보(placeUrl, lat, lng)를 저장하는 key
     public String getShopInfoKey(long shopId) {return "shop:" + shopId;}
 }

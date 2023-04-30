@@ -112,11 +112,12 @@ public class ShopController {
      */
     @GetMapping("/{shop-id}")
     public ResponseEntity<ResponseShopDetail> showDetail (@PathVariable(name = "shop-id") Long id,
-                                                          @RequestParam @NotBlank String distance,
+                                                          @RequestParam @NotNull Double userLat,
+                                                          @RequestParam @NotNull Double userLng,
                                                           @AuthenticationPrincipal MemberContext memberContext) {
 
         Shop dbShop = shopService.findById(id);
-        ResponseShopDetail shopDetailDto = shopService.setResponseDto(dbShop, distance);
+        ResponseShopDetail shopDetailDto = shopService.setResponseDto(dbShop, userLat, userLng);
 
         List<ResponseShopReviewDto> recentReviews = reviewService.getTop3ShopReviews(shopDetailDto.getId());
         shopDetailDto.setRecentReviews(recentReviews);
