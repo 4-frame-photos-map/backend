@@ -1,7 +1,8 @@
-package com.idea5.four_cut_photos_map.domain.crawl.service;
+package com.idea5.four_cut_photos_map.domain.crawler.service.mainbrand;
 
 import com.idea5.four_cut_photos_map.domain.brand.entity.Brand;
 import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
+import com.idea5.four_cut_photos_map.domain.crawler.service.mainbrand.CrawlService;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class LifefourcutsCrawlService implements CrawlService {
                     if (shopRepository.existsByPlaceName(placeName)) continue;
                     Shop shop = Shop.builder()
                             .placeName(placeName)
-                            .roadAddressName(address)
+                            .address(address)
                             .brand(brand)
                             .favoriteCnt(0)
                             .reviewCnt(0)

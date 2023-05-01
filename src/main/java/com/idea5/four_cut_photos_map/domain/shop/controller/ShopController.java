@@ -51,7 +51,7 @@ public class ShopController {
             return ResponseEntity.ok(resultShops);
         }
 
-        resultShops = shopService.compareWithDbShops(apiShop, ResponseShopKeyword.class);
+        resultShops = shopService.findMatchingShops(apiShop, ResponseShopKeyword.class);
         if(resultShops.isEmpty()) {
             return ResponseEntity.ok(resultShops);
         }
@@ -89,7 +89,7 @@ public class ShopController {
             return ResponseEntity.ok(responseMap);
         }
 
-        resultShops = shopService.compareWithDbShops(apiShop, ResponseShopBrand.class);
+        resultShops = shopService.findMatchingShops(apiShop, ResponseShopBrand.class);
         if(resultShops.isEmpty()) {
             return ResponseEntity.ok(responseMap);
         }
@@ -112,11 +112,12 @@ public class ShopController {
      */
     @GetMapping("/{shop-id}")
     public ResponseEntity<ResponseShopDetail> showDetail (@PathVariable(name = "shop-id") Long id,
-                                                          @RequestParam @NotBlank String distance,
+                                                          @RequestParam @NotNull Double userLat,
+                                                          @RequestParam @NotNull Double userLng,
                                                           @AuthenticationPrincipal MemberContext memberContext) {
 
         Shop dbShop = shopService.findById(id);
-        ResponseShopDetail shopDetailDto = shopService.renameShopAndSetResponseDto(dbShop, distance);
+        ResponseShopDetail shopDetailDto = shopService.setResponseDto(dbShop, userLat, userLng);
 
         List<ResponseShopReviewDto> recentReviews = reviewService.getTop3ShopReviews(shopDetailDto.getId());
         shopDetailDto.setRecentReviews(recentReviews);

@@ -1,4 +1,4 @@
-package com.idea5.four_cut_photos_map.domain.crawl.service;
+package com.idea5.four_cut_photos_map.domain.crawler.service.mainbrand;
 
 import org.springframework.stereotype.Service;
 
