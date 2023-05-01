@@ -14,6 +14,7 @@ public class CrawlController {
     private final HarufilmCrawlService harufilmCrawlService;
     private final PhotoismCrawlService photoismCrawlService;
     private final PhotograyCrawlService photograyCrawlService;
+    private final PhotosignatureCrawlService photosignatureCrawlService;
 
     @GetMapping
     public void crawl() {
@@ -21,9 +22,10 @@ public class CrawlController {
         stopWatch.start();
 
         lifefourcutsCrawlService.crawl();
-//        harufilmCrawlService.crawl();
-//        photoismCrawlService.crawl();
-//        photograyCrawlService.crawl();
+        harufilmCrawlService.crawl();
+        photoismCrawlService.crawl();
+        photograyCrawlService.crawl();
+        photosignatureCrawlService.crawl();
 
         stopWatch.stop();
         System.out.println(stopWatch.prettyPrint());
