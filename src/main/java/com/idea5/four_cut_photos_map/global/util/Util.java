@@ -143,4 +143,16 @@ public class Util {
         return ip;
 
     }
+
+    // 도로명 주소 상세주소 제거
+    public static String getRoadAddressName(String address) {
+        int find = -1;
+        for(int i = address.length() - 1; i >= 0; i--) {
+            if(Character.isDigit(address.charAt(i))) {
+                find = i;
+                break;
+            }
+        }
+        return (find == -1) ? address.trim() : address.substring(0, find + 1);
+    }
 }
