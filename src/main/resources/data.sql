@@ -1,25 +1,25 @@
 -- [크롤링 데이터 Shop 테이블에 저장 후 필수작업] 카카오 API 데이터와 비교가능한 지역명으로 수정
 -- 카카오 API 주소명에서 '세종특별자치시'와 '제주특별자치도'는 줄여서 사용하지 않음
-UPDATE shop SET road_address_name= REPLACE(road_address_name,'서울특별시','서울');
-UPDATE shop SET road_address_name= REPLACE(road_address_name, '서울시', '서울');
-UPDATE shop SET road_address_name= REPLACE(road_address_name, '서울특벼릿', '서울');
-UPDATE shop SET road_address_name= REPLACE(road_address_name, '부산광역시','부산');
-UPDATE shop SET road_address_name= REPLACE(road_address_name,'대구시','대구');
-UPDATE shop SET road_address_name= REPLACE(road_address_name,'대구광역시','대구');
-UPDATE shop SET road_address_name= REPLACE(road_address_name,'인천시','인천');
-UPDATE shop SET road_address_name= REPLACE(road_address_name,'인천광역시','인천');
-UPDATE shop SET road_address_name= REPLACE(road_address_name,'광주광역시','광주');
-UPDATE shop SET road_address_name= REPLACE(road_address_name,'대전시','대전');
-UPDATE shop SET road_address_name= REPLACE(road_address_name,'대전광역시','대전');
-UPDATE shop SET road_address_name= REPLACE(road_address_name,'울산광역시','울산');
-UPDATE shop SET road_address_name= REPLACE(road_address_name,'경기도','경기');
-UPDATE shop SET road_address_name= REPLACE(road_address_name,'강원도','강원');
-UPDATE shop SET road_address_name= REPLACE(road_address_name,'충청북도','충북');
-UPDATE shop SET road_address_name= REPLACE(road_address_name,'충청남도','충남');
-UPDATE shop SET road_address_name= REPLACE(road_address_name,'전라북도','전북');
-UPDATE shop SET road_address_name= REPLACE(road_address_name,'전라남도','전남');
-UPDATE shop SET road_address_name= REPLACE(road_address_name,'경상북도','경북');
-UPDATE shop SET road_address_name= REPLACE(road_address_name,'경상남도','경남');
+UPDATE shop SET address = REPLACE(address,'서울특별시','서울');
+UPDATE shop SET address= REPLACE(address, '서울시', '서울');
+UPDATE shop SET address= REPLACE(address, '서울특벼릿', '서울');
+UPDATE shop SET address= REPLACE(address, '부산광역시','부산');
+UPDATE shop SET address= REPLACE(address,'대구시','대구');
+UPDATE shop SET address= REPLACE(address,'대구광역시','대구');
+UPDATE shop SET address= REPLACE(address,'인천시','인천');
+UPDATE shop SET address= REPLACE(address,'인천광역시','인천');
+UPDATE shop SET address= REPLACE(address,'광주광역시','광주');
+UPDATE shop SET address= REPLACE(address,'대전시','대전');
+UPDATE shop SET address= REPLACE(address,'대전광역시','대전');
+UPDATE shop SET address= REPLACE(address,'울산광역시','울산');
+UPDATE shop SET address= REPLACE(address,'경기도','경기');
+UPDATE shop SET address= REPLACE(address,'강원도','강원');
+UPDATE shop SET address= REPLACE(address,'충청북도','충북');
+UPDATE shop SET address= REPLACE(address,'충청남도','충남');
+UPDATE shop SET address= REPLACE(address,'전라북도','전북');
+UPDATE shop SET address= REPLACE(address,'전라남도','전남');
+UPDATE shop SET address= REPLACE(address,'경상북도','경북');
+UPDATE shop SET address= REPLACE(address,'경상남도','경남');
 
 -- [크롤링 데이터 Shop 테이블에 저장 후 선택작업] 즉석사진이 아닌 데이터 제거하기
 DELETE FROM shop WHERE place_name not like '%인생네컷%'
