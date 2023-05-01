@@ -32,7 +32,6 @@ public class KakaoMapSearchApi {
     private final WebClient fourthWebClient;
     private final RedisDao redisDao;
     private final ObjectMapper objectMapper;
-    public final int radius = 2000;
     public static final String DEFAULT_QUERY_WORD = "즉석사진";
     public static final String CATEGORY_NAME = "사진";
 
@@ -62,7 +61,7 @@ public class KakaoMapSearchApi {
         return deserialize(resultList, documents);
     }
 
-    public List<KakaoMapSearchDto> searchByQueryWord(String queryWord, Double userLat, Double userLng, Double mapLat, Double mapLng) {
+    public List<KakaoMapSearchDto> searchByQueryWord(String queryWord, Integer radius, Double userLat, Double userLng, Double mapLat, Double mapLng) {
         List<KakaoMapSearchDto> resultList = new ArrayList<>();
 
         // 1. API 호출을 위한 요청 설정

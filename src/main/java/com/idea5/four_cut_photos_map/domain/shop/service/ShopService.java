@@ -113,12 +113,8 @@ public class ShopService {
         return kakaoMapSearchApi.searchByQueryWord(keyword, userLat, userLng);
     }
 
-    public List<KakaoMapSearchDto> searchKakaoMapByBrand(String brand, Double userLat, Double userLng, Double mapLat, Double mapLng) {
-        if (userLat == mapLat && userLng == mapLng) {
-            return kakaoMapSearchApi.searchByQueryWord(brand, userLat, userLng);
-        } else {
-            return kakaoMapSearchApi.searchByQueryWord(brand, userLat, userLng, mapLat, mapLng);
-        }
+    public List<KakaoMapSearchDto> searchKakaoMapByBrand(String brand, Integer radius, Double userLat, Double userLng, Double mapLat, Double mapLng) {
+            return kakaoMapSearchApi.searchByQueryWord(brand, radius, userLat, userLng, mapLat, mapLng);
     }
 
     public String[] searchSingleShopByQueryWord(Shop dbShop, Double userLat, Double userLng) {
