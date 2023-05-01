@@ -71,6 +71,9 @@ dependencies {
 
     // 암호화
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
+
+    //
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.15.2'
 }
 
 tasks.named('test') {
