@@ -72,6 +72,7 @@ public class ShopController {
      */
     @GetMapping("/brand")
     public ResponseEntity<Map<String, Object>> showSearchResultsByBrand (@RequestParam(required = false, defaultValue = "") String brand,
+                                                                         @RequestParam(required = false, defaultValue = "2000") Integer radius,
                                                                          @RequestParam @NotNull Double userLat,
                                                                          @RequestParam @NotNull Double userLng,
                                                                          @RequestParam @NotNull Double mapLat,
@@ -84,7 +85,7 @@ public class ShopController {
         responseMap.put("address", mapCenterAddress);
         responseMap.put("shops", resultShops);
 
-        List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByBrand(brand, userLat, userLng, mapLat, mapLng);
+        List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByBrand(brand, radius, userLat, userLng, mapLat, mapLng);
         if(apiShop.isEmpty()) {
             return ResponseEntity.ok(responseMap);
         }
