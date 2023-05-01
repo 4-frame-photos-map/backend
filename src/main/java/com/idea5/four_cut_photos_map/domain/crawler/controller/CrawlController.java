@@ -1,7 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.crawler.controller;
 
-import com.idea5.four_cut_photos_map.domain.crawler.service.mainbrand.*;
-import com.idea5.four_cut_photos_map.domain.crawler.service.otherbrand.*;
+import com.idea5.four_cut_photos_map.domain.crawler.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StopWatch;

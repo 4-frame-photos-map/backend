@@ -1,8 +1,7 @@
-package com.idea5.four_cut_photos_map.domain.crawler.service.mainbrand;
+package com.idea5.four_cut_photos_map.domain.crawler.service;
 
 import com.idea5.four_cut_photos_map.domain.brand.entity.Brand;
 import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
-import com.idea5.four_cut_photos_map.domain.crawler.service.mainbrand.CrawlService;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,26 +17,29 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
-public class HarufilmCrawlService implements CrawlService {
+public class PhotosignatureCrawlService implements CrawlService {
     private final ShopRepository shopRepository;
     private final BrandRepository brandRepository;
 
     @Transactional
     public void crawl() {
-        int[] codes = {202, 203, 204, 205, 206, 207, 208, 209};
-        Brand brand = brandRepository.findById(2L).orElse(null);
-
-        for(int code : codes) {
-            String url = "http://harufilm.com/" + code;
+        int page = 26;
+        Brand brand = brandRepository.findById(5L).orElse(null);
+        for(int i = 1; i <= page; i++) {
+            String url = "http://photosignature.co.kr/muse/bbs/board.php?bo_table=store&page=" + i;
             Connection conn = Jsoup.connect(url);
 
             try {
                 Document document = conn.get();
-                Elements titles = document.select("p.title");
+                Elements titles = document.select("#gallery tr tr:nth-child(2)>td>div");
 
-                for (Element element : titles) {
-                    String address = element.select("span.body").text().trim();
-                    String placeName = "하루필름 " + element.text().replace(address, "").trim();
+                for (Element e : titles) {
+                    String placeName = "포토시그니처 " + e.select("div:first-child>span>a").text();
+                    String address = e.select("div:nth-child(2)").text()
+                            .replace("주소 : ", "")
+                            .replace("TEL :", "").trim();
+//                    System.out.println("placeName = " + placeName);
+//                    System.out.println("address = " + address);
                     // 지점명으로 중복 검사
                     if (shopRepository.existsByPlaceName(placeName)) continue;
                     Shop shop = Shop.builder()

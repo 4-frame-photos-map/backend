@@ -1,8 +1,7 @@
-package com.idea5.four_cut_photos_map.domain.crawler.service.mainbrand;
+package com.idea5.four_cut_photos_map.domain.crawler.service;
 
 import com.idea5.four_cut_photos_map.domain.brand.entity.Brand;
 import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
-import com.idea5.four_cut_photos_map.domain.crawler.service.mainbrand.CrawlService;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,26 +17,25 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
-public class LifefourcutsCrawlService implements CrawlService {
+public class PhotograyCrawlService implements CrawlService {
     private final ShopRepository shopRepository;
     private final BrandRepository brandRepository;
 
     @Transactional
     public void crawl() {
-        int page = 49;
-        Brand brand = brandRepository.findById(1L).orElse(null);
+        int page = 2;
+        Brand brand = brandRepository.findById(4L).orElse(null);
         for(int i = 1; i <= page; i++) {
-            String url = "https://lifefourcuts.com/Store01/?sort=TIME&keyword_type=all&page=" + i;
+            String url = "http://photogray.com/bbs/board.php?bo_table=store&page=" + i;
             Connection conn = Jsoup.connect(url);
 
             try {
                 Document document = conn.get();
-                Elements titles = document.select("div.map_contents.inline-blocked");
+                Elements titles = document.select("div.addr");
 
                 for (Element e : titles) {
-                    String placeName = "인생네컷 " + e.select("div.tit").text().trim();
-                    String address = e.select("p.adress").text().trim();
-//                    String address = Util.getRoadAddressName(e.select("p.adress").text());
+                    String placeName = "포토그레이 " + e.select("div.title").text().trim();
+                    String address = e.select("div.st_info").text().trim();
                     // 지점명으로 중복 검사
                     if (shopRepository.existsByPlaceName(placeName)) continue;
                     Shop shop = Shop.builder()
