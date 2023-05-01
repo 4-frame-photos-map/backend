@@ -33,7 +33,9 @@ public class KakaoMapSearchApi {
     private final RedisDao redisDao;
     private final ObjectMapper objectMapper;
     public final int radius = 2000;
-    public static final String DEFAULT_QUERY_WORD = "사진";
+    public static final String DEFAULT_QUERY_WORD = "즉석사진";
+    public static final String CATEGORY_NAME = "사진";
+
 
 
     public List<KakaoMapSearchDto> searchByQueryWord(String queryWord, Double userLat, Double userLng) {
@@ -151,7 +153,7 @@ public class KakaoMapSearchApi {
     private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
-            if(document.get("category_name").asText().contains(DEFAULT_QUERY_WORD)) {
+            if(document.get("category_name").asText().contains(CATEGORY_NAME)) {
                 try {
                     KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
                     dto.setDistance(Util.distanceFormatting(dto.getDistance()));
@@ -167,7 +169,7 @@ public class KakaoMapSearchApi {
     private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents, Double userLat, Double userLng) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
-            if (document.get("category_name").asText().contains(DEFAULT_QUERY_WORD)) {
+            if (document.get("category_name").asText().contains(CATEGORY_NAME)) {
                 try {
                     KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
 

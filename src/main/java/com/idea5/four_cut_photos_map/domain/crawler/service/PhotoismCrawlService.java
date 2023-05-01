@@ -1,8 +1,7 @@
-package com.idea5.four_cut_photos_map.domain.crawler.service.mainbrand;
+package com.idea5.four_cut_photos_map.domain.crawler.service;
 
 import com.idea5.four_cut_photos_map.domain.brand.entity.Brand;
 import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
-import com.idea5.four_cut_photos_map.domain.crawler.service.mainbrand.CrawlService;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
