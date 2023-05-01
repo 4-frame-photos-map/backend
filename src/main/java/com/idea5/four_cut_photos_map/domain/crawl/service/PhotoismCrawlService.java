@@ -1,4 +1,4 @@
-package com.idea5.four_cut_photos_map.domain.crawl;
+package com.idea5.four_cut_photos_map.domain.crawl.service;
 
 import com.idea5.four_cut_photos_map.domain.brand.entity.Brand;
 import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;

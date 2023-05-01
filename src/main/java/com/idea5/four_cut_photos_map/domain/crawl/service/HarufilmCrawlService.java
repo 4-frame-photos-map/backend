@@ -1,4 +1,4 @@
-package com.idea5.four_cut_photos_map.domain.crawl;
+package com.idea5.four_cut_photos_map.domain.crawl.service;
 
 import com.idea5.four_cut_photos_map.domain.brand.entity.Brand;
 import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
@@ -17,26 +17,26 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
-public class LifefourcutsCrawlService implements CrawlService {
+public class HarufilmCrawlService implements CrawlService {
     private final ShopRepository shopRepository;
     private final BrandRepository brandRepository;
 
     @Transactional
     public void crawl() {
-        int page = 49;
-        Brand brand = brandRepository.findById(1L).orElse(null);
-        for(int i = 1; i <= page; i++) {
-            String url = "https://lifefourcuts.com/Store01/?sort=TIME&keyword_type=all&page=" + i;
+        int[] codes = {202, 203, 204, 205, 206, 207, 208, 209};
+        Brand brand = brandRepository.findById(2L).orElse(null);
+
+        for(int code : codes) {
+            String url = "http://harufilm.com/" + code;
             Connection conn = Jsoup.connect(url);
 
             try {
                 Document document = conn.get();
-                Elements titles = document.select("div.map_contents.inline-blocked");
+                Elements titles = document.select("p.title");
 
-                for (Element e : titles) {
-                    String placeName = "인생네컷 " + e.select("div.tit").text().trim();
-                    String address = e.select("p.adress").text().trim();
-//                    String address = Util.getRoadAddressName(e.select("p.adress").text());
+                for (Element element : titles) {
+                    String address = element.select("span.body").text().trim();
+                    String placeName = "하루필름 " + element.text().replace(address, "").trim();
                     // 지점명으로 중복 검사
                     if (shopRepository.existsByPlaceName(placeName)) continue;
                     Shop shop = Shop.builder()

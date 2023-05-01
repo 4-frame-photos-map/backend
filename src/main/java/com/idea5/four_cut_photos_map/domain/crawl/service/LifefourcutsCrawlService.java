@@ -1,4 +1,4 @@
-package com.idea5.four_cut_photos_map.domain.crawl;
+package com.idea5.four_cut_photos_map.domain.crawl.service;
 
 import com.idea5.four_cut_photos_map.domain.brand.entity.Brand;
 import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
@@ -17,29 +17,26 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
-public class PhotosignatureCrawlService implements CrawlService {
+public class LifefourcutsCrawlService implements CrawlService {
     private final ShopRepository shopRepository;
     private final BrandRepository brandRepository;
 
     @Transactional
     public void crawl() {
-        int page = 26;
-        Brand brand = brandRepository.findById(5L).orElse(null);
+        int page = 49;
+        Brand brand = brandRepository.findById(1L).orElse(null);
         for(int i = 1; i <= page; i++) {
-            String url = "http://photosignature.co.kr/muse/bbs/board.php?bo_table=store&page=" + i;
+            String url = "https://lifefourcuts.com/Store01/?sort=TIME&keyword_type=all&page=" + i;
             Connection conn = Jsoup.connect(url);
 
             try {
                 Document document = conn.get();
-                Elements titles = document.select("#gallery tr tr:nth-child(2)>td>div");
+                Elements titles = document.select("div.map_contents.inline-blocked");
 
                 for (Element e : titles) {
-                    String placeName = "포토시그니처 " + e.select("div:first-child>span>a").text();
-                    String address = e.select("div:nth-child(2)").text()
-                            .replace("주소 : ", "")
-                            .replace("TEL :", "").trim();
-//                    System.out.println("placeName = " + placeName);
-//                    System.out.println("address = " + address);
+                    String placeName = "인생네컷 " + e.select("div.tit").text().trim();
+                    String address = e.select("p.adress").text().trim();
+//                    String address = Util.getRoadAddressName(e.select("p.adress").text());
                     // 지점명으로 중복 검사
                     if (shopRepository.existsByPlaceName(placeName)) continue;
                     Shop shop = Shop.builder()

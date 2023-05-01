@@ -1,5 +1,6 @@
-package com.idea5.four_cut_photos_map.domain.crawl;
+package com.idea5.four_cut_photos_map.domain.crawl.controller;
 
+import com.idea5.four_cut_photos_map.domain.crawl.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.GetMapping;
