@@ -1,4 +1,4 @@
-package com.idea5.four_cut_photos_map.domain.crawler.service;
+package com.idea5.four_cut_photos_map.domain.crawler.service.otherbrand;
 
 import com.idea5.four_cut_photos_map.domain.brand.repository.BrandRepository;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
@@ -20,7 +20,6 @@ import java.io.IOException;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@SuperBuilder
 @Transactional
 abstract class EtcBrandCrawlService {
     private final ShopRepository shopRepository;
@@ -167,7 +166,7 @@ abstract class EtcBrandCrawlService {
         return elements;
     }
 
-    public String formatAddress(String address) {
+    public static String formatAddress(String address) {
         if (address.startsWith("대한민국")) {
             address = address.replace("대한민국 ", "");
         }
