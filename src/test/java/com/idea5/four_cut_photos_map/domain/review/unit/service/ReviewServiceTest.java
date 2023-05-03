@@ -118,7 +118,7 @@ public class ReviewServiceTest {
             writer = Member.builder().id(1L).kakaoId(1000L).nickname("user1").build();
             brand = Brand.builder().id(1L).brandName("인생네컷").filePath("https://d18tllc1sxg8cp.cloudfront.net/brand_image/brand_1.jpg").build();
             shop = Shop.builder().id(1L).brand(brand).placeName("인생네컷망리단길점").address("서울 마포구 포은로 109-1").favoriteCnt(0).reviewCnt(0).starRatingAvg(0.0).build();
-            review = Review.builder().id(1L).createDate(LocalDateTime.now()).modifyDate(LocalDateTime.now()).writer(writer).shop(shop).starRating(5).content("리뷰 내용").purity(PurityScore.UNSELECTED).retouch(RetouchScore.UNSELECTED).item(ItemScore.UNSELECTED).build();
+            review = Review.builder().id(1L).createDate(LocalDateTime.now()).modifyDate(LocalDateTime.now()).writer(writer).shop(shop).starRating(5).content("리뷰 내용").purity(PurityScore.BAD).retouch(RetouchScore.BAD).item(ItemScore.BAD).build();
         }
 
         @Nested
@@ -140,9 +140,37 @@ public class ReviewServiceTest {
                 // then
                 Assertions.assertEquals(responseReviewDto.getReviewInfo().getStarRating(), modifyReviewDto.getStarRating());
                 Assertions.assertEquals(responseReviewDto.getReviewInfo().getContent(), modifyReviewDto.getContent());
-                Assertions.assertEquals(String.valueOf(responseReviewDto.getReviewInfo().getPurity()), modifyReviewDto.getPurity());
+                Assertions.assertEquals(responseReviewDto.getReviewInfo().getPurity(), PurityScore.valueOf(modifyReviewDto.getPurity()));
                 Assertions.assertEquals(String.valueOf(responseReviewDto.getReviewInfo().getRetouch()), modifyReviewDto.getRetouch());
                 Assertions.assertEquals(String.valueOf(responseReviewDto.getReviewInfo().getItem()), modifyReviewDto.getItem());
+            }
+
+            @Test
+            @DisplayName("purity, retouch, item를 null로 전송")
+            void modifyReviewSuccess2() {
+                // given
+                Long modifyReviewId = 1L;
+                Member user = Member.builder().id(1L).build();
+                RequestReviewDto modifyReviewDto = RequestReviewDto.builder().starRating(3).content("수정 후 리뷰 내용").build();
+
+                // when
+                when(reviewRepository.findById(modifyReviewId)).thenReturn(Optional.of(review));
+
+                ResponseReviewDto responseReviewDto = reviewService.modify(user, modifyReviewId, modifyReviewDto);
+
+                // then
+                Assertions.assertEquals(responseReviewDto.getReviewInfo().getId(), modifyReviewId);
+                Assertions.assertEquals(responseReviewDto.getReviewInfo().getStarRating(), modifyReviewDto.getStarRating());
+                Assertions.assertEquals(responseReviewDto.getReviewInfo().getContent(), modifyReviewDto.getContent());
+                Assertions.assertEquals(responseReviewDto.getReviewInfo().getPurity(), PurityScore.UNSELECTED);
+                Assertions.assertEquals(responseReviewDto.getReviewInfo().getRetouch(), RetouchScore.UNSELECTED);
+                Assertions.assertEquals(responseReviewDto.getReviewInfo().getItem(), ItemScore.UNSELECTED);
+
+                Assertions.assertEquals(responseReviewDto.getMemberInfo().getId(), writer.getId());
+                Assertions.assertEquals(responseReviewDto.getMemberInfo().getNickname(), writer.getNickname());
+
+                Assertions.assertEquals(responseReviewDto.getShopInfo().getId(), shop.getId());
+                Assertions.assertEquals(responseReviewDto.getShopInfo().getPlaceName(), shop.getPlaceName());
             }
         }
 
@@ -471,5 +499,99 @@ public class ReviewServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("상점 리뷰 작성")
+    class WriteReviewShop {
+        private Member writer;
+        private Brand brand;
+        private Shop shop;
+        private Review review;
 
+        @BeforeEach
+        void setUp() {
+            writer = Member.builder().id(1L).kakaoId(1000L).nickname("user1").build();
+            brand = Brand.builder().id(1L).brandName("인생네컷").filePath("https://d18tllc1sxg8cp.cloudfront.net/brand_image/brand_1.jpg").build();
+            shop = Shop.builder().id(1L).brand(brand).placeName("인생네컷망리단길점").address("서울 마포구 포은로 109-1").favoriteCnt(0).reviewCnt(0).starRatingAvg(0.0).build();
+        }
+
+        @Nested
+        @DisplayName("성공")
+        class SuccessCase {
+//            @Test
+//            @DisplayName("shopId 가진 지점에 review 추가")
+//            void writeReviewShopSuccess1() {
+//                // given
+//                Long shopId = 1L;
+//                RequestReviewDto requestReviewDto = RequestReviewDto.builder().starRating(3).content("지점의 두번째 리뷰 내용").purity("GOOD").retouch("GOOD").item("GOOD").build();
+//
+//                // when
+//                when(shopService.findById(shopId)).thenReturn(shop);
+//                when(reviewRepository.save())
+//                reviewService.write(writer, shopId, requestReviewDto);
+//
+//                // then
+//
+//            }
+//
+//            @Test
+//            @DisplayName("shop2 리뷰 조회")
+//            void retrieveShopReviewsSuccess2() {
+//                // given
+//                Long shopId = 2L;
+//                List<Review> reviews = new ArrayList<>();
+//                reviews.add(review3);
+//
+//                // when
+//                when(shopService.findById(shopId)).thenReturn(shop2);
+//                when(reviewRepository.findAllByShopIdOrderByCreateDateDesc(shopId)).thenReturn(reviews);
+//
+//                List<ResponseShopReviewDto> shopReviews = reviewService.getAllShopReviews(shopId);
+//
+//                // then
+//                Assertions.assertEquals(shopReviews.size(), reviews.size());
+//
+//                Assertions.assertEquals(shopReviews.get(0).getReviewInfo().getId(), review3.getId());
+//                Assertions.assertEquals(shopReviews.get(0).getReviewInfo().getContent(), review3.getContent());
+//                Assertions.assertEquals(shopReviews.get(0).getMemberInfo().getId(), writer.getId());
+//                Assertions.assertEquals(shopReviews.get(0).getMemberInfo().getNickname(), writer.getNickname());
+//            }
+//
+//            @Test
+//            @DisplayName("shopId 해당하는 리뷰 없음")
+//            void retrieveShopReviewsSuccess3() {
+//                // given
+//                Long shopId = 3L;
+//                List<Review> reviews = new ArrayList<>();
+//
+//                // when
+//                when(shopService.findById(shopId)).thenReturn(shop3);
+//                when(reviewRepository.findAllByShopIdOrderByCreateDateDesc(shopId)).thenReturn(reviews);
+//
+//                List<ResponseShopReviewDto> shopReviews = reviewService.getAllShopReviews(shopId);
+//
+//                // then
+//                Assertions.assertEquals(shopReviews.size(), reviews.size());
+//            }
+        }
+
+//        @Nested
+//        @DisplayName("실패")
+//        class FailCase {
+//            @Test
+//            @DisplayName("ShopId 해당하는 Shop 없음")
+//            void retrieveShopReviewsFail1() {
+//                // given
+//                Long shopId = 4L;
+//                BusinessException exception = new BusinessException(ErrorCode.SHOP_NOT_FOUND);
+//
+//                // when
+//                when(shopService.findById(shopId)).thenThrow(exception);
+//
+//                // then
+//                BusinessException resultException = Assertions.assertThrows(exception.getClass(), () -> reviewService.getAllShopReviews(shopId));
+//                Assertions.assertEquals(resultException.getErrorCode(), exception.getErrorCode());
+//                Assertions.assertEquals(resultException.getMessage(), exception.getMessage());
+//            }
+//        }
+    }
 }

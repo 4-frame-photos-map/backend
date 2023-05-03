@@ -35,13 +35,10 @@ public class RequestReviewDto {
 
     private String item;
 
-    public Review toEntity(){
-        return Review.builder()
-                .starRating(getStarRating())
-                .content(getContent())
-                .purity(getPurity() == null ? PurityScore.UNSELECTED : PurityScore.valueOf(getPurity()))
-                .retouch(getRetouch() == null ? RetouchScore.UNSELECTED : RetouchScore.valueOf(getRetouch()))
-                .item(getItem() == null ? ItemScore.UNSELECTED : ItemScore.valueOf(getItem()))
-                .build();
-    }
+//    public Review toEntity(){
+//        return Review.builder()
+//                .starRating(getStarRating())
+//                .content(getContent())
+//
+//    }
 }
