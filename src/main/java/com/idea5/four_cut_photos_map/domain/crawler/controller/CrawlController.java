@@ -35,7 +35,6 @@ class CrawlController {
         harufilmCrawlService.crawl();
         photoismCrawlService.crawl();
         photograyCrawlService.crawl();
-        photosignatureCrawlService.crawl();
 
         stopWatch.stop();
         System.out.println(stopWatch.prettyPrint());
@@ -45,6 +44,7 @@ class CrawlController {
     @PostMapping("/other/shops")
     public ResponseEntity<String> crawlOtherBrands() {
 
+        photosignatureCrawlService.crawl();
         harryphotoCrawlService.crawl();
         insphotoCrawlService.crawl();
         photodrinkCrawlService.crawl();

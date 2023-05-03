@@ -95,7 +95,7 @@ public class ShopService {
     private Shop compareMatchingShops(String apiPlaceName, List<Shop> dbShops) {
         return Arrays.stream(ShopMatchPriority.values())
                 .flatMap(priority -> dbShops.stream()
-                        .filter(dbShop -> priority.isMatchedShop(dbShop, apiPlaceName)))
+                        .filter(dbShop -> priority.isMatchedShop(dbShop.getPlaceName(), apiPlaceName)))
                 .findFirst()
                 .orElse(null);
     }
@@ -107,6 +107,11 @@ public class ShopService {
                 String.join(",", apiShop.getPlaceUrl(), apiShop.getLatitude(), apiShop.getLongitude()),
                 Duration.ofDays(1)
         );
+    }
+
+    private void cacheInvalidShopId(long shopId) {
+        String cacheKey = redisDao.getInvalidShopIdKey();
+        redisDao.setValues(cacheKey, String.valueOf(shopId));
     }
 
     public List<KakaoMapSearchDto> searchKakaoMapByKeyword(String keyword, Double userLat, Double userLng) {
@@ -121,6 +126,22 @@ public class ShopService {
         return kakaoMapSearchApi.searchSingleShopByQueryWord(dbShop, userLat, userLng);
     }
 
+    public String convertMapCenterCoordToAddress(Double mapLat, Double mapLng) {
+        return kakaoMapSearchApi.convertCoordinateToAddress(mapLat, mapLng);
+    }
+
+    public String convertAddressToCoordAndGetDist(Shop dbShop, Double userLat, Double userLng) {
+        if(dbShop.getAddress() != null) {
+            return kakaoMapSearchApi.convertAddressToCoordAndGetDist(dbShop, userLat, userLng);
+        } else {
+            String[] apiShop = searchSingleShopByQueryWord(dbShop, userLat, userLng);
+            if (apiShop != null) {
+                return apiShop[3];
+            }
+        }
+        return null;
+    }
+
     @Transactional(readOnly = true)
     public Shop findById(Long id) {
         return shopRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
@@ -130,7 +151,10 @@ public class ShopService {
         // 지점명으로 반환하는 지점 없을 시, 주소로 비교
         String[] apiShop = searchSingleShopByQueryWord(dbShop, userLat, userLng);
 
-        if (apiShop == null) throw new BusinessException(INVALID_SHOP_ID);
+        if (apiShop == null) {
+            cacheInvalidShopId(dbShop.getId());
+            throw new BusinessException(INVALID_SHOP_ID);
+        }
         String placeUrl = apiShop[0];
         String placeLat = apiShop[1];
         String placeLng = apiShop[2];
@@ -140,21 +164,9 @@ public class ShopService {
     }
 
     public FavoriteResponse setResponseDto(Favorite favorite, Double userLat, Double userLng) {
-        // 지점명으로 반환하는 지점 없을 시, 주소로 비교
-        String[] apiShop = searchSingleShopByQueryWord(favorite.getShop(), userLat, userLng);
-
-        if (apiShop == null) {
-            Shop shopWithInvalidId = favorite.getShop();
-            favoriteRepository.deleteById(favorite.getId());
-            reduceFavoriteCnt(shopWithInvalidId);
-            return null;
-        }
-
-        String distance = apiShop[3];
-
+        String distance = convertAddressToCoordAndGetDist(favorite.getShop(), userLat, userLng);
         return FavoriteResponse.from(favorite, distance);
     }
-
 
     @Transactional(readOnly = true)
     public ResponseShopBriefInfo setResponseDto(long id, String placeName, String distance) {
@@ -167,42 +179,8 @@ public class ShopService {
         shopRepository.save(shop);
     }
 
-    @Transactional
-    public void reduceFavoriteCnt(Long shopId) {
-        Shop shop = findById(shopId);
-        shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0 ? 0 : shop.getFavoriteCnt() - 1);
-    }
-
-    public void increaseFavoriteCnt(Shop shop) {
-        shop.setFavoriteCnt(shop.getFavoriteCnt() + 1);
+    public void increaseFavoriteCnt(Shop shop){
+        shop.setFavoriteCnt(shop.getFavoriteCnt()+1);
         shopRepository.save(shop);
     }
-
-    public String convertMapCenterCoordToAddress(Double mapLat, Double mapLng) {
-        return kakaoMapSearchApi.convertCoordinateToAddress(mapLat, mapLng);
-    }
-
-
-    // 브랜드별 Map Marker
-//    public List<ResponseShopMarker> searchMarkers(RequestShop shop, String brandName) {
-//        List<KakaoKeywordResponseDto> kakaoShops = keywordSearchKakaoApi.searchByQueryWord(shop, brandName);
-//        List<ShopDto> dbShops = findByBrand(brandName);
-//        List<ResponseShopMarker> resultShops = new ArrayList<>();
-//
-//        for (KakaoKeywordResponseDto kakaoShop : kakaoShops) {
-//            for (ShopDto dbShop : dbShops) {
-//                if (kakaoShop.getRoadAddressName().equals(dbShop.getRoadAddressName())) {
-//                    ResponseShopMarker responseShopMarker = ResponseShopMarker.of(kakaoShop);
-//                    responseShopMarker.setId(dbShop.getId());
-//                    // 상점이 칭호를 보유했으면 추가
-//                    if(shopTitleLogService.existShopTitles(dbShop.getId())){
-//                        responseShopMarker.setShopTitles(shopTitleLogService.getShopTitles(dbShop.getId()));
-//                    }
-//                    resultShops.add(responseShopMarker);
-//                    break;
-//                }
-//            }
-//        }
-//        return resultShops;
-//    }
 }

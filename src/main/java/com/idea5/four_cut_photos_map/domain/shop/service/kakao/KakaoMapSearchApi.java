@@ -17,6 +17,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,7 +71,6 @@ public class KakaoMapSearchApi {
                 .queryParam("query", queryWord + DEFAULT_QUERY_WORD)
                 .queryParam("y", mapLat)
                 .queryParam("x", mapLng)
-                .queryParam("sort", "distance")
                 .queryParam("radius", radius);
 
         String apiUrl = uriBuilder.build().toString();
@@ -84,7 +84,7 @@ public class KakaoMapSearchApi {
         }
 
         // 3. JSON -> DTO 역직렬화
-        return deserialize(resultList, documents, userLat, userLng);
+        return deserialize(resultList, documents, userLat, userLng, mapLat, mapLng);
     }
 
     public String[] searchSingleShopByQueryWord(Shop dbShop, Double userLat, Double userLng) {
@@ -149,6 +149,38 @@ public class KakaoMapSearchApi {
         return address;
     }
 
+    public String convertAddressToCoordAndGetDist(Shop dbShop, Double userLat, Double userLng) {
+        // 1. Redis에서 조회
+        String[] cachedArr = getShopInfoFromCacheAndCalculateDist(dbShop, userLat, userLng);
+        if (cachedArr != null) {return cachedArr[3];}
+
+        // 2. API 호출을 위한 요청 설정
+        String apiPath = "/v2/local/search/address.json";
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
+                .queryParam("query", dbShop.getAddress())
+                .queryParam("size", 1);
+
+        String apiUrl = uriBuilder.build().toString();
+
+        // 3. API 호출
+        JsonNode documents;
+        try {
+            documents = getDocuments(apiUrl);
+        } catch (Exception e) {
+            throw new BusinessException(TOO_MANY_REQUESTS);
+        }
+
+        // 4. JSON -> DTO 역직렬화 및 사용자 현재위치 좌표로부터 지점까지의 거리 계산
+        if(documents.get(0).hasNonNull("y") && documents.get(0).hasNonNull("x")) {
+            return Util.calculateDist(
+                    documents.get(0).get("y").asDouble(),documents.get(0).get("x").asDouble(),
+                    userLat, userLng
+            );
+        } else {
+            return "unknown";
+        }
+    }
+
     private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
@@ -165,17 +197,20 @@ public class KakaoMapSearchApi {
         return resultList;
     }
 
-    private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents, Double userLat, Double userLng) {
+    private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents, Double userLat, Double userLng,
+                                                Double mapLat, Double mapLng) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
             if (document.get("category_name").asText().contains(CATEGORY_NAME)) {
                 try {
                     KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
 
-                    // 사용자 중심좌표를 기준으로 지점으로부터의 거리 갱신
-                    Double placeLat = Double.parseDouble(dto.getLatitude());
-                    Double placeLng = Double.parseDouble(dto.getLongitude());
-                    dto.setDistance(Util.calculateDist(placeLat, placeLng, userLat, userLng));
+                    if((userLat != mapLat) || (userLng != mapLng)) {
+                        // 사용자 현재위치 좌표로부터 지점까지의 거리 갱신
+                        Double placeLat = Double.parseDouble(dto.getLatitude());
+                        Double placeLng = Double.parseDouble(dto.getLongitude());
+                        dto.setDistance(Util.calculateDist(placeLat, placeLng, userLat, userLng));
+                    }
 
                     resultList.add(dto);
                 } catch (Exception e) {
@@ -183,6 +218,8 @@ public class KakaoMapSearchApi {
                 }
             }
         }
+        resultList.sort(Comparator.comparing(KakaoMapSearchDto::getDistance));
+
         return resultList;
     }
 
