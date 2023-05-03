@@ -32,7 +32,7 @@
 |배포|<img src="https://img.shields.io/badge/NCP-03C75A?style=for-the-badge&logoColor=white"> <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/githubactions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white">|
 
 ## 📄 API 명세 및 명세화 도구
-<h4><a href="https://four-cut-photos-map.gitbook.io/four-cut-photos-map/">✔️ GitBook 바로가기</a></h4>
+<h4><a href="https://organization-ggq.gitbook.io/undefined/">✔️ GitBook 바로가기</a></h4>
 
 > GitBook을 이용하여 API 명세를 관리했습니다.
 
