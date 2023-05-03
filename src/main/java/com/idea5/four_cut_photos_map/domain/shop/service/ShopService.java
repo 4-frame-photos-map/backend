@@ -109,6 +109,11 @@ public class ShopService {
         );
     }
 
+    private void cacheInvalidShopId(long shopId) {
+        String cacheKey = redisDao.getInvalidShopIdKey();
+        redisDao.setValues(cacheKey, String.valueOf(shopId));
+    }
+
     public List<KakaoMapSearchDto> searchKakaoMapByKeyword(String keyword, Double userLat, Double userLng) {
         return kakaoMapSearchApi.searchByQueryWord(keyword, userLat, userLng);
     }
@@ -146,7 +151,10 @@ public class ShopService {
         // 지점명으로 반환하는 지점 없을 시, 주소로 비교
         String[] apiShop = searchSingleShopByQueryWord(dbShop, userLat, userLng);
 
-        if (apiShop == null) throw new BusinessException(INVALID_SHOP_ID);
+        if (apiShop == null) {
+            cacheInvalidShopId(dbShop.getId());
+            throw new BusinessException(INVALID_SHOP_ID);
+        }
         String placeUrl = apiShop[0];
         String placeLat = apiShop[1];
         String placeLng = apiShop[2];
