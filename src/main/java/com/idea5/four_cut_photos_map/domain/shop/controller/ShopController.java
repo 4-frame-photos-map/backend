@@ -53,7 +53,7 @@ public class ShopController {
             return ResponseEntity.ok(resultShops);
         }
 
-        resultShops = shopService.compareWithDbShops(apiShop, ResponseShopKeyword.class);
+        resultShops = shopService.findMatchingShops(apiShop, ResponseShopKeyword.class);
         if(resultShops.isEmpty()) {
             return ResponseEntity.ok(resultShops);
         }
@@ -74,6 +74,7 @@ public class ShopController {
      */
     @GetMapping("/brand")
     public ResponseEntity<Map<String, Object>> showSearchResultsByBrand (@RequestParam(required = false, defaultValue = "") String brand,
+                                                                         @RequestParam(required = false, defaultValue = "2000") Integer radius,
                                                                          @RequestParam @NotNull Double userLat,
                                                                          @RequestParam @NotNull Double userLng,
                                                                          @RequestParam @NotNull Double mapLat,
@@ -86,12 +87,12 @@ public class ShopController {
         responseMap.put("address", mapCenterAddress);
         responseMap.put("shops", resultShops);
 
-        List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByBrand(brand, userLat, userLng, mapLat, mapLng);
+        List<KakaoMapSearchDto> apiShop = shopService.searchKakaoMapByBrand(brand, radius, userLat, userLng, mapLat, mapLng);
         if(apiShop.isEmpty()) {
             return ResponseEntity.ok(responseMap);
         }
 
-        resultShops = shopService.compareWithDbShops(apiShop, ResponseShopBrand.class);
+        resultShops = shopService.findMatchingShops(apiShop, ResponseShopBrand.class);
         if(resultShops.isEmpty()) {
             return ResponseEntity.ok(responseMap);
         }
@@ -114,11 +115,12 @@ public class ShopController {
      */
     @GetMapping("/{shop-id}")
     public ResponseEntity<ResponseShopDetail> showDetail (@PathVariable(name = "shop-id") Long id,
-                                                          @RequestParam @NotBlank String distance,
+                                                          @RequestParam @NotNull Double userLat,
+                                                          @RequestParam @NotNull Double userLng,
                                                           @AuthenticationPrincipal MemberContext memberContext) {
 
         Shop dbShop = shopService.findById(id);
-        ResponseShopDetail shopDetailDto = shopService.renameShopAndSetResponseDto(dbShop, distance);
+        ResponseShopDetail shopDetailDto = shopService.setResponseDto(dbShop, userLat, userLng);
 
         List<ResponseShopReviewDto> recentReviews = reviewService.getTop3ShopReviews(shopDetailDto.getId());
         shopDetailDto.setRecentReviews(recentReviews);

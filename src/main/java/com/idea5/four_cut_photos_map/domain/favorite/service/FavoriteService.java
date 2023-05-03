@@ -87,7 +87,7 @@ public class FavoriteService {
 
         return  favorites
                 .stream()
-                .map(favorite -> shopService.renameShopAndSetResponseDto(favorite, userLat, userLng))
+                .map(favorite -> shopService.setResponseDto(favorite, userLat, userLng))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }

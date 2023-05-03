@@ -63,5 +63,7 @@ public class RedisDao {
     public static String getBlackListAtkKey(String accessToken) {
         return "jwt_black_list:" + accessToken;
     }
-    public String getRoadAddressKey(String roadAddressName) {return "search:" + roadAddressName;}
+
+    // 지점 정보(placeUrl, lat, lng)를 저장하는 key
+    public String getShopInfoKey(long shopId) {return "shop:" + shopId;}
 }
