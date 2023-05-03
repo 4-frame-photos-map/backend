@@ -28,8 +28,8 @@
 | BackEnd | <img src="https://img.shields.io/badge/springboot 2.7.7-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"> <img src="https://img.shields.io/badge/spring security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white"> <img src="https://img.shields.io/badge/JPA-273347?style=for-the-badge&logoColor=white"> <img src="https://img.shields.io/badge/kakao API-FFCD00?style=for-the-badge&logo=kakao&logoColor=black"> <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white"> <img src="https://img.shields.io/badge/junit5-25A162?style=for-the-badge&logo=JUnit5&logoColor=white"> <img src="https://img.shields.io/badge/slf4j-03C75A?style=for-the-badge&logo=slf4j&logoColor=white"> <img src="https://img.shields.io/badge/jsoup-00AFF0?style=for-the-badge&logoColor=white">|
 |Build Tool|<img src="https://img.shields.io/badge/gradle 7.5-02303A?style=for-the-badge&logo=gradle&logoColor=white">|
 |Database|<img src="https://img.shields.io/badge/mysql 8.0.25-4479A1?style=for-the-badge&logo=mysql&logoColor=white"> <img src="https://img.shields.io/badge/redis-DC382D?style=for-the-badge&logo=redis&logoColor=white">|
-|협업|<img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white"> <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"> <img src="https://img.shields.io/badge/GitBook-3884FF?style=for-the-badge&logo=GitBook&logoColor=white"> <img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white">|
-|배포|<img src="https://img.shields.io/badge/NCP-03C75A?style=for-the-badge&logoColor=white"> <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/githubactions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white">|
+|Collaboration|<img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white"> <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"> <img src="https://img.shields.io/badge/GitBook-3884FF?style=for-the-badge&logo=GitBook&logoColor=white"> <img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white">|
+|Deployment|<img src="https://img.shields.io/badge/NCP-03C75A?style=for-the-badge&logoColor=white"> <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/githubactions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white">|
 
 ## 📄 API 명세 및 명세화 도구
 <h4><a href="https://organization-ggq.gitbook.io/undefined/">✔️ GitBook 바로가기</a></h4>
@@ -63,5 +63,5 @@
 |회원 칭호 단건 조회|`GET /member-titles/{id}`|
 |회원 칭호 전체 조회|`GET /member-titles`|
 
-## 💾 ERD
+## 🔎 ERD
 <img src ="https://user-images.githubusercontent.com/63441091/235579800-862dd134-c75a-44f0-83d5-1cd90e9125fe.png" width="700" height="550">
