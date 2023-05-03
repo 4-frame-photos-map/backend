@@ -130,10 +130,11 @@ public class ShopController {
             shopDetailDto.setFavorite(favorite != null);
         }
 
-        if (shopTitleLogService.existShopTitles(id)) {
-            List<String> shopTitles = shopTitleLogService.getShopTitles(id);
-            shopDetailDto.setShopTitles(shopTitles);
-        }
+        // todo: 지점 칭호 디자인 완성 후 재반영 예정
+//        if (shopTitleLogService.existShopTitles(id)) {
+//            List<String> shopTitles = shopTitleLogService.getShopTitles(id);
+//            shopDetailDto.setShopTitles(shopTitles);
+//        }
 
         return ResponseEntity.ok(shopDetailDto);
     }
@@ -156,21 +157,4 @@ public class ShopController {
 
         return ResponseEntity.ok(responseShopBriefInfo);
     }
-
-    // 브랜드별 Map Marker
-    // 현재 위치 기준, 반경 2km
-//    @GetMapping("/marker")
-//    public ResponseEntity<RsData<Map<String, List<ResponseShopMarker>>>> currentLocationSearch(@ModelAttribute @Valid RequestShop requestShop) {
-//
-//        String[] names = Brand.Names; // 브랜드명 ( 하루필름, 인생네컷 ... )
-//
-//        Map<String, List<ResponseShopMarker>> maps = new HashMap<>();
-//        for (String brandName : names) {
-//            List<ResponseShopMarker> list = shopService.searchMarkers(requestShop, brandName);
-//            maps.put(brandName, list);
-//        }
-//
-//        return ResponseEntity.ok(
-//                new RsData<Map<String, List<ResponseShopMarker>>>(true, "반경 2km 이내 Shop 조회 성공", maps)
-//        );
 }

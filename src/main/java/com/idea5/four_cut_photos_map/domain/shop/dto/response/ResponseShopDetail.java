@@ -23,7 +23,7 @@ public class ResponseShopDetail extends ResponseShopBriefInfo {
     private String longitude;
     private String placeUrl;
     private List<ResponseShopReviewDto> recentReviews;
-    private List<String> shopTitles;
+//    private List<String> shopTitles; // todo: 지점 칭호 디자인 완성 후 재반영 예정
 
 
     public static ResponseShopDetail of(Shop dbShop, String placeUrl, String placeLat, String placeLng,  String distance){
@@ -37,15 +37,7 @@ public class ResponseShopDetail extends ResponseShopBriefInfo {
                 .starRatingAvg(dbShop.getStarRatingAvg())
                 .reviewCnt(dbShop.getReviewCnt())
                 .favoriteCnt(dbShop.getFavoriteCnt())
-                .shopTitles(new ArrayList<>())
+//                .shopTitles(new ArrayList<>())
                 .build();
     }
-
-
-    // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
-//    @JsonIgnore // 상점이 보유한 칭호가 없다면 null 보다는 응답 데이터에서 제외되는게 더 낫다고 생각
-//    private List<String> shopTitles = new ArrayList<>();
-//    public void setShopTitles(List<String> shopTitles) {
-//        this.shopTitles = shopTitles;
-//    }
 }
