@@ -20,4 +20,5 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     List<Favorite> findByCreateDateAfter(LocalDateTime minusMonths);
     @Query("SELECT f.shop.id FROM Favorite f WHERE f.createDate BETWEEN :startDate AND :endDate GROUP BY f.shop.id HAVING COUNT(f.shop.id) >= 3")
     List<Long> findShopIdsWithMoreThanThreeFavorites(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+    boolean existsByShopIdAndMemberId(Long shopId, Long id);
 }

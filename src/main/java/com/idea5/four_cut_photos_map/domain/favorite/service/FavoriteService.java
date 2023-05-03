@@ -33,7 +33,7 @@ public class FavoriteService {
     @Transactional
     public Shop save(Long shopId, Member member) {
         // 1. 중복 데이터 생성 불가 -> 기존 데이터 생성 여부 체크
-        if(findByShopIdAndMemberId(shopId, member.getId()) != null){
+        if(favoriteRepository.existsByShopIdAndMemberId(shopId, member.getId())){
             throw new BusinessException(DUPLICATE_FAVORITE);
         }
 
