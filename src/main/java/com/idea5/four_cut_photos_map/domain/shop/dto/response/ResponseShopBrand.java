@@ -29,7 +29,7 @@ public class ResponseShopBrand extends ResponseShop {
 
         return ResponseShopBrand.builder()
                 .id(dbShop.getId())
-                .placeName(apiShop.getPlaceName())
+                .placeName(dbShop.getPlaceName())
                 .longitude(apiShop.getLongitude())
                 .latitude(apiShop.getLatitude())
                 .distance(apiShop.getDistance())

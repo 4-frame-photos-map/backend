@@ -10,12 +10,12 @@ public enum ShopMatchPriority {
     PLACE_NAME,
     BRAND_NAME_CONTAINS;
 
-    public boolean isMatchedShop(Shop dbShop, String apiPlaceName) {
+    public boolean isMatchedShop(String dbPlaceName, String apiPlaceName) {
         switch (this) {
             case PLACE_NAME:
-                return dbShop.getPlaceName().equals(apiPlaceName);
+                return dbPlaceName.equals(apiPlaceName);
             case BRAND_NAME_CONTAINS:
-                return dbShop.getPlaceName().contains(apiPlaceName.split(" ")[0]);
+                return dbPlaceName.contains(apiPlaceName.split(" ")[0]);
             default:
                 return false;
         }
