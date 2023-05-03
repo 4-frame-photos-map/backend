@@ -248,4 +248,105 @@ public class ReviewServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("회원 전체 리뷰 조회")
+    class RetrieveMemberReviews {
+        private Member writer1;
+        private Member writer2;
+        private Brand brand;
+
+        private Shop shop;
+        private Review review1;
+        private Review review2;
+        private Review review3;
+
+        @BeforeEach
+        void setUp() {
+            writer1 = Member.builder().id(1L).kakaoId(1000L).nickname("user1").build();
+            writer2 = Member.builder().id(2L).kakaoId(2000L).nickname("user2").build();
+            brand = Brand.builder().id(1L).brandName("인생네컷").filePath("https://d18tllc1sxg8cp.cloudfront.net/brand_image/brand_1.jpg").build();
+            shop = Shop.builder().id(1L).brand(brand).placeName("인생네컷망리단길점").address("서울 마포구 포은로 109-1").favoriteCnt(0).reviewCnt(0).starRatingAvg(0.0).build();
+            review1 = Review.builder().id(1L).createDate(LocalDateTime.now()).modifyDate(LocalDateTime.now()).writer(writer1).shop(shop).starRating(5).content("user1 작성한 리뷰 내용-1").purity(PurityScore.GOOD).retouch(RetouchScore.GOOD).item(ItemScore.GOOD).build();
+            review2 = Review.builder().id(2L).createDate(LocalDateTime.now()).modifyDate(LocalDateTime.now()).writer(writer1).shop(shop).starRating(4).content("user1 작성한 리뷰 내용-2").purity(PurityScore.UNSELECTED).retouch(RetouchScore.UNSELECTED).item(ItemScore.UNSELECTED).build();
+            review3 = Review.builder().id(3L).createDate(LocalDateTime.now()).modifyDate(LocalDateTime.now()).writer(writer2).shop(shop).starRating(3).content("user2 작성한 리뷰 내용-1").purity(PurityScore.BAD).retouch(RetouchScore.BAD).item(ItemScore.BAD).build();
+        }
+
+        @Nested
+        @DisplayName("성공")
+        class SuccessCase {
+            @Test
+            @DisplayName("user1 리뷰 조회")
+            void retrieveMemberReviewSuccess1() {
+                // given
+                Long memberId = 1L;
+                List<Review> reviews = new ArrayList<>();
+                reviews.add(review1);
+                reviews.add(review2);
+
+                // when
+                when(reviewRepository.findAllByWriterIdOrderByCreateDateDesc(memberId)).thenReturn(reviews);
+
+                List<ResponseMemberReviewDto> memberReviews = reviewService.getAllMemberReviews(memberId);
+
+                // then
+                Assertions.assertEquals(memberReviews.size(), 2);
+
+                Assertions.assertEquals(memberReviews.get(0).getReviewInfo().getId(), review1.getId());
+                Assertions.assertEquals(memberReviews.get(0).getReviewInfo().getContent(), review1.getContent());
+                Assertions.assertEquals(memberReviews.get(0).getShopInfo().getId(), shop.getId());
+                Assertions.assertEquals(memberReviews.get(0).getShopInfo().getPlaceName(), shop.getPlaceName());
+
+                Assertions.assertEquals(memberReviews.get(1).getReviewInfo().getId(), review2.getId());
+                Assertions.assertEquals(memberReviews.get(1).getReviewInfo().getContent(), review2.getContent());
+                Assertions.assertEquals(memberReviews.get(1).getShopInfo().getId(), shop.getId());
+                Assertions.assertEquals(memberReviews.get(1).getShopInfo().getPlaceName(), shop.getPlaceName());
+
+            }
+
+            @Test
+            @DisplayName("user2 리뷰 조회")
+            void retrieveMemberReviewSuccess2() {
+                Long memberId = 2L;
+                List<Review> reviews = new ArrayList<>();
+                reviews.add(review3);
+
+                // when
+                when(reviewRepository.findAllByWriterIdOrderByCreateDateDesc(memberId)).thenReturn(reviews);
+
+                List<ResponseMemberReviewDto> memberReviews = reviewService.getAllMemberReviews(memberId);
+
+                // then
+                Assertions.assertEquals(memberReviews.size(), 1);
+
+                Assertions.assertEquals(memberReviews.get(0).getReviewInfo().getId(), review3.getId());
+                Assertions.assertEquals(memberReviews.get(0).getReviewInfo().getContent(), review3.getContent());
+
+                Assertions.assertEquals(memberReviews.get(0).getShopInfo().getId(), shop.getId());
+                Assertions.assertEquals(memberReviews.get(0).getShopInfo().getPlaceName(), shop.getPlaceName());
+            }
+
+            @Test
+            @DisplayName("user1 회원 리뷰가 존재하지 않음")
+            void retrieveMemberReviewSuccess3() {
+                // given
+                Long memberId = 3L;
+                List<Review> reviews = new ArrayList<>();
+
+                // when
+                when(reviewRepository.findAllByWriterIdOrderByCreateDateDesc(memberId)).thenReturn(reviews);
+
+                List<ResponseMemberReviewDto> memberReviews = reviewService.getAllMemberReviews(memberId);
+
+                // then
+                Assertions.assertEquals(memberReviews.size(), 0);
+            }
+        }
+
+        @Nested
+        @DisplayName("실패")
+        class FailCase {
+
+        }
+    }
+
 }
