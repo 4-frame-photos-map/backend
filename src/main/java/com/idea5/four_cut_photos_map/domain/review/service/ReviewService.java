@@ -79,13 +79,11 @@ public class ReviewService {
     public ResponseReviewDto write(Member member, Long shopId, RequestReviewDto reviewDto) {
         Shop shop = shopService.findById(shopId);
 
-        Review review = ReviewMapper.toEntity(member, shop, reviewDto);
+        Review savedReview = reviewRepository.save(ReviewMapper.toEntity(member, shop, reviewDto));
 
-        reviewRepository.save(review);
+        //updateShopReviewStats(review);
 
-        // updateShopReviewStats(review);
-
-        return ReviewMapper.toResponseReviewDto(review);
+        return ReviewMapper.toResponseReviewDto(savedReview);
     }
 
     public ResponseReviewDto modify(Member member, Long reviewId, RequestReviewDto reviewDto) {

@@ -35,10 +35,4 @@ public class RequestReviewDto {
 
     private String item;
 
-//    public Review toEntity(){
-//        return Review.builder()
-//                .starRating(getStarRating())
-//                .content(getContent())
-//
-//    }
 }

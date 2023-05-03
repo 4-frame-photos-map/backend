@@ -11,6 +11,7 @@ import com.idea5.four_cut_photos_map.domain.review.entity.Review;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.ItemScore;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.PurityScore;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.RetouchScore;
+import com.idea5.four_cut_photos_map.domain.review.mapper.ReviewMapper;
 import com.idea5.four_cut_photos_map.domain.review.repository.ReviewRepository;
 import com.idea5.four_cut_photos_map.domain.review.service.ReviewService;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -505,7 +507,6 @@ public class ReviewServiceTest {
         private Member writer;
         private Brand brand;
         private Shop shop;
-        private Review review;
 
         @BeforeEach
         void setUp() {
@@ -517,81 +518,95 @@ public class ReviewServiceTest {
         @Nested
         @DisplayName("성공")
         class SuccessCase {
-//            @Test
-//            @DisplayName("shopId 가진 지점에 review 추가")
-//            void writeReviewShopSuccess1() {
-//                // given
-//                Long shopId = 1L;
-//                RequestReviewDto requestReviewDto = RequestReviewDto.builder().starRating(3).content("지점의 두번째 리뷰 내용").purity("GOOD").retouch("GOOD").item("GOOD").build();
-//
-//                // when
-//                when(shopService.findById(shopId)).thenReturn(shop);
-//                when(reviewRepository.save())
-//                reviewService.write(writer, shopId, requestReviewDto);
-//
-//                // then
-//
-//            }
-//
-//            @Test
-//            @DisplayName("shop2 리뷰 조회")
-//            void retrieveShopReviewsSuccess2() {
-//                // given
-//                Long shopId = 2L;
-//                List<Review> reviews = new ArrayList<>();
-//                reviews.add(review3);
-//
-//                // when
-//                when(shopService.findById(shopId)).thenReturn(shop2);
-//                when(reviewRepository.findAllByShopIdOrderByCreateDateDesc(shopId)).thenReturn(reviews);
-//
-//                List<ResponseShopReviewDto> shopReviews = reviewService.getAllShopReviews(shopId);
-//
-//                // then
-//                Assertions.assertEquals(shopReviews.size(), reviews.size());
-//
-//                Assertions.assertEquals(shopReviews.get(0).getReviewInfo().getId(), review3.getId());
-//                Assertions.assertEquals(shopReviews.get(0).getReviewInfo().getContent(), review3.getContent());
-//                Assertions.assertEquals(shopReviews.get(0).getMemberInfo().getId(), writer.getId());
-//                Assertions.assertEquals(shopReviews.get(0).getMemberInfo().getNickname(), writer.getNickname());
-//            }
-//
-//            @Test
-//            @DisplayName("shopId 해당하는 리뷰 없음")
-//            void retrieveShopReviewsSuccess3() {
-//                // given
-//                Long shopId = 3L;
-//                List<Review> reviews = new ArrayList<>();
-//
-//                // when
-//                when(shopService.findById(shopId)).thenReturn(shop3);
-//                when(reviewRepository.findAllByShopIdOrderByCreateDateDesc(shopId)).thenReturn(reviews);
-//
-//                List<ResponseShopReviewDto> shopReviews = reviewService.getAllShopReviews(shopId);
-//
-//                // then
-//                Assertions.assertEquals(shopReviews.size(), reviews.size());
-//            }
+            @Test
+            @DisplayName("shopId 가진 지점에 review 추가")
+            void writeReviewShopSuccess1() {
+                // given
+                Long shopId = 1L;
+                RequestReviewDto requestReviewDto = RequestReviewDto.builder().starRating(3).content("새로 지점에 추가하는 리뷰 내용").purity("GOOD").retouch("GOOD").item("GOOD").build();
+                Review review = Review.builder()
+                        .id(1L)
+                        .createDate(LocalDateTime.now())
+                        .modifyDate(LocalDateTime.now())
+                        .writer(writer)
+                        .shop(shop)
+                        .starRating(requestReviewDto.getStarRating())
+                        .content(requestReviewDto.getContent())
+                        .purity(PurityScore.valueOf(requestReviewDto.getPurity()))
+                        .retouch(RetouchScore.valueOf(requestReviewDto.getRetouch()))
+                        .item(ItemScore.valueOf(requestReviewDto.getItem()))
+                        .build();
+
+                // when
+                when(shopService.findById(shopId)).thenReturn(shop);
+                when(reviewRepository.save(any(Review.class))).thenReturn(review);
+
+                ResponseReviewDto responseReviewDto = reviewService.write(writer, shopId, requestReviewDto);
+
+                // then
+                Assertions.assertEquals(responseReviewDto.getReviewInfo().getId(), review.getId());
+                Assertions.assertEquals(responseReviewDto.getReviewInfo().getStarRating(), review.getStarRating());
+                Assertions.assertEquals(responseReviewDto.getReviewInfo().getContent(), review.getContent());
+
+            }
+
+            @Test
+            @DisplayName("shopId 가진 지점에 purity, retouch, item null인 review 추가")
+            void retrieveShopReviewsSuccess2() {
+                // given
+                Long shopId = 1L;
+                RequestReviewDto requestReviewDto = RequestReviewDto.builder().starRating(3).content("새로 지점에 추가하는 리뷰 내용").build();
+                Review review = Review.builder()
+                        .id(1L)
+                        .createDate(LocalDateTime.now())
+                        .modifyDate(LocalDateTime.now())
+                        .writer(writer)
+                        .shop(shop)
+                        .starRating(requestReviewDto.getStarRating())
+                        .content(requestReviewDto.getContent())
+                        .purity(PurityScore.UNSELECTED)
+                        .retouch(RetouchScore.UNSELECTED)
+                        .item(ItemScore.UNSELECTED)
+                        .build();
+
+                // when
+                when(shopService.findById(shopId)).thenReturn(shop);
+                when(reviewRepository.save(any(Review.class))).thenReturn(review);
+
+                ResponseReviewDto responseReviewDto = reviewService.write(writer, shopId, requestReviewDto);
+
+                // then
+                Assertions.assertEquals(responseReviewDto.getReviewInfo().getId(), review.getId());
+                Assertions.assertEquals(responseReviewDto.getReviewInfo().getStarRating(), review.getStarRating());
+                Assertions.assertEquals(responseReviewDto.getReviewInfo().getContent(), review.getContent());
+                Assertions.assertEquals(responseReviewDto.getReviewInfo().getPurity(), review.getPurity());
+                Assertions.assertEquals(responseReviewDto.getReviewInfo().getRetouch(), review.getRetouch());
+                Assertions.assertEquals(responseReviewDto.getReviewInfo().getItem(), review.getItem());
+
+                Assertions.assertEquals(responseReviewDto.getShopInfo().getId(), shop.getId());
+                Assertions.assertEquals(responseReviewDto.getShopInfo().getPlaceName(), shop.getPlaceName());
+            }
         }
 
-//        @Nested
-//        @DisplayName("실패")
-//        class FailCase {
-//            @Test
-//            @DisplayName("ShopId 해당하는 Shop 없음")
-//            void retrieveShopReviewsFail1() {
-//                // given
-//                Long shopId = 4L;
-//                BusinessException exception = new BusinessException(ErrorCode.SHOP_NOT_FOUND);
-//
-//                // when
-//                when(shopService.findById(shopId)).thenThrow(exception);
-//
-//                // then
-//                BusinessException resultException = Assertions.assertThrows(exception.getClass(), () -> reviewService.getAllShopReviews(shopId));
-//                Assertions.assertEquals(resultException.getErrorCode(), exception.getErrorCode());
-//                Assertions.assertEquals(resultException.getMessage(), exception.getMessage());
-//            }
-//        }
+        @Nested
+        @DisplayName("실패")
+        class FailCase {
+            @Test
+            @DisplayName("ShopId 존재하지 않는 지점")
+            void retrieveShopReviewsFail1() {
+                // given
+                Long shopId = 2L;
+                RequestReviewDto requestReviewDto = RequestReviewDto.builder().starRating(3).content("새로 지점에 추가하는 리뷰 내용").purity("GOOD").retouch("GOOD").item("GOOD").build();
+                BusinessException exception = new BusinessException(ErrorCode.SHOP_NOT_FOUND);
+
+                // when
+                when(shopService.findById(shopId)).thenThrow(exception);
+
+                // then
+                BusinessException resultException = Assertions.assertThrows(exception.getClass(), () -> reviewService.write(writer, shopId, requestReviewDto));
+                Assertions.assertEquals(resultException.getErrorCode(), exception.getErrorCode());
+                Assertions.assertEquals(resultException.getMessage(), exception.getMessage());
+            }
+        }
     }
 }
