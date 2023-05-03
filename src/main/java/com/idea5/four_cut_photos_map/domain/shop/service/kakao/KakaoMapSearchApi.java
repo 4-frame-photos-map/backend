@@ -84,7 +84,7 @@ public class KakaoMapSearchApi {
         }
 
         // 3. JSON -> DTO 역직렬화
-        return deserialize(resultList, documents, userLat, userLng);
+        return deserialize(resultList, documents, userLat, userLng, mapLat, mapLng);
     }
 
     public String[] searchSingleShopByQueryWord(Shop dbShop, Double userLat, Double userLng) {
@@ -165,17 +165,21 @@ public class KakaoMapSearchApi {
         return resultList;
     }
 
-    private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents, Double userLat, Double userLng) {
+    private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents, Double userLat, Double userLng,
+                                                                                                        Double mapLat, Double mapLng) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        boolean isUserAndMapCoordSame = (userLat == mapLat) && (userLng == mapLng);
         for (JsonNode document : documents) {
             if (document.get("category_name").asText().contains(CATEGORY_NAME)) {
                 try {
                     KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
 
-                    // 사용자 중심좌표를 기준으로 지점으로부터의 거리 갱신
-                    Double placeLat = Double.parseDouble(dto.getLatitude());
-                    Double placeLng = Double.parseDouble(dto.getLongitude());
-                    dto.setDistance(Util.calculateDist(placeLat, placeLng, userLat, userLng));
+                    if(!isUserAndMapCoordSame) {
+                        // 사용자 중심좌표를 기준으로 지점으로부터의 거리 갱신
+                        Double placeLat = Double.parseDouble(dto.getLatitude());
+                        Double placeLng = Double.parseDouble(dto.getLongitude());
+                        dto.setDistance(Util.calculateDist(placeLat, placeLng, userLat, userLng));
+                    }
 
                     resultList.add(dto);
                 } catch (Exception e) {
