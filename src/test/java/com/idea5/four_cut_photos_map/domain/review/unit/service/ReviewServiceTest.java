@@ -349,4 +349,127 @@ public class ReviewServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("지점 전체 리뷰 조회")
+    class RetrieveShopReviews {
+        private Member writer;
+        private Brand brand1;
+        private Brand brand2;
+        private Brand brand3;
+        private Shop shop1;
+        private Shop shop2;
+        private Shop shop3;
+        private Review review1;
+        private Review review2;
+        private Review review3;
+
+        @BeforeEach
+        void setUp() {
+            writer = Member.builder().id(1L).kakaoId(1000L).nickname("user1").build();
+            brand1 = Brand.builder().id(1L).brandName("인생네컷").filePath("https://d18tllc1sxg8cp.cloudfront.net/brand_image/brand_1.jpg").build();
+            brand2 = Brand.builder().id(2L).brandName("하루필름").filePath("https://d18tllc1sxg8cp.cloudfront.net/brand_image/brand_2.jpg").build();
+            brand2 = Brand.builder().id(3L).brandName("포토이즘").filePath("https://d18tllc1sxg8cp.cloudfront.net/brand_image/brand_3.jpg").build();
+            shop1 = Shop.builder().id(1L).brand(brand1).placeName("인생네컷망리단길점").address("서울 마포구 포은로 109-1").favoriteCnt(0).reviewCnt(0).starRatingAvg(0.0).build();
+            shop2 = Shop.builder().id(2L).brand(brand2).placeName("하루필름 연트럴파크점").address("서울 마포구 양화로23길 30, 1층 (동교동)").favoriteCnt(0).reviewCnt(0).starRatingAvg(0.0).build();
+            shop3 = Shop.builder().id(3L).brand(brand3).placeName("포토이즘박스 광운대점").address("서울 노원구 석계로 95 성북빌딩").favoriteCnt(0).reviewCnt(0).starRatingAvg(0.0).build();
+            review1 = Review.builder().id(1L).createDate(LocalDateTime.now()).modifyDate(LocalDateTime.now()).writer(writer).shop(shop1).starRating(5).content("shop1 작성한 리뷰 내용-1").purity(PurityScore.GOOD).retouch(RetouchScore.GOOD).item(ItemScore.GOOD).build();
+            review2 = Review.builder().id(2L).createDate(LocalDateTime.now()).modifyDate(LocalDateTime.now()).writer(writer).shop(shop1).starRating(4).content("shop1 작성한 리뷰 내용-2").purity(PurityScore.UNSELECTED).retouch(RetouchScore.UNSELECTED).item(ItemScore.UNSELECTED).build();
+            review3 = Review.builder().id(3L).createDate(LocalDateTime.now()).modifyDate(LocalDateTime.now()).writer(writer).shop(shop2).starRating(3).content("shop2 작성한 리뷰 내용-1").purity(PurityScore.BAD).retouch(RetouchScore.BAD).item(ItemScore.BAD).build();
+        }
+
+        @Nested
+        @DisplayName("성공")
+        class SuccessCase {
+            @Test
+            @DisplayName("shop1 리뷰 조회")
+            void retrieveShopReviewsSuccess1() {
+                // given
+                Long shopId = 1L;
+                List<Review> reviews = new ArrayList<>();
+                reviews.add(review1);
+                reviews.add(review2);
+
+                // when
+                when(shopService.findById(shopId)).thenReturn(shop1);
+                when(reviewRepository.findAllByShopIdOrderByCreateDateDesc(shopId)).thenReturn(reviews);
+
+                List<ResponseShopReviewDto> shopReviews = reviewService.getAllShopReviews(shopId);
+
+                // then
+                Assertions.assertEquals(shopReviews.size(), reviews.size());
+
+                Assertions.assertEquals(shopReviews.get(0).getReviewInfo().getId(), review1.getId());
+                Assertions.assertEquals(shopReviews.get(0).getReviewInfo().getContent(), review1.getContent());
+                Assertions.assertEquals(shopReviews.get(0).getMemberInfo().getId(), writer.getId());
+                Assertions.assertEquals(shopReviews.get(0).getMemberInfo().getNickname(), writer.getNickname());
+
+                Assertions.assertEquals(shopReviews.get(1).getReviewInfo().getId(), review2.getId());
+                Assertions.assertEquals(shopReviews.get(1).getReviewInfo().getContent(), review2.getContent());
+                Assertions.assertEquals(shopReviews.get(1).getMemberInfo().getId(), writer.getId());
+                Assertions.assertEquals(shopReviews.get(1).getMemberInfo().getNickname(), writer.getNickname());
+            }
+
+            @Test
+            @DisplayName("shop2 리뷰 조회")
+            void retrieveShopReviewsSuccess2() {
+                // given
+                Long shopId = 2L;
+                List<Review> reviews = new ArrayList<>();
+                reviews.add(review3);
+
+                // when
+                when(shopService.findById(shopId)).thenReturn(shop2);
+                when(reviewRepository.findAllByShopIdOrderByCreateDateDesc(shopId)).thenReturn(reviews);
+
+                List<ResponseShopReviewDto> shopReviews = reviewService.getAllShopReviews(shopId);
+
+                // then
+                Assertions.assertEquals(shopReviews.size(), reviews.size());
+
+                Assertions.assertEquals(shopReviews.get(0).getReviewInfo().getId(), review3.getId());
+                Assertions.assertEquals(shopReviews.get(0).getReviewInfo().getContent(), review3.getContent());
+                Assertions.assertEquals(shopReviews.get(0).getMemberInfo().getId(), writer.getId());
+                Assertions.assertEquals(shopReviews.get(0).getMemberInfo().getNickname(), writer.getNickname());
+            }
+
+            @Test
+            @DisplayName("shopId 해당하는 리뷰 없음")
+            void retrieveShopReviewsSuccess3() {
+                // given
+                Long shopId = 3L;
+                List<Review> reviews = new ArrayList<>();
+
+                // when
+                when(shopService.findById(shopId)).thenReturn(shop3);
+                when(reviewRepository.findAllByShopIdOrderByCreateDateDesc(shopId)).thenReturn(reviews);
+
+                List<ResponseShopReviewDto> shopReviews = reviewService.getAllShopReviews(shopId);
+
+                // then
+                Assertions.assertEquals(shopReviews.size(), reviews.size());
+            }
+        }
+
+        @Nested
+        @DisplayName("실패")
+        class FailCase {
+            @Test
+            @DisplayName("ShopId 해당하는 Shop 없음")
+            void retrieveShopReviewsFail1() {
+                // given
+                Long shopId = 4L;
+                BusinessException exception = new BusinessException(ErrorCode.SHOP_NOT_FOUND);
+
+                // when
+                when(shopService.findById(shopId)).thenThrow(exception);
+
+                // then
+                BusinessException resultException = Assertions.assertThrows(exception.getClass(), () -> reviewService.getAllShopReviews(shopId));
+                Assertions.assertEquals(resultException.getErrorCode(), exception.getErrorCode());
+                Assertions.assertEquals(resultException.getMessage(), exception.getMessage());
+            }
+        }
+    }
+
+
 }
