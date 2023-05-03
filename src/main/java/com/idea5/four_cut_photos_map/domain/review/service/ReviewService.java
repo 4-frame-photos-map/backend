@@ -126,7 +126,7 @@ public class ReviewService {
 
         reviewRepository.delete(review);
 
-        updateShopReviewStats(review);
+        // updateShopReviewStats(review);
     }
 
     // Shop 리뷰 관련 통계 컬럼 업데이트

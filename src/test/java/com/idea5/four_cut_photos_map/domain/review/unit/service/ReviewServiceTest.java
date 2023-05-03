@@ -187,4 +187,65 @@ public class ReviewServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("특정 리뷰 삭제")
+    class DeleteReview {
+        private Member writer;
+        private Brand brand;
+        private Shop shop;
+        private Review review;
+
+        @BeforeEach
+        void setUp() {
+            writer = Member.builder().id(1L).kakaoId(1000L).nickname("user1").build();
+            brand = Brand.builder().id(1L).brandName("인생네컷").filePath("https://d18tllc1sxg8cp.cloudfront.net/brand_image/brand_1.jpg").build();
+            shop = Shop.builder().id(1L).brand(brand).placeName("인생네컷망리단길점").address("서울 마포구 포은로 109-1").favoriteCnt(0).reviewCnt(0).starRatingAvg(0.0).build();
+            review = Review.builder().id(1L).createDate(LocalDateTime.now()).modifyDate(LocalDateTime.now()).writer(writer).shop(shop).starRating(5).content("리뷰 내용").purity(PurityScore.UNSELECTED).retouch(RetouchScore.UNSELECTED).item(ItemScore.UNSELECTED).build();
+        }
+
+        @Nested
+        @DisplayName("성공")
+        class SuccessCase {
+
+        }
+
+        @Nested
+        @DisplayName("실패")
+        class FailCase {
+            @Test
+            @DisplayName("해당 id 가진 리뷰 존재하지 않음")
+            void modifyReviewFail1() {
+                // given
+                Long deleteReviewId = 2L;
+                Member user = Member.builder().id(1L).build();
+                BusinessException exception = new BusinessException(ErrorCode.REVIEW_NOT_FOUND);
+
+                // when
+                when(reviewRepository.findById(deleteReviewId)).thenThrow(exception);
+
+                // then
+                BusinessException resultException = Assertions.assertThrows(exception.getClass(), () -> reviewService.delete(user, deleteReviewId));
+                Assertions.assertEquals(resultException.getErrorCode(), exception.getErrorCode());
+                Assertions.assertEquals(resultException.getMessage(), exception.getMessage());
+            }
+
+            @Test
+            @DisplayName("사용자와 리뷰 작성자 불일치")
+            void modifyReviewFail2() {
+                // given
+                Long modifyReviewId = 1L;
+                Member user = Member.builder().id(2L).build();
+                BusinessException exception = new BusinessException(ErrorCode.WRITER_DOES_NOT_MATCH);
+
+                // when
+                when(reviewRepository.findById(modifyReviewId)).thenReturn(Optional.of(review));
+
+                // then
+                BusinessException resultException = Assertions.assertThrows(exception.getClass(), () -> reviewService.delete(user, modifyReviewId));
+                Assertions.assertEquals(resultException.getErrorCode(), exception.getErrorCode());
+                Assertions.assertEquals(resultException.getMessage(), exception.getMessage());
+            }
+        }
+    }
+
 }
