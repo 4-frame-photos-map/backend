@@ -101,7 +101,7 @@ public class ReviewService {
         // Review Entity 수정
         review = updateReview(review, reviewDto);
 
-        updateShopReviewStats(review);
+        // updateShopReviewStats(review);
 
         return ReviewMapper.toResponseReviewDto(review);
     }
