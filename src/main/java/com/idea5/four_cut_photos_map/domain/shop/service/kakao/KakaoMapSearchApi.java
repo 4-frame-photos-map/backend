@@ -17,6 +17,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,7 +71,6 @@ public class KakaoMapSearchApi {
                 .queryParam("query", queryWord + DEFAULT_QUERY_WORD)
                 .queryParam("y", mapLat)
                 .queryParam("x", mapLng)
-                .queryParam("sort", "distance")
                 .queryParam("radius", radius);
 
         String apiUrl = uriBuilder.build().toString();
@@ -198,15 +198,14 @@ public class KakaoMapSearchApi {
     }
 
     private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents, Double userLat, Double userLng,
-                                                                                                        Double mapLat, Double mapLng) {
+                                                Double mapLat, Double mapLng) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        boolean isUserAndMapCoordSame = (userLat == mapLat) && (userLng == mapLng);
         for (JsonNode document : documents) {
             if (document.get("category_name").asText().contains(CATEGORY_NAME)) {
                 try {
                     KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
 
-                    if(!isUserAndMapCoordSame) {
+                    if((userLat != mapLat) || (userLng != mapLng)) {
                         // 사용자 현재위치 좌표로부터 지점까지의 거리 갱신
                         Double placeLat = Double.parseDouble(dto.getLatitude());
                         Double placeLng = Double.parseDouble(dto.getLongitude());
@@ -219,6 +218,8 @@ public class KakaoMapSearchApi {
                 }
             }
         }
+        resultList.sort(Comparator.comparing(KakaoMapSearchDto::getDistance));
+
         return resultList;
     }
 
