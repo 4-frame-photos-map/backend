@@ -42,7 +42,7 @@ public class ShopController {
      * 키워드 조회, 정확도순 정렬
      */
     @GetMapping(value = "")
-    public ResponseEntity<List<ResponseShopKeyword>> showSearchResultsByKeyword (@RequestParam @NotBlank String keyword,
+    public ResponseEntity<List<ResponseShopKeyword>> searchShopsByKeyword (@RequestParam @NotBlank String keyword,
                                                                                  @RequestParam @NotNull Double userLat,
                                                                                  @RequestParam @NotNull Double userLng,
                                                                                  @AuthenticationPrincipal MemberContext memberContext) {
@@ -73,7 +73,7 @@ public class ShopController {
      * 브랜드별 조회, 거리순 정렬
      */
     @GetMapping("/brand")
-    public ResponseEntity<Map<String, Object>> showSearchResultsByBrand (@RequestParam(required = false, defaultValue = "") String brand,
+    public ResponseEntity<Map<String, Object>> searchShopsByBrand (@RequestParam(required = false, defaultValue = "") String brand,
                                                                          @RequestParam(required = false, defaultValue = "2000") Integer radius,
                                                                          @RequestParam @NotNull Double userLat,
                                                                          @RequestParam @NotNull Double userLng,
@@ -114,7 +114,7 @@ public class ShopController {
      * 상세 조회
      */
     @GetMapping("/{shop-id}")
-    public ResponseEntity<ResponseShopDetail> showDetail (@PathVariable(name = "shop-id") Long id,
+    public ResponseEntity<ResponseShopDetail> getShopDetail (@PathVariable(name = "shop-id") Long id,
                                                           @RequestParam @NotNull Double userLat,
                                                           @RequestParam @NotNull Double userLng,
                                                           @AuthenticationPrincipal MemberContext memberContext) {
@@ -143,7 +143,7 @@ public class ShopController {
      * 간단 조회, Map Marker 모달용
      */
     @GetMapping("/{shop-id}/info")
-    public ResponseEntity<ResponseShopBriefInfo> showBriefInfo (@PathVariable(name = "shop-id") Long id,
+    public ResponseEntity<ResponseShopBriefInfo> getShopBriefInfo (@PathVariable(name = "shop-id") Long id,
                                                                 @RequestParam @NotBlank String placeName,
                                                                 @RequestParam @NotBlank String distance,
                                                                 @AuthenticationPrincipal MemberContext memberContext) {
