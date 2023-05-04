@@ -66,4 +66,7 @@ public class RedisDao {
 
     // 지점 정보(placeUrl, lat, lng)를 저장하는 key
     public String getShopInfoKey(long shopId) {return "shop:" + shopId;}
+
+    // 유효하지 않은 shop id를 저장하는 key
+    public String getInvalidShopIdKey() {return "invalid_shop_id";}
 }

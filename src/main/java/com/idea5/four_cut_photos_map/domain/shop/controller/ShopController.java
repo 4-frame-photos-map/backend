@@ -9,6 +9,7 @@ import com.idea5.four_cut_photos_map.domain.review.service.ReviewService;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
+import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,13 +35,14 @@ public class ShopController {
     private final ShopService shopService;
     private final FavoriteService favoriteService;
     private final ReviewService reviewService;
+    private final ShopTitleLogService shopTitleLogService;
 
 
     /**
      * 키워드 조회, 정확도순 정렬
      */
     @GetMapping(value = "")
-    public ResponseEntity<List<ResponseShopKeyword>> showSearchResultsByKeyword (@RequestParam @NotBlank String keyword,
+    public ResponseEntity<List<ResponseShopKeyword>> searchShopsByKeyword (@RequestParam @NotBlank String keyword,
                                                                                  @RequestParam @NotNull Double userLat,
                                                                                  @RequestParam @NotNull Double userLng,
                                                                                  @AuthenticationPrincipal MemberContext memberContext) {
@@ -71,7 +73,7 @@ public class ShopController {
      * 브랜드별 조회, 거리순 정렬
      */
     @GetMapping("/brand")
-    public ResponseEntity<Map<String, Object>> showSearchResultsByBrand (@RequestParam(required = false, defaultValue = "") String brand,
+    public ResponseEntity<Map<String, Object>> searchShopsByBrand (@RequestParam(required = false, defaultValue = "") String brand,
                                                                          @RequestParam(required = false, defaultValue = "2000") Integer radius,
                                                                          @RequestParam @NotNull Double userLat,
                                                                          @RequestParam @NotNull Double userLng,
@@ -112,7 +114,7 @@ public class ShopController {
      * 상세 조회
      */
     @GetMapping("/{shop-id}")
-    public ResponseEntity<ResponseShopDetail> showDetail (@PathVariable(name = "shop-id") Long id,
+    public ResponseEntity<ResponseShopDetail> getShopDetail (@PathVariable(name = "shop-id") Long id,
                                                           @RequestParam @NotNull Double userLat,
                                                           @RequestParam @NotNull Double userLng,
                                                           @AuthenticationPrincipal MemberContext memberContext) {
@@ -128,7 +130,7 @@ public class ShopController {
             shopDetailDto.setFavorite(favorite != null);
         }
 
-        // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
+        // todo: 지점 칭호 디자인 완성 후 재반영 예정
 //        if (shopTitleLogService.existShopTitles(id)) {
 //            List<String> shopTitles = shopTitleLogService.getShopTitles(id);
 //            shopDetailDto.setShopTitles(shopTitles);
@@ -141,7 +143,7 @@ public class ShopController {
      * 간단 조회, Map Marker 모달용
      */
     @GetMapping("/{shop-id}/info")
-    public ResponseEntity<ResponseShopBriefInfo> showBriefInfo (@PathVariable(name = "shop-id") Long id,
+    public ResponseEntity<ResponseShopBriefInfo> getShopBriefInfo (@PathVariable(name = "shop-id") Long id,
                                                                 @RequestParam @NotBlank String placeName,
                                                                 @RequestParam @NotBlank String distance,
                                                                 @AuthenticationPrincipal MemberContext memberContext) {
@@ -155,21 +157,4 @@ public class ShopController {
 
         return ResponseEntity.ok(responseShopBriefInfo);
     }
-
-    // 브랜드별 Map Marker
-    // 현재 위치 기준, 반경 2km
-//    @GetMapping("/marker")
-//    public ResponseEntity<RsData<Map<String, List<ResponseShopMarker>>>> currentLocationSearch(@ModelAttribute @Valid RequestShop requestShop) {
-//
-//        String[] names = Brand.Names; // 브랜드명 ( 하루필름, 인생네컷 ... )
-//
-//        Map<String, List<ResponseShopMarker>> maps = new HashMap<>();
-//        for (String brandName : names) {
-//            List<ResponseShopMarker> list = shopService.searchMarkers(requestShop, brandName);
-//            maps.put(brandName, list);
-//        }
-//
-//        return ResponseEntity.ok(
-//                new RsData<Map<String, List<ResponseShopMarker>>>(true, "반경 2km 이내 Shop 조회 성공", maps)
-//        );
 }

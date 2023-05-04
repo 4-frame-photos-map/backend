@@ -39,7 +39,7 @@ public class ResponseShop {
 
         return ResponseShop.builder()
                 .id(dbShop.getId())
-                .placeName(apiShop.getPlaceName())
+                .placeName(dbShop.getPlaceName())
                 .longitude(apiShop.getLongitude())
                 .latitude(apiShop.getLatitude())
                 .distance(apiShop.getDistance())

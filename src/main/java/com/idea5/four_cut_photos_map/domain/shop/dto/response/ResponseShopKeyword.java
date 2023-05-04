@@ -29,7 +29,7 @@ public class ResponseShopKeyword extends ResponseShop {
 
         return ResponseShopKeyword.builder()
                 .id(dbShop.getId())
-                .placeName(apiShop.getPlaceName())
+                .placeName(dbShop.getPlaceName())
                 .longitude(apiShop.getLongitude())
                 .latitude(apiShop.getLatitude())
                 .distance(apiShop.getDistance())
