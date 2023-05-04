@@ -5,6 +5,7 @@ import com.idea5.four_cut_photos_map.domain.review.dto.request.RequestReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseMemberReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseShopReviewDto;
+import com.idea5.four_cut_photos_map.domain.review.dto.response.ShopReviewInfoDto;
 import com.idea5.four_cut_photos_map.domain.review.entity.Review;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.ItemScore;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.PurityScore;
@@ -81,8 +82,6 @@ public class ReviewService {
 
         Review savedReview = reviewRepository.save(ReviewMapper.toEntity(member, shop, reviewDto));
 
-        //updateShopReviewStats(review);
-
         return ReviewMapper.toResponseReviewDto(savedReview);
     }
 
@@ -94,10 +93,7 @@ public class ReviewService {
             throw new BusinessException(ErrorCode.WRITER_DOES_NOT_MATCH);
         }
 
-        // Review Entity 수정
         review = updateReview(review, reviewDto);
-
-        // updateShopReviewStats(review);
 
         return ReviewMapper.toResponseReviewDto(review);
     }
@@ -121,25 +117,23 @@ public class ReviewService {
         }
 
         reviewRepository.delete(review);
-
-        // updateShopReviewStats(review);
     }
 
     // Shop 리뷰 관련 통계 컬럼 업데이트
-    public void updateShopReviewStats(Review review) {
-        Shop shop = shopService.findById(review.getShop().getId());
-
-        int reviewCount = reviewRepository.countByShop(shop);
-        shop.setReviewCnt(reviewCount);
-
-        double avgStarRating = 0.0;
-        if(reviewCount != 0) {
-            avgStarRating = reviewRepository.getAverageStarRating(shop.getId());
-            avgStarRating = Double.parseDouble(String.format("%.1f", avgStarRating));
-        }
-        shop.setStarRatingAvg(avgStarRating);
-
-    }
+//    public void updateShopReviewStats(Review review) {
+//        Shop shop = shopService.findById(review.getShop().getId());
+//
+//        int reviewCount = reviewRepository.countByShop(shop);
+//        shop.setReviewCnt(reviewCount);
+//
+//        double avgStarRating = 0.0;
+//        if(reviewCount != 0) {
+//            avgStarRating = reviewRepository.getAverageStarRating(shop.getId());
+//            avgStarRating = Double.parseDouble(String.format("%.1f", avgStarRating));
+//        }
+//        shop.setStarRatingAvg(avgStarRating);
+//
+//    }
 
     // 회원의 리뷰수 조회
     public Long getReviewCntByWriter(Member member) {
@@ -148,5 +142,15 @@ public class ReviewService {
 
     public void deleteByWriterId(Long memberId) {
         reviewRepository.deleteByWriterId(memberId);
+    }
+
+    @Transactional(readOnly = true)
+    public ShopReviewInfoDto getShopReviewInfo(Long shopId) {
+        Shop shop = shopService.findById(shopId);
+
+        int reviewCount = reviewRepository.countByShop(shop);
+        double starRatingAvg = reviewRepository.getAverageStarRating(shopId);
+
+        return new ShopReviewInfoDto(reviewCount, starRatingAvg);
     }
 }

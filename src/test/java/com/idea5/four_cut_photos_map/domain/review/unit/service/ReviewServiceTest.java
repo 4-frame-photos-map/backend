@@ -7,6 +7,7 @@ import com.idea5.four_cut_photos_map.domain.review.dto.request.RequestReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseMemberReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseShopReviewDto;
+import com.idea5.four_cut_photos_map.domain.review.dto.response.ShopReviewInfoDto;
 import com.idea5.four_cut_photos_map.domain.review.entity.Review;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.ItemScore;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.PurityScore;
@@ -25,6 +26,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.OngoingStubbing;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -604,6 +606,64 @@ public class ReviewServiceTest {
 
                 // then
                 BusinessException resultException = Assertions.assertThrows(exception.getClass(), () -> reviewService.write(writer, shopId, requestReviewDto));
+                Assertions.assertEquals(resultException.getErrorCode(), exception.getErrorCode());
+                Assertions.assertEquals(resultException.getMessage(), exception.getMessage());
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("상점의 리뷰 정보 가져오기")
+    class GetShopReviewInfo {
+
+        private Brand brand;
+        private Shop shop;
+
+        @BeforeEach
+        void setUp() {
+            brand = Brand.builder().id(1L).brandName("인생네컷").filePath("https://d18tllc1sxg8cp.cloudfront.net/brand_image/brand_1.jpg").build();
+            shop = Shop.builder().id(1L).brand(brand).placeName("인생네컷망리단길점").address("서울 마포구 포은로 109-1").favoriteCnt(0).reviewCnt(0).starRatingAvg(0.0).build();
+        }
+
+        @Nested
+        @DisplayName("성공")
+        class SuccessCase {
+            @Test
+            @DisplayName("shopId 해당하는 상점 정보 가져오기")
+            void getShopReviewInfoSuccess1() {
+                // given
+                Long shopId = 1L;
+                int reviewCount = 10;
+                double starRatingAvg = 4.3;
+
+                // when
+                when(shopService.findById(shopId)).thenReturn(shop);
+                when(reviewRepository.countByShop(shop)).thenReturn(reviewCount);
+                when(reviewRepository.getAverageStarRating(shopId)).thenReturn(starRatingAvg);
+
+                ShopReviewInfoDto shopReviewInfo = reviewService.getShopReviewInfo(shopId);
+
+                // then
+                Assertions.assertEquals(shopReviewInfo.getReviewCnt(), reviewCount);
+                Assertions.assertEquals(shopReviewInfo.getStarRatingAvg(), starRatingAvg);
+            }
+        }
+
+        @Nested
+        @DisplayName("실패")
+        class FailCase {
+            @Test
+            @DisplayName("shopId 존재하지 않는 경우")
+            void getShopReviewInfoFail1() {
+                // given
+                Long shopId = 1L;
+                BusinessException exception = new BusinessException(ErrorCode.SHOP_NOT_FOUND);
+
+                // when
+                when(shopService.findById(shopId)).thenThrow(exception);
+
+                // then
+                BusinessException resultException = Assertions.assertThrows(exception.getClass(), () -> reviewService.getShopReviewInfo(shopId));
                 Assertions.assertEquals(resultException.getErrorCode(), exception.getErrorCode());
                 Assertions.assertEquals(resultException.getMessage(), exception.getMessage());
             }
