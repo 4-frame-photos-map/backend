@@ -634,7 +634,8 @@ public class ReviewServiceTest {
                 // given
                 Long shopId = 1L;
                 int reviewCount = 10;
-                double starRatingAvg = 4.3;
+                double starRatingAvg = 4.12345678;
+                double roundedStarRatingAvg = 4.1;
 
                 // when
                 when(shopService.findById(shopId)).thenReturn(shop);
@@ -644,6 +645,27 @@ public class ReviewServiceTest {
                 ShopReviewInfoDto shopReviewInfo = reviewService.getShopReviewInfo(shopId);
 
                 // then
+                Assertions.assertEquals(shopReviewInfo.getShopId(), shopId);
+                Assertions.assertEquals(shopReviewInfo.getReviewCnt(), reviewCount);
+                Assertions.assertEquals(shopReviewInfo.getStarRatingAvg(), roundedStarRatingAvg);
+            }
+
+            @Test
+            @DisplayName("상점의 리뷰가 없을 때 별점 평균 처리")
+            void getShopReviewInfoSuccess2() {
+                // given
+                Long shopId = 1L;
+                int reviewCount = 0;
+                double starRatingAvg = 0.0;
+
+                // when
+                when(shopService.findById(shopId)).thenReturn(shop);
+                when(reviewRepository.countByShop(shop)).thenReturn(reviewCount);
+
+                ShopReviewInfoDto shopReviewInfo = reviewService.getShopReviewInfo(shopId);
+
+                // then
+                Assertions.assertEquals(shopReviewInfo.getShopId(), shopId);
                 Assertions.assertEquals(shopReviewInfo.getReviewCnt(), reviewCount);
                 Assertions.assertEquals(shopReviewInfo.getStarRatingAvg(), starRatingAvg);
             }

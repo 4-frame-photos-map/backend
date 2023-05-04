@@ -11,6 +11,7 @@ import lombok.*;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ShopReviewInfoDto {
+    private Long shopId;
     private int reviewCnt;
     private double starRatingAvg;
 }

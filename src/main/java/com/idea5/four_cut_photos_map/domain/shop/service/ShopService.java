@@ -3,6 +3,7 @@ package com.idea5.four_cut_photos_map.domain.shop.service;
 import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponse;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
+import com.idea5.four_cut_photos_map.domain.review.dto.response.ShopReviewInfoDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.entity.ShopMatchPriority;
@@ -180,6 +181,13 @@ public class ShopService {
 
     public String convertMapCenterCoordToAddress(Double mapLat, Double mapLng) {
         return kakaoMapSearchApi.convertCoordinateToAddress(mapLat, mapLng);
+    }
+
+    @Transactional
+    public void updateReviewInfo(ShopReviewInfoDto shopReviewInfo) {
+        Shop shop = findById(shopReviewInfo.getShopId());
+        shop.setReviewCnt(shopReviewInfo.getReviewCnt());
+        shop.setStarRatingAvg(shopReviewInfo.getStarRatingAvg());
     }
 
 
