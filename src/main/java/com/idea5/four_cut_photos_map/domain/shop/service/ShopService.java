@@ -122,10 +122,6 @@ public class ShopService {
             return kakaoMapSearchApi.searchByQueryWord(brand, radius, userLat, userLng, mapLat, mapLng);
     }
 
-    public String[] searchSingleShopByQueryWord(Shop dbShop, Double userLat, Double userLng) {
-        return kakaoMapSearchApi.searchSingleShopByQueryWord(dbShop, userLat, userLng);
-    }
-
     public String convertMapCenterCoordToAddress(Double mapLat, Double mapLng) {
         return kakaoMapSearchApi.convertCoordinateToAddress(mapLat, mapLng);
     }
@@ -138,7 +134,7 @@ public class ShopService {
             if (dbShop.getAddress() != null) {
                 return kakaoMapSearchApi.convertAddressToCoordAndCalcDist(dbShop, userLat, userLng);
             } else {
-                String[] apiShop = searchSingleShopByQueryWord(dbShop, userLat, userLng);
+                String[] apiShop = kakaoMapSearchApi.searchSingleShopByQueryWord(dbShop, userLat, userLng, dbShop.getPlaceName());
                 if (apiShop != null) {
                     return apiShop[3];
                 }
@@ -154,7 +150,10 @@ public class ShopService {
 
     public ResponseShopDetail setResponseDto(Shop dbShop, Double userLat, Double userLng) {
         // 지점명으로 반환하는 지점 없을 시, 주소로 비교
-        String[] apiShop = searchSingleShopByQueryWord(dbShop, userLat, userLng);
+        String[] queryWords = dbShop.getAddress() == null ?
+                    new String[]{dbShop.getPlaceName()} : new String[]{dbShop.getPlaceName(), dbShop.getAddress()};
+
+        String[] apiShop = kakaoMapSearchApi.searchSingleShopByQueryWord(dbShop, userLat, userLng, queryWords);
 
         if (apiShop == null) {
             cacheInvalidShopId(dbShop.getId());
@@ -163,14 +162,14 @@ public class ShopService {
         String placeUrl = apiShop[0];
         String placeLat = apiShop[1];
         String placeLng = apiShop[2];
-        String distance = apiShop[3];
+        String distance = apiShop[3]; // userLat 또는 userLng가 null이면 Empty String 반환
 
         return ResponseShopDetail.of(dbShop, placeUrl, placeLat, placeLng, distance);
     }
 
     public FavoriteResponse setResponseDto(Favorite favorite, Double userLat, Double userLng) {
         String distance = calcDistFromUserLocation(favorite.getShop(), userLat, userLng);
-        return FavoriteResponse.from(favorite, distance);
+        return FavoriteResponse.from(favorite, distance == null ? "" : distance);
     }
 
     @Transactional(readOnly = true)

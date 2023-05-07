@@ -61,13 +61,16 @@ public class Util {
     }
 
     public static String distanceFormatting(String distance){
+        if (distance.isEmpty()) {
+            return distance;
+        }
+
         int length = distance.length();
-        if(distance.equals("")) // 공백일 시, 알 수없음으로 반환
-            return "unknown";
-        if(length < 4) // distance -> m
+        double dkm = Integer.parseInt(distance) / 1000.0; // m -> km
+
+        if (length < 4) { // distance -> m
             return distance + "m";
-        double dkm = Integer.parseInt(distance) / 1000.0; // km 환산한 값
-        if(length >= 4 && length < 6) { // distance -> km
+        } else if (length < 6) { // distance -> km
             if(dkm % 1 == 0)
                 return String.format("%.0fkm", dkm);
             // 소수점 둘째 자리에서 반올림
