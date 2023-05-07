@@ -63,10 +63,10 @@ public class ShopService {
     }
 
     /**
-     * 지점명 일치여부나 주소명 포함여부로 비교하여 Kakao API Shop과 일치하는 DB Shop 객체 반환
-     * 중복 발생 시 주소 중복일 확률이 높으므로, 지점명과 브랜드명을 기준으로 우선순위를 결정함
-     * @param placeName (카카오 API 지점명)
-     * @param addresses (카카오 API 도로명주소, 지번주소)
+     * 지점명 일치여부나 주소명 포함여부로 비교하여 Kakao API Shop과 일치하는 DB Shop 객체 반환하는 메서드입니다.
+     * 중복 발생 시 주소 중복일 확률이 높으므로, 지점명과 브랜드명을 기준으로 우선순위를 결정합니다.
+     * @param placeName 카카오 API 지점명
+     * @param addresses 카카오 API 도로명주소, 지번주소
      * @return DB Shop
      */
     @Transactional(readOnly = true)

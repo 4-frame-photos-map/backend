@@ -115,8 +115,8 @@ public class ShopController {
      */
     @GetMapping("/{shop-id}")
     public ResponseEntity<ResponseShopDetail> getShopDetail (@PathVariable(name = "shop-id") Long id,
-                                                          @RequestParam @NotNull Double userLat,
-                                                          @RequestParam @NotNull Double userLng,
+                                                          @RequestParam(required = false) @NotNull Double userLat,
+                                                          @RequestParam(required = false) @NotNull Double userLng,
                                                           @AuthenticationPrincipal MemberContext memberContext) {
 
         Shop dbShop = shopService.findById(id);

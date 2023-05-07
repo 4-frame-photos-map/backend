@@ -37,7 +37,14 @@ public class KakaoMapSearchApi {
     public static final String CATEGORY_NAME = "사진";
 
 
-
+    /**
+     * Kakao Maps API 호출하여 사용자가 입력한 검색 키워드로 즉석사진 지점 정보 가져오는 메서드입니다.
+     * 지도 중심좌표가 아닌 사용자 현재위치 좌표로 검색하며, 검색 반경에 제한이 없습니다.
+     * @param queryWord 검색할 키워드
+     * @param userLat
+     * @param userLng
+     * @return List<KakaoMapSearchDto>
+     */
     public List<KakaoMapSearchDto> searchByQueryWord(String queryWord, Double userLat, Double userLng) {
         List<KakaoMapSearchDto> resultList = new ArrayList<>();
 
@@ -62,6 +69,17 @@ public class KakaoMapSearchApi {
         return deserialize(resultList, documents);
     }
 
+    /**
+     * Kakao Maps API 호출하여 사용자가 선택한 브랜드의 즉석사진 지점 정보 가져오는 메서드입니다.
+     * 사용자 현재위치 좌표가 아닌 지도 중심좌표로 검색하며, 검색 반경에 제한 있습니다.
+     * @param queryWord 사용자가 선택한 브랜드
+     * @param radius
+     * @param userLat
+     * @param userLng
+     * @param mapLat
+     * @param mapLng
+     * @return List<KakaoMapSearchDto>
+     */
     public List<KakaoMapSearchDto> searchByQueryWord(String queryWord, Integer radius, Double userLat, Double userLng, Double mapLat, Double mapLng) {
         List<KakaoMapSearchDto> resultList = new ArrayList<>();
 
@@ -87,6 +105,14 @@ public class KakaoMapSearchApi {
         return deserialize(resultList, documents, userLat, userLng, mapLat, mapLng);
     }
 
+    /**
+     * Kakao Maps API 호출하여 지점명이나 주소로 특정 즉석사진 지점 정보 가져오는 메서드입니다.
+     * @param dbShop
+     * @param userLat
+     * @param userLng
+     * @return 검색 결과로부터 가져온 특정 지점의 카카오맵 바로가기 URL(placeUrl), 위도(placeLat), 경도(placeLng),
+     *          사용자의 현재위치 좌표로부터 지점까지의 거리(distance)를 반환합니다.
+     */
     public String[] searchSingleShopByQueryWord(Shop dbShop, Double userLat, Double userLng) {
         // 1. Redis에서 조회
         String[] cachedArr = getShopInfoFromCacheAndCalculateDist(dbShop, userLat, userLng);
@@ -122,6 +148,12 @@ public class KakaoMapSearchApi {
         return null;
     }
 
+    /**
+     * Kakao Maps API 호출하여 지도 중심 좌표를 주소로 변환하는 메서드입니다.
+     * @param mapLat
+     * @param mapLng
+     * @return address
+     */
     public String convertCoordinateToAddress(Double mapLat, Double mapLng) {
         // 1. API 호출을 위한 요청 설정
         String apiPath = "/v2/local/geo/coord2address.json";
@@ -149,6 +181,13 @@ public class KakaoMapSearchApi {
         return address;
     }
 
+    /**
+     * Kakao Maps API 호출하여 지점 주소를 좌표로 변환하고 사용자의 현재위치로부터 지점까지의 거리를 계산하는 메서드입니다.
+     * @param dbShop
+     * @param userLat
+     * @param userLng
+     * @return
+     */
     public String convertAddressToCoordAndGetDist(Shop dbShop, Double userLat, Double userLng) {
         // 1. Redis에서 조회
         String[] cachedArr = getShopInfoFromCacheAndCalculateDist(dbShop, userLat, userLng);
@@ -250,7 +289,7 @@ public class KakaoMapSearchApi {
     }
 
     /**
-     * Redis에서 지점 정보 가져와서 지점으로부터 현재 위치까지의 거리 계산하기
+     * Redis에서 지점 정보 가져와서 지점으로부터 현재 위치까지의 거리 계산하는 메서드입니다.
      * @param dbShop
      * @param userLat
      * @param userLng
