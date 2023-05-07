@@ -41,6 +41,31 @@ class CrawlController {
         return ResponseEntity.ok("Main brands crawled successfully");
     }
 
+    @PostMapping("/lifefourcuts/shops")
+    public ResponseEntity<String> crawlLifefourcuts() {
+        lifefourcutsCrawlService.crawl();
+
+        return ResponseEntity.ok("Lifefourcuts crawled successfully");
+    }
+
+    @PostMapping("/harufilm/shops")
+    public ResponseEntity<String> crawlHarufilm() {
+        harufilmCrawlService.crawl();
+        return ResponseEntity.ok("Harufilm crawled successfully");
+    }
+
+    @PostMapping("/photoism/shops")
+    public ResponseEntity<String> crawlPhotoism() {
+        photoismCrawlService.crawl();
+        return ResponseEntity.ok("Photoism crawled successfully");
+    }
+
+    @PostMapping("/photogray/shops")
+    public ResponseEntity<String> crawlPhotogray() {
+        photograyCrawlService.crawl();
+        return ResponseEntity.ok("Photogray crawled successfully");
+    }
+
     @PostMapping("/other/shops")
     public ResponseEntity<String> crawlOtherBrands() {
 
