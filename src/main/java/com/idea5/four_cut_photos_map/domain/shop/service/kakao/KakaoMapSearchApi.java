@@ -115,7 +115,7 @@ public class KakaoMapSearchApi {
      */
     public String[] searchSingleShopByQueryWord(Shop dbShop, Double userLat, Double userLng) {
         // 1. Redis에서 조회
-        String[] cachedArr = getShopInfoFromCacheAndCalculateDist(dbShop, userLat, userLng);
+        String[] cachedArr = getShopInfoFromCacheAndCalcDist(dbShop, userLat, userLng);
         if (cachedArr != null) {return cachedArr;}
 
         String[] queryWords = {dbShop.getPlaceName(), dbShop.getAddress()};
@@ -182,18 +182,14 @@ public class KakaoMapSearchApi {
     }
 
     /**
-     * Kakao Maps API 호출하여 지점 주소를 좌표로 변환하고 사용자의 현재위치로부터 지점까지의 거리를 계산하는 메서드입니다.
+     * Kakao Maps API 호출하여 지점 주소를 좌표로 변환하고, 사용자의 현재위치로부터 지점까지의 거리를 계산하는 메서드입니다.
      * @param dbShop
      * @param userLat
      * @param userLng
      * @return
      */
-    public String convertAddressToCoordAndGetDist(Shop dbShop, Double userLat, Double userLng) {
-        // 1. Redis에서 조회
-        String[] cachedArr = getShopInfoFromCacheAndCalculateDist(dbShop, userLat, userLng);
-        if (cachedArr != null) {return cachedArr[3];}
-
-        // 2. API 호출을 위한 요청 설정
+    public String convertAddressToCoordAndCalcDist(Shop dbShop, Double userLat, Double userLng) {
+        // 1. API 호출을 위한 요청 설정
         String apiPath = "/v2/local/search/address.json";
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
                 .queryParam("query", dbShop.getAddress())
@@ -201,7 +197,7 @@ public class KakaoMapSearchApi {
 
         String apiUrl = uriBuilder.build().toString();
 
-        // 3. API 호출
+        // 2. API 호출
         JsonNode documents;
         try {
             documents = getDocuments(apiUrl);
@@ -209,7 +205,7 @@ public class KakaoMapSearchApi {
             throw new BusinessException(TOO_MANY_REQUESTS);
         }
 
-        // 4. JSON -> DTO 역직렬화 및 사용자 현재위치 좌표로부터 지점까지의 거리 계산
+        // 3. JSON -> DTO 역직렬화 및 사용자 현재위치 좌표로부터 지점까지의 거리 계산
         if(documents.get(0).hasNonNull("y") && documents.get(0).hasNonNull("x")) {
             return Util.calculateDist(
                     documents.get(0).get("y").asDouble(),documents.get(0).get("x").asDouble(),
@@ -295,7 +291,7 @@ public class KakaoMapSearchApi {
      * @param userLng
      * @return placeUrl, placeLat, placeLng, distance
      */
-    private String[] getShopInfoFromCacheAndCalculateDist(Shop dbShop, Double userLat, Double userLng) {
+    public String[] getShopInfoFromCacheAndCalcDist(Shop dbShop, Double userLat, Double userLng) {
         String cacheKey = redisDao.getShopInfoKey(dbShop.getId());
         String cachedData = redisDao.getValues(cacheKey);
 
@@ -314,7 +310,7 @@ public class KakaoMapSearchApi {
         return null;
     }
 
-    public boolean isMatchedShop(String dbPlaceName, String apiPlaceName, String dbAddress, String apiAddress) {
+    private boolean isMatchedShop(String dbPlaceName, String apiPlaceName, String dbAddress, String apiAddress) {
         return dbPlaceName.equals(apiPlaceName) || dbAddress.contains(apiAddress);
     }
 

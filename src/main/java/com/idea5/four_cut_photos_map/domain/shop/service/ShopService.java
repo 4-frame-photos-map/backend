@@ -130,13 +130,18 @@ public class ShopService {
         return kakaoMapSearchApi.convertCoordinateToAddress(mapLat, mapLng);
     }
 
-    public String convertAddressToCoordAndGetDist(Shop dbShop, Double userLat, Double userLng) {
-        if(dbShop.getAddress() != null) {
-            return kakaoMapSearchApi.convertAddressToCoordAndGetDist(dbShop, userLat, userLng);
+    public String calcDistFromUserLocation(Shop dbShop, Double userLat, Double userLng) {
+        String[] cachedArr = kakaoMapSearchApi.getShopInfoFromCacheAndCalcDist(dbShop, userLat, userLng);
+        if (cachedArr != null) {
+            return cachedArr[3];
         } else {
-            String[] apiShop = searchSingleShopByQueryWord(dbShop, userLat, userLng);
-            if (apiShop != null) {
-                return apiShop[3];
+            if (dbShop.getAddress() != null) {
+                return kakaoMapSearchApi.convertAddressToCoordAndCalcDist(dbShop, userLat, userLng);
+            } else {
+                String[] apiShop = searchSingleShopByQueryWord(dbShop, userLat, userLng);
+                if (apiShop != null) {
+                    return apiShop[3];
+                }
             }
         }
         return null;
@@ -164,7 +169,7 @@ public class ShopService {
     }
 
     public FavoriteResponse setResponseDto(Favorite favorite, Double userLat, Double userLng) {
-        String distance = convertAddressToCoordAndGetDist(favorite.getShop(), userLat, userLng);
+        String distance = calcDistFromUserLocation(favorite.getShop(), userLat, userLng);
         return FavoriteResponse.from(favorite, distance);
     }
 
