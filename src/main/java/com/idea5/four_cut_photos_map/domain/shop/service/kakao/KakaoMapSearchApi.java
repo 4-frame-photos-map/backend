@@ -193,7 +193,7 @@ public class KakaoMapSearchApi {
     private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
-            if(document.get("category_name").asText().contains(CATEGORY_NAME)) {
+            if(isCategoryNameMatched(document)) {
                 try {
                     KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
                     dto.setDistance(Util.distanceFormatting(dto.getDistance()));
@@ -210,7 +210,7 @@ public class KakaoMapSearchApi {
                                                 Double mapLat, Double mapLng) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
-            if (document.get("category_name").asText().contains(CATEGORY_NAME)) {
+            if (isCategoryNameMatched(document)) {
                 try {
                     KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
 
@@ -233,13 +233,8 @@ public class KakaoMapSearchApi {
             String unit1 = dto1.getDistance().replaceAll("[\\d.]", "");
             String unit2 = dto2.getDistance().replaceAll("[\\d.]", "");
 
-            if (unit1.equals("m")) {
-                dist1 /= 1000;
-            }
-
-            if (unit2.equals("m")) {
-                dist2 /= 1000;
-            }
+            if (unit1.equals("m")) {dist1 /= 1000;}
+            if (unit2.equals("m")) {dist2 /= 1000;}
 
             return Double.compare(dist1, dist2);
         });
@@ -257,9 +252,9 @@ public class KakaoMapSearchApi {
                 String apiRoadAddressName = dto.getRoadAddressName();
                 String apiAddressName = dto.getAddressName();
 
-                if (document.get("category_name").asText().contains(CATEGORY_NAME) &&
-                        (isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiRoadAddressName) ||
-                                isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiAddressName))) {
+                if (isCategoryNameMatched(document) &&
+                        (isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiRoadAddressName)
+                                || isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiAddressName))) {
                     return new String[]{
                             dto.getPlaceUrl(),
                             dto.getLatitude(),
@@ -315,6 +310,10 @@ public class KakaoMapSearchApi {
             }
         }
         return null;
+    }
+
+    private boolean isCategoryNameMatched(JsonNode document) {
+        return document.get("category_name").asText().contains(CATEGORY_NAME);
     }
 
     private boolean isMatchedShop(String dbPlaceName, String apiPlaceName, String dbAddress, String apiAddress) {
