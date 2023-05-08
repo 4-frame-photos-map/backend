@@ -10,16 +10,14 @@ import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.global.util.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.TOO_MANY_REQUESTS;
 
@@ -37,7 +35,14 @@ public class KakaoMapSearchApi {
     public static final String CATEGORY_NAME = "사진";
 
 
-
+    /**
+     * Kakao Maps API 호출하여 사용자가 입력한 검색 키워드로 즉석사진 지점 정보 가져오는 메서드입니다.
+     * 지도 중심좌표가 아닌 사용자 현재위치 좌표로 검색하며, 검색 반경에 제한이 없습니다.
+     * @param queryWord 검색할 키워드
+     * @param userLat
+     * @param userLng
+     * @return List<KakaoMapSearchDto>
+     */
     public List<KakaoMapSearchDto> searchByQueryWord(String queryWord, Double userLat, Double userLng) {
         List<KakaoMapSearchDto> resultList = new ArrayList<>();
 
@@ -51,17 +56,23 @@ public class KakaoMapSearchApi {
         String apiUrl = uriBuilder.build().toString();
 
         // 2. API 호출
-        JsonNode documents;
-        try {
-            documents = getDocuments(apiUrl);
-        } catch (Exception e) {
-            throw new BusinessException(TOO_MANY_REQUESTS);
-        }
+        JsonNode documents = getDocuments(apiUrl);
 
         // 3. JSON -> DTO 역직렬화
         return deserialize(resultList, documents);
     }
 
+    /**
+     * Kakao Maps API 호출하여 사용자가 선택한 브랜드의 즉석사진 지점 정보 가져오는 메서드입니다.
+     * 사용자 현재위치 좌표가 아닌 지도 중심좌표로 검색하며, 검색 반경에 제한 있습니다.
+     * @param queryWord 사용자가 선택한 브랜드
+     * @param radius
+     * @param userLat
+     * @param userLng
+     * @param mapLat
+     * @param mapLng
+     * @return List<KakaoMapSearchDto>
+     */
     public List<KakaoMapSearchDto> searchByQueryWord(String queryWord, Integer radius, Double userLat, Double userLng, Double mapLat, Double mapLng) {
         List<KakaoMapSearchDto> resultList = new ArrayList<>();
 
@@ -76,41 +87,40 @@ public class KakaoMapSearchApi {
         String apiUrl = uriBuilder.build().toString();
 
         // 2. API 호출
-        JsonNode documents;
-        try {
-            documents = getDocuments(apiUrl);
-        } catch (Exception e) {
-            throw new BusinessException(TOO_MANY_REQUESTS);
-        }
+        JsonNode documents = getDocuments(apiUrl);
 
         // 3. JSON -> DTO 역직렬화
         return deserialize(resultList, documents, userLat, userLng, mapLat, mapLng);
     }
 
-    public String[] searchSingleShopByQueryWord(Shop dbShop, Double userLat, Double userLng) {
+    /**
+     * Kakao Maps API 호출하여 지점명이나 주소로 특정 즉석사진 지점 정보 가져오는 메서드입니다.
+     * @param dbShop
+     * @param userLat
+     * @param userLng
+     * @return 검색 결과로부터 가져온 특정 지점의 카카오맵 바로가기 URL(placeUrl), 위도(placeLat), 경도(placeLng),
+     *          사용자의 현재위치 좌표로부터 지점까지의 거리(distance)를 반환합니다.
+     */
+    public String[] searchSingleShopByQueryWord(Shop dbShop, Double userLat, Double userLng, String...queryWords) {
         // 1. Redis에서 조회
-        String[] cachedArr = getShopInfoFromCacheAndCalculateDist(dbShop, userLat, userLng);
+        String[] cachedArr = getShopInfoFromCacheAndCalcDist(dbShop, userLat, userLng);
         if (cachedArr != null) {return cachedArr;}
 
-        String[] queryWords = {dbShop.getPlaceName(), dbShop.getAddress()};
         for (String queryWord : queryWords) {
             // 2. API 호출을 위한 요청 설정
             String apiPath = "/v2/local/search/keyword.json";
-            String apiUrl = UriComponentsBuilder.fromPath(apiPath)
-                    .queryParam("query", queryWord + DEFAULT_QUERY_WORD)
-                    .queryParam("y", userLat)
-                    .queryParam("x", userLng)
-                    .queryParam("")
-                    .build()
-                    .toString();
+            UriComponentsBuilder builder = UriComponentsBuilder.fromPath(apiPath)
+                    .queryParam("query", queryWord);
+
+            if (userLat != null && userLng != null) {
+                builder.queryParam("y", userLat)
+                        .queryParam("x", userLng);
+            }
+
+            String apiUrl = builder.build().toString();
 
             // 3. API 호출
-            JsonNode documents;
-            try {
-                documents = getDocuments(apiUrl);
-            } catch (Exception e) {
-                throw new BusinessException(TOO_MANY_REQUESTS);
-            }
+            JsonNode documents = getDocuments(apiUrl);
 
             // 4. JSON -> String 역직렬화
             // 도로명주소와 DEFAULT_QUERY_WORD로 검색 시
@@ -122,6 +132,12 @@ public class KakaoMapSearchApi {
         return null;
     }
 
+    /**
+     * Kakao Maps API 호출하여 지도 중심 좌표를 주소로 변환하는 메서드입니다.
+     * @param mapLat
+     * @param mapLng
+     * @return address
+     */
     public String convertCoordinateToAddress(Double mapLat, Double mapLng) {
         // 1. API 호출을 위한 요청 설정
         String apiPath = "/v2/local/geo/coord2address.json";
@@ -132,12 +148,7 @@ public class KakaoMapSearchApi {
         String apiUrl = uriBuilder.build().toString();
 
         // 2. API 호출
-        JsonNode documents;
-        try {
-            documents = getDocuments(apiUrl);
-        } catch (Exception e) {
-            throw new BusinessException(TOO_MANY_REQUESTS);
-        }
+        JsonNode documents = getDocuments(apiUrl);
 
         // 3. JSON -> DTO 역직렬화
         // 도로명 주소가 없다면 지번 주소 반환
@@ -149,12 +160,15 @@ public class KakaoMapSearchApi {
         return address;
     }
 
-    public String convertAddressToCoordAndGetDist(Shop dbShop, Double userLat, Double userLng) {
-        // 1. Redis에서 조회
-        String[] cachedArr = getShopInfoFromCacheAndCalculateDist(dbShop, userLat, userLng);
-        if (cachedArr != null) {return cachedArr[3];}
-
-        // 2. API 호출을 위한 요청 설정
+    /**
+     * Kakao Maps API 호출하여 지점 주소를 좌표로 변환하고, 사용자의 현재위치로부터 지점까지의 거리를 계산하는 메서드입니다.
+     * @param dbShop
+     * @param userLat
+     * @param userLng
+     * @return distance
+     */
+    public String convertAddressToCoordAndCalcDist(Shop dbShop, Double userLat, Double userLng) {
+        // 1. API 호출을 위한 요청 설정
         String apiPath = "/v2/local/search/address.json";
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
                 .queryParam("query", dbShop.getAddress())
@@ -162,29 +176,24 @@ public class KakaoMapSearchApi {
 
         String apiUrl = uriBuilder.build().toString();
 
-        // 3. API 호출
-        JsonNode documents;
-        try {
-            documents = getDocuments(apiUrl);
-        } catch (Exception e) {
-            throw new BusinessException(TOO_MANY_REQUESTS);
-        }
+        // 2. API 호출
+        JsonNode documents = getDocuments(apiUrl);
 
-        // 4. JSON -> DTO 역직렬화 및 사용자 현재위치 좌표로부터 지점까지의 거리 계산
+        // 3. JSON -> DTO 역직렬화 및 사용자 현재위치 좌표로부터 지점까지의 거리 계산
         if(documents.get(0).hasNonNull("y") && documents.get(0).hasNonNull("x")) {
             return Util.calculateDist(
                     documents.get(0).get("y").asDouble(),documents.get(0).get("x").asDouble(),
                     userLat, userLng
             );
         } else {
-            return "unknown";
+            return null;
         }
     }
 
     private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
-            if(document.get("category_name").asText().contains(CATEGORY_NAME)) {
+            if(isCategoryNameMatched(document)) {
                 try {
                     KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
                     dto.setDistance(Util.distanceFormatting(dto.getDistance()));
@@ -201,7 +210,7 @@ public class KakaoMapSearchApi {
                                                 Double mapLat, Double mapLng) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
-            if (document.get("category_name").asText().contains(CATEGORY_NAME)) {
+            if (isCategoryNameMatched(document)) {
                 try {
                     KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
 
@@ -218,13 +227,23 @@ public class KakaoMapSearchApi {
                 }
             }
         }
-        resultList.sort(Comparator.comparing(KakaoMapSearchDto::getDistance));
+        resultList.sort((dto1, dto2) -> {
+            double dist1 = Double.parseDouble(dto1.getDistance().replaceAll("[^\\d.]", ""));
+            double dist2 = Double.parseDouble(dto2.getDistance().replaceAll("[^\\d.]", ""));
+            String unit1 = dto1.getDistance().replaceAll("[\\d.]", "");
+            String unit2 = dto2.getDistance().replaceAll("[\\d.]", "");
 
+            if (unit1.equals("m")) {dist1 /= 1000;}
+            if (unit2.equals("m")) {dist2 /= 1000;}
+
+            return Double.compare(dist1, dist2);
+        });
         return resultList;
     }
 
     private String[] matchAndDeserialize(JsonNode documents, String dbAddress, String dbPlaceName) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         for (JsonNode document : documents) {
             try {
                 KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
@@ -233,8 +252,9 @@ public class KakaoMapSearchApi {
                 String apiRoadAddressName = dto.getRoadAddressName();
                 String apiAddressName = dto.getAddressName();
 
-                if (isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiRoadAddressName) ||
-                        isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiAddressName)) {
+                if (isCategoryNameMatched(document) &&
+                        (isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiRoadAddressName)
+                                || isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiAddressName))) {
                     return new String[]{
                             dto.getPlaceUrl(),
                             dto.getLatitude(),
@@ -250,33 +270,56 @@ public class KakaoMapSearchApi {
     }
 
     /**
-     * Redis에서 지점 정보 가져와서 지점으로부터 현재 위치까지의 거리 계산하기
+     * Redis에서 지점 정보 가져오는 메서드입니다.
      * @param dbShop
-     * @param userLat
-     * @param userLng
-     * @return placeUrl, placeLat, placeLng, distance
+     * @return placeUrl, placeLat, placeLng
      */
-    private String[] getShopInfoFromCacheAndCalculateDist(Shop dbShop, Double userLat, Double userLng) {
+    public String[] getShopInfoFromCache(Shop dbShop) {
         String cacheKey = redisDao.getShopInfoKey(dbShop.getId());
         String cachedData = redisDao.getValues(cacheKey);
 
         if (cachedData != null) {
-            String[] cachedArr = cachedData.split(",");
             log.info("=======Shop Info Cache Hit=======");
-            String distance = Util.calculateDist(
-                    Double.parseDouble(cachedArr[1]), // placeLat
-                    Double.parseDouble(cachedArr[2]), // placeLng
-                    userLat,
-                    userLng
-            );
-            return new String[]{cachedArr[0], cachedArr[1], cachedArr[2], distance};
+            return cachedData.split(",");
         }
         log.info("=======Shop Info Cache Miss=======");
         return null;
     }
 
-    public boolean isMatchedShop(String dbPlaceName, String apiPlaceName, String dbAddress, String apiAddress) {
-        return dbPlaceName.equals(apiPlaceName) || dbAddress.contains(apiAddress);
+    /**
+     * Redis에서 지점 정보 가져와서 지점으로부터 현재 위치까지의 거리 계산하는 메서드입니다.
+     * @param dbShop
+     * @param userLat
+     * @param userLng
+     * @return placeUrl, placeLat, placeLng, distance
+     */
+    public String[] getShopInfoFromCacheAndCalcDist(Shop dbShop, Double userLat, Double userLng) {
+        String[] cachedArr = getShopInfoFromCache(dbShop);
+
+        if (cachedArr != null) {
+            if(userLat != null && userLng != null) {
+                String distance = Util.calculateDist(
+                        Double.parseDouble(cachedArr[1]), // placeLat
+                        Double.parseDouble(cachedArr[2]), // placeLng
+                        userLat,
+                        userLng
+                );
+                return new String[]{cachedArr[0], cachedArr[1], cachedArr[2], distance};
+            } else {
+                return new String[]{cachedArr[0], cachedArr[1], cachedArr[2], ""};
+            }
+        }
+        return null;
+    }
+
+    private boolean isCategoryNameMatched(JsonNode document) {
+        return document.get("category_name").asText().contains(CATEGORY_NAME);
+    }
+
+    private boolean isMatchedShop(String dbPlaceName, String apiPlaceName, String dbAddress, String apiAddress) {
+        return dbPlaceName.equals(apiPlaceName) ||
+                (dbPlaceName.contains(apiPlaceName.split(" ")[0])
+                        && (apiAddress.contains(apiAddress) || dbAddress.contains(apiAddress)));
     }
 
     private JsonNode getDocuments(String apiUrl) {
@@ -291,43 +334,53 @@ public class KakaoMapSearchApi {
                     .block()
                     .get("documents");
         } catch (WebClientResponseException e) {
-            webClient = secondWebClient;
+            if (e.getRawStatusCode() == HttpStatus.TOO_MANY_REQUESTS.value()) {
+                webClient = secondWebClient;
+
+                try {
+                    return webClient.get()
+                            .uri(apiUrl)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .retrieve()
+                            .bodyToMono(JsonNode.class)
+                            .block()
+                            .get("documents");
+                } catch (WebClientResponseException ex) {
+                    webClient = thirdWebClient;
+
+                    try {
+                        return webClient.get()
+                                .uri(apiUrl)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .retrieve()
+                                .bodyToMono(JsonNode.class)
+                                .block()
+                                .get("documents");
+                    } catch (WebClientResponseException exc) {
+                        webClient = fourthWebClient;
+
+                        try {
+                            return webClient.get()
+                                    .uri(apiUrl)
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .retrieve()
+                                    .bodyToMono(JsonNode.class)
+                                    .block()
+                                    .get("documents");
+                        } catch (WebClientResponseException exce) {
+                            if (exce.getRawStatusCode() == HttpStatus.TOO_MANY_REQUESTS.value()) {
+                                throw new BusinessException(TOO_MANY_REQUESTS);
+                            } else {
+                                log.error(exce.getMessage());
+                            }
+                        }
+                    }
+                }
+            } else {
+                log.error(e.getMessage());
+            }
         }
 
-        try {
-            return webClient.get()
-                    .uri(apiUrl)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .retrieve()
-                    .bodyToMono(JsonNode.class)
-                    .block()
-                    .get("documents");
-        } catch (WebClientResponseException e) {
-            webClient = thirdWebClient;
-        }
-
-        try {
-            return webClient.get()
-                    .uri(apiUrl)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .retrieve()
-                    .bodyToMono(JsonNode.class)
-                    .block()
-                    .get("documents");
-        } catch (WebClientResponseException e) {
-            webClient = fourthWebClient;
-        }
-
-        try {
-            return webClient.get()
-                    .uri(apiUrl)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .retrieve()
-                    .bodyToMono(JsonNode.class)
-                    .block()
-                    .get("documents");
-        } catch (WebClientResponseException e) {
-            throw new BusinessException(TOO_MANY_REQUESTS);
-        }
+        return null;
     }
 }

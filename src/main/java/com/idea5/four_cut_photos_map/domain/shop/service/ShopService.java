@@ -63,10 +63,10 @@ public class ShopService {
     }
 
     /**
-     * 지점명 일치여부나 주소명 포함여부로 비교하여 Kakao API Shop과 일치하는 DB Shop 객체 반환
-     * 중복 발생 시 주소 중복일 확률이 높으므로, 지점명과 브랜드명을 기준으로 우선순위를 결정함
-     * @param placeName (카카오 API 지점명)
-     * @param addresses (카카오 API 도로명주소, 지번주소)
+     * 지점명 일치여부나 주소명 포함여부로 비교하여 Kakao API Shop과 일치하는 DB Shop 객체 반환하는 메서드입니다.
+     * 중복 발생 시 주소 중복일 확률이 높으므로, 지점명과 브랜드명을 기준으로 우선순위를 결정합니다.
+     * @param placeName 카카오 API 지점명
+     * @param addresses 카카오 API 도로명주소, 지번주소
      * @return DB Shop
      */
     @Transactional(readOnly = true)
@@ -122,21 +122,22 @@ public class ShopService {
             return kakaoMapSearchApi.searchByQueryWord(brand, radius, userLat, userLng, mapLat, mapLng);
     }
 
-    public String[] searchSingleShopByQueryWord(Shop dbShop, Double userLat, Double userLng) {
-        return kakaoMapSearchApi.searchSingleShopByQueryWord(dbShop, userLat, userLng);
-    }
-
     public String convertMapCenterCoordToAddress(Double mapLat, Double mapLng) {
         return kakaoMapSearchApi.convertCoordinateToAddress(mapLat, mapLng);
     }
 
-    public String convertAddressToCoordAndGetDist(Shop dbShop, Double userLat, Double userLng) {
-        if(dbShop.getAddress() != null) {
-            return kakaoMapSearchApi.convertAddressToCoordAndGetDist(dbShop, userLat, userLng);
+    public String calcDistFromUserLocation(Shop dbShop, Double userLat, Double userLng) {
+        String[] cachedArr = kakaoMapSearchApi.getShopInfoFromCacheAndCalcDist(dbShop, userLat, userLng);
+        if (cachedArr != null) {
+            return cachedArr[3];
         } else {
-            String[] apiShop = searchSingleShopByQueryWord(dbShop, userLat, userLng);
-            if (apiShop != null) {
-                return apiShop[3];
+            if (dbShop.getAddress() != null) {
+                return kakaoMapSearchApi.convertAddressToCoordAndCalcDist(dbShop, userLat, userLng);
+            } else {
+                String[] apiShop = kakaoMapSearchApi.searchSingleShopByQueryWord(dbShop, userLat, userLng, dbShop.getPlaceName());
+                if (apiShop != null) {
+                    return apiShop[3];
+                }
             }
         }
         return null;
@@ -149,7 +150,10 @@ public class ShopService {
 
     public ResponseShopDetail setResponseDto(Shop dbShop, Double userLat, Double userLng) {
         // 지점명으로 반환하는 지점 없을 시, 주소로 비교
-        String[] apiShop = searchSingleShopByQueryWord(dbShop, userLat, userLng);
+        String[] queryWords = dbShop.getAddress() == null ?
+                    new String[]{dbShop.getPlaceName()} : new String[]{dbShop.getPlaceName(), dbShop.getAddress()};
+
+        String[] apiShop = kakaoMapSearchApi.searchSingleShopByQueryWord(dbShop, userLat, userLng, queryWords);
 
         if (apiShop == null) {
             cacheInvalidShopId(dbShop.getId());
@@ -158,14 +162,14 @@ public class ShopService {
         String placeUrl = apiShop[0];
         String placeLat = apiShop[1];
         String placeLng = apiShop[2];
-        String distance = apiShop[3];
+        String distance = apiShop[3]; // userLat 또는 userLng가 null이면 Empty String 반환
 
         return ResponseShopDetail.of(dbShop, placeUrl, placeLat, placeLng, distance);
     }
 
     public FavoriteResponse setResponseDto(Favorite favorite, Double userLat, Double userLng) {
-        String distance = convertAddressToCoordAndGetDist(favorite.getShop(), userLat, userLng);
-        return FavoriteResponse.from(favorite, distance);
+        String distance = calcDistFromUserLocation(favorite.getShop(), userLat, userLng);
+        return FavoriteResponse.from(favorite, distance == null ? "" : distance);
     }
 
     @Transactional(readOnly = true)

@@ -1,10 +1,11 @@
 package com.idea5.four_cut_photos_map.domain.shop.entity;
 
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
+
+import java.util.List;
 
 /**
- * 데이터 중복일 경우 적용되는 우선순위
- * 도로명주소로 인한 데이터 중복 가능성이 높으므로, 지점명과 브랜드명을 기준으로 우선순위를 결정함
+ * Kakao Maps API 지점과 일치하는 DB 지점 조회 시 중복되는 지점이 있을 경우, 이를 해결하기 위해 적용되는 우선순위
+ * @see com.idea5.four_cut_photos_map.domain.shop.service.ShopService#compareMatchingShops(String, List)
  */
 public enum ShopMatchPriority {
     PLACE_NAME,
