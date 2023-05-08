@@ -111,19 +111,19 @@ public class ShopController {
      */
     @GetMapping("/{shop-id}")
     public ResponseEntity<ResponseShopDetail> getShopDetail (@PathVariable(name = "shop-id") Long id,
-                                                             @RequestParam(name = "userLat") Optional<String> userLatStr,
-                                                             @RequestParam(name = "userLng") Optional<String> userLngStr,
+                                                             @RequestParam(name = "userLat", required = false) String userLatStr,
+                                                             @RequestParam(name = "userLng", required = false) String userLngStr,
                                                           @AuthenticationPrincipal MemberContext memberContext) {
 
         // 공유된 링크일 경우 프론트에서 사용자 위치 파라미터를 아예 전달하지 않기 때문에
         // userLat, userLng에 null 할당 후 undefined가 아닌 경우에만 실수형 타입으로 변환
         Double userLat = null;
         Double userLng = null;
-        if (userLatStr.isPresent() && !userLatStr.get().equals("undefined")) {
-            userLat = Double.valueOf(userLatStr.get());
+        if (userLatStr != null && !userLatStr.equals("undefined")) {
+            userLat = Double.valueOf(userLatStr);
         }
-        if (userLngStr.isPresent() && !userLngStr.get().equals("undefined")) {
-            userLng = Double.valueOf(userLngStr.get());
+        if (userLngStr != null && !userLngStr.equals("undefined")) {
+            userLng = Double.valueOf(userLngStr);
         }
 
         Shop dbShop = shopService.findById(id);
