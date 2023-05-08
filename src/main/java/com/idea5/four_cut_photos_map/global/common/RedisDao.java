@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.global.common;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +32,11 @@ public class RedisDao {
     public void setValues(String key, String data, Duration duration) {
         ValueOperations<String, String> values = redisTemplate.opsForValue();
         values.set(key, data, duration);
+    }
+
+    // Set 타입으로 저장 (만료기간 설정 X)
+    public void addSet(String key, String data) {
+        redisTemplate.opsForSet().add(key, data);
     }
 
     // key 로 value 조회
