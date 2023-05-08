@@ -119,10 +119,10 @@ public class ShopController {
         // userLat, userLng에 null 할당 후 undefined가 아닌 경우에만 실수형 타입으로 변환
         Double userLat = null;
         Double userLng = null;
-        if (userLatStr != null && !userLatStr.equals("undefined")) {
+        if (userLatStr != null && !userLatStr.isEmpty() && userLatStr.equals("undefined")) {
             userLat = Double.valueOf(userLatStr);
         }
-        if (userLngStr != null && !userLngStr.equals("undefined")) {
+        if (userLngStr != null && !userLngStr.isEmpty() && !userLngStr.equals("undefined")) {
             userLng = Double.valueOf(userLngStr);
         }
 

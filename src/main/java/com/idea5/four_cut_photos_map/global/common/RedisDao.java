@@ -74,5 +74,5 @@ public class RedisDao {
     public String getShopInfoKey(long shopId) {return "shop:" + shopId;}
 
     // 유효하지 않은 shop id를 저장하는 key
-    public String getInvalidShopIdKey() {return "invalid_shop_id";}
+    public String getInvalidShopIdKey() {return "invalid_shop_ids";}
 }
