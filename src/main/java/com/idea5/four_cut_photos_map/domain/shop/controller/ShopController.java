@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @RequestMapping("/shops")
@@ -114,9 +111,17 @@ public class ShopController {
      */
     @GetMapping("/{shop-id}")
     public ResponseEntity<ResponseShopDetail> getShopDetail (@PathVariable(name = "shop-id") Long id,
-                                                          @RequestParam(required = false) Double userLat,
-                                                          @RequestParam(required = false) Double userLng,
+                                                             @RequestParam(name = "userLat", required = false) Double userLat,
+                                                             @RequestParam(name = "userLng", required = false) Double userLng,
                                                           @AuthenticationPrincipal MemberContext memberContext) {
+
+
+        if (userLat == null || userLat == 0) {
+            userLat = null;
+        }
+        if (userLng == null || userLng == 0) {
+            userLng = null;
+        }
 
         Shop dbShop = shopService.findById(id);
         ResponseShopDetail shopDetailDto = shopService.setResponseDto(dbShop, userLat, userLng);

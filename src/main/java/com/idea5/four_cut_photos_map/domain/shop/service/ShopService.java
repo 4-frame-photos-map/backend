@@ -111,7 +111,7 @@ public class ShopService {
 
     private void cacheInvalidShopId(long shopId) {
         String cacheKey = redisDao.getInvalidShopIdKey();
-        redisDao.setValues(cacheKey, String.valueOf(shopId));
+        redisDao.addSet(cacheKey, String.valueOf(shopId));
     }
 
     public List<KakaoMapSearchDto> searchKakaoMapByKeyword(String keyword, Double userLat, Double userLng) {
