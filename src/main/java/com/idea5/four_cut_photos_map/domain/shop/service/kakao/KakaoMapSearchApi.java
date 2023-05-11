@@ -317,15 +317,8 @@ public class KakaoMapSearchApi {
     }
 
     private boolean isMatchedShop(String dbPlaceName, String apiPlaceName, String dbAddress, String apiAddress) {
-        String apiBrandName = apiPlaceName.split(" ")[0];
-        dbPlaceName = Util.removeSpace(dbPlaceName);
-        apiPlaceName = Util.removeSpace(apiPlaceName);
-        dbAddress = Util.removeSpace(dbAddress);
-        apiAddress = Util.removeSpace(apiAddress);
-
-        return dbPlaceName.contains(apiPlaceName)
-                || dbAddress.contains(apiAddress)
-                || (dbPlaceName.contains(apiBrandName) && (apiAddress.contains(dbAddress) || dbAddress.contains(apiAddress)));
+     return Util.removeSpace(dbPlaceName).contains(Util.removeSpace(apiPlaceName))
+             || Util.removeSpace(dbAddress).contains(Util.removeSpace(apiAddress));
     }
 
     private JsonNode getDocuments(String apiUrl) {
