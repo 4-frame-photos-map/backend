@@ -108,43 +108,30 @@ public class Util {
         return sb.toString();
     }
 
-    //
     public static String getClientIpAddr(HttpServletRequest request) {
-
         String ip = request.getHeader("X-Forwarded-For");
 
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-
             ip = request.getHeader("Proxy-Client-IP");
-
         }
 
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-
             ip = request.getHeader("WL-Proxy-Client-IP");
-
         }
 
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-
             ip = request.getHeader("HTTP_CLIENT_IP");
-
         }
 
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-
             ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-
         }
 
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-
             ip = request.getRemoteAddr();
-
         }
 
         return ip;
-
     }
 
     // 도로명 주소 상세주소 제거
@@ -157,5 +144,9 @@ public class Util {
             }
         }
         return (find == -1) ? address.trim() : address.substring(0, find + 1);
+    }
+
+    public static String removeSpace(String str) {
+        return str.replaceAll("\\s+", "");
     }
 }

@@ -252,9 +252,9 @@ public class KakaoMapSearchApi {
                 String apiRoadAddressName = dto.getRoadAddressName();
                 String apiAddressName = dto.getAddressName();
 
-                if (isCategoryNameMatched(document) &&
-                        (isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiRoadAddressName)
-                                || isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiAddressName))) {
+                if (isCategoryNameMatched(document)
+                        && (isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiRoadAddressName)
+                            || isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiAddressName))) {
                     return new String[]{
                             dto.getPlaceUrl(),
                             dto.getLatitude(),
@@ -317,9 +317,8 @@ public class KakaoMapSearchApi {
     }
 
     private boolean isMatchedShop(String dbPlaceName, String apiPlaceName, String dbAddress, String apiAddress) {
-        return dbPlaceName.equals(apiPlaceName) ||
-                (dbPlaceName.contains(apiPlaceName.split(" ")[0])
-                        && (apiAddress.contains(apiAddress) || dbAddress.contains(apiAddress)));
+     return Util.removeSpace(dbPlaceName).contains(Util.removeSpace(apiPlaceName))
+             || Util.removeSpace(dbAddress).contains(Util.removeSpace(apiAddress));
     }
 
     private JsonNode getDocuments(String apiUrl) {
