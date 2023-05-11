@@ -17,7 +17,7 @@ import javax.persistence.*;
 @ToString(callSuper = true)
 @DynamicUpdate
 @Table(indexes = {
-        @Index(name ="idx_shop_place_name", columnList ="place_name"),
+        @Index(name ="idx_shop_place_name", columnList ="placeName"),
         @Index(name="idx_shop_brand", columnList="brand_id")})
 public class Shop extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
