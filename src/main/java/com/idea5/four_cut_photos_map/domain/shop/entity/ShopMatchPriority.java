@@ -1,6 +1,8 @@
 package com.idea5.four_cut_photos_map.domain.shop.entity;
 
 
+import com.idea5.four_cut_photos_map.global.util.Util;
+
 import java.util.List;
 
 /**
@@ -13,10 +15,10 @@ public enum ShopMatchPriority {
     public boolean isMatchedShop(String dbPlaceName, String apiPlaceName, List<Shop> dbShops) {
         switch (this) {
             case PLACE_NAME:
-                return dbPlaceName.equals(apiPlaceName);
+                  return Util.removeSpace(dbPlaceName).equals(Util.removeSpace(apiPlaceName));
             case BRAND_NAME_CONTAINS:
                 String apiBrandName = apiPlaceName.split(" ")[0];
-                if(dbPlaceName.contains(apiBrandName)) {
+                if (dbPlaceName.contains(apiBrandName)) {
                     return dbShops.stream()
                             .filter(dbShop -> dbShop.getPlaceName().contains(apiBrandName))
                             .count() == 1;

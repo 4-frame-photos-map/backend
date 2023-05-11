@@ -10,6 +10,7 @@ import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.domain.shop.service.kakao.KakaoMapSearchApi;
 import com.idea5.four_cut_photos_map.global.common.RedisDao;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
+import com.idea5.four_cut_photos_map.global.util.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -73,8 +74,8 @@ public class ShopService {
     public Shop compareWithPlaceNameOrAddress(String placeName, String... addresses) {
         for (String address : addresses) {
             List<Shop> matchedShops = shopRepository.findByPlaceNameAndAddressIgnoringSpace(
-                    placeName.replaceAll("\\s+", ""),
-                    address.replaceAll("\\s+", "")
+                    Util.removeSpace(placeName),
+                    Util.removeSpace(address)
             );
             if (matchedShops.size() == 1) {
                 return matchedShops.get(0);

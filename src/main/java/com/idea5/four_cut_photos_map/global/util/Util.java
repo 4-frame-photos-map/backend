@@ -158,4 +158,8 @@ public class Util {
         }
         return (find == -1) ? address.trim() : address.substring(0, find + 1);
     }
+
+    public static String removeSpace(String str) {
+        return str.replaceAll("\\s+", "");
+    }
 }
