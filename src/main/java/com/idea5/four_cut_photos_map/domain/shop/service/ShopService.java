@@ -95,7 +95,7 @@ public class ShopService {
     private Shop compareMatchingShops(String apiPlaceName, List<Shop> dbShops) {
         return Arrays.stream(ShopMatchPriority.values())
                 .flatMap(priority -> dbShops.stream()
-                        .filter(dbShop -> priority.isMatchedShop(dbShop.getPlaceName(), apiPlaceName)))
+                        .filter(dbShop -> priority.isMatchedShop(dbShop.getPlaceName(), apiPlaceName, dbShops)))
                 .findFirst()
                 .orElse(null);
     }
