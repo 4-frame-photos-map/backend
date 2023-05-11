@@ -72,9 +72,9 @@ public class ShopService {
     @Transactional(readOnly = true)
     public Shop compareWithPlaceNameOrAddress(String placeName, String... addresses) {
         for (String address : addresses) {
-            List<Shop> matchedShops = shopRepository.findDistinctByPlaceNameOrAddressContaining(
-                    placeName,
-                    address
+            List<Shop> matchedShops = shopRepository.findByPlaceNameAndAddressIgnoringSpace(
+                    placeName.replaceAll("\\s+", ""),
+                    address.replaceAll("\\s+", "")
             );
             if (matchedShops.size() == 1) {
                 return matchedShops.get(0);
@@ -119,7 +119,7 @@ public class ShopService {
     }
 
     public List<KakaoMapSearchDto> searchKakaoMapByBrand(String brand, Integer radius, Double userLat, Double userLng, Double mapLat, Double mapLng) {
-            return kakaoMapSearchApi.searchByQueryWord(brand, radius, userLat, userLng, mapLat, mapLng);
+        return kakaoMapSearchApi.searchByQueryWord(brand, radius, userLat, userLng, mapLat, mapLng);
     }
 
     public String convertMapCenterCoordToAddress(Double mapLat, Double mapLng) {
@@ -151,7 +151,7 @@ public class ShopService {
     public ResponseShopDetail setResponseDto(Shop dbShop, Double userLat, Double userLng) {
         // 지점명으로 반환하는 지점 없을 시, 주소로 비교
         String[] queryWords = dbShop.getAddress() == null ?
-                    new String[]{dbShop.getPlaceName()} : new String[]{dbShop.getPlaceName(), dbShop.getAddress()};
+                new String[]{dbShop.getPlaceName()} : new String[]{dbShop.getPlaceName(), dbShop.getAddress()};
 
         String[] apiShop = kakaoMapSearchApi.searchSingleShopByQueryWord(dbShop, userLat, userLng, queryWords);
 
