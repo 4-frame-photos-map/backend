@@ -29,9 +29,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.OngoingStubbing;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -400,7 +399,7 @@ public class ReviewServiceTest {
             writer = Member.builder().id(1L).kakaoId(1000L).nickname("user1").build();
             brand1 = Brand.builder().id(1L).brandName("인생네컷").filePath("https://d18tllc1sxg8cp.cloudfront.net/brand_image/brand_1.jpg").build();
             brand2 = Brand.builder().id(2L).brandName("하루필름").filePath("https://d18tllc1sxg8cp.cloudfront.net/brand_image/brand_2.jpg").build();
-            brand2 = Brand.builder().id(3L).brandName("포토이즘").filePath("https://d18tllc1sxg8cp.cloudfront.net/brand_image/brand_3.jpg").build();
+            brand3 = Brand.builder().id(3L).brandName("포토이즘").filePath("https://d18tllc1sxg8cp.cloudfront.net/brand_image/brand_3.jpg").build();
             shop1 = Shop.builder().id(1L).brand(brand1).placeName("인생네컷망리단길점").address("서울 마포구 포은로 109-1").favoriteCnt(0).reviewCnt(0).starRatingAvg(0.0).build();
             shop2 = Shop.builder().id(2L).brand(brand2).placeName("하루필름 연트럴파크점").address("서울 마포구 양화로23길 30, 1층 (동교동)").favoriteCnt(0).reviewCnt(0).starRatingAvg(0.0).build();
             shop3 = Shop.builder().id(3L).brand(brand3).placeName("포토이즘박스 광운대점").address("서울 노원구 석계로 95 성북빌딩").favoriteCnt(0).reviewCnt(0).starRatingAvg(0.0).build();
@@ -688,6 +687,155 @@ public class ReviewServiceTest {
                 BusinessException resultException = Assertions.assertThrows(exception.getClass(), () -> reviewService.getShopReviewInfo(shopId));
                 Assertions.assertEquals(resultException.getErrorCode(), exception.getErrorCode());
                 Assertions.assertEquals(resultException.getMessage(), exception.getMessage());
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("회원의 리뷰수 조회")
+    class GetReviewCntByWriter {
+        // 리뷰 추가
+        private Member writer;
+        private Brand brand1;
+        private Brand brand2;
+        private Shop shop1;
+        private Shop shop2;
+        private Review review1;
+        private Review review2;
+
+        @BeforeEach
+        void setUp() {
+            writer = Member.builder().id(1L).kakaoId(1000L).nickname("리뷰 작성자").build();
+            brand1 = Brand.builder().id(1L).brandName("인생네컷").filePath("https://d18tllc1sxg8cp.cloudfront.net/brand_image/brand_1.jpg").build();
+            brand2 = Brand.builder().id(2L).brandName("하루필름").filePath("https://d18tllc1sxg8cp.cloudfront.net/brand_image/brand_2.jpg").build();
+            shop1 = Shop.builder().id(1L).brand(brand1).placeName("인생네컷망리단길점").address("서울 마포구 포은로 109-1").favoriteCnt(0).reviewCnt(0).starRatingAvg(0.0).build();
+            shop2 = Shop.builder().id(2L).brand(brand2).placeName("하루필름 연트럴파크점").address("서울 마포구 양화로23길 30, 1층 (동교동)").favoriteCnt(0).reviewCnt(0).starRatingAvg(0.0).build();
+            review1 = Review.builder().id(1L).createDate(LocalDateTime.now()).modifyDate(LocalDateTime.now()).writer(writer).shop(shop1).starRating(5).content("shop1 작성한 리뷰 내용").purity(PurityScore.GOOD).retouch(RetouchScore.GOOD).item(ItemScore.GOOD).build();
+            review2 = Review.builder().id(2L).createDate(LocalDateTime.now()).modifyDate(LocalDateTime.now()).writer(writer).shop(shop2).starRating(4).content("shop2 작성한 리뷰 내용").purity(PurityScore.UNSELECTED).retouch(RetouchScore.UNSELECTED).item(ItemScore.UNSELECTED).build();
+        }
+
+        @Nested
+        @DisplayName("성공")
+        class SuccessCase {
+            @Test
+            @DisplayName("회원 정보가진 리뷰 존재")
+            void getReviewCntByWriterSuccess1() {
+                // given
+                Member user = writer;
+                Long userReviewCnt = 2L;
+
+                // when
+                when(reviewRepository.countByWriter(user)).thenReturn(userReviewCnt);
+
+                Long result = reviewService.getReviewCntByWriter(user);
+
+                // then
+                Assertions.assertEquals(userReviewCnt, result);
+            }
+
+            @Test
+            @DisplayName("회원 정보가진 리뷰 존재하지 않음")
+            void getReviewCntByWriterSuccess2() {
+                // given
+                Member user = Member.builder().id(2L).kakaoId(2000L).nickname("현재 접속자").build();
+                Long userReviewCnt = 0L;
+
+                // when
+                when(reviewRepository.countByWriter(user)).thenReturn(userReviewCnt);
+
+                Long resultCnt = reviewService.getReviewCntByWriter(user);
+
+                // then
+                Assertions.assertEquals(userReviewCnt, resultCnt);
+            }
+        }
+
+    }
+
+    @Nested
+    @DisplayName("최신 리뷰 3건 가져오기")
+    class GetTop3ShopReviews {
+        private Member writer;
+        private Brand brand;
+        private Shop shop;
+
+        @BeforeEach
+        void setUp() {
+            writer = Member.builder().id(1L).kakaoId(1000L).nickname("user1").build();
+            brand = Brand.builder().id(1L).brandName("인생네컷").filePath("https://d18tllc1sxg8cp.cloudfront.net/brand_image/brand_1.jpg").build();
+            shop = Shop.builder().id(1L).brand(brand).placeName("인생네컷망리단길점").address("서울 마포구 포은로 109-1").favoriteCnt(0).reviewCnt(0).starRatingAvg(0.0).build();
+        }
+
+        List<Review> createReviews(int n) {
+            ArrayList<Review> reviews = new ArrayList<>();
+            for(int i=1; i<=n; i++) {
+                Review review = Review.builder().id((long)i).createDate(LocalDateTime.now()).modifyDate(LocalDateTime.now()).writer(writer).shop(shop).starRating(i).content("리뷰 " + i + "번 내용").purity(PurityScore.GOOD).retouch(RetouchScore.GOOD).item(ItemScore.GOOD).build();
+                reviews.add(review);
+            }
+
+            return reviews;
+        }
+
+        List<Review> getTop3ShopReviews (List<Review> reviews){
+            List<Review> top3ShopReviews = new ArrayList<>();
+
+            for(int i= reviews.size()-1; i>=reviews.size()-3 && i>=0; i--) {
+                top3ShopReviews.add(reviews.get(i));
+            }
+
+            return top3ShopReviews;
+        }
+
+        @Nested
+        @DisplayName("성공")
+        class GetTop3ShopReviewsSuccessCase {
+            @Test
+            @DisplayName("상점 리뷰 5건 중 최신 리뷰 3건만 조회")
+            void getTop3ShopReviewsSuccess1() {
+                // given
+                Long shopId = 1L;
+                int reviewCnt = 5;
+
+                List<Review> shopReviews = createReviews(reviewCnt);
+                List<Review> topShopReviews = getTop3ShopReviews(shopReviews);
+                List<ResponseShopReviewDto> topShopReviewDtoList = topShopReviews.stream()
+                        .map(review -> ReviewMapper.toResponseShopReviewDto(review))
+                        .collect(Collectors.toList());
+
+                // when
+                when(reviewRepository.findTop3ByShopIdOrderByCreateDateDesc(shopId)).thenReturn(topShopReviews);
+
+                List<ResponseShopReviewDto> resultShopReviewDtoList = reviewService.getTop3ShopReviews(shopId);
+
+                // then
+                Assertions.assertEquals(resultShopReviewDtoList.size(), 3);
+                Assertions.assertEquals(resultShopReviewDtoList.get(0).getReviewInfo().getId(), topShopReviewDtoList.get(0).getReviewInfo().getId());
+                Assertions.assertEquals(resultShopReviewDtoList.get(1).getReviewInfo().getId(), topShopReviewDtoList.get(1).getReviewInfo().getId());
+                Assertions.assertEquals(resultShopReviewDtoList.get(2).getReviewInfo().getId(), topShopReviewDtoList.get(2).getReviewInfo().getId());
+            }
+
+            @Test
+            @DisplayName("상점 리뷰 3건 이하일 때 리뷰 조회")
+            void getTop3ShopReviewsSuccess2() {
+                // given
+                Long shopId = 1L;
+                int reviewCnt = 2;
+
+                List<Review> shopReviews = createReviews(2);
+                List<Review> topShopReviews = getTop3ShopReviews(shopReviews);
+                List<ResponseShopReviewDto> topShopReviewDtoList = topShopReviews.stream()
+                        .map(review -> ReviewMapper.toResponseShopReviewDto(review))
+                        .collect(Collectors.toList());
+
+                // when
+                when(reviewRepository.findTop3ByShopIdOrderByCreateDateDesc(shopId)).thenReturn(topShopReviews);
+
+                List<ResponseShopReviewDto> resultShopReviewDtoList = reviewService.getTop3ShopReviews(shopId);
+
+                // then
+                Assertions.assertEquals(resultShopReviewDtoList.size(), reviewCnt);
+                Assertions.assertEquals(resultShopReviewDtoList.get(0).getReviewInfo().getId(), topShopReviewDtoList.get(0).getReviewInfo().getId());
+                Assertions.assertEquals(resultShopReviewDtoList.get(1).getReviewInfo().getId(), topShopReviewDtoList.get(1).getReviewInfo().getId());
             }
         }
     }
