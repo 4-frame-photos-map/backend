@@ -6,6 +6,9 @@ import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 간단 조회 응답 DTO (Map Marker 모달용)
  */
@@ -21,6 +24,7 @@ public class ResponseShopBriefInfo {
     private int reviewCnt;
     private int favoriteCnt;
     private boolean isFavorite;
+    private List<String> shopTitles;
 
 
     static public ResponseShopBriefInfo of(Shop dbShop, String placeName, String distance){
@@ -31,6 +35,7 @@ public class ResponseShopBriefInfo {
                 .starRatingAvg(dbShop.getStarRatingAvg())
                 .reviewCnt(dbShop.getReviewCnt())
                 .favoriteCnt(dbShop.getFavoriteCnt())
+                .shopTitles(new ArrayList<>())
                 .build();
     }
 }
