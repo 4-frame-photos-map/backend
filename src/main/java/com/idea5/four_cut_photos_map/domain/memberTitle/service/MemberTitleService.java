@@ -48,7 +48,7 @@ public class MemberTitleService {
         return MemberTitleInfoResp.toDto(memberTitle, status, isMain);
     }
 
-    // TODO : 로직 리팩토링
+    // 회원 칭호 전체 조회
     public MemberTitlesResp getMemberTitles(Member member) {
         // 1. 전체 회원 칭호 조회
         log.info("----Before memberTitleRepository.findAllByOrderByIdAsc()----");
