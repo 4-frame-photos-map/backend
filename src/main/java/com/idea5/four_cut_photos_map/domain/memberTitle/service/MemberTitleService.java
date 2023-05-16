@@ -33,9 +33,17 @@ public class MemberTitleService {
     }
 
     // 회원 칭호 정보 조회
-    public MemberTitleInfoResp getMemberTitleInfo(Long id) {
-        MemberTitle memberTitle = findById(id);
-        return MemberTitleInfoResp.toDto(memberTitle);
+    public MemberTitleInfoResp getMemberTitleInfo(Long memberTitleId, Long memberId) {
+        MemberTitle memberTitle = findById(memberTitleId);
+        // 획득 여부, 대표 칭호 여부 조회
+        boolean status = false;
+        boolean isMain = false;
+        MemberTitleLog memberTitleLog = memberTitleLogRepository.findByMemberIdAndMemberTitleId(memberId, memberTitleId).orElse(null);
+        if(memberTitleLog != null) {
+            status = true;
+            isMain = memberTitleLog.getIsMain();
+        }
+        return MemberTitleInfoResp.toDto(memberTitle, status, isMain);
     }
 
     // TODO : 로직 리팩토링

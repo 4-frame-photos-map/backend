@@ -21,15 +21,15 @@ import java.util.List;
 public class MemberTitleController {
     private final MemberTitleService memberTitleService;
 
-    // 회원 칭호 정보 조회
+    // 회원 칭호 단건 조회
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
-    public ResponseEntity<MemberTitleInfoResp> getMemberTitleInfo(@PathVariable Long id) {
-        MemberTitleInfoResp memberTitleInfo = memberTitleService.getMemberTitleInfo(id);
+    public ResponseEntity<MemberTitleInfoResp> getMemberTitleInfo(@PathVariable Long id, @AuthenticationPrincipal MemberContext memberContext) {
+        MemberTitleInfoResp memberTitleInfo = memberTitleService.getMemberTitleInfo(id, memberContext.getId());
         return ResponseEntity.ok(memberTitleInfo);
     }
 
-    // 모든 칭호 조회
+    // 회원 칭호 전체 조회
     @PreAuthorize("isAuthenticated()")
     @GetMapping("")
     public ResponseEntity<List<MemberTitleResp>> getMemberTitles(@AuthenticationPrincipal MemberContext memberContext) {
