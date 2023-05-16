@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MemberTitleLogRepository extends JpaRepository<MemberTitleLog, Long> {
-    List<MemberTitleLog> findAllByMemberIdOrderByIdAsc(Long memberId);
+    List<MemberTitleLog> findAllByMember(Member member);
 
     List<MemberTitleLog> findByMember(Member member);
 

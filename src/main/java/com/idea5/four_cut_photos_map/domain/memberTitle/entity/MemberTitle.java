@@ -8,8 +8,10 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,8 +22,15 @@ import java.util.List;
 @SuperBuilder
 @ToString
 public class MemberTitle extends BaseEntity {
+    @NotNull
     private String name;    // 칭호명
+
+    @NotNull
     private String content; // 칭호 획득 방법(기준)
+
+    @NotNull
+    @Column(columnDefinition = "TEXT")
+    private String imageUrl; // 칭호 이미지 URL
 
     @OneToMany(mappedBy = "memberTitle", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberTitleLog> memberTitleLogs = new ArrayList<>();
