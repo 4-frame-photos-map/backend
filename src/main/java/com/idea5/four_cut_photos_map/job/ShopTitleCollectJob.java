@@ -28,9 +28,8 @@ public class ShopTitleCollectJob {
     private final ShopTitleLogService shopTitleLogService;
     private final ReviewRepository reviewRepository;
 
-//    @Scheduled(cron = "0 0 3 1 * *") // 매달 1일 3시에 실행
-@Scheduled(cron = "0 35 * * * *")
-@Transactional
+    @Scheduled(cron = "0 0 3 1 * *") // 매달 1일 3시에 실행
+    @Transactional
     public void collectHotPlaceTitle() {
         log.info("=======Start Hot Place Title Collect Job=======");
 
@@ -42,8 +41,7 @@ public class ShopTitleCollectJob {
         shopTitleLogRepository.deleteOldShopTitles(lastMonthStart.plusDays(1)); // 지난 달 2일 이전 생성된 데이터 제거
 
         // 2. 저번 달 찜 개수 기준으로 이번 달 핫플레이스 칭호 부여
-//        List<Long> ids = favoriteRepository.findShopIdsWithMoreThanThreeFavorites(lastMonthStart, lastMonthEnd);
-        List<Long> ids = favoriteRepository.findShopIdsWithMoreThanThreeFavorites(lastMonthStart, now); // for test
+        List<Long> ids = favoriteRepository.findShopIdsWithMoreThanThreeFavorites(lastMonthStart, lastMonthEnd);
 
     for (long shopId : ids) {
             shopTitleLogService.save(shopId, HOT_PLACE.getId());
@@ -52,9 +50,8 @@ public class ShopTitleCollectJob {
         log.info("=======End Hot Place Title Collect Job=======");
     }
 
-//    @Scheduled(cron = "0 0 3 1 * *") // 매달 1일 3시에 실행
-@Scheduled(cron = "0 35 * * * *")
-@Transactional
+    @Scheduled(cron = "0 0 3 1 * *") // 매달 1일 3시에 실행
+    @Transactional
     public void collectGoodCleanlinessTitle() {
         log.info("=======Start Good Cleanliness Title Collect Job=======");
 
@@ -66,10 +63,9 @@ public class ShopTitleCollectJob {
         shopTitleLogRepository.deleteOldShopTitles(lastMonthStart.plusDays(1)); // 지난 달 2일 이전 생성된 데이터 제거
 
         // 2. 저번 달 리뷰 개수와 청결도 평균을 기준으로 이번 달 청결한 지점 칭호 부여
-//        List<Review> reviews = reviewRepository.findLastMonthReviewsWithGoodOrBadPurity(lastMonthStart, lastMonthEnd);
-          List<Review> reviews = reviewRepository.findLastMonthReviewsWithGoodOrBadPurity(lastMonthStart, now);
+        List<Review> reviews = reviewRepository.findLastMonthReviewsWithGoodOrBadPurity(lastMonthStart, lastMonthEnd);
 
-    Map<Long, List<Review>> reviewMap = reviews.stream()
+        Map<Long, List<Review>> reviewMap = reviews.stream()
                 .collect(Collectors.groupingBy(review -> review.getShop().getId()));
 
         for (Map.Entry<Long, List<Review>> entry : reviewMap.entrySet()) {
