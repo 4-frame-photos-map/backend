@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import javax.persistence.Column;
-
 @AllArgsConstructor
 @Getter
 @Builder
@@ -21,7 +19,5 @@ public class ShopTitleDto {
                 .conditions(shopTitle.getConditions())
                 .content(shopTitle.getContent())
                 .build();
-
-
     }
 }
