@@ -1,7 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.memberTitle.controller;
 
 import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleInfoResp;
-import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleResp;
+import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitlesResp;
 import com.idea5.four_cut_photos_map.domain.memberTitle.service.MemberTitleService;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/member-titles")
@@ -32,8 +30,8 @@ public class MemberTitleController {
     // 회원 칭호 전체 조회
     @PreAuthorize("isAuthenticated()")
     @GetMapping("")
-    public ResponseEntity<List<MemberTitleResp>> getMemberTitles(@AuthenticationPrincipal MemberContext memberContext) {
-        List<MemberTitleResp> memberTitles = memberTitleService.getMemberTitles(memberContext.getId());
+    public ResponseEntity<MemberTitlesResp> getMemberTitles(@AuthenticationPrincipal MemberContext memberContext) {
+        MemberTitlesResp memberTitles = memberTitleService.getMemberTitles(memberContext.getMember());
         return ResponseEntity.ok(memberTitles);
     }
 }
