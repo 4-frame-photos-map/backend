@@ -68,17 +68,19 @@ public class MemberTitleService {
         MemberTitleResp mainMemberTitle = null;
         for(MemberTitle mt : memberTitles) {
             MemberTitleLog memberTitleLog = myMemberTitleLogs.get(idx);
-            boolean status = false; // 획득 여부
+            boolean isHolding = false; // 획득 여부
+            boolean isMain = false;
             // 4. 획득한 칭호인지 검사
             if(idx != cnt && memberTitleLog.getMemberTitle().getId().equals(mt.getId())) {
-                status = true;
+                isHolding = true;
                 idx++;
                 // 5. 대표 칭호인지 검사
                 if(memberTitleLog.getIsMain()) {
-                    mainMemberTitle = MemberTitleResp.toDto(mt, status);
+                    isMain = true;
+                    mainMemberTitle = MemberTitleResp.toDto(mt, true, true);
                 }
             }
-            memberTitleResps.add(MemberTitleResp.toDto(mt, status));
+            memberTitleResps.add(MemberTitleResp.toDto(mt, isHolding, isMain));
         }
         return new MemberTitlesResp(cnt, mainMemberTitle, memberTitleResps);
     }
