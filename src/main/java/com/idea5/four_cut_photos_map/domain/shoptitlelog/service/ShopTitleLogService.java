@@ -106,6 +106,7 @@ public class ShopTitleLogService {
     }
 
     // 모든 지점 칭호 로그를 조회하여 지점 칭호 별로 그룹화
+    @Transactional(readOnly = true)
     public Map<String, List<ShopTitleLogDto>> getGroupedShopTitleLogs(){
         List<ShopTitleLog> shopTitleLogs = shopTitleLogRepository.findAll();
 
