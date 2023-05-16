@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.shoptitlelog.controller;
 
 import com.idea5.four_cut_photos_map.domain.shoptitle.dto.ShopTitleDto;
+import com.idea5.four_cut_photos_map.domain.shoptitlelog.dto.ShopTitleLogDto;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
 import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping("/shop-title-logs")
 @RestController
@@ -17,6 +19,16 @@ import java.util.List;
 public class ShopTitleLogController {
 
     private final ShopTitleLogService shopTitleLogService;
+
+
+    // 모든 지점 칭호 로그 조회
+    @GetMapping("")
+    public ResponseEntity<Map<Long, List<ShopTitleLogDto>>> getAllShopTitleLogs() {
+
+        Map<Long, List<ShopTitleLogDto>> responseMap = shopTitleLogService.getGroupedShopTitleLogs();
+
+        return ResponseEntity.ok(responseMap);
+    }
 
     // Shop이 보유한 칭호 조회
     @GetMapping("/{shopId}")

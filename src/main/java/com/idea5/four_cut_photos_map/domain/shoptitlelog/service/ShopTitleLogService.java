@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -27,11 +28,8 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.*;
 @Slf4j
 @Transactional(readOnly = true)
 public class ShopTitleLogService {
-
     private final ShopTitleLogRepository shopTitleLogRepository;
-
     private final ShopTitleRepository shopTitleRepository;
-
     private final ShopRepository shopRepository;
 
     /**
@@ -79,12 +77,10 @@ public class ShopTitleLogService {
         return responseList;
     }
 
-
     // 상점이 칭호가 아예 없는 상태인지 아닌지 체크 (상점 상세보기 api용)
     public boolean existShopTitles(Long shopId){
         return shopTitleLogRepository.existsByShopId(shopId);
     }
-
 
 
     // Shop 칭호 부여
@@ -109,15 +105,15 @@ public class ShopTitleLogService {
 
     }
 
-    public List<ShopTitleLogDto> findAllShopTitleLogs(){
+    // 모든 지점 칭호 로그를 조회하여 지점 칭호별로 그룹화
+    public Map<Long, List<ShopTitleLogDto>> getGroupedShopTitleLogs(){
         List<ShopTitleLog> shopTitleLogs = shopTitleLogRepository.findAll();
 
-        List<ShopTitleLogDto> responseList = shopTitleLogs.stream()
-                .map(shopTitleLog -> ShopTitleLogDto.of(shopTitleLog))
-                .collect(Collectors.toList());
+        Map<Long, List<ShopTitleLogDto>> responseMap = shopTitleLogs.stream()
+                .collect(Collectors.groupingBy(shopTitleLog -> shopTitleLog.getShopTitle().getId(),
+                        Collectors.mapping(ShopTitleLogDto::of, Collectors.toList())));
 
-        return responseList;
-
+        return responseMap;
     }
 
     // 칭호 삭제
