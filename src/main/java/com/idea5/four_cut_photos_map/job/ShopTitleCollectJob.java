@@ -28,8 +28,9 @@ public class ShopTitleCollectJob {
     private final ShopTitleLogService shopTitleLogService;
     private final ReviewRepository reviewRepository;
 
-    @Scheduled(cron = "0 0 3 1 * *") // 매달 1일 3시에 실행
-    @Transactional
+//    @Scheduled(cron = "0 0 3 1 * *") // 매달 1일 3시에 실행
+@Scheduled(cron = "0 25 * * * *")
+@Transactional
     public void collectHotPlaceTitle() {
         log.info("=======Start Hot Place Title Collect Job=======");
 
@@ -50,8 +51,9 @@ public class ShopTitleCollectJob {
         log.info("=======End Hot Place Title Collect Job=======");
     }
 
-    @Scheduled(cron = "0 0 3 1 * *") // 매달 1일 3시에 실행
-    @Transactional
+//    @Scheduled(cron = "0 0 3 1 * *") // 매달 1일 3시에 실행
+@Scheduled(cron = "0 25 * * * *")
+@Transactional
     public void collectGoodCleanlinessTitle() {
         log.info("=======Start Good Cleanliness Title Collect Job=======");
 
