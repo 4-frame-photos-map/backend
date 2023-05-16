@@ -105,12 +105,12 @@ public class ShopTitleLogService {
 
     }
 
-    // 모든 지점 칭호 로그를 조회하여 지점 칭호별로 그룹화
-    public Map<Long, List<ShopTitleLogDto>> getGroupedShopTitleLogs(){
+    // 모든 지점 칭호 로그를 조회하여 지점 칭호 별로 그룹화
+    public Map<String, List<ShopTitleLogDto>> getGroupedShopTitleLogs(){
         List<ShopTitleLog> shopTitleLogs = shopTitleLogRepository.findAll();
 
-        Map<Long, List<ShopTitleLogDto>> responseMap = shopTitleLogs.stream()
-                .collect(Collectors.groupingBy(shopTitleLog -> shopTitleLog.getShopTitle().getId(),
+        Map<String, List<ShopTitleLogDto>> responseMap = shopTitleLogs.stream()
+                .collect(Collectors.groupingBy(shopTitleLog -> shopTitleLog.getShopTitle().getName(),
                         Collectors.mapping(ShopTitleLogDto::of, Collectors.toList())));
 
         return responseMap;

@@ -26,9 +26,9 @@ public class ShopTitleLogController {
 
     // 모든 지점 칭호 로그 조회
     @GetMapping("")
-    public ResponseEntity<Map<Long, List<ShopTitleLogDto>>> getAllShopTitleLogs() {
+    public ResponseEntity<Map<String, List<ShopTitleLogDto>>> getAllShopTitleLogs() {
 
-        Map<Long, List<ShopTitleLogDto>> responseMap = shopTitleLogService.getGroupedShopTitleLogs();
+        Map<String, List<ShopTitleLogDto>> responseMap = shopTitleLogService.getGroupedShopTitleLogs();
 
         return ResponseEntity.ok(responseMap);
     }
