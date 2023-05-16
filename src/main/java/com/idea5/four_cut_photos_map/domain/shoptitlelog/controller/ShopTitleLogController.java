@@ -1,5 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.shoptitlelog.controller;
 
+import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
+import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.domain.shoptitle.dto.ShopTitleDto;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.dto.ShopTitleLogDto;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_NOT_FOUND;
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_TITLE_LOGS_NOT_FOUND;
 
 @RequestMapping("/shop-title-logs")
@@ -22,6 +25,7 @@ import static com.idea5.four_cut_photos_map.global.error.ErrorCode.SHOP_TITLE_LO
 public class ShopTitleLogController {
 
     private final ShopTitleLogService shopTitleLogService;
+    private final ShopRepository shopRepository;
 
 
     // 모든 지점 칭호 로그 조회
@@ -37,6 +41,10 @@ public class ShopTitleLogController {
     @GetMapping("/{shopId}")
     public ResponseEntity<List<ShopTitleDto>> getShopTitles(@PathVariable Long shopId) {
 
+        // 상점 id 유효성 체크
+        if(!shopRepository.existsById(shopId)){
+            throw new BusinessException(SHOP_NOT_FOUND);
+        }
         // 상점 칭호 보유 여부 체크
         boolean existShopTitles = shopTitleLogService.existShopTitles(shopId);
         if (!existShopTitles) {
