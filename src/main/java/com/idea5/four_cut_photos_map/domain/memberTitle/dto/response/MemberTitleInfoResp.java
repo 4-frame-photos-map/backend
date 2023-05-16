@@ -18,6 +18,7 @@ public class MemberTitleInfoResp {
     private Long id;
     private String name;    // 이름
     private String content; // 부여기준(획득방법)
+    private String imageUrl;// 이미지 URL
     private Boolean status; // 획득여부
     private Boolean isMain; // 대표칭호 여부
 
@@ -26,6 +27,7 @@ public class MemberTitleInfoResp {
                 .id(memberTitle.getId())
                 .name(memberTitle.getName())
                 .content(memberTitle.getContent())
+                .imageUrl(memberTitle.getImageUrl())
                 .status(status)
                 .isMain(isMain)
                 .build();

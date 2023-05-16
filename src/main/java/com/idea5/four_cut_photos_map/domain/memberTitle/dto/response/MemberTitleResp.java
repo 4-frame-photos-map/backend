@@ -1,5 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.memberTitle.dto.response;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitle;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,15 +12,18 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MemberTitleResp {
     private Long id;        // id
     private String name;    // 이름
+    private String imageUrl;// 이미지 URL
     private Boolean status; // 획득 여부
 
     public static MemberTitleResp toDto(MemberTitle memberTitle, boolean status) {
         return MemberTitleResp.builder()
                 .id(memberTitle.getId())
                 .name(memberTitle.getName())
+                .imageUrl(memberTitle.getImageUrl())
                 .status(status)
                 .build();
     }
