@@ -9,6 +9,7 @@ import com.idea5.four_cut_photos_map.security.jwt.dto.response.JwtToken;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,9 @@ public class JwtService {
     private final JwtProvider jwtProvider;
     private final RedisDao redisDao;
 
+    @Value("${jwt.rtk.expiration}")
+    private long refreshTokenValidationSecond;    // accessToken 유효기간(1달)
+
     // accessToken, refreshToken 발급
     @Transactional
     public JwtToken generateTokens(Member member) {
@@ -35,7 +39,7 @@ public class JwtService {
         redisDao.setValues(
                 RedisDao.getRtkKey(member.getId()),
                 refreshToken,
-                Duration.ofMillis(60 * 60 * 24 * 30L));
+                Duration.ofSeconds(refreshTokenValidationSecond));
 
         return JwtToken.builder()
                 .accessToken(accessToken)
@@ -57,7 +61,7 @@ public class JwtService {
         String redisRefreshToken = redisDao.getValues(RedisDao.getRtkKey(memberId));
         // 3. redis 에 저장된 refreshToken 과 요청 헤더로 전달된 refreshToken 값이 일치하는지 확인
         if(!refreshToken.equals(redisRefreshToken)) {
-            throw new RuntimeException("refreshToken 불일치");
+            throw new BusinessException(ErrorCode.INVALID_RTK);
         }
         // 4. member 객체 생성
         Member member = Member.builder()

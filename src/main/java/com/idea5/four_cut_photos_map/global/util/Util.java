@@ -61,13 +61,16 @@ public class Util {
     }
 
     public static String distanceFormatting(String distance){
+        if (distance.isEmpty()) {
+            return distance;
+        }
+
         int length = distance.length();
-        if(distance.equals("")) // 공백일 시, 알 수없음으로 반환
-            return "unknown";
-        if(length < 4) // distance -> m
+        double dkm = Integer.parseInt(distance) / 1000.0; // m -> km
+
+        if (length < 4) { // distance -> m
             return distance + "m";
-        double dkm = Integer.parseInt(distance) / 1000.0; // km 환산한 값
-        if(length >= 4 && length < 6) { // distance -> km
+        } else if (length < 6) { // distance -> km
             if(dkm % 1 == 0)
                 return String.format("%.0fkm", dkm);
             // 소수점 둘째 자리에서 반올림
@@ -105,42 +108,45 @@ public class Util {
         return sb.toString();
     }
 
-    //
     public static String getClientIpAddr(HttpServletRequest request) {
-
         String ip = request.getHeader("X-Forwarded-For");
 
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-
             ip = request.getHeader("Proxy-Client-IP");
-
         }
 
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-
             ip = request.getHeader("WL-Proxy-Client-IP");
-
         }
 
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-
             ip = request.getHeader("HTTP_CLIENT_IP");
-
         }
 
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-
             ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-
         }
 
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-
             ip = request.getRemoteAddr();
-
         }
 
         return ip;
+    }
 
+    // 도로명 주소 상세주소 제거
+    public static String getRoadAddressName(String address) {
+        int find = -1;
+        for(int i = address.length() - 1; i >= 0; i--) {
+            if(Character.isDigit(address.charAt(i))) {
+                find = i;
+                break;
+            }
+        }
+        return (find == -1) ? address.trim() : address.substring(0, find + 1);
+    }
+
+    public static String removeSpace(String str) {
+        return str.replaceAll("\\s+", "");
     }
 }

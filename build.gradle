@@ -69,6 +69,9 @@ dependencies {
     // web client
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
+    // jsoup
+    implementation 'org.jsoup:jsoup:1.15.3'
+
     // 암호화
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
 }

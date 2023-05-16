@@ -17,22 +17,22 @@ import javax.persistence.*;
 @ToString(callSuper = true)
 @DynamicUpdate
 @Table(indexes = {
-        @Index(name ="idx_shop_address", columnList ="roadAddressName"),
+        @Index(name ="idx_shop_place_name", columnList ="placeName"),
         @Index(name="idx_shop_brand", columnList="brand_id")})
 public class Shop extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
     private Brand brand;
     private String placeName;
-    private String roadAddressName;
+    private String address;
     private Integer favoriteCnt;
     private Integer reviewCnt;
     private Double starRatingAvg;
 
 
-    public Shop(String placeName, String roadAddressName) {
+    public Shop(String placeName, String address) {
         this.placeName = placeName;
-        this.roadAddressName = roadAddressName;
+        this.address = address;
     }
 
     public Shop(Long id, int favoriteCnt) {
