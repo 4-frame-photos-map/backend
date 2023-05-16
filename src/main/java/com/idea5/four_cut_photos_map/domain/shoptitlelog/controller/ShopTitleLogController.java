@@ -1,11 +1,9 @@
 package com.idea5.four_cut_photos_map.domain.shoptitlelog.controller;
 
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopTitleLog;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
-import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.domain.shoptitle.dto.ShopTitleDto;
-import com.idea5.four_cut_photos_map.domain.shoptitlelog.dto.ShopTitleLogDto;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
-import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,9 +28,9 @@ public class ShopTitleLogController {
 
     // 모든 지점 칭호 로그 조회
     @GetMapping("")
-    public ResponseEntity<Map<String, List<ShopTitleLogDto>>> getAllShopTitleLogs() {
+    public ResponseEntity<Map<String, List<ResponseShopTitleLog>>> getAllShopTitleLogs() {
 
-        Map<String, List<ShopTitleLogDto>> responseMap = shopTitleLogService.getGroupedShopTitleLogs();
+        Map<String, List<ResponseShopTitleLog>> responseMap = shopTitleLogService.getGroupedShopTitleLogs();
 
         return ResponseEntity.ok(responseMap);
     }

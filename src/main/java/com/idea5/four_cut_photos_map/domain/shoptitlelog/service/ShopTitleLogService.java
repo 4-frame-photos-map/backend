@@ -1,11 +1,11 @@
 package com.idea5.four_cut_photos_map.domain.shoptitlelog.service;
 
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopTitleLog;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.repository.ShopRepository;
 import com.idea5.four_cut_photos_map.domain.shoptitle.dto.ShopTitleDto;
 import com.idea5.four_cut_photos_map.domain.shoptitle.entity.ShopTitle;
 import com.idea5.four_cut_photos_map.domain.shoptitle.repository.ShopTitleRepository;
-import com.idea5.four_cut_photos_map.domain.shoptitlelog.dto.ShopTitleLogDto;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.entity.ShopTitleLog;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.repository.ShopTitleLogRepository;
 import com.idea5.four_cut_photos_map.global.error.ErrorCode;
@@ -62,17 +62,9 @@ public class ShopTitleLogService {
         if (shopTitleLogs.isEmpty())
             throw new BusinessException(SHOP_TITLE_NOT_FOUND);
 
-       // entity -> Dto 변환
-        List<ShopTitleLogDto> allShopTitleLogs = shopTitleLogs.stream()
-                .map(shopTitlelog -> ShopTitleLogDto.of(shopTitlelog))
+        responseList = shopTitleLogs.stream()
+                .map(shopTitleLog -> ShopTitleDto.of(shopTitleLog.getShopTitle()))
                 .collect(Collectors.toList());
-
-
-        // 응답 데이터(상점이 보유한 칭호) 작업 [ShopTitleLogDto -> ShopTileDto]
-        for (ShopTitleLogDto shopTitleLog : allShopTitleLogs) {
-            ShopTitle shopTitle = shopTitleLog.getShopTitle();
-            responseList.add(ShopTitleDto.of(shopTitle));
-        }
 
         return responseList;
     }
@@ -107,12 +99,12 @@ public class ShopTitleLogService {
 
     // 모든 지점 칭호 로그를 조회하여 지점 칭호 별로 그룹화
     @Transactional(readOnly = true)
-    public Map<String, List<ShopTitleLogDto>> getGroupedShopTitleLogs(){
+    public Map<String, List<ResponseShopTitleLog>> getGroupedShopTitleLogs(){
         List<ShopTitleLog> shopTitleLogs = shopTitleLogRepository.findAll();
 
-        Map<String, List<ShopTitleLogDto>> responseMap = shopTitleLogs.stream()
+        Map<String, List<ResponseShopTitleLog>> responseMap = shopTitleLogs.stream()
                 .collect(Collectors.groupingBy(shopTitleLog -> shopTitleLog.getShopTitle().getName(),
-                        Collectors.mapping(ShopTitleLogDto::of, Collectors.toList())));
+                        Collectors.mapping(shopTitleLog -> ResponseShopTitleLog.from(shopTitleLog.getShop()), Collectors.toList())));
 
         return responseMap;
     }
