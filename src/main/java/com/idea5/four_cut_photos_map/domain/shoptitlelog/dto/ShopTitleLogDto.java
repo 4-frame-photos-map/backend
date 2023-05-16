@@ -1,5 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.shoptitlelog.dto;
 
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseFavoriteShop;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopTitleLog;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shoptitle.entity.ShopTitle;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.entity.ShopTitleLog;
@@ -14,12 +16,14 @@ import javax.persistence.ManyToOne;
 @Getter
 @Builder
 public class ShopTitleLogDto {
-    private Shop shop;
+    private ResponseShopTitleLog shop;
     private ShopTitle shopTitle;
 
     static public ShopTitleLogDto of (ShopTitleLog shopTitleLog){
+        ResponseShopTitleLog shopDto = ResponseShopTitleLog.from(shopTitleLog.getShop());
+
         return ShopTitleLogDto.builder()
-                .shop(shopTitleLog.getShop())
+                .shop(shopDto)
                 .shopTitle(shopTitleLog.getShopTitle())
                 .build();
     }

@@ -21,7 +21,5 @@ public class ShopTitleDto {
                 .conditions(shopTitle.getConditions())
                 .content(shopTitle.getContent())
                 .build();
-
-
     }
 }
