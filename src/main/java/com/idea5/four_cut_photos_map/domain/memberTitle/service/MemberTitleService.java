@@ -62,14 +62,15 @@ public class MemberTitleService {
 //                .map(memberTitleLog -> memberTitleLog.getMemberTitle())
 //                .collect(Collectors.toList());
         // DTO 변환해서 담기
-        List<MemberTitleResp> memberTitleResps = new ArrayList<>();
+        int cnt = myMemberTitleLogs.size(); // 획득한 칭호 개수
         int idx = 0; // 탐색 인덱스
+        List<MemberTitleResp> memberTitleResps = new ArrayList<>();
         MemberTitleResp mainMemberTitle = null;
         for(MemberTitle mt : memberTitles) {
             MemberTitleLog memberTitleLog = myMemberTitleLogs.get(idx);
             boolean status = false; // 획득 여부
             // 4. 획득한 칭호인지 검사
-            if(idx != myMemberTitleLogs.size() && memberTitleLog.getMemberTitle().getId().equals(mt.getId())) {
+            if(idx != cnt && memberTitleLog.getMemberTitle().getId().equals(mt.getId())) {
                 status = true;
                 idx++;
                 // 5. 대표 칭호인지 검사
@@ -79,7 +80,7 @@ public class MemberTitleService {
             }
             memberTitleResps.add(MemberTitleResp.toDto(mt, status));
         }
-        return new MemberTitlesResp(mainMemberTitle, memberTitleResps);
+        return new MemberTitlesResp(cnt, mainMemberTitle, memberTitleResps);
     }
 
     public List<MemberTitleLog> findByMember(Member member) {

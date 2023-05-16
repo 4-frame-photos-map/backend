@@ -18,6 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MemberTitlesResp {
-    private MemberTitleResp mainMemberTitle;
-    private List<MemberTitleResp> memberTitles;
+    private Integer holdingCount; // 획득한 칭호 개수
+    private MemberTitleResp mainMemberTitle; // 대표 칭호
+    private List<MemberTitleResp> memberTitles; // 전체 칭호
 }
