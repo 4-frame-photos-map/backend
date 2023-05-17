@@ -14,10 +14,11 @@ import java.util.Optional;
 
 @Repository
 public interface ShopTitleLogRepository extends JpaRepository<ShopTitleLog, Long> {
-
     List<ShopTitleLog> findAllByShopId(Long shopId);
 
     Optional<ShopTitleLog> findByShopIdAndShopTitleId(Long shopId, Long shopTitleId);
+
+    boolean existsByShopIdAndShopTitleId(Long shopId, Long shopTitleId);
 
     boolean existsByShopId(Long shopId);
 
