@@ -58,13 +58,11 @@ public class ShopTitleLogService {
         // shopId를 통해 ShopTitleLogs 데이터 조회
         List<ShopTitleLog> shopTitleLogs = shopTitleLogRepository.findAllByShopId(shopId);
 
-        // 조회 결과, 빈 컬렉션인 경우 -> 보유한 칭호가 없음.
-        if (shopTitleLogs.isEmpty())
-            throw new BusinessException(SHOP_TITLE_NOT_FOUND);
-
-        responseList = shopTitleLogs.stream()
-                .map(shopTitleLog -> ShopTitleDto.of(shopTitleLog.getShopTitle()))
-                .collect(Collectors.toList());
+        if (!shopTitleLogs.isEmpty()) {
+            responseList = shopTitleLogs.stream()
+                    .map(shopTitleLog -> ShopTitleDto.of(shopTitleLog.getShopTitle()))
+                    .collect(Collectors.toList());
+        }
 
         return responseList;
     }

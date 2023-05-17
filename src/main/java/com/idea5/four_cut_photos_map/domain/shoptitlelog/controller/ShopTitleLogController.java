@@ -43,11 +43,6 @@ public class ShopTitleLogController {
         if(!shopRepository.existsById(shopId)){
             throw new BusinessException(SHOP_NOT_FOUND);
         }
-        // 상점 칭호 보유 여부 체크
-        boolean existShopTitles = shopTitleLogService.existShopTitles(shopId);
-        if (!existShopTitles) {
-            throw new BusinessException(SHOP_TITLE_LOGS_NOT_FOUND);
-        }
 
         List<ShopTitleDto> responseList = shopTitleLogService.findShopTitlesByShopId(shopId);
 
