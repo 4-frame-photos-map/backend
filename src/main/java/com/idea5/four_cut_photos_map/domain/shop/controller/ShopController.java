@@ -100,7 +100,7 @@ public class ShopController {
             }
 
             if (shopTitleLogService.existShopTitles(responseShopBrand.getId())) {
-                List<String> shopTitles = shopTitleLogService.getShopTitles(responseShopBrand.getId());
+                List<String> shopTitles = shopTitleLogService.getShopTitleNames(responseShopBrand.getId());
                 responseShopBrand.setShopTitles(shopTitles);
             }
         });
@@ -138,10 +138,9 @@ public class ShopController {
             shopDetailDto.setFavorite(favorite != null);
         }
 
-        if (shopTitleLogService.existShopTitles(id)) {
-            List<String> shopTitles = shopTitleLogService.getShopTitles(id);
+            List<String> shopTitles = shopTitleLogService.getShopTitleNames(id);
             shopDetailDto.setShopTitles(shopTitles);
-        }
+
 
         return ResponseEntity.ok(shopDetailDto);
     }
@@ -163,7 +162,7 @@ public class ShopController {
         }
 
         if (shopTitleLogService.existShopTitles(id)) {
-            List<String> shopTitles = shopTitleLogService.getShopTitles(id);
+            List<String> shopTitles = shopTitleLogService.getShopTitleNames(id);
             responseShopBriefInfo.setShopTitles(shopTitles);
         }
 

@@ -32,32 +32,29 @@ public class ShopTitleLogService {
     private final ShopTitleRepository shopTitleRepository;
     private final ShopRepository shopRepository;
 
-    /**
-     * 칭호가 없을 때)
-     * orElseThrow;
-     * orElse(null);
-     */
 
-    // 상점이 보유한 칭호 조회
-    public List<String> getShopTitles(Long shopId) {
-        // 상점이 보유한 칭호 엔티티 조회
-        List<ShopTitleDto> shopTitleByShopId = findShopTitlesByShopId(shopId);
-
-        // 칭호 이름만 get
-        List<String> resultList = shopTitleByShopId.stream()
-                .map(shopTitle -> shopTitle.getName())
-                .collect(Collectors.toList());
-
-        return resultList;
+    public boolean existShopTitles(Long shopId){
+        return shopTitleLogRepository.existsByShopId(shopId);
     }
 
-    // Shop이 보유한 칭호 조회
-    public List<ShopTitleDto> findShopTitlesByShopId(Long shopId){
-        List<ShopTitleDto> responseList = new ArrayList<>();
+    public boolean isDuplicateShopTitleExist(Long shopId, Long shopTitleId){
+        return shopTitleLogRepository.existsByShopIdAndShopTitleId(shopId, shopTitleId);
+    }
 
-        // shopId를 통해 ShopTitleLogs 데이터 조회
+    // 지점이 보유한 칭호명 목록 조회
+    public List<String> getShopTitleNames(Long shopId) {
+        List<ShopTitleDto> shopTitleByShopId = findShopTitlesByShopId(shopId);
+
+        return shopTitleByShopId.stream()
+                .map(ShopTitleDto::getName)
+                .collect(Collectors.toList());
+    }
+
+    // 지점이 보유한 칭호 목록 조회
+    public List<ShopTitleDto> findShopTitlesByShopId(Long shopId){
         List<ShopTitleLog> shopTitleLogs = shopTitleLogRepository.findAllByShopId(shopId);
 
+        List<ShopTitleDto> responseList = new ArrayList<>();
         if (!shopTitleLogs.isEmpty()) {
             responseList = shopTitleLogs.stream()
                     .map(shopTitleLog -> ShopTitleDto.of(shopTitleLog.getShopTitle()))
@@ -67,37 +64,9 @@ public class ShopTitleLogService {
         return responseList;
     }
 
-    // 상점이 칭호가 아예 없는 상태인지 아닌지 체크 (상점 상세보기 api용)
-    public boolean existShopTitles(Long shopId){
-        return shopTitleLogRepository.existsByShopId(shopId);
-    }
-
-
-    // Shop 칭호 부여
-    @Transactional
-    public void save(Long shopId, Long shopTitleId) {
-
-        // 상점에 칭호 부여전, 중복된 데이터가 있는지 체크
-        if (!validateDuplicate(shopId, shopTitleId)) {
-
-            // 엔티티 조회
-            Shop shop = shopRepository.findById(shopId).orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
-            ShopTitle shopTitle = shopTitleRepository.findById(shopTitleId).orElseThrow(() -> new BusinessException(ErrorCode.SHOP_TITLE_NOT_FOUND));
-
-            ShopTitleLog shopTitleLog = ShopTitleLog.builder()
-                    .shop(shop)
-                    .shopTitle(shopTitle)
-                    .build();
-
-            // 저장
-            shopTitleLogRepository.save(shopTitleLog);
-        }
-
-    }
-
-    // 모든 지점 칭호 로그를 조회하여 지점 칭호 별로 그룹화
+    // 모든 지점 칭호 로그를 조회하여 지점 칭호명 별로 그룹화
     @Transactional(readOnly = true)
-    public Map<String, List<ResponseShopTitleLog>> getGroupedShopTitleLogs(){
+    public Map<String, List<ResponseShopTitleLog>> getAllShopTitleLogsGroupedByTitle(){
         List<ShopTitleLog> shopTitleLogs = shopTitleLogRepository.findAll();
 
         Map<String, List<ResponseShopTitleLog>> responseMap = shopTitleLogs.stream()
@@ -107,29 +76,26 @@ public class ShopTitleLogService {
         return responseMap;
     }
 
-    // 칭호 삭제
-    @Transactional
-    public void delete(Long id) {
-        // 제거 전, DB에 존재하는지 체크
-        ShopTitleLog entity = shopTitleLogRepository.findById(id).orElseThrow(() -> new BusinessException(SHOP_TITLE_NOT_FOUND));
-        shopTitleLogRepository.delete(entity);
-    }
-
-    // log 조회
     public ShopTitleLog findShopTitleLog(Long shopId, Long shopTitleId){
         return shopTitleLogRepository.findByShopIdAndShopTitleId(shopId, shopTitleId).orElse(null);
     }
 
-    // 칭호 중복여부 체크, false : 중복 x (칭호 부여 가능)
-    public boolean validateDuplicate(Long shopId, Long shopTitleId){
+    // 지점 칭호 부여
+    @Transactional
+    public void save(Long shopId, Long shopTitleId) {
+        if (!isDuplicateShopTitleExist(shopId, shopTitleId)) {
 
-        Optional<ShopTitleLog> shopTitleLog = shopTitleLogRepository.findByShopIdAndShopTitleId(shopId, shopTitleId);
-        // 널값이 아니면 값이 있다는 의미 -> 중복
-        if (shopTitleLog.isPresent()) {
-            throw new BusinessException(DUPLICATE_SHOP_TITLE);
+            Shop shop = shopRepository.findById(shopId)
+                    .orElseThrow(() -> new BusinessException(SHOP_NOT_FOUND));
+            ShopTitle shopTitle = shopTitleRepository.findById(shopTitleId)
+                    .orElseThrow(() -> new BusinessException(ErrorCode.SHOP_TITLE_NOT_FOUND));
+
+            ShopTitleLog shopTitleLog = ShopTitleLog.builder()
+                    .shop(shop)
+                    .shopTitle(shopTitle)
+                    .build();
+
+            shopTitleLogRepository.save(shopTitleLog);
         }
-
-        // 널값이면 save 가능
-        return false;
     }
 }
