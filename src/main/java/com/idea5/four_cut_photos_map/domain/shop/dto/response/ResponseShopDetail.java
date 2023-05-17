@@ -23,7 +23,6 @@ public class ResponseShopDetail extends ResponseShopBriefInfo {
     private String longitude;
     private String placeUrl;
     private List<ResponseShopReviewDto> recentReviews;
-//    private List<String> shopTitles; // todo: 지점 칭호 디자인 완성 후 재반영 예정
 
 
     public static ResponseShopDetail of(Shop dbShop, String placeUrl, String placeLat, String placeLng,  String distance){
@@ -37,7 +36,7 @@ public class ResponseShopDetail extends ResponseShopBriefInfo {
                 .starRatingAvg(dbShop.getStarRatingAvg())
                 .reviewCnt(dbShop.getReviewCnt())
                 .favoriteCnt(dbShop.getFavoriteCnt())
-//                .shopTitles(new ArrayList<>())
+                .shopTitles(new ArrayList<>())
                 .build();
     }
 }

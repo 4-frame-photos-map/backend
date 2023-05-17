@@ -6,8 +6,6 @@ import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteReposito
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
-import com.idea5.four_cut_photos_map.domain.shoptitle.service.ShopTitleService;
-import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

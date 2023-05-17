@@ -3,7 +3,6 @@ package com.idea5.four_cut_photos_map.domain.shop.controller;
 
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
-import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseShopReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.service.ReviewService;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
@@ -20,10 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @RequestMapping("/shops")
@@ -97,13 +93,17 @@ public class ShopController {
             return ResponseEntity.ok(responseMap);
         }
 
-        if (memberContext != null) {
-            resultShops.forEach(resultShop -> {
-                        Favorite favorite = favoriteService.findByShopIdAndMemberId(resultShop.getId(), memberContext.getId());
-                        resultShop.setFavorite(favorite != null);
-                    }
-            );
-        }
+        resultShops.forEach(responseShopBrand -> {
+            if (memberContext != null) {
+                Favorite favorite = favoriteService.findByShopIdAndMemberId(responseShopBrand.getId(), memberContext.getId());
+                responseShopBrand.setFavorite(favorite != null);
+            }
+
+            if (shopTitleLogService.existShopTitles(responseShopBrand.getId())) {
+                List<String> shopTitles = shopTitleLogService.getShopTitleNames(responseShopBrand.getId());
+                responseShopBrand.setShopTitles(shopTitles);
+            }
+        });
 
         responseMap.put("shops", resultShops);
 
@@ -115,9 +115,17 @@ public class ShopController {
      */
     @GetMapping("/{shop-id}")
     public ResponseEntity<ResponseShopDetail> getShopDetail (@PathVariable(name = "shop-id") Long id,
-                                                          @RequestParam @NotNull Double userLat,
-                                                          @RequestParam @NotNull Double userLng,
+                                                             @RequestParam(name = "userLat", required = false) Double userLat,
+                                                             @RequestParam(name = "userLng", required = false) Double userLng,
                                                           @AuthenticationPrincipal MemberContext memberContext) {
+
+
+        if (userLat == null || userLat == 0) {
+            userLat = null;
+        }
+        if (userLng == null || userLng == 0) {
+            userLng = null;
+        }
 
         Shop dbShop = shopService.findById(id);
         ResponseShopDetail shopDetailDto = shopService.setResponseDto(dbShop, userLat, userLng);
@@ -130,11 +138,9 @@ public class ShopController {
             shopDetailDto.setFavorite(favorite != null);
         }
 
-        // todo: 지점 칭호 디자인 완성 후 재반영 예정
-//        if (shopTitleLogService.existShopTitles(id)) {
-//            List<String> shopTitles = shopTitleLogService.getShopTitles(id);
-//            shopDetailDto.setShopTitles(shopTitles);
-//        }
+            List<String> shopTitles = shopTitleLogService.getShopTitleNames(id);
+            shopDetailDto.setShopTitles(shopTitles);
+
 
         return ResponseEntity.ok(shopDetailDto);
     }
@@ -153,6 +159,11 @@ public class ShopController {
         if (memberContext != null) {
             Favorite favorite = favoriteService.findByShopIdAndMemberId(responseShopBriefInfo.getId(), memberContext.getId());
             responseShopBriefInfo.setFavorite(favorite != null);
+        }
+
+        if (shopTitleLogService.existShopTitles(id)) {
+            List<String> shopTitles = shopTitleLogService.getShopTitleNames(id);
+            responseShopBriefInfo.setShopTitles(shopTitles);
         }
 
         return ResponseEntity.ok(responseShopBriefInfo);

@@ -43,7 +43,7 @@ public class ShopTitleCollectJob {
         // 2. 저번 달 찜 개수 기준으로 이번 달 핫플레이스 칭호 부여
         List<Long> ids = favoriteRepository.findShopIdsWithMoreThanThreeFavorites(lastMonthStart, lastMonthEnd);
 
-        for (long shopId : ids) {
+    for (long shopId : ids) {
             shopTitleLogService.save(shopId, HOT_PLACE.getId());
         }
 

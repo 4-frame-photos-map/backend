@@ -14,9 +14,7 @@ public enum ShopTitleType {
 //    GOOD_PROP(4L, "소품 양호", "소품 점수 4점 이상", "다양하게 연출하기 좋아요.");
 
     private Long id;
-    private String name; // 칭호명
-    private String conditions; // 칭호 획득 조건
-
-    private String content; // 칭호 부연 설명
-
+    private String name;
+    private String conditions;
+    private String content;
 }

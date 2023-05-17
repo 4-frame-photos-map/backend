@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.global.common;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +32,11 @@ public class RedisDao {
     public void setValues(String key, String data, Duration duration) {
         ValueOperations<String, String> values = redisTemplate.opsForValue();
         values.set(key, data, duration);
+    }
+
+    // Set 타입으로 저장 (만료기간 설정 X)
+    public void addSet(String key, String data) {
+        redisTemplate.opsForSet().add(key, data);
     }
 
     // key 로 value 조회
@@ -68,5 +74,9 @@ public class RedisDao {
     public String getShopInfoKey(long shopId) {return "shop:" + shopId;}
 
     // 유효하지 않은 shop id를 저장하는 key
-    public String getInvalidShopIdKey() {return "invalid_shop_id";}
+    public String getInvalidShopIdKey() {return "invalid_shop_ids";}
+
+    // Kakao Maps API 데이터와 비교 시 데이터 중복 발생한 shop id 저장하는 key
+    public String getDuplicateShopIdKey() {return "duplicate_shop_ids";}
+
 }
