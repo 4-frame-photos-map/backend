@@ -94,11 +94,16 @@ public class MemberTitleService {
     public void updateMainMemberTitle(Member member, Long memberTitleId) {
         // 1. 변경할 칭호 조회
         MemberTitle memberTitle = findById(memberTitleId);
-        // 2. 기존 회원의 대표 칭호 해제
+        // 2. 기존 회원의 대표 칭호 조회
         log.info("----Before memberTitleLogRepository.findByMemberIdAndIsMainTrue()----");
         MemberTitleLog memberTitleLog = memberTitleLogRepository.findByMemberAndIsMainTrue(member).orElse(null);
+        // 3. 이미 대표 칭호로 설정된 칭호에 대한 예외 처리
+        if(memberTitleLog.getMemberTitle().equals(memberTitle)) {
+            throw new BusinessException(ErrorCode.DUPLICATE_MAIN_MEMBER_TITLE);
+        }
+        // 4. 기존 대표 칭호 해제
         memberTitleLog.cancelMain();
-        // 3. 새로운 칭호로 대표 칭호 설정
+        // 5. 새로운 칭호로 대표 칭호 설정
         log.info("----Before memberTitleLogRepository.findByMemberIdAndMemberTitleId()----");
         MemberTitleLog newMemberTitleLog = memberTitleLogRepository.findByMemberAndMemberTitle(member, memberTitle)
                 .orElseThrow(() -> {
