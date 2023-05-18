@@ -8,6 +8,7 @@ import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitle;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleLog;
 import com.idea5.four_cut_photos_map.domain.memberTitle.repository.MemberTitleLogRepository;
 import com.idea5.four_cut_photos_map.domain.memberTitle.repository.MemberTitleRepository;
+import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import com.idea5.four_cut_photos_map.global.util.DatabaseCleaner;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
@@ -19,8 +20,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.idea5.four_cut_photos_map.global.error.ErrorCode.MEMBER_TITLE_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
 @SpringBootTest
@@ -119,5 +122,18 @@ class MemberTitleServiceTest {
                 () -> assertThat(memberTitleInfo.getIsHolding()).isEqualTo(true),
                 () -> assertThat(memberTitleInfo.getIsMain()).isEqualTo(false)
         );
+    }
+
+    @Test
+    @DisplayName("1번 회원이 존재하지 않는 6번 칭호 정보를 조회한다.")
+    void t4() {
+        // given
+        Member member = memberRepository.save(Member.builder().id(1L).nickname("user").build());
+        Long memberTitleId = 6L;
+        // when, then
+        BusinessException e = assertThrows(BusinessException.class, () ->
+                memberTitleService.getMemberTitleInfo(memberTitleId, member.getId())
+        );
+        assertThat(e.getMessage()).isEqualTo(MEMBER_TITLE_NOT_FOUND.getMessage());
     }
 }
