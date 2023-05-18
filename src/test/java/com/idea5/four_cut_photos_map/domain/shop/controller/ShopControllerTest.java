@@ -61,7 +61,7 @@ class ShopControllerTest {
         shopRepository.save(new Shop(brand3, "하루필름 서울숲점", "서울 성동구 서울숲2길 45",0,0,0.0));
         shopRepository.save(new Shop(brand1, "인생네컷 서울이태원점", "서울 용산구 이태원로 171",0,0,0.0));
         shopRepository.save(new Shop(brand4, "셀픽스 건대점", null,0,0,0.0));
-        shopRepository.save(new Shop(brand1, "포토그레이 서울 성수점", "서울 성동구 성수동2가 310-3",0,0,0.0));
+        shopRepository.save(new Shop(brand5, "포토그레이 서울 성수점", "서울 성동구 성수동2가 310-3",0,0,0.0));
     }
 
     @AfterEach
