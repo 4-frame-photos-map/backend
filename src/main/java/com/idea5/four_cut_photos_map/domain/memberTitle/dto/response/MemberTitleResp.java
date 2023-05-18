@@ -24,7 +24,7 @@ public class MemberTitleResp {
         return MemberTitleResp.builder()
                 .id(memberTitle.getId())
                 .name(memberTitle.getName())
-                .imageUrl(memberTitle.getImageUrl())
+                .imageUrl(status == true ? memberTitle.getColorImageUrl() : memberTitle.getBwImageUrl())
                 .isHolding(status)
                 .isMain(isMain)
                 .build();
