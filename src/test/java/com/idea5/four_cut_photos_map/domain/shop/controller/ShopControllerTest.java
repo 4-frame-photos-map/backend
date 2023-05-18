@@ -88,7 +88,7 @@ class ShopControllerTest {
 
         // Then
         resultActions
-                //.andDo(print())
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(handler().methodName("searchShopsByBrand"))
                 .andExpect(jsonPath("$.shops", hasSize(2)))
