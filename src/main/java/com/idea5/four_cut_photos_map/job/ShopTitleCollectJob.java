@@ -13,7 +13,8 @@ import java.time.LocalDateTime;
 public class ShopTitleCollectJob {
     private final HotPlaceTitleService hotPlaceTitleService;
     private final GoodCleanlinessTitleService goodCleanlinessTitleService;
-    @Scheduled(cron = "0 0 3 1 * *") // 매달 1일 3시에 실행
+//    @Scheduled(cron = "0 0 3 1 * *") // 매달 1일 3시에 실행
+    @Scheduled(cron = "0 40 * * * *")
     public void collectShopTitle() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime lastMonthStart = now.withDayOfMonth(1).minusMonths(1);
