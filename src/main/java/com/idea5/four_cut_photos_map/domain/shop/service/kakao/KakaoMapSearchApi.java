@@ -222,17 +222,16 @@ public class KakaoMapSearchApi {
                 log.error(e.getMessage());
             }
         }
-        resultList.sort((dto1, dto2) -> {
-            double dist1 = Double.parseDouble(dto1.getDistance().replaceAll("[^\\d.]", ""));
-            double dist2 = Double.parseDouble(dto2.getDistance().replaceAll("[^\\d.]", ""));
-            String unit1 = dto1.getDistance().replaceAll("[\\d.]", "");
-            String unit2 = dto2.getDistance().replaceAll("[\\d.]", "");
-
-            if (unit1.equals("m")) {dist1 /= 1000;}
-            if (unit2.equals("m")) {dist2 /= 1000;}
-
-            return Double.compare(dist1, dist2);
-        });
+        resultList.sort(
+                Comparator.comparingDouble(dto -> {
+                    double dist = Double.parseDouble(dto.getDistance().replaceAll("[^\\d.]", ""));
+                    String unit = dto.getDistance().replaceAll("[\\d.]", "");
+                    if (unit.equals("m")) {
+                        dist /= 1000;
+                    }
+                    return dist;
+                })
+        );
         return resultList;
     }
 
