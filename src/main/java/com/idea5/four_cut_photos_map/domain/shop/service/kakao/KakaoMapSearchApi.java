@@ -31,7 +31,8 @@ public class KakaoMapSearchApi {
     private final WebClient fourthWebClient;
     private final RedisDao redisDao;
     private final ObjectMapper objectMapper;
-    public static final String DEFAULT_QUERY_WORD = "사진";
+    private final String DEFAULT_QUERY_WORD = "사진";
+    private final int MAX_PAGE = 2;
 
 
     /**
@@ -45,20 +46,39 @@ public class KakaoMapSearchApi {
     public List<KakaoMapSearchDto> searchByQueryWord(String queryWord, Double userLat, Double userLng) {
         List<KakaoMapSearchDto> resultList = new ArrayList<>();
 
-        // 1. API 호출을 위한 요청 설정
-        String apiPath = "/v2/local/search/keyword.json";
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
-                .queryParam("query", queryWord + DEFAULT_QUERY_WORD)
-                .queryParam("y", userLat)
-                .queryParam("x", userLng);
+        String prevEl = null;
+        for (int page = 1; page <= MAX_PAGE; page++) {
+            // 1. API 호출을 위한 요청 설정
+            String apiPath = "/v2/local/search/keyword.json";
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
+                    .queryParam("query", queryWord + DEFAULT_QUERY_WORD)
+                    .queryParam("y", userLat)
+                    .queryParam("x", userLng)
+                    .queryParam("page", page);
 
-        String apiUrl = uriBuilder.build().toString();
+            String apiUrl = uriBuilder.build().toString();
 
-        // 2. API 호출
-        JsonNode documents = getDocuments(apiUrl);
+            // 2. API 호출
+            JsonNode documents = getDocuments(apiUrl);
 
-        // 3. JSON -> DTO 역직렬화
-        return deserialize(resultList, documents);
+            // 3. JSON -> DTO 역직렬화
+            if (page == 1) {
+                prevEl = documents.get(0).get("place_name").asText();
+                deserialize(resultList, documents);
+            } else {
+                String currEl = documents.get(0).get("place_name").asText();
+                // 첫 번째 결과 개수가 딱 15개일 경우 최대 개수임에도 두 번째 호출을 할 수 있기 때문에
+                // 이전 첫 번째 요소와 현재 첫 번째 요소 비교
+                if (!prevEl.equals(currEl)) {
+                    deserialize(resultList, documents);
+                    prevEl = currEl;
+                }
+            }
+
+            // 첫 번째 결과 개수가 최대 개수 이하면 break
+            if (page == 1 && documents.size() < 15) break;
+        }
+        return resultList;
     }
 
     /**
@@ -75,21 +95,50 @@ public class KakaoMapSearchApi {
     public List<KakaoMapSearchDto> searchByQueryWord(String queryWord, Integer radius, Double userLat, Double userLng, Double mapLat, Double mapLng) {
         List<KakaoMapSearchDto> resultList = new ArrayList<>();
 
-        // 1. API 호출을 위한 요청 설정
-        String apiPath = "/v2/local/search/keyword.json";
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
-                .queryParam("query", queryWord + DEFAULT_QUERY_WORD)
-                .queryParam("y", mapLat)
-                .queryParam("x", mapLng)
-                .queryParam("radius", radius);
+        String prevEl = null;
+        for (int page = 1; page <= MAX_PAGE; page++) {
+            // 1. API 호출을 위한 요청 설정
+            String apiPath = "/v2/local/search/keyword.json";
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
+                    .queryParam("query", queryWord + DEFAULT_QUERY_WORD)
+                    .queryParam("y", mapLat)
+                    .queryParam("x", mapLng)
+                    .queryParam("radius", radius)
+                    .queryParam("page", page);
 
-        String apiUrl = uriBuilder.build().toString();
+            String apiUrl = uriBuilder.build().toString();
 
-        // 2. API 호출
-        JsonNode documents = getDocuments(apiUrl);
+            // 2. API 호출
+            JsonNode documents = getDocuments(apiUrl);
 
-        // 3. JSON -> DTO 역직렬화
-        return deserialize(resultList, documents, userLat, userLng, mapLat, mapLng);
+            // 3. JSON -> DTO 역직렬화
+            if (page == 1) {
+                prevEl = documents.get(0).get("place_name").asText();
+                deserialize(resultList, documents, userLat, userLng, mapLat, mapLng);
+            } else {
+                String currEl = documents.get(0).get("place_name").asText();
+                // 첫 번째 결과 개수가 딱 15개일 경우 최대 개수임에도 두 번째 호출을 할 수 있기 때문에
+                // 이전 첫 번째 요소와 현재 첫 번째 요소 비교
+                if (!prevEl.equals(currEl)) {
+                    deserialize(resultList, documents, userLat, userLng, mapLat, mapLng);
+                    prevEl = currEl;
+                }
+            }
+            // 첫 번째 결과 개수가 최대 개수 이하면 break
+            if (page == 1 && documents.size() < 15) break;
+        }
+        // 4. 거리순 정렬
+        resultList.sort(
+                Comparator.comparingDouble(dto -> {
+                    double dist = Double.parseDouble(dto.getDistance().replaceAll("[^\\d.]", ""));
+                    String unit = dto.getDistance().replaceAll("[\\d.]", "");
+                    if (unit.equals("m")) {
+                        dist /= 1000;
+                    }
+                    return dist;
+                })
+        );
+        return resultList;
     }
 
     /**
@@ -222,16 +271,6 @@ public class KakaoMapSearchApi {
                 log.error(e.getMessage());
             }
         }
-        resultList.sort(
-                Comparator.comparingDouble(dto -> {
-                    double dist = Double.parseDouble(dto.getDistance().replaceAll("[^\\d.]", ""));
-                    String unit = dto.getDistance().replaceAll("[\\d.]", "");
-                    if (unit.equals("m")) {
-                        dist /= 1000;
-                    }
-                    return dist;
-                })
-        );
         return resultList;
     }
 
