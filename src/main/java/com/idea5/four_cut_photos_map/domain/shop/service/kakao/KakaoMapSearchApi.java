@@ -31,7 +31,7 @@ public class KakaoMapSearchApi {
     private final WebClient fourthWebClient;
     private final RedisDao redisDao;
     private final ObjectMapper objectMapper;
-    public static final String DEFAULT_QUERY_WORD = "즉석사진";
+    public static final String DEFAULT_QUERY_WORD = "셀프사진";
     public static final String CATEGORY_NAME = "사진";
 
 
@@ -193,14 +193,12 @@ public class KakaoMapSearchApi {
     private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
-            if(isCategoryNameMatched(document)) {
                 try {
                     KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
                     dto.setDistance(Util.distanceFormatting(dto.getDistance()));
                     resultList.add(dto);
                 } catch (Exception e) {
                     log.error(e.getMessage());
-                }
             }
         }
         return resultList;
