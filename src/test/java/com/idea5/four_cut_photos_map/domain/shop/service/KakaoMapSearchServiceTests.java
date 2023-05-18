@@ -48,9 +48,13 @@ public class KakaoMapSearchServiceTests {
                 () -> assertThat(apiShopJson).extracting(KakaoMapSearchDto::getPlaceName, KakaoMapSearchDto::getAddressName, KakaoMapSearchDto::getRoadAddressName, KakaoMapSearchDto::getDistance)
                         .contains(
                                 tuple("인생네컷 홍대동교점","서울 마포구 동교동 162-14","서울 마포구 홍익로6길 21", "18.1km")
-                        )
+                        ),
+                // 결과 첫 번째 페이지 요소와 두 번째 페이지 요소가 다른 요소인지 검증
+                // 첫 번째 페이지 최대 사이즈(15) 이상일 때 두 번째 페이지를 호출하므로
+                () -> assertThat(apiShopJson.get(0).getPlaceName()).isNotEqualTo(apiShopJson.get(15).getPlaceName())
         );
-
+        System.out.println(apiShopJson.get(0).getPlaceName());
+        System.out.println(apiShopJson.get(15).getPlaceName());
     }
 
     @Test
