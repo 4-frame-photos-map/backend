@@ -31,7 +31,7 @@ public class KakaoMapSearchApi {
     private final WebClient fourthWebClient;
     private final RedisDao redisDao;
     private final ObjectMapper objectMapper;
-    public static final String DEFAULT_QUERY_WORD = "셀프사진";
+    public static final String DEFAULT_QUERY_WORD = "사진";
 
 
     /**

@@ -38,7 +38,7 @@ public class ShopService {
         List<T> resultShop = new ArrayList<>();
         for (KakaoMapSearchDto apiShop : apiShops) {
             // 도로명주소 비교로 반환하는 지점 없을 시, 지번주소로 비교
-            Shop dbShop = compareWithPlaceNameAndAddress(apiShop.getPlaceName(), apiShop.getRoadAddressName(), apiShop.getAddressName());
+            Shop dbShop = compareWithPlaceNameOrAddress(apiShop.getPlaceName(), apiShop.getRoadAddressName(), apiShop.getAddressName());
 
             if (dbShop != null) {
                 log.info("Matched: DB shop ({} - {}), Kakao API shop ({} - {} - {})",
@@ -67,9 +67,9 @@ public class ShopService {
      * @return DB Shop
      */
     @Transactional(readOnly = true)
-    public Shop compareWithPlaceNameAndAddress(String placeName, String... addresses) {
+    public Shop compareWithPlaceNameOrAddress(String placeName, String... addresses) {
         for (String address : addresses) {
-            List<Shop> matchedShops = shopRepository.findByPlaceNameAndAddressIgnoringSpace(
+            List<Shop> matchedShops = shopRepository.findByPlaceNameOrAddressIgnoringSpace(
                     Util.removeSpace(placeName),
                     Util.removeSpace(address)
             );
