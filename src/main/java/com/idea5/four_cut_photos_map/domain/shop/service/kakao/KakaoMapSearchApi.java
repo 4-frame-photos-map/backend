@@ -31,8 +31,7 @@ public class KakaoMapSearchApi {
     private final WebClient fourthWebClient;
     private final RedisDao redisDao;
     private final ObjectMapper objectMapper;
-    public static final String DEFAULT_QUERY_WORD = "즉석사진";
-    public static final String CATEGORY_NAME = "사진";
+    public static final String DEFAULT_QUERY_WORD = "사진";
 
 
     /**
@@ -193,14 +192,12 @@ public class KakaoMapSearchApi {
     private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
-            if(isCategoryNameMatched(document)) {
                 try {
                     KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
                     dto.setDistance(Util.distanceFormatting(dto.getDistance()));
                     resultList.add(dto);
                 } catch (Exception e) {
                     log.error(e.getMessage());
-                }
             }
         }
         return resultList;
@@ -210,34 +207,31 @@ public class KakaoMapSearchApi {
                                                 Double mapLat, Double mapLng) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
-            if (isCategoryNameMatched(document)) {
-                try {
-                    KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
+            try {
+                KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
+                Double placeLat = Double.parseDouble(dto.getLatitude());
+                Double placeLng = Double.parseDouble(dto.getLongitude());
 
-                    if((userLat != mapLat) || (userLng != mapLng)) {
-                        // 사용자 현재위치 좌표로부터 지점까지의 거리 갱신
-                        Double placeLat = Double.parseDouble(dto.getLatitude());
-                        Double placeLng = Double.parseDouble(dto.getLongitude());
-                        dto.setDistance(Util.calculateDist(placeLat, placeLng, userLat, userLng));
-                    }
-
-                    resultList.add(dto);
-                } catch (Exception e) {
-                    log.error(e.getMessage());
+                if((userLat != mapLat) || (userLng != mapLng)) {
+                    // 사용자 현재위치 좌표로부터 지점까지의 거리 갱신
+                    dto.setDistance(Util.calculateDist(placeLat, placeLng, userLat, userLng));
                 }
+
+                resultList.add(dto);
+            } catch (Exception e) {
+                log.error(e.getMessage());
             }
         }
-        resultList.sort((dto1, dto2) -> {
-            double dist1 = Double.parseDouble(dto1.getDistance().replaceAll("[^\\d.]", ""));
-            double dist2 = Double.parseDouble(dto2.getDistance().replaceAll("[^\\d.]", ""));
-            String unit1 = dto1.getDistance().replaceAll("[\\d.]", "");
-            String unit2 = dto2.getDistance().replaceAll("[\\d.]", "");
-
-            if (unit1.equals("m")) {dist1 /= 1000;}
-            if (unit2.equals("m")) {dist2 /= 1000;}
-
-            return Double.compare(dist1, dist2);
-        });
+        resultList.sort(
+                Comparator.comparingDouble(dto -> {
+                    double dist = Double.parseDouble(dto.getDistance().replaceAll("[^\\d.]", ""));
+                    String unit = dto.getDistance().replaceAll("[\\d.]", "");
+                    if (unit.equals("m")) {
+                        dist /= 1000;
+                    }
+                    return dist;
+                })
+        );
         return resultList;
     }
 
@@ -252,9 +246,8 @@ public class KakaoMapSearchApi {
                 String apiRoadAddressName = dto.getRoadAddressName();
                 String apiAddressName = dto.getAddressName();
 
-                if (isCategoryNameMatched(document)
-                        && (isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiRoadAddressName)
-                            || isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiAddressName))) {
+                if (isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiRoadAddressName)
+                            || isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiAddressName)) {
                     return new String[]{
                             dto.getPlaceUrl(),
                             dto.getLatitude(),
@@ -310,10 +303,6 @@ public class KakaoMapSearchApi {
             }
         }
         return null;
-    }
-
-    private boolean isCategoryNameMatched(JsonNode document) {
-        return document.get("category_name").asText().contains(CATEGORY_NAME);
     }
 
     private boolean isMatchedShop(String dbPlaceName, String apiPlaceName, String dbAddress, String apiAddress) {
