@@ -93,13 +93,17 @@ public class ShopController {
             return ResponseEntity.ok(responseMap);
         }
 
-        if (memberContext != null) {
-            resultShops.forEach(resultShop -> {
-                        Favorite favorite = favoriteService.findByShopIdAndMemberId(resultShop.getId(), memberContext.getId());
-                        resultShop.setFavorite(favorite != null);
-                    }
-            );
-        }
+        resultShops.forEach(responseShopBrand -> {
+            if (memberContext != null) {
+                Favorite favorite = favoriteService.findByShopIdAndMemberId(responseShopBrand.getId(), memberContext.getId());
+                responseShopBrand.setFavorite(favorite != null);
+            }
+
+            if (shopTitleLogService.existShopTitles(responseShopBrand.getId())) {
+                List<String> shopTitles = shopTitleLogService.getShopTitleNames(responseShopBrand.getId());
+                responseShopBrand.setShopTitles(shopTitles);
+            }
+        });
 
         responseMap.put("shops", resultShops);
 
@@ -134,11 +138,9 @@ public class ShopController {
             shopDetailDto.setFavorite(favorite != null);
         }
 
-        // todo: 지점 칭호 디자인 완성 후 재반영 예정
-//        if (shopTitleLogService.existShopTitles(id)) {
-//            List<String> shopTitles = shopTitleLogService.getShopTitles(id);
-//            shopDetailDto.setShopTitles(shopTitles);
-//        }
+            List<String> shopTitles = shopTitleLogService.getShopTitleNames(id);
+            shopDetailDto.setShopTitles(shopTitles);
+
 
         return ResponseEntity.ok(shopDetailDto);
     }
@@ -157,6 +159,11 @@ public class ShopController {
         if (memberContext != null) {
             Favorite favorite = favoriteService.findByShopIdAndMemberId(responseShopBriefInfo.getId(), memberContext.getId());
             responseShopBriefInfo.setFavorite(favorite != null);
+        }
+
+        if (shopTitleLogService.existShopTitles(id)) {
+            List<String> shopTitles = shopTitleLogService.getShopTitleNames(id);
+            responseShopBriefInfo.setShopTitles(shopTitles);
         }
 
         return ResponseEntity.ok(responseShopBriefInfo);
