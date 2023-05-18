@@ -30,7 +30,11 @@ public class MemberTitle extends BaseEntity {
 
     @NotNull
     @Column(columnDefinition = "TEXT")
-    private String imageUrl; // 칭호 이미지 URL
+    private String colorImageUrl; // 칭호 컬러 이미지 URL
+
+    @NotNull
+    @Column(columnDefinition = "TEXT")
+    private String bwImageUrl; // 칭호 흑백 이미지 URL
 
     @OneToMany(mappedBy = "memberTitle", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberTitleLog> memberTitleLogs = new ArrayList<>();
