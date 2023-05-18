@@ -52,12 +52,16 @@ class ShopControllerTest {
         Brand brand1 = brandRepository.save(new Brand(MajorBrand.LIFEFOURCUTS.getBrandName(), MajorBrand.LIFEFOURCUTS.getFilePath()));
         Brand brand2 = brandRepository.save(new Brand(MajorBrand.PHOTOISM.getBrandName(), MajorBrand.PHOTOISM.getFilePath()));
         Brand brand3 = brandRepository.save(new Brand(MajorBrand.HARUFILM.getBrandName(), MajorBrand.HARUFILM.getFilePath()));
+        Brand brand4 = brandRepository.save(new Brand(MajorBrand.PHOTOGRAY.getBrandName(), MajorBrand.PHOTOGRAY.getFilePath()));
+        Brand brand5 = brandRepository.save(new Brand("기타", "https://--"));
 
         shopRepository.save(new Shop(brand1, "인생네컷 카페성수로드점", "서울 성동구 서울숲4길 13",0,0,0.0));
         shopRepository.save(new Shop(brand1, "인생네컷 서울숲점", "서울 성동구 서울숲4길 20",0,0,0.0));
         shopRepository.save(new Shop(brand2, "포토이즘박스 성수점", "서울 성동구 서울숲2길 17-2",0,0,0.0));
         shopRepository.save(new Shop(brand3, "하루필름 서울숲점", "서울 성동구 서울숲2길 45",0,0,0.0));
         shopRepository.save(new Shop(brand1, "인생네컷 서울이태원점", "서울 용산구 이태원로 171",0,0,0.0));
+        shopRepository.save(new Shop(brand4, "셀픽스 건대점", null,0,0,0.0));
+        shopRepository.save(new Shop(brand1, "포토그레이 서울 성수점", "서울 성동구 성수동2가 310-3",0,0,0.0));
     }
 
     @AfterEach
@@ -267,4 +271,57 @@ class ShopControllerTest {
                 .andExpect(jsonPath("$.*", hasSize(0)));
     }
 
+    @DisplayName("키워드로 조회된 상점 리스트 보여주기, 주소값이 null이고 장소명이 일치하는 데이터도 포함")
+    @Test
+    void t7() throws Exception {
+        // Given
+        String keyword = "성수 셀픽스";
+
+        // 서울특별시 성동구 서울숲2길 22-2 (성수동1가)
+        double userLat = 37.546912668813;
+        double userLng = 127.0411420343;
+
+        // When
+        ResultActions resultActions = mockMvc
+                .perform(get("/shops")
+                        .param("keyword", keyword)
+                        .param("userLat", String.valueOf(userLat))
+                        .param("userLng", String.valueOf(userLng))
+                        .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8)));
+        // Then
+        resultActions
+                //.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("searchShopsByKeyword"))
+                .andExpect(jsonPath("$.*", hasSize(1)))
+                .andExpect(jsonPath("$.[0].id", equalTo(6)))
+                .andExpect(jsonPath("$.[0].place_name", equalTo("셀픽스 건대점")));
+    }
+
+    @DisplayName("키워드로 조회된 상점 리스트 보여주기, Kakao Maps API에서 일반 사진관으로 분류되어있지만 즉석사진 브랜드인 데이터")
+    @Test
+    void t8() throws Exception {
+        // Given
+        String keyword = "성수 포토그레이";
+
+        // 서울특별시 성동구 서울숲2길 22-2 (성수동1가)
+        double userLat = 37.546912668813;
+        double userLng = 127.0411420343;
+
+        // When
+        ResultActions resultActions = mockMvc
+                .perform(get("/shops")
+                        .param("keyword", keyword)
+                        .param("userLat", String.valueOf(userLat))
+                        .param("userLng", String.valueOf(userLng))
+                        .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8)));
+        // Then
+        resultActions
+                //.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("searchShopsByKeyword"))
+                .andExpect(jsonPath("$.*", hasSize(1)))
+                .andExpect(jsonPath("$.[0].id", equalTo(7)))
+                .andExpect(jsonPath("$.[0].place_name", equalTo("포토그레이 서울 성수점")));
+    }
 }
