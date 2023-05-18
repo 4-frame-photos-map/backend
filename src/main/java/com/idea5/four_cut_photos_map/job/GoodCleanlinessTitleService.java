@@ -1,6 +1,5 @@
 package com.idea5.four_cut_photos_map.job;
 
-import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
 import com.idea5.four_cut_photos_map.domain.review.entity.Review;
 import com.idea5.four_cut_photos_map.domain.review.repository.ReviewRepository;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.repository.ShopTitleLogRepository;
@@ -26,12 +25,8 @@ public class GoodCleanlinessTitleService {
     private final ShopTitleLogService shopTitleLogService;
 
     @Transactional
-    public void collectGoodCleanlinessTitles() {
+    public void collectGoodCleanlinessTitles(LocalDateTime lastMonthStart, LocalDateTime lastMonthEnd) {
         log.info("=======Start Good Cleanliness Title Collect Job=======");
-
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime lastMonthStart = now.withDayOfMonth(1).minusMonths(1);
-        LocalDateTime lastMonthEnd = now.withDayOfMonth(1).minusDays(1);
 
         // 1. 저번 달 리뷰 개수와 청결도 평균을 기준으로 이번 달 청결한 지점 칭호 부여
         List<Review> reviews = reviewRepository.findLastMonthReviewsWithGoodOrBadPurity(lastMonthStart, lastMonthEnd);

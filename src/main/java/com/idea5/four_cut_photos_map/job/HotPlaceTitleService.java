@@ -22,12 +22,8 @@ public class HotPlaceTitleService {
     private final ShopTitleLogService shopTitleLogService;
 
     @Transactional
-    public void collectHotPlaceTitles() {
+    public void collectHotPlaceTitles(LocalDateTime lastMonthStart, LocalDateTime lastMonthEnd) {
         log.info("=======Start Hot Place Title Collect Job=======");
-
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime lastMonthStart = now.withDayOfMonth(1).minusMonths(1);
-        LocalDateTime lastMonthEnd = now.withDayOfMonth(1).minusDays(1);
 
         // 1. 이전 달 ShopTitleLog 테이블 데이터 전체 삭제
         shopTitleLogRepository.deleteOldShopTitles(lastMonthStart.plusDays(1)); // 지난 달 2일 이전 생성된 데이터 제거
