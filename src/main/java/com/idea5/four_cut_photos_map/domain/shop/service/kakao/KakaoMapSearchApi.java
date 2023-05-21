@@ -326,7 +326,7 @@ public class KakaoMapSearchApi {
     }
 
     private boolean isMatchedShop(String dbPlaceName, String apiPlaceName, String dbAddress, String apiAddress) {
-     return Util.removeSpace(dbPlaceName).contains(Util.removeSpace(apiPlaceName))
+     return Util.removeSpace(dbPlaceName).equals(Util.removeSpace(apiPlaceName))
              || Util.removeSpace(dbAddress).contains(Util.removeSpace(apiAddress));
     }
 
