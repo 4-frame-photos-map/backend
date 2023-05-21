@@ -76,9 +76,20 @@ public class ShopService {
             if (matchedShops.size() == 1) {
                 return matchedShops.get(0);
             } else if (matchedShops.size() > 1){
-                matchedShops.stream().map(Shop::getId).forEach(this::cacheDuplicateShopId);
-                return null;
+                Shop matchingShop = matchedShops.stream()
+                        .filter(shop -> shop.getPlaceName().equals(Util.removeSpace(placeName)))
+                        .findFirst()
+                        .orElse(null);
+                if (matchingShop != null) {
+                    return matchingShop;
+                }
             }
+            log.info("Not Matched: DB shops ({} - {}), Kakao API shop ({} - {})",
+                    matchedShops.stream().map(Shop::getPlaceName).collect(Collectors.toList()),
+                    matchedShops.stream().map(Shop::getAddress).collect(Collectors.toList()),
+                    placeName,
+                    address
+            );
         }
         return null;
     }
@@ -90,11 +101,6 @@ public class ShopService {
                 String.join(",", apiShop.getPlaceUrl(), apiShop.getLatitude(), apiShop.getLongitude()),
                 Duration.ofDays(1)
         );
-    }
-
-    private void cacheDuplicateShopId(long shopId) {
-        String cacheKey = redisDao.getDuplicateShopIdKey();
-        redisDao.addSet(cacheKey, String.valueOf(shopId));
     }
 
     private void cacheInvalidShopId(long shopId) {

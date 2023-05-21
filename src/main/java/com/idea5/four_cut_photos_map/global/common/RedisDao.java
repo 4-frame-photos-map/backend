@@ -75,8 +75,4 @@ public class RedisDao {
 
     // 유효하지 않은 shop id를 저장하는 key
     public String getInvalidShopIdKey() {return "invalid_shop_ids";}
-
-    // Kakao Maps API 데이터와 비교 시 데이터 중복 발생한 shop id 저장하는 key
-    public String getDuplicateShopIdKey() {return "duplicate_shop_ids";}
-
 }
