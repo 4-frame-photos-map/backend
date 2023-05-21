@@ -92,7 +92,6 @@ class ShopControllerTest {
 
         // Then
         resultActions
-//                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(handler().methodName("searchShopsByBrand"))
                 .andExpect(jsonPath("$.shops", hasSize(2)))
@@ -130,7 +129,6 @@ class ShopControllerTest {
 
         // Then
         resultActions
-//                .andDo(print());
                 .andExpect(status().isOk())
                 .andExpect(handler().methodName("searchShopsByBrand"))
                 .andExpect(jsonPath("$.shops", hasSize(1)))
@@ -159,10 +157,9 @@ class ShopControllerTest {
 
         // Then
         resultActions
-//                .andDo(print());
                 .andExpect(status().isOk())
                 .andExpect(handler().methodName("searchShopsByBrand"))
-                .andExpect(jsonPath("$.shops", hasSize(4)))
+                .andExpect(jsonPath("$.shops", hasSize(5)))
 
                 .andExpect(jsonPath("$.shops[0].id", equalTo(3)))
                 .andExpect(jsonPath("$.shops[0].place_name", equalTo("포토이즘박스 성수점")))
@@ -175,7 +172,10 @@ class ShopControllerTest {
                 .andExpect(jsonPath("$.shops[2].place_name", equalTo("인생네컷 서울숲점")))
 
                 .andExpect(jsonPath("$.shops[3].id", equalTo(4)))
-                .andExpect(jsonPath("$.shops[3].place_name", equalTo("하루필름 서울숲점")));
+                .andExpect(jsonPath("$.shops[3].place_name", equalTo("하루필름 서울숲점")))
+
+                .andExpect(jsonPath("$.shops[4].id", equalTo(7)))
+                .andExpect(jsonPath("$.shops[4].place_name", equalTo("포토그레이 서울 성수점")));
     }
 
     @Test
@@ -195,7 +195,6 @@ class ShopControllerTest {
 
         // Then
         resultActions
-//                .andDo(print())
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(handler().methodName("getShopDetail"))
                 .andExpect(jsonPath("$.place_name", equalTo("하루필름 서울숲점")))
@@ -224,10 +223,9 @@ class ShopControllerTest {
 
         // Then
         resultActions
-//        .andDo(print());
                 .andExpect(status().isOk())
                 .andExpect(handler().methodName("searchShopsByKeyword"))
-                 .andExpect(jsonPath("$.*", hasSize(4)))
+                .andExpect(jsonPath("$.*", hasSize(4)))
 
                 .andExpect(jsonPath("$.[0].id", equalTo(3)))
                 .andExpect(jsonPath("$.[0].place_name", equalTo("포토이즘박스 성수점")))
@@ -237,13 +235,13 @@ class ShopControllerTest {
                 .andExpect(jsonPath("$.[1].place_name", equalTo("하루필름 서울숲점")))
                 .andExpect(jsonPath("$.[1].distance", equalTo("223m")))
 
-                .andExpect(jsonPath("$.[2].id", equalTo(2)))
-                .andExpect(jsonPath("$.[2].place_name", equalTo("인생네컷 서울숲점")))
-                .andExpect(jsonPath("$.[2].distance", equalTo("168m")))
+                .andExpect(jsonPath("$.[2].id", equalTo(1)))
+                .andExpect(jsonPath("$.[2].place_name", equalTo("인생네컷 카페성수로드점")))
+                .andExpect(jsonPath("$.[2].distance", equalTo("136m")))
 
-                .andExpect(jsonPath("$.[3].id", equalTo(1)))
-                .andExpect(jsonPath("$.[3].place_name", equalTo("인생네컷 카페성수로드점")))
-                .andExpect(jsonPath("$.[3].distance", equalTo("136m")));
+                .andExpect(jsonPath("$.[3].id", equalTo(2)))
+                .andExpect(jsonPath("$.[3].place_name", equalTo("인생네컷 서울숲점")))
+                .andExpect(jsonPath("$.[3].distance", equalTo("168m")));
     }
 
     @DisplayName("키워드로 조회된 상점 리스트 보여주기, DB에 동일 데이터 존재하지 않음")
@@ -265,7 +263,6 @@ class ShopControllerTest {
                         .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8)));
         // Then
         resultActions
-                //.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(handler().methodName("searchShopsByKeyword"))
                 .andExpect(jsonPath("$.*", hasSize(0)));
@@ -290,7 +287,6 @@ class ShopControllerTest {
                         .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8)));
         // Then
         resultActions
-                //.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(handler().methodName("searchShopsByKeyword"))
                 .andExpect(jsonPath("$.*", hasSize(1)))
@@ -317,7 +313,6 @@ class ShopControllerTest {
                         .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8)));
         // Then
         resultActions
-                //.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(handler().methodName("searchShopsByKeyword"))
                 .andExpect(jsonPath("$.*", hasSize(1)))
