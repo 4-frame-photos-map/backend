@@ -31,8 +31,8 @@ public class KakaoMapSearchApi {
     private final WebClient fourthWebClient;
     private final RedisDao redisDao;
     private final ObjectMapper objectMapper;
-    public static final String DEFAULT_QUERY_WORD = "즉석사진";
-    public static final String CATEGORY_NAME = "사진";
+    private final String DEFAULT_QUERY_WORD = "사진";
+    private final double DOCUMENTS_PER_PAGE = 15.0;
 
 
     /**
@@ -46,20 +46,29 @@ public class KakaoMapSearchApi {
     public List<KakaoMapSearchDto> searchByQueryWord(String queryWord, Double userLat, Double userLng) {
         List<KakaoMapSearchDto> resultList = new ArrayList<>();
 
-        // 1. API 호출을 위한 요청 설정
-        String apiPath = "/v2/local/search/keyword.json";
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
-                .queryParam("query", queryWord + DEFAULT_QUERY_WORD)
-                .queryParam("y", userLat)
-                .queryParam("x", userLng);
+        int extraCalls = 0;
+        for (int call = 1; call <= 1 + extraCalls; call++) {
+            // 1. API 호출을 위한 요청 설정
+            String apiPath = "/v2/local/search/keyword.json";
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
+                    .queryParam("query", queryWord + DEFAULT_QUERY_WORD)
+                    .queryParam("y", userLat)
+                    .queryParam("x", userLng)
+                    .queryParam("page", call);
 
-        String apiUrl = uriBuilder.build().toString();
+            String apiUrl = uriBuilder.build().toString();
 
-        // 2. API 호출
-        JsonNode documents = getDocuments(apiUrl);
+            // 2. API 호출
+            JsonNode response = getResponse(apiUrl);
 
-        // 3. JSON -> DTO 역직렬화
-        return deserialize(resultList, documents);
+            // 3. JSON -> DTO 역직렬화
+            if (response != null && call == 1) {
+                int extraPages = (int) (Math.ceil(response.get("meta").get("pageable_count").asInt() / DOCUMENTS_PER_PAGE)) - 1;
+                extraCalls = Math.min(extraPages, 1);
+            }
+            deserialize(resultList, response.get("documents"));
+        }
+        return resultList;
     }
 
     /**
@@ -76,21 +85,41 @@ public class KakaoMapSearchApi {
     public List<KakaoMapSearchDto> searchByQueryWord(String queryWord, Integer radius, Double userLat, Double userLng, Double mapLat, Double mapLng) {
         List<KakaoMapSearchDto> resultList = new ArrayList<>();
 
-        // 1. API 호출을 위한 요청 설정
-        String apiPath = "/v2/local/search/keyword.json";
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
-                .queryParam("query", queryWord + DEFAULT_QUERY_WORD)
-                .queryParam("y", mapLat)
-                .queryParam("x", mapLng)
-                .queryParam("radius", radius);
+        int extraCalls = 0;
+        for (int call = 1; call <= 1 + extraCalls; call++) {
+            // 1. API 호출을 위한 요청 설정
+            String apiPath = "/v2/local/search/keyword.json";
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
+                    .queryParam("query", queryWord + DEFAULT_QUERY_WORD)
+                    .queryParam("y", mapLat)
+                    .queryParam("x", mapLng)
+                    .queryParam("radius", radius)
+                    .queryParam("page", call + extraCalls);
 
-        String apiUrl = uriBuilder.build().toString();
+            String apiUrl = uriBuilder.build().toString();
 
-        // 2. API 호출
-        JsonNode documents = getDocuments(apiUrl);
+            // 2. API 호출
+            JsonNode response = getResponse(apiUrl);
 
-        // 3. JSON -> DTO 역직렬화
-        return deserialize(resultList, documents, userLat, userLng, mapLat, mapLng);
+            // 3. JSON -> DTO 역직렬화
+            if (response != null && call == 1) {
+                int extraPages = (int) (Math.ceil(response.get("meta").get("pageable_count").asInt() / DOCUMENTS_PER_PAGE)) - 1;
+                extraCalls = Math.min(extraPages, 1);
+            }
+            deserialize(resultList, response.get("documents"), userLat, userLng, mapLat, mapLng);
+        }
+        // 4. 거리순 정렬
+        resultList.sort(
+                Comparator.comparingDouble(dto -> {
+                    double dist = Double.parseDouble(dto.getDistance().replaceAll("[^\\d.]", ""));
+                    String unit = dto.getDistance().replaceAll("[\\d.]", "");
+                    if (unit.equals("m")) {
+                        dist /= 1000;
+                    }
+                    return dist;
+                })
+        );
+        return resultList;
     }
 
     /**
@@ -120,7 +149,7 @@ public class KakaoMapSearchApi {
             String apiUrl = builder.build().toString();
 
             // 3. API 호출
-            JsonNode documents = getDocuments(apiUrl);
+            JsonNode documents = getResponse(apiUrl).get("documents");
 
             // 4. JSON -> String 역직렬화
             // 도로명주소와 DEFAULT_QUERY_WORD로 검색 시
@@ -148,7 +177,7 @@ public class KakaoMapSearchApi {
         String apiUrl = uriBuilder.build().toString();
 
         // 2. API 호출
-        JsonNode documents = getDocuments(apiUrl);
+        JsonNode documents = getResponse(apiUrl).get("documents");
 
         // 3. JSON -> DTO 역직렬화
         // 도로명 주소가 없다면 지번 주소 반환
@@ -177,7 +206,7 @@ public class KakaoMapSearchApi {
         String apiUrl = uriBuilder.build().toString();
 
         // 2. API 호출
-        JsonNode documents = getDocuments(apiUrl);
+        JsonNode documents = getResponse(apiUrl).get("documents");
 
         // 3. JSON -> DTO 역직렬화 및 사용자 현재위치 좌표로부터 지점까지의 거리 계산
         if(documents.get(0).hasNonNull("y") && documents.get(0).hasNonNull("x")) {
@@ -193,14 +222,12 @@ public class KakaoMapSearchApi {
     private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
-            if(isCategoryNameMatched(document)) {
                 try {
                     KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
                     dto.setDistance(Util.distanceFormatting(dto.getDistance()));
                     resultList.add(dto);
                 } catch (Exception e) {
                     log.error(e.getMessage());
-                }
             }
         }
         return resultList;
@@ -210,34 +237,21 @@ public class KakaoMapSearchApi {
                                                 Double mapLat, Double mapLng) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
-            if (isCategoryNameMatched(document)) {
-                try {
-                    KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
+            try {
+                KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
+                Double placeLat = Double.parseDouble(dto.getLatitude());
+                Double placeLng = Double.parseDouble(dto.getLongitude());
 
-                    if((userLat != mapLat) || (userLng != mapLng)) {
-                        // 사용자 현재위치 좌표로부터 지점까지의 거리 갱신
-                        Double placeLat = Double.parseDouble(dto.getLatitude());
-                        Double placeLng = Double.parseDouble(dto.getLongitude());
-                        dto.setDistance(Util.calculateDist(placeLat, placeLng, userLat, userLng));
-                    }
-
-                    resultList.add(dto);
-                } catch (Exception e) {
-                    log.error(e.getMessage());
+                if((userLat != mapLat) || (userLng != mapLng)) {
+                    // 사용자 현재위치 좌표로부터 지점까지의 거리 갱신
+                    dto.setDistance(Util.calculateDist(placeLat, placeLng, userLat, userLng));
                 }
+
+                resultList.add(dto);
+            } catch (Exception e) {
+                log.error(e.getMessage());
             }
         }
-        resultList.sort((dto1, dto2) -> {
-            double dist1 = Double.parseDouble(dto1.getDistance().replaceAll("[^\\d.]", ""));
-            double dist2 = Double.parseDouble(dto2.getDistance().replaceAll("[^\\d.]", ""));
-            String unit1 = dto1.getDistance().replaceAll("[\\d.]", "");
-            String unit2 = dto2.getDistance().replaceAll("[\\d.]", "");
-
-            if (unit1.equals("m")) {dist1 /= 1000;}
-            if (unit2.equals("m")) {dist2 /= 1000;}
-
-            return Double.compare(dist1, dist2);
-        });
         return resultList;
     }
 
@@ -252,9 +266,8 @@ public class KakaoMapSearchApi {
                 String apiRoadAddressName = dto.getRoadAddressName();
                 String apiAddressName = dto.getAddressName();
 
-                if (isCategoryNameMatched(document)
-                        && (isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiRoadAddressName)
-                            || isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiAddressName))) {
+                if (isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiRoadAddressName)
+                            || isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiAddressName)) {
                     return new String[]{
                             dto.getPlaceUrl(),
                             dto.getLatitude(),
@@ -312,16 +325,12 @@ public class KakaoMapSearchApi {
         return null;
     }
 
-    private boolean isCategoryNameMatched(JsonNode document) {
-        return document.get("category_name").asText().contains(CATEGORY_NAME);
-    }
-
     private boolean isMatchedShop(String dbPlaceName, String apiPlaceName, String dbAddress, String apiAddress) {
-     return Util.removeSpace(dbPlaceName).contains(Util.removeSpace(apiPlaceName))
+     return Util.removeSpace(dbPlaceName).equals(Util.removeSpace(apiPlaceName))
              || Util.removeSpace(dbAddress).contains(Util.removeSpace(apiAddress));
     }
 
-    private JsonNode getDocuments(String apiUrl) {
+    private JsonNode getResponse(String apiUrl) {
         WebClient webClient = firstWebClient;
 
         try {
@@ -330,8 +339,7 @@ public class KakaoMapSearchApi {
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .bodyToMono(JsonNode.class)
-                    .block()
-                    .get("documents");
+                    .block();
         } catch (WebClientResponseException e) {
             if (e.getRawStatusCode() == HttpStatus.TOO_MANY_REQUESTS.value()) {
                 webClient = secondWebClient;
@@ -342,8 +350,7 @@ public class KakaoMapSearchApi {
                             .accept(MediaType.APPLICATION_JSON)
                             .retrieve()
                             .bodyToMono(JsonNode.class)
-                            .block()
-                            .get("documents");
+                            .block();
                 } catch (WebClientResponseException ex) {
                     webClient = thirdWebClient;
 
@@ -353,8 +360,7 @@ public class KakaoMapSearchApi {
                                 .accept(MediaType.APPLICATION_JSON)
                                 .retrieve()
                                 .bodyToMono(JsonNode.class)
-                                .block()
-                                .get("documents");
+                                .block();
                     } catch (WebClientResponseException exc) {
                         webClient = fourthWebClient;
 
@@ -364,8 +370,7 @@ public class KakaoMapSearchApi {
                                     .accept(MediaType.APPLICATION_JSON)
                                     .retrieve()
                                     .bodyToMono(JsonNode.class)
-                                    .block()
-                                    .get("documents");
+                                    .block();
                         } catch (WebClientResponseException exce) {
                             if (exce.getRawStatusCode() == HttpStatus.TOO_MANY_REQUESTS.value()) {
                                 throw new BusinessException(TOO_MANY_REQUESTS);

@@ -11,8 +11,8 @@ import java.util.Optional;
 
 @Repository
 public interface ShopRepository extends JpaRepository<Shop, Long> {
-    @Query("SELECT s FROM Shop s WHERE (FUNCTION('REPLACE', s.placeName, ' ', '') = :placeName) AND (FUNCTION('REPLACE', s.address, ' ', '') LIKE %:address%)")
-    List<Shop> findByPlaceNameAndAddressIgnoringSpace(@Param("placeName") String placeName, @Param("address") String address);    Optional<Shop> findByPlaceName(String placeName);
+    @Query("SELECT s FROM Shop s WHERE (FUNCTION('REPLACE', s.placeName, ' ', '') = :placeName) OR (FUNCTION('REPLACE', s.address, ' ', '') LIKE %:address%)")
+    List<Shop> findByPlaceNameOrAddressIgnoringSpace(@Param("placeName") String placeName, @Param("address") String address);    Optional<Shop> findByPlaceName(String placeName);
 
     boolean existsByPlaceName(String placeName);
 }

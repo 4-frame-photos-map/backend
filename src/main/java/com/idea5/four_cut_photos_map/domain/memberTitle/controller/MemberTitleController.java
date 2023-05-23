@@ -23,7 +23,7 @@ public class MemberTitleController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<MemberTitleInfoResp> getMemberTitleInfo(@PathVariable Long id, @AuthenticationPrincipal MemberContext memberContext) {
-        MemberTitleInfoResp memberTitleInfo = memberTitleService.getMemberTitleInfo(id, memberContext.getId());
+        MemberTitleInfoResp memberTitleInfo = memberTitleService.getMemberTitle(id, memberContext.getMember());
         return ResponseEntity.ok(memberTitleInfo);
     }
 
