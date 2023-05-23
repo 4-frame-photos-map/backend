@@ -2,7 +2,6 @@ package com.idea5.four_cut_photos_map.domain.memberTitle.service;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
-import com.idea5.four_cut_photos_map.domain.member.service.MemberService;
 import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleInfoResp;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitle;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleLog;
@@ -30,9 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Transactional
 @ActiveProfiles("test")
 class MemberTitleServiceTest {
-    @Autowired
-    private MemberService memberService;
-
     @Autowired
     private MemberTitleService memberTitleService;
 
@@ -70,7 +66,7 @@ class MemberTitleServiceTest {
         Member member = memberRepository.save(Member.builder().id(1L).nickname("user").build());
         Long memberTitleId = 2L;
         // when
-        MemberTitleInfoResp memberTitleInfo = memberTitleService.getMemberTitleInfo(memberTitleId, member.getId());
+        MemberTitleInfoResp memberTitleInfo = memberTitleService.getMemberTitle(memberTitleId, member);
         // then
         assertAll(
                 () -> assertThat(memberTitleInfo.getId()).isEqualTo(2L),
@@ -91,7 +87,7 @@ class MemberTitleServiceTest {
         MemberTitle memberTitle = memberTitleRepository.findById(memberTitleId).orElse(null);
         memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle, true));
         // when
-        MemberTitleInfoResp memberTitleInfo = memberTitleService.getMemberTitleInfo(memberTitleId, member.getId());
+        MemberTitleInfoResp memberTitleInfo = memberTitleService.getMemberTitle(memberTitleId, member);
         // then
         assertAll(
                 () -> assertThat(memberTitleInfo.getId()).isEqualTo(1L),
@@ -112,7 +108,7 @@ class MemberTitleServiceTest {
         MemberTitle memberTitle = memberTitleRepository.findById(memberTitleId).orElse(null);
         memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle, false));
         // when
-        MemberTitleInfoResp memberTitleInfo = memberTitleService.getMemberTitleInfo(memberTitleId, member.getId());
+        MemberTitleInfoResp memberTitleInfo = memberTitleService.getMemberTitle(memberTitleId, member);
         // then
         assertAll(
                 () -> assertThat(memberTitleInfo.getId()).isEqualTo(1L),
@@ -132,7 +128,7 @@ class MemberTitleServiceTest {
         Long memberTitleId = 6L;
         // when, then
         BusinessException e = assertThrows(BusinessException.class, () ->
-                memberTitleService.getMemberTitleInfo(memberTitleId, member.getId())
+                memberTitleService.getMemberTitle(memberTitleId, member)
         );
         assertThat(e.getMessage()).isEqualTo(MEMBER_TITLE_NOT_FOUND.getMessage());
     }
