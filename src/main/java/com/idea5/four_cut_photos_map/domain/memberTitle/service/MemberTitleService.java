@@ -35,12 +35,12 @@ public class MemberTitleService {
     }
 
     // 회원 칭호 정보 조회
-    public MemberTitleInfoResp getMemberTitleInfo(Long memberTitleId, Long memberId) {
+    public MemberTitleInfoResp getMemberTitle(Long memberTitleId, Member member) {
         MemberTitle memberTitle = findById(memberTitleId);
         // 획득 여부, 대표 칭호 여부 조회
         boolean status = false;
         boolean isMain = false;
-        MemberTitleLog memberTitleLog = memberTitleLogRepository.findByMemberIdAndMemberTitleId(memberId, memberTitleId).orElse(null);
+        MemberTitleLog memberTitleLog = memberTitleLogRepository.findByMemberAndMemberTitle(member, memberTitle).orElse(null);
         if(memberTitleLog != null) {
             status = true;
             isMain = memberTitleLog.getIsMain();
@@ -92,13 +92,20 @@ public class MemberTitleService {
     // 회원 대표 칭호 수정
     @Transactional
     public void updateMainMemberTitle(Member member, Long memberTitleId) {
-        // 1. 기존 회원의 대표 칭호 해제
+        // 1. 변경할 칭호 조회
+        MemberTitle memberTitle = findById(memberTitleId);
+        // 2. 기존 회원의 대표 칭호 조회
         log.info("----Before memberTitleLogRepository.findByMemberIdAndIsMainTrue()----");
         MemberTitleLog memberTitleLog = memberTitleLogRepository.findByMemberAndIsMainTrue(member).orElse(null);
+        // 3. 이미 대표 칭호로 설정된 칭호에 대한 예외 처리
+        if(memberTitleLog.getMemberTitle().equals(memberTitle)) {
+            throw new BusinessException(ErrorCode.DUPLICATE_MAIN_MEMBER_TITLE);
+        }
+        // 4. 기존 대표 칭호 해제
         memberTitleLog.cancelMain();
-        // 2. 새로운 칭호로 대표 칭호 설정
+        // 5. 새로운 칭호로 대표 칭호 설정
         log.info("----Before memberTitleLogRepository.findByMemberIdAndMemberTitleId()----");
-        MemberTitleLog newMemberTitleLog = memberTitleLogRepository.findByMemberAndMemberTitleId(member, memberTitleId)
+        MemberTitleLog newMemberTitleLog = memberTitleLogRepository.findByMemberAndMemberTitle(member, memberTitle)
                 .orElseThrow(() -> {
                     throw new BusinessException(ErrorCode.MEMBER_TITLE_NOT_HAD);
                 });

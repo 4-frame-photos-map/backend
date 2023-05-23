@@ -27,7 +27,7 @@ public class MemberTitleInfoResp {
                 .id(memberTitle.getId())
                 .name(memberTitle.getName())
                 .content(memberTitle.getContent())
-                .imageUrl(memberTitle.getImageUrl())
+                .imageUrl(status == true ? memberTitle.getColorImageUrl() : memberTitle.getBwImageUrl())
                 .isHolding(status)
                 .isMain(isMain)
                 .build();

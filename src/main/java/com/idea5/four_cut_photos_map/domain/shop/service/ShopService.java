@@ -39,7 +39,7 @@ public class ShopService {
         List<T> resultShop = new ArrayList<>();
         for (KakaoMapSearchDto apiShop : apiShops) {
             // 도로명주소 비교로 반환하는 지점 없을 시, 지번주소로 비교
-            Shop dbShop = compareWithPlaceNameAndAddress(apiShop.getPlaceName(), apiShop.getRoadAddressName(), apiShop.getAddressName());
+            Shop dbShop = compareWithPlaceNameOrAddress(apiShop.getPlaceName(), apiShop.getRoadAddressName(), apiShop.getAddressName());
 
             if (dbShop != null) {
                 log.info("Matched: DB shop ({} - {}), Kakao API shop ({} - {} - {})",
@@ -68,18 +68,29 @@ public class ShopService {
      * @return DB Shop
      */
     @Transactional(readOnly = true)
-    public Shop compareWithPlaceNameAndAddress(String placeName, String... addresses) {
+    public Shop compareWithPlaceNameOrAddress(String placeName, String... addresses) {
         for (String address : addresses) {
-            List<Shop> matchedShops = shopRepository.findByPlaceNameAndAddressIgnoringSpace(
+            List<Shop> matchedShops = shopRepository.findByPlaceNameOrAddressIgnoringSpace(
                     Util.removeSpace(placeName),
                     Util.removeSpace(address)
             );
             if (matchedShops.size() == 1) {
                 return matchedShops.get(0);
             } else if (matchedShops.size() > 1){
-                matchedShops.stream().map(Shop::getId).forEach(this::cacheDuplicateShopId);
-                return null;
+                Shop matchingShop = matchedShops.stream()
+                        .filter(shop -> shop.getPlaceName().equals(Util.removeSpace(placeName)))
+                        .findFirst()
+                        .orElse(null);
+                if (matchingShop != null) {
+                    return matchingShop;
+                }
             }
+            log.info("Not Matched: DB shops ({} - {}), Kakao API shop ({} - {})",
+                    matchedShops.stream().map(Shop::getPlaceName).collect(Collectors.toList()),
+                    matchedShops.stream().map(Shop::getAddress).collect(Collectors.toList()),
+                    placeName,
+                    address
+            );
         }
         return null;
     }
@@ -91,11 +102,6 @@ public class ShopService {
                 String.join(",", apiShop.getPlaceUrl(), apiShop.getLatitude(), apiShop.getLongitude()),
                 Duration.ofDays(1)
         );
-    }
-
-    private void cacheDuplicateShopId(long shopId) {
-        String cacheKey = redisDao.getDuplicateShopIdKey();
-        redisDao.addSet(cacheKey, String.valueOf(shopId));
     }
 
     private void cacheInvalidShopId(long shopId) {
