@@ -114,12 +114,10 @@ public class ShopController {
      * 상세 조회
      */
     @GetMapping("/{shop-id}")
-    public ResponseEntity<ResponseShopDetail> getShopDetail (@PathVariable(name = "shop-id") Long id,
-                                                             @RequestParam(name = "userLat", required = false) Double userLat,
-                                                             @RequestParam(name = "userLng", required = false) Double userLng,
-                                                          @AuthenticationPrincipal MemberContext memberContext) {
-
-
+    public ResponseEntity<ResponseShopDetail> getShopDetail(@PathVariable(name = "shop-id") Long id,
+                                                            @RequestParam(name = "userLat", required = false) Double userLat,
+                                                            @RequestParam(name = "userLng", required = false) Double userLng,
+                                                            @AuthenticationPrincipal MemberContext memberContext) {
         if (userLat == null || userLat == 0) {
             userLat = null;
         }
@@ -138,34 +136,9 @@ public class ShopController {
             shopDetailDto.setFavorite(favorite != null);
         }
 
-            List<String> shopTitles = shopTitleLogService.getShopTitleNames(id);
-            shopDetailDto.setShopTitles(shopTitles);
-
+        List<String> shopTitles = shopTitleLogService.getShopTitleNames(id);
+        shopDetailDto.setShopTitles(shopTitles);
 
         return ResponseEntity.ok(shopDetailDto);
-    }
-
-    /**
-     * 간단 조회, Map Marker 모달용
-     */
-    @GetMapping("/{shop-id}/info")
-    public ResponseEntity<ResponseShopBriefInfo> getShopBriefInfo (@PathVariable(name = "shop-id") Long id,
-                                                                @RequestParam @NotBlank String placeName,
-                                                                @RequestParam @NotBlank String distance,
-                                                                @AuthenticationPrincipal MemberContext memberContext) {
-
-        ResponseShopBriefInfo responseShopBriefInfo = shopService.setResponseDto(id, placeName, distance);
-
-        if (memberContext != null) {
-            Favorite favorite = favoriteService.findByShopIdAndMemberId(responseShopBriefInfo.getId(), memberContext.getId());
-            responseShopBriefInfo.setFavorite(favorite != null);
-        }
-
-        if (shopTitleLogService.existShopTitles(id)) {
-            List<String> shopTitles = shopTitleLogService.getShopTitleNames(id);
-            responseShopBriefInfo.setShopTitles(shopTitles);
-        }
-
-        return ResponseEntity.ok(responseShopBriefInfo);
     }
 }

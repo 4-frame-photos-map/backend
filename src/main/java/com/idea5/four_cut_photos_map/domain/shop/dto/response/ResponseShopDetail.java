@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseShopReviewDto;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +15,17 @@ import java.util.List;
  */
 @Getter
 @Setter
-@SuperBuilder
+@Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ResponseShopDetail extends ResponseShopBriefInfo {
+public class ResponseShopDetail {
+    private long id;
+    private String placeName;
+    private String distance;
+    private double starRatingAvg;
+    private int reviewCnt;
+    private int favoriteCnt;
+    private boolean isFavorite;
+    private List<String> shopTitles;
     private String latitude;
     private String longitude;
     private String placeUrl;
