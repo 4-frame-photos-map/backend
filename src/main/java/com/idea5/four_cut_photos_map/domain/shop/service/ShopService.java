@@ -165,12 +165,6 @@ public class ShopService {
         return FavoriteResponse.from(favorite, distance == null ? "" : distance);
     }
 
-    @Transactional(readOnly = true)
-    public ResponseShopBriefInfo setResponseDto(long id, String placeName, String distance) {
-        Shop dbShop = findById(id);
-        return ResponseShopBriefInfo.of(dbShop, placeName, distance);
-    }
-
     public void reduceFavoriteCnt(Shop shop) {
         shop.setFavoriteCnt(shop.getFavoriteCnt() <= 0 ? 0 : shop.getFavoriteCnt() - 1);
         shopRepository.save(shop);
