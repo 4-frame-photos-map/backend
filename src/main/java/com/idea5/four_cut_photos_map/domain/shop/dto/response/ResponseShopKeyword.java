@@ -33,7 +33,6 @@ public class ResponseShopKeyword extends ResponseShop {
                 .longitude(apiShop.getLongitude())
                 .latitude(apiShop.getLatitude())
                 .distance(apiShop.getDistance())
-                .placeUrl(apiShop.getPlaceUrl())
                 .starRatingAvg(dbShop.getStarRatingAvg())
                 .reviewCnt(dbShop.getReviewCnt())
                 .favoriteCnt(dbShop.getFavoriteCnt())

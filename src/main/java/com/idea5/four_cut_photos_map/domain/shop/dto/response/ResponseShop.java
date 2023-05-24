@@ -23,7 +23,6 @@ public class ResponseShop {
     private String longitude;
     private String latitude;
     private String distance;
-    private String placeUrl;
     private double starRatingAvg;
     private int reviewCnt;
     private int favoriteCnt;
@@ -43,7 +42,6 @@ public class ResponseShop {
                 .longitude(apiShop.getLongitude())
                 .latitude(apiShop.getLatitude())
                 .distance(apiShop.getDistance())
-                .placeUrl(apiShop.getPlaceUrl())
                 .starRatingAvg(dbShop.getStarRatingAvg())
                 .reviewCnt(dbShop.getReviewCnt())
                 .favoriteCnt(dbShop.getFavoriteCnt())
