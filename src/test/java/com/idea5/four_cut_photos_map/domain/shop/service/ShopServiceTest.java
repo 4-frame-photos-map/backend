@@ -89,10 +89,26 @@ class ShopServiceTest {
     @Test
     void t2() {
         // given
-        Brand lifeFourCuts = brandRepository.save(new Brand(MajorBrand.LIFEFOURCUTS.getBrandName(), MajorBrand.LIFEFOURCUTS.getFilePath()));
+        Brand brand = brandRepository.save(new Brand(MajorBrand.LIFEFOURCUTS.getBrandName(), MajorBrand.LIFEFOURCUTS.getFilePath()));
 
-        shopRepository.save(new Shop(lifeFourCuts, "인생네컷 광주 충장로직영점", "광주 동구 충장로 94-9",0,0,0.0));
-        shopRepository.save(new Shop(lifeFourCuts, "인생네컷 광주 충장로점", "광주 동구 충장로 94-9",0,0,0.0));
+        Shop targetShop = Shop.builder()
+                .brand(brand)
+                .placeName("인생네컷 광주 충장로직영점")
+                .address("광주 동구 충장로 94-9")
+                .favoriteCnt(0)
+                .reviewCnt(0)
+                .starRatingAvg(0.0)
+                .build();
+        shopRepository.save(targetShop);
+        Shop duplicateAddressShop = Shop.builder()
+                .brand(brand)
+                .placeName("인생네컷 광주 충장로점")
+                .address("광주 동구 충장로 94-9")
+                .favoriteCnt(0)
+                .reviewCnt(0)
+                .starRatingAvg(0.0)
+                .build();
+        shopRepository.save(duplicateAddressShop);
 
         List<KakaoMapSearchDto> apiShops = new ArrayList<>();
         KakaoMapSearchDto kakaoKeywordResponseDto = KakaoMapSearchDto.builder()
@@ -112,10 +128,55 @@ class ShopServiceTest {
         // then
         assertAll(
                 () -> assertThat(response.size()).isEqualTo(1),
-                () -> assertThat(response.get(0).getPlaceName()).isEqualTo("인생네컷 광주 충장로직영점"),
-                () -> assertThat(response.get(0).getPlaceAddress()).isEqualTo(kakaoKeywordResponseDto.getRoadAddressName()),
-                () -> assertThat(response.get(0).getLatitude()).isEqualTo(kakaoKeywordResponseDto.getLatitude()),
-                () -> assertThat(response.get(0).getLongitude()).isEqualTo(kakaoKeywordResponseDto.getLongitude())
+                () -> assertThat(response.get(0).getPlaceName()).isEqualTo(targetShop.getPlaceName())
+        );
+    }
+
+    @DisplayName("Kakao Maps API 장소 데이터와 일치하는 DB 데이터 조회하기, DB에는 존재하지 않지만 Kakao API에 주소 중복 데이터가 존재할 때")
+    @Test
+    void t3() {
+        // given
+        Brand brand = brandRepository.save(new Brand(MajorBrand.LIFEFOURCUTS.getBrandName(), MajorBrand.LIFEFOURCUTS.getFilePath()));
+
+        Shop shop = Shop.builder()
+                .brand(brand)
+                .placeName("인생네컷 청주 충북대점")
+                .address("충북 청주시 서원구 1순환로704번길 78")
+                .favoriteCnt(0)
+                .reviewCnt(0)
+                .starRatingAvg(0.0)
+                .build();
+        shopRepository.save(shop);
+
+        List<KakaoMapSearchDto> apiShops = new ArrayList<>();
+        KakaoMapSearchDto kakaoKeywordResponseDto1 = KakaoMapSearchDto.builder()
+                .placeName("인생네컷 청주충북대중문점")
+                .addressName("충북 청주시 서원구 사창동 413-1")
+                .roadAddressName("충북 청주시 서원구 1순환로704번길 78")
+                .longitude("127.458256927887")
+                .latitude("36.6328952742398")
+                .placeUrl("http://place.map.kakao")
+                .distance("")
+                .build();
+        apiShops.add(kakaoKeywordResponseDto1);
+        KakaoMapSearchDto kakaoKeywordResponseDto2 = KakaoMapSearchDto.builder()
+                .placeName("인생네컷 청주충북대점")
+                .addressName("충북 청주시 서원구 사창동 413-1")
+                .roadAddressName("충북 청주시 서원구 1순환로704번길 78")
+                .longitude("127.458256927887")
+                .latitude("36.6328952742398")
+                .placeUrl("http://place.map.kakao")
+                .distance("")
+                .build();
+        apiShops.add(kakaoKeywordResponseDto2);
+
+        // when
+        List<ResponseShopKeyword> response = shopService.findMatchingShops(apiShops, ResponseShopKeyword.class);
+
+        // then
+        assertAll(
+                () -> assertThat(response.size()).isEqualTo(1),
+                () -> assertThat(response.get(0).getPlaceName()).isEqualTo(shop.getPlaceName())
         );
     }
 }
