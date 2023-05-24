@@ -73,10 +73,12 @@ public class ShopService {
                     Util.removeSpace(address)
             );
             if (matchedShops.size() == 1) {
-                return matchedShops.get(0);
+                if(Util.removeSpace(matchedShops.get(0).getPlaceName()).equals(Util.removeSpace(placeName))) {
+                    return matchedShops.get(0);
+                }
             } else if (matchedShops.size() > 1){
                 Shop matchingShop = matchedShops.stream()
-                        .filter(shop -> shop.getPlaceName().equals(Util.removeSpace(placeName)))
+                        .filter(shop -> Util.removeSpace(shop.getPlaceName()).equals(Util.removeSpace(placeName)))
                         .findFirst()
                         .orElse(null);
                 if (matchingShop != null) {
