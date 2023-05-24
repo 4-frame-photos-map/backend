@@ -19,8 +19,9 @@
   - [x] `feat`: 모든 지점 칭호 로그 조회하는 엔드포인트 추가 
   - [x] `fix` : 지점 칭호 단건 조회 시 id 유효성 체크하도록 수정, 칭호 존재하지 않으면 빈 리스트 반환
   - [x] `refactor` : ShopTitleLogController 통일된 응답 구조로 수정 및 지점 칭호 관련 미사용 코드 정리 
-  - [x] `fix` :  ([#136](https://github.com/4-frame-photos-map/backend/issues/136))
 
+### 참고 자료(선택)
+- [[JPA] Spring Data JPA replace 함수 사용법](https://velog.io/@ddmkim94/JPA-Spring-Data-JPA-replace-%ED%95%A8%EC%88%98-%EC%82%AC%EC%9A%A9%EB%B2%95)
 ### 다음주 계획(선택)
 - ShopTitle
    - `fix` : 지점 칭호 id순으로 부여하도록 수정
