@@ -85,28 +85,4 @@ public class AuthController {
         memberService.logout(memberContext.getId());
         return ResponseEntity.ok(null);
     }
-
-//    // TODO: 카카오와 함께 로그아웃 요청시 state 에 accessToken 값을 넘겨 응답에
-//    /**
-//     * 카카오와 함께 로그아웃
-//     * @param bearerToken accessToken
-//     * @return
-//     */
-//    @GetMapping("/logout/oauth2/kakao")
-//    public ResponseEntity<RsData> kakaoLogout(@RequestParam("state") String bearerToken) {
-//        // 서비스 로그아웃
-//        log.info("카카오와 함께 로그아웃");
-//        String accessToken = bearerToken.substring("bearer ".length());
-//        // redis 에 해당 accessToken 블랙리스트로 저장하기
-//        Long expiration = jwtProvider.getExpiration(accessToken);
-//        redisDao.setValues(accessToken, "logout", Duration.ofMillis(expiration));
-////        session.invalidate();
-//        // body 에 토큰 담기
-//        RsData<Object> body = new RsData<>(
-//                200,
-//                "로그아웃 성공",
-//                null
-//        );
-//        return new ResponseEntity<>(body, HttpStatus.OK);
-//    }
 }

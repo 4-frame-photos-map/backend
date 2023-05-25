@@ -75,10 +75,12 @@ public class ShopService {
                     Util.removeSpace(address)
             );
             if (matchedShops.size() == 1) {
-                return matchedShops.get(0);
+                if(Util.removeSpace(matchedShops.get(0).getPlaceName()).equals(Util.removeSpace(placeName))) {
+                    return matchedShops.get(0);
+                }
             } else if (matchedShops.size() > 1){
                 Shop matchingShop = matchedShops.stream()
-                        .filter(shop -> shop.getPlaceName().equals(Util.removeSpace(placeName)))
+                        .filter(shop -> Util.removeSpace(shop.getPlaceName()).equals(Util.removeSpace(placeName)))
                         .findFirst()
                         .orElse(null);
                 if (matchingShop != null) {
@@ -165,12 +167,6 @@ public class ShopService {
     public FavoriteResponse setResponseDto(Favorite favorite, Double userLat, Double userLng) {
         String distance = calcDistFromUserLocation(favorite.getShop(), userLat, userLng);
         return FavoriteResponse.from(favorite, distance == null ? "" : distance);
-    }
-
-    @Transactional(readOnly = true)
-    public ResponseShopBriefInfo setResponseDto(long id, String placeName, String distance) {
-        Shop dbShop = findById(id);
-        return ResponseShopBriefInfo.of(dbShop, placeName, distance);
     }
 
     public void reduceFavoriteCnt(Shop shop) {

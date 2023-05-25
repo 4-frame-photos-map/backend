@@ -235,13 +235,15 @@ class ShopControllerTest {
                 .andExpect(jsonPath("$.[1].place_name", equalTo("하루필름 서울숲점")))
                 .andExpect(jsonPath("$.[1].distance", equalTo("223m")))
 
-                .andExpect(jsonPath("$.[2].id", equalTo(1)))
-                .andExpect(jsonPath("$.[2].place_name", equalTo("인생네컷 카페성수로드점")))
-                .andExpect(jsonPath("$.[2].distance", equalTo("136m")))
+                .andExpect(jsonPath("$.[2].id", equalTo(2)))
+                .andExpect(jsonPath("$.[2].place_name", equalTo("인생네컷 서울숲점")))
+                .andExpect(jsonPath("$.[2].distance", equalTo("168m")))
 
-                .andExpect(jsonPath("$.[3].id", equalTo(2)))
-                .andExpect(jsonPath("$.[3].place_name", equalTo("인생네컷 서울숲점")))
-                .andExpect(jsonPath("$.[3].distance", equalTo("168m")));
+                .andExpect(jsonPath("$.[3].id", equalTo(1)))
+                .andExpect(jsonPath("$.[3].place_name", equalTo("인생네컷 카페성수로드점")))
+                .andExpect(jsonPath("$.[3].distance", equalTo("136m")));
+
+
     }
 
     @DisplayName("키워드로 조회된 상점 리스트 보여주기, DB에 동일 데이터 존재하지 않음")

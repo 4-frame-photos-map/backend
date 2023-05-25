@@ -61,7 +61,6 @@ public class BrandServiceTest {
                 ResponseBrandDto responseBrandDto = brandService.getBrandById(id);
 
                 // then
-                assertEquals(responseBrandDto.getId(), id);
                 assertEquals(responseBrandDto.getBrandName(), brandName);
                 assertEquals(responseBrandDto.getFilePath(), filePath);
             }

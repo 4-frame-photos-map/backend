@@ -27,7 +27,6 @@ public class ResponseShopBrand extends ResponseShop {
 
     static public ResponseShopBrand of(Shop dbShop, KakaoMapSearchDto apiShop, Brand brand){
         ResponseBrandDto brandDto = ResponseBrandDto.builder()
-                .id(brand.getId())
                 .brandName(brand.getBrandName())
                 .filePath(brand.getFilePath())
                 .build();
@@ -38,7 +37,6 @@ public class ResponseShopBrand extends ResponseShop {
                 .longitude(apiShop.getLongitude())
                 .latitude(apiShop.getLatitude())
                 .distance(apiShop.getDistance())
-                .placeUrl(apiShop.getPlaceUrl())
                 .starRatingAvg(dbShop.getStarRatingAvg())
                 .reviewCnt(dbShop.getReviewCnt())
                 .favoriteCnt(dbShop.getFavoriteCnt())
