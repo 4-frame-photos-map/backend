@@ -2,7 +2,7 @@ package com.idea5.four_cut_photos_map.domain.memberTitle.service;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
-import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleInfoResp;
+import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleResp;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitle;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleLog;
 import com.idea5.four_cut_photos_map.domain.memberTitle.repository.MemberTitleLogRepository;
@@ -66,12 +66,12 @@ class MemberTitleServiceTest {
         Member member = memberRepository.save(Member.builder().id(1L).nickname("user").build());
         Long memberTitleId = 2L;
         // when
-        MemberTitleInfoResp memberTitleInfo = memberTitleService.getMemberTitle(memberTitleId, member);
+        MemberTitleResp memberTitleInfo = memberTitleService.getMemberTitle(memberTitleId, member);
         // then
         assertAll(
                 () -> assertThat(memberTitleInfo.getId()).isEqualTo(2L),
                 () -> assertThat(memberTitleInfo.getName()).isEqualTo("리뷰 첫 걸음"),
-                () -> assertThat(memberTitleInfo.getContent()).isEqualTo("첫번째 리뷰 작성"),
+                () -> assertThat(memberTitleInfo.getStandard()).isEqualTo("첫번째 리뷰 작성"),
                 () -> assertThat(memberTitleInfo.getImageUrl()).isEqualTo("리뷰 첫 걸음 흑백 이미지"),
                 () -> assertThat(memberTitleInfo.getIsHolding()).isEqualTo(false),
                 () -> assertThat(memberTitleInfo.getIsMain()).isEqualTo(false)
@@ -87,12 +87,12 @@ class MemberTitleServiceTest {
         MemberTitle memberTitle = memberTitleRepository.findById(memberTitleId).orElse(null);
         memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle, true));
         // when
-        MemberTitleInfoResp memberTitleInfo = memberTitleService.getMemberTitle(memberTitleId, member);
+        MemberTitleResp memberTitleInfo = memberTitleService.getMemberTitle(memberTitleId, member);
         // then
         assertAll(
                 () -> assertThat(memberTitleInfo.getId()).isEqualTo(1L),
                 () -> assertThat(memberTitleInfo.getName()).isEqualTo("뉴비"),
-                () -> assertThat(memberTitleInfo.getContent()).isEqualTo("회원가입"),
+                () -> assertThat(memberTitleInfo.getStandard()).isEqualTo("회원가입"),
                 () -> assertThat(memberTitleInfo.getImageUrl()).isEqualTo("뉴비 컬러 이미지"),
                 () -> assertThat(memberTitleInfo.getIsHolding()).isEqualTo(true),
                 () -> assertThat(memberTitleInfo.getIsMain()).isEqualTo(true)
@@ -108,12 +108,12 @@ class MemberTitleServiceTest {
         MemberTitle memberTitle = memberTitleRepository.findById(memberTitleId).orElse(null);
         memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle, false));
         // when
-        MemberTitleInfoResp memberTitleInfo = memberTitleService.getMemberTitle(memberTitleId, member);
+        MemberTitleResp memberTitleInfo = memberTitleService.getMemberTitle(memberTitleId, member);
         // then
         assertAll(
                 () -> assertThat(memberTitleInfo.getId()).isEqualTo(1L),
                 () -> assertThat(memberTitleInfo.getName()).isEqualTo("뉴비"),
-                () -> assertThat(memberTitleInfo.getContent()).isEqualTo("회원가입"),
+                () -> assertThat(memberTitleInfo.getStandard()).isEqualTo("회원가입"),
                 () -> assertThat(memberTitleInfo.getImageUrl()).isEqualTo("뉴비 컬러 이미지"),
                 () -> assertThat(memberTitleInfo.getIsHolding()).isEqualTo(true),
                 () -> assertThat(memberTitleInfo.getIsMain()).isEqualTo(false)
