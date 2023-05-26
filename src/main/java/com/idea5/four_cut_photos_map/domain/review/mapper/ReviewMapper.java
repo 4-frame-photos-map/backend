@@ -4,13 +4,33 @@ import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.review.dto.entity.MemberDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.entity.ReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.entity.ShopDto;
+import com.idea5.four_cut_photos_map.domain.review.dto.request.RequestReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseMemberReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseShopReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.entity.Review;
+import com.idea5.four_cut_photos_map.domain.review.entity.score.ItemScore;
+import com.idea5.four_cut_photos_map.domain.review.entity.score.PurityScore;
+import com.idea5.four_cut_photos_map.domain.review.entity.score.RetouchScore;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 
 public class ReviewMapper {
+    public static Review toEntity(Member writer, Shop shop, RequestReviewDto reviewDto) {
+        Review review = toEntity(reviewDto);
+        review.setWriter(writer);
+        review.setShop(shop);
+
+        return review;
+    }
+    public static Review toEntity(RequestReviewDto reviewDto) {
+        return Review.builder()
+                .starRating(reviewDto.getStarRating())
+                .content(reviewDto.getContent())
+                .purity(reviewDto.getPurity() == null ? PurityScore.UNSELECTED : PurityScore.valueOf(reviewDto.getPurity()))
+                .retouch(reviewDto.getRetouch() == null ? RetouchScore.UNSELECTED : RetouchScore.valueOf(reviewDto.getRetouch()))
+                .item(reviewDto.getItem() == null ? ItemScore.UNSELECTED : ItemScore.valueOf(reviewDto.getItem()))
+                .build();
+    }
 
     /**
      * Review -> ReviewDto
