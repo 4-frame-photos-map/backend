@@ -2,12 +2,14 @@ package com.idea5.four_cut_photos_map.domain.review.mapper;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.review.dto.entity.MemberDto;
+import com.idea5.four_cut_photos_map.domain.review.dto.entity.MemberResp;
 import com.idea5.four_cut_photos_map.domain.review.dto.entity.ReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.entity.ShopDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.request.RequestReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseMemberReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseShopReviewDto;
+import com.idea5.four_cut_photos_map.domain.review.dto.response.ShopReviewResp;
 import com.idea5.four_cut_photos_map.domain.review.entity.Review;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.ItemScore;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.PurityScore;
@@ -58,6 +60,14 @@ public class ReviewMapper {
                 .build();
     }
 
+    private static MemberResp toMemberResp(Member writer, String mainMemberTitle) {
+        return MemberResp.builder()
+                .id(writer.getId())
+                .nickname(writer.getNickname())
+                .mainMemberTitle(mainMemberTitle)
+                .build();
+    }
+
     /**
      * Review.shop -> ShopDto
      */
@@ -89,6 +99,14 @@ public class ReviewMapper {
         return ResponseShopReviewDto.builder()
                 .reviewInfo(toReviewDto(review))
                 .memberInfo(toMemberDto(review.getWriter()))
+                .build();
+    }
+
+    // 리뷰, 회원 정보가 담긴 지점 리뷰 정보 반환
+    public static ShopReviewResp toShopReviewResp(Review review, String mainMemberTitle) {
+        return ShopReviewResp.builder()
+                .reviewInfo(toReviewDto(review))
+                .memberInfo(toMemberResp(review.getWriter(), mainMemberTitle))
                 .build();
     }
 

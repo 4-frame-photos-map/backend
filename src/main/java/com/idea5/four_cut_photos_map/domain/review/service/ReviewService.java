@@ -1,11 +1,9 @@
 package com.idea5.four_cut_photos_map.domain.review.service;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
+import com.idea5.four_cut_photos_map.domain.memberTitle.service.MemberTitleService;
 import com.idea5.four_cut_photos_map.domain.review.dto.request.RequestReviewDto;
-import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseMemberReviewDto;
-import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
-import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseShopReviewDto;
-import com.idea5.four_cut_photos_map.domain.review.dto.response.ShopReviewInfoDto;
+import com.idea5.four_cut_photos_map.domain.review.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.review.entity.Review;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.ItemScore;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.PurityScore;
@@ -29,6 +27,7 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 public class ReviewService {
+    private final MemberTitleService memberTitleService;
     private final ReviewRepository reviewRepository;
     private final ShopService shopService;
 
@@ -53,9 +52,22 @@ public class ReviewService {
         Shop shop = shopService.findById(shopId);
 
         List<Review> reviews = reviewRepository.findAllByShopIdOrderByCreateDateDesc(shopId);   // 최신 작성순
-
         return reviews.stream()
                 .map(review -> ReviewMapper.toResponseShopReviewDto(review))
+                .collect(Collectors.toList());
+    }
+
+    // 지점 전체 리뷰 조회
+    @Transactional(readOnly = true)
+    public List<ShopReviewResp> getAllShopReview(Long shopId) {
+        Shop shop = shopService.findById(shopId);
+
+        List<Review> reviews = reviewRepository.findAllByShopIdOrderByCreateDateDesc(shopId);   // 최신 작성순
+        return reviews.stream()
+                .map(review -> ReviewMapper.toShopReviewResp(
+                        review,
+                        memberTitleService.getMainMemberTitle(review.getWriter())
+                ))
                 .collect(Collectors.toList());
     }
 
