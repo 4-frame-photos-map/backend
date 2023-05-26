@@ -80,12 +80,26 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
+
     @Transactional(readOnly = true)
     public List<ResponseShopReviewDto> getTop3ShopReviews(Long shopId) {
         List<Review> reviews = reviewRepository.findTop3ByShopIdOrderByCreateDateDesc(shopId);
 
         return reviews.stream()
                 .map(review -> ReviewMapper.toResponseShopReviewDto(review))
+                .collect(Collectors.toList());
+    }
+
+    // 리뷰 최신순 3개 조회
+    @Transactional(readOnly = true)
+    public List<ShopReviewResp> getTop3ShopReview(Long shopId) {
+        List<Review> reviews = reviewRepository.findTop3ByShopIdOrderByCreateDateDesc(shopId);
+
+        return reviews.stream()
+                .map(review -> ReviewMapper.toShopReviewResp(
+                        review,
+                        memberTitleService.getMainMemberTitle(review.getWriter())
+                ))
                 .collect(Collectors.toList());
     }
 
