@@ -26,7 +26,7 @@ public enum ErrorCode {
     DELETED_FAVORITE(HttpStatus.CONFLICT, "409", "해당 지점은 이미 찜 되어있지 않습니다."),
     MEMBER_TITLE_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "해당 회원 칭호가 존재하지 않습니다."),
     MEMBER_TITLE_NOT_HAD(HttpStatus.BAD_REQUEST, "404", "해당 회원이 칭호를 소유하고 있지 않습니다."),
-    DUPLICATE_MAIN_MEMBER_TITLE(HttpStatus.CONFLICT, "409", "이미 대표 칭호로 설정된 회원 칭호입니다."),
+    DUPLICATE_MAIN_MEMBER_TITLE(HttpStatus.CONFLICT, "409", "이미 대표 칭호로 설정되었습니다."),
     SHOP_TITLE_LOGS_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "해당 지점은 칭호가 없습니다."),
     SHOP_TITLE_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "칭호가 없습니다."),
     DUPLICATE_SHOP_TITLE(HttpStatus.CONFLICT, "409", "해당 지점은 이미 타이틀을 보유하고 있습니다."),

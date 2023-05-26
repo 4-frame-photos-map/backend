@@ -14,6 +14,7 @@ public interface MemberTitleLogRepository extends JpaRepository<MemberTitleLog, 
     List<MemberTitleLog> findByMember(Member member);
 
     Optional<MemberTitleLog> findByMemberAndIsMainTrue(Member member);
+    List<MemberTitleLog> findAllByMemberAndIsMainTrue(Member member);
 
     Optional<MemberTitleLog> findByMemberAndMemberTitle(Member member, MemberTitle memberTitle);
 }
