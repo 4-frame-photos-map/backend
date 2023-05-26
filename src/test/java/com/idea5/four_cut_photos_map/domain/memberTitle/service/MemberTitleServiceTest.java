@@ -2,7 +2,7 @@ package com.idea5.four_cut_photos_map.domain.memberTitle.service;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
-import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleInfoResp;
+import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleResp;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitle;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleLog;
 import com.idea5.four_cut_photos_map.domain.memberTitle.repository.MemberTitleLogRepository;
@@ -66,7 +66,7 @@ class MemberTitleServiceTest {
         Member member = memberRepository.save(Member.builder().id(1L).nickname("user").build());
         Long memberTitleId = 2L;
         // when
-        MemberTitleInfoResp memberTitleInfo = memberTitleService.getMemberTitle(memberTitleId, member);
+        MemberTitleResp memberTitleInfo = memberTitleService.getMemberTitle(memberTitleId, member);
         // then
         assertAll(
                 () -> assertThat(memberTitleInfo.getId()).isEqualTo(2L),
@@ -87,7 +87,7 @@ class MemberTitleServiceTest {
         MemberTitle memberTitle = memberTitleRepository.findById(memberTitleId).orElse(null);
         memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle, true));
         // when
-        MemberTitleInfoResp memberTitleInfo = memberTitleService.getMemberTitle(memberTitleId, member);
+        MemberTitleResp memberTitleInfo = memberTitleService.getMemberTitle(memberTitleId, member);
         // then
         assertAll(
                 () -> assertThat(memberTitleInfo.getId()).isEqualTo(1L),
@@ -108,7 +108,7 @@ class MemberTitleServiceTest {
         MemberTitle memberTitle = memberTitleRepository.findById(memberTitleId).orElse(null);
         memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle, false));
         // when
-        MemberTitleInfoResp memberTitleInfo = memberTitleService.getMemberTitle(memberTitleId, member);
+        MemberTitleResp memberTitleInfo = memberTitleService.getMemberTitle(memberTitleId, member);
         // then
         assertAll(
                 () -> assertThat(memberTitleInfo.getId()).isEqualTo(1L),

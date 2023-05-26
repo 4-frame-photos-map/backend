@@ -1,7 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.memberTitle.service;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
-import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleInfoResp;
 import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleResp;
 import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitlesResp;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitle;
@@ -35,7 +34,7 @@ public class MemberTitleService {
     }
 
     // 회원 칭호 정보 조회
-    public MemberTitleInfoResp getMemberTitle(Long memberTitleId, Member member) {
+    public MemberTitleResp getMemberTitle(Long memberTitleId, Member member) {
         MemberTitle memberTitle = findById(memberTitleId);
         // 획득 여부, 대표 칭호 여부 조회
         boolean status = false;
@@ -45,7 +44,7 @@ public class MemberTitleService {
             status = true;
             isMain = memberTitleLog.getIsMain();
         }
-        return MemberTitleInfoResp.toDto(memberTitle, status, isMain);
+        return MemberTitleResp.toDto(memberTitle, status, isMain);
     }
 
     // 회원 칭호 전체 조회

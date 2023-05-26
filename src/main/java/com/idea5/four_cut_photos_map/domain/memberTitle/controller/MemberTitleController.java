@@ -1,6 +1,6 @@
 package com.idea5.four_cut_photos_map.domain.memberTitle.controller;
 
-import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleInfoResp;
+import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleResp;
 import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitlesResp;
 import com.idea5.four_cut_photos_map.domain.memberTitle.service.MemberTitleService;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
@@ -22,8 +22,8 @@ public class MemberTitleController {
     // 회원 칭호 단건 조회
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
-    public ResponseEntity<MemberTitleInfoResp> getMemberTitleInfo(@PathVariable Long id, @AuthenticationPrincipal MemberContext memberContext) {
-        MemberTitleInfoResp memberTitleInfo = memberTitleService.getMemberTitle(id, memberContext.getMember());
+    public ResponseEntity<MemberTitleResp> getMemberTitleInfo(@PathVariable Long id, @AuthenticationPrincipal MemberContext memberContext) {
+        MemberTitleResp memberTitleInfo = memberTitleService.getMemberTitle(id, memberContext.getMember());
         return ResponseEntity.ok(memberTitleInfo);
     }
 
