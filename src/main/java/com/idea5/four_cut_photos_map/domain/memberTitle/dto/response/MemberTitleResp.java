@@ -17,7 +17,8 @@ import lombok.Setter;
 public class MemberTitleResp {
     private Long id;
     private String name;    // 이름
-    private String content; // 부여기준(획득방법)
+    private String standard; // 부여기준
+    private String content; // 설명
     private String imageUrl;// 이미지 URL
     private Boolean isHolding; // 획득여부
     private Boolean isMain; // 대표칭호 여부
@@ -26,6 +27,7 @@ public class MemberTitleResp {
         return MemberTitleResp.builder()
                 .id(memberTitle.getId())
                 .name(memberTitle.getName())
+                .standard(memberTitle.getStandard())
                 .content(memberTitle.getContent())
                 .imageUrl(status == true ? memberTitle.getColorImageUrl() : memberTitle.getBwImageUrl())
                 .isHolding(status)

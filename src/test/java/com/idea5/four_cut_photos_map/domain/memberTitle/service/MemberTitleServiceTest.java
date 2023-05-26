@@ -71,7 +71,7 @@ class MemberTitleServiceTest {
         assertAll(
                 () -> assertThat(memberTitleInfo.getId()).isEqualTo(2L),
                 () -> assertThat(memberTitleInfo.getName()).isEqualTo("리뷰 첫 걸음"),
-                () -> assertThat(memberTitleInfo.getContent()).isEqualTo("첫번째 리뷰 작성"),
+                () -> assertThat(memberTitleInfo.getStandard()).isEqualTo("첫번째 리뷰 작성"),
                 () -> assertThat(memberTitleInfo.getImageUrl()).isEqualTo("리뷰 첫 걸음 흑백 이미지"),
                 () -> assertThat(memberTitleInfo.getIsHolding()).isEqualTo(false),
                 () -> assertThat(memberTitleInfo.getIsMain()).isEqualTo(false)
@@ -92,7 +92,7 @@ class MemberTitleServiceTest {
         assertAll(
                 () -> assertThat(memberTitleInfo.getId()).isEqualTo(1L),
                 () -> assertThat(memberTitleInfo.getName()).isEqualTo("뉴비"),
-                () -> assertThat(memberTitleInfo.getContent()).isEqualTo("회원가입"),
+                () -> assertThat(memberTitleInfo.getStandard()).isEqualTo("회원가입"),
                 () -> assertThat(memberTitleInfo.getImageUrl()).isEqualTo("뉴비 컬러 이미지"),
                 () -> assertThat(memberTitleInfo.getIsHolding()).isEqualTo(true),
                 () -> assertThat(memberTitleInfo.getIsMain()).isEqualTo(true)
@@ -113,7 +113,7 @@ class MemberTitleServiceTest {
         assertAll(
                 () -> assertThat(memberTitleInfo.getId()).isEqualTo(1L),
                 () -> assertThat(memberTitleInfo.getName()).isEqualTo("뉴비"),
-                () -> assertThat(memberTitleInfo.getContent()).isEqualTo("회원가입"),
+                () -> assertThat(memberTitleInfo.getStandard()).isEqualTo("회원가입"),
                 () -> assertThat(memberTitleInfo.getImageUrl()).isEqualTo("뉴비 컬러 이미지"),
                 () -> assertThat(memberTitleInfo.getIsHolding()).isEqualTo(true),
                 () -> assertThat(memberTitleInfo.getIsMain()).isEqualTo(false)

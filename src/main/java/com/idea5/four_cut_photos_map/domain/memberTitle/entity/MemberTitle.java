@@ -26,7 +26,10 @@ public class MemberTitle extends BaseEntity {
     private String name;    // 칭호명
 
     @NotNull
-    private String content; // 칭호 획득 방법(기준)
+    private String standard; // 획득 방법
+
+    @NotNull
+    private String content; // 설명
 
     @NotNull
     @Column(columnDefinition = "TEXT")
