@@ -135,4 +135,10 @@ public class MemberTitleService {
                 .stream().map(memberTitleLog -> memberTitleLog.getMemberTitle().getId())
                 .collect(Collectors.toList());
     }
+
+    // 회원 대표 칭호 조회
+    public String getMainMemberTitle(Member member) {
+        MemberTitleLog memberTitleLog = memberTitleLogRepository.findByMemberAndIsMainTrue(member).orElse(null);
+        return memberTitleLog == null ? "" : memberTitleLog.getMemberTitleName();
+    }
 }

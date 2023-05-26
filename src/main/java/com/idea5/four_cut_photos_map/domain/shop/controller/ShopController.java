@@ -3,9 +3,12 @@ package com.idea5.four_cut_photos_map.domain.shop.controller;
 
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
 import com.idea5.four_cut_photos_map.domain.favorite.service.FavoriteService;
-import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseShopReviewDto;
+import com.idea5.four_cut_photos_map.domain.review.dto.response.ShopReviewResp;
 import com.idea5.four_cut_photos_map.domain.review.service.ReviewService;
-import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.KakaoMapSearchDto;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopBrand;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopDetail;
+import com.idea5.four_cut_photos_map.domain.shop.dto.response.ResponseShopKeyword;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
@@ -19,7 +22,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @RequestMapping("/shops")
@@ -128,7 +134,7 @@ public class ShopController {
         Shop dbShop = shopService.findById(id);
         ResponseShopDetail shopDetailDto = shopService.setResponseDto(dbShop, userLat, userLng);
 
-        List<ResponseShopReviewDto> recentReviews = reviewService.getTop3ShopReviews(shopDetailDto.getId());
+        List<ShopReviewResp> recentReviews = reviewService.getTop3ShopReview(shopDetailDto.getId());
         shopDetailDto.setRecentReviews(recentReviews);
 
         if (memberContext != null) {

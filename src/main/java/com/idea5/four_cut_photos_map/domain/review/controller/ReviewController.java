@@ -3,16 +3,13 @@ package com.idea5.four_cut_photos_map.domain.review.controller;
 import com.idea5.four_cut_photos_map.domain.review.dto.request.RequestReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseMemberReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
-import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseShopReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ShopReviewInfoDto;
+import com.idea5.four_cut_photos_map.domain.review.dto.response.ShopReviewResp;
 import com.idea5.four_cut_photos_map.domain.review.service.ReviewService;
-import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
-import com.idea5.four_cut_photos_map.global.common.response.RsData;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -88,8 +85,8 @@ public class ReviewController {
      * 지점 전체 리뷰 조회
      */
     @GetMapping("/shop/{shop-id}")
-    public ResponseEntity<List<ResponseShopReviewDto>> getShopReviews(@PathVariable("shop-id") Long shopId) {
-        List<ResponseShopReviewDto> reviews = reviewService.getAllShopReviews(shopId);
+    public ResponseEntity<List<ShopReviewResp>> getShopReviews(@PathVariable("shop-id") Long shopId) {
+        List<ShopReviewResp> reviews = reviewService.getAllShopReview(shopId);
 
         return ResponseEntity.ok(reviews);
     }
