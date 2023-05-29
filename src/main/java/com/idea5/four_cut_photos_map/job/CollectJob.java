@@ -25,8 +25,7 @@ public class CollectJob {
     private final CollectService collectService;
 
     // 초 분 시 일 월 요일
-//    @Scheduled(cron = "0 * * * * *")      // TODO: 테스트용 매분마다 실행
-    @Scheduled(cron = "0 0 1 * * *")    // 매일 1시 실행
+    @Scheduled(cron = "0 0 2 * * *")    // 매일 02시 실행
     @Transactional
     public void add() {
         // 인증된 API 요청 -> 로그 남기자
