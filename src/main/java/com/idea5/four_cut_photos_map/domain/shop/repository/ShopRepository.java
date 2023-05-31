@@ -11,11 +11,12 @@ import java.util.Optional;
 
 @Repository
 public interface ShopRepository extends JpaRepository<Shop, Long> {
-    @Query("SELECT s FROM Shop s " +
-            "WHERE ((FUNCTION('REPLACE', s.placeName, ' ', '') = :placeName AND FUNCTION('REPLACE', s.address, ' ', '') LIKE %:roadAddress%)" +
-            "OR (FUNCTION('REPLACE', s.placeName, ' ', '') = :placeName AND FUNCTION('REPLACE', s.address, ' ', '') LIKE %:address%)" +
-            "OR  (FUNCTION('REPLACE', s.placeName, ' ', '') = :placeName) AND s.address IS NULL)")
-    List<Shop> findByPlaceNameOrAddressIgnoringSpace(String placeName, String roadAddress, String address);
+    @Query(value = "SELECT * FROM shop " +
+            "WHERE ((REPLACE(place_name, ' ', '') = :placeName AND REPLACE(address, ' ', '') LIKE CONCAT('%', :roadAddress, '%')) " +
+            "OR (REPLACE(place_name, ' ', '') = :placeName AND REPLACE(address, ' ', '') LIKE CONCAT('%', :address, '%')) " +
+            "OR (REPLACE(place_name, ' ', '') = :placeName AND address IS NULL)) " +
+            "LIMIT 1", nativeQuery = true)
+    Optional<Shop> findByPlaceNameOrAddressIgnoringSpace(String placeName, String roadAddress, String address);
 
     Optional<Shop> findByPlaceName(String placeName);
 

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_SHOP_ID;
@@ -62,36 +63,15 @@ public class ShopService {
 
     /**
      * 지점명과 주소를 비교하여 일치하는 DB Shop 객체를 조회하는 메서드입니다.
-     * 비교 대상과 비교되는 대상의 장소명과 주소명은 공백을 제거하여 비교합니다.
-     * 조회 우선순위는 다음과 같습니다:
+     * 조회 우선순위:
      * 1. 장소명이 일치하고 DB 주소가 카카오맵 API 도로명주소를 포함하는 경우
      * 2. 장소명이 일치하고 DB 주소가 카카오맵 API 지번주소를 포함하는 경우
      * 3. 장소명이 일치하고 DB 주소가 NULL인 경우
-     * @param placeName 카카오맵 API 지점명
-     * @param roadAddress 카카오맵 API 도로명주소
-     * @param address 카카오맵 API 지번주소
-     * @return 일치하는 DB Shop 객체
-     * 일치하는 객체가 없는 경우 NULL을 반환합니다.
      */
     public Shop compareWithPlaceNameOrAddress(String placeName, String roadAddress, String address) {
-        String normalizedPlaceName = Util.removeSpace(placeName);
-        String normalizedRoadAddress = Util.removeSpace(roadAddress);
-        String normalizedAddress = Util.removeSpace(address);
-        List<Shop> matchedShops = shopRepository.findByPlaceNameOrAddressIgnoringSpace(normalizedPlaceName, normalizedRoadAddress, normalizedAddress);
-
-        if (!matchedShops.isEmpty()) {
-            return matchedShops.get(0);
-        }
-
-        log.info("Not Matched: DB shops ({} - {}), Kakao API shop ({} - {})",
-                matchedShops.stream().map(Shop::getPlaceName).collect(Collectors.toList()),
-                matchedShops.stream().map(Shop::getAddress).collect(Collectors.toList()),
-                placeName,
-                address
-        );
-        return null;
+        return shopRepository.findByPlaceNameOrAddressIgnoringSpace(Util.removeSpace(placeName), Util.removeSpace(roadAddress), Util.removeSpace(address))
+                .orElse(null);
     }
-
 
     private void cacheShopInfoById(Shop dbShop, KakaoMapSearchDto apiShop) {
         String cacheKey = redisDao.getShopInfoKey(dbShop.getId());
