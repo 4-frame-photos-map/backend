@@ -2,7 +2,6 @@ package com.idea5.four_cut_photos_map.domain.shop.service;
 
 import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponse;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
-import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ShopReviewInfoDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
@@ -39,7 +38,7 @@ public class ShopService {
     public <T extends ResponseShop> List<T> findMatchingShops(List<KakaoMapSearchDto> apiShops, Class<T> responseClass) {
         List<T> resultShop = new ArrayList<>();
         for (KakaoMapSearchDto apiShop : apiShops) {
-            // 도로명주소 비교로 반환하는 지점 없을 시, 지번주소로 비교
+            // DB 주소체계가 도로명주소와 지번주소가 섞여있기 때문에 도로명주소와 지번주소 둘 다 인수로 전달
             Shop dbShop = compareWithPlaceNameOrAddress(apiShop.getPlaceName(), apiShop.getRoadAddressName(), apiShop.getAddressName());
 
             if (dbShop != null) {
@@ -63,32 +62,32 @@ public class ShopService {
     }
 
     /**
-     * 지점명 일치여부나 주소명 포함여부로 비교하여 Kakao API Shop과 일치하는 DB Shop 객체 반환하는 메서드입니다.
-     * @param placeName 카카오 API 지점명
-     * @param addresses 카카오 API 도로명주소, 지번주소
+     * 카카오맵 API 장소 데이터의 지점명이나 주소명으로 DB Shop 객체를 조회하고, 장소명으로 2차 필터링하는 메서드입니다.
+     * @param placeName 카카오맵 API 지점명
+     * @param roadAddress 카카오맵 API 도로명주소
+     * @param address 카카오맵 API 지번주소
      * @return DB Shop
      */
-    public Shop compareWithPlaceNameOrAddress(String placeName, String... addresses) {
-        for (String address : addresses) {
-            String normalizedPlaceName = Util.removeSpace(placeName);
-            String normalizedAddress = Util.removeSpace(address);
-            List<Shop> matchedShops = shopRepository.findByPlaceNameOrAddressIgnoringSpace(normalizedPlaceName, normalizedAddress);
+    public Shop compareWithPlaceNameOrAddress(String placeName, String roadAddress, String address) {
+        String normalizedPlaceName = Util.removeSpace(placeName);
+        String normalizedRoadAddress = Util.removeSpace(roadAddress);
+        String normalizedAddress = Util.removeSpace(address);
+        List<Shop> matchedShops = shopRepository.findByPlaceNameOrAddressIgnoringSpace(normalizedPlaceName, normalizedRoadAddress, normalizedAddress);
 
-            Optional<Shop> exactMatch = matchedShops.stream()
-                    .filter(shop -> Util.removeSpace(shop.getPlaceName()).equals(normalizedPlaceName))
-                    .findFirst();
+        Optional<Shop> exactMatch = matchedShops.stream()
+                .filter(shop -> Util.removeSpace(shop.getPlaceName()).equals(normalizedPlaceName))
+                .findFirst();
 
-            if (exactMatch.isPresent()) {
-                return exactMatch.get();
-            }
-
-            log.info("Not Matched: DB shops ({} - {}), Kakao API shop ({} - {})",
-                    matchedShops.stream().map(Shop::getPlaceName).collect(Collectors.toList()),
-                    matchedShops.stream().map(Shop::getAddress).collect(Collectors.toList()),
-                    placeName,
-                    address
-            );
+        if (exactMatch.isPresent()) {
+            return exactMatch.get();
         }
+
+        log.info("Not Matched: DB shops ({} - {}), Kakao API shop ({} - {})",
+                matchedShops.stream().map(Shop::getPlaceName).collect(Collectors.toList()),
+                matchedShops.stream().map(Shop::getAddress).collect(Collectors.toList()),
+                placeName,
+                address
+        );
         return null;
     }
 
