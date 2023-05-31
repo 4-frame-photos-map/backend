@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_SHOP_ID;
@@ -67,26 +68,20 @@ public class ShopService {
      * @param addresses 카카오 API 도로명주소, 지번주소
      * @return DB Shop
      */
-    @Transactional(readOnly = true)
     public Shop compareWithPlaceNameOrAddress(String placeName, String... addresses) {
         for (String address : addresses) {
-            List<Shop> matchedShops = shopRepository.findByPlaceNameOrAddressIgnoringSpace(
-                    Util.removeSpace(placeName),
-                    Util.removeSpace(address)
-            );
-            if (matchedShops.size() == 1) {
-                if(Util.removeSpace(matchedShops.get(0).getPlaceName()).equals(Util.removeSpace(placeName))) {
-                    return matchedShops.get(0);
-                }
-            } else if (matchedShops.size() > 1){
-                Shop matchingShop = matchedShops.stream()
-                        .filter(shop -> Util.removeSpace(shop.getPlaceName()).equals(Util.removeSpace(placeName)))
-                        .findFirst()
-                        .orElse(null);
-                if (matchingShop != null) {
-                    return matchingShop;
-                }
+            String normalizedPlaceName = Util.removeSpace(placeName);
+            String normalizedAddress = Util.removeSpace(address);
+            List<Shop> matchedShops = shopRepository.findByPlaceNameOrAddressIgnoringSpace(normalizedPlaceName, normalizedAddress);
+
+            Optional<Shop> exactMatch = matchedShops.stream()
+                    .filter(shop -> Util.removeSpace(shop.getPlaceName()).equals(normalizedPlaceName))
+                    .findFirst();
+
+            if (exactMatch.isPresent()) {
+                return exactMatch.get();
             }
+
             log.info("Not Matched: DB shops ({} - {}), Kakao API shop ({} - {})",
                     matchedShops.stream().map(Shop::getPlaceName).collect(Collectors.toList()),
                     matchedShops.stream().map(Shop::getAddress).collect(Collectors.toList()),
@@ -96,6 +91,7 @@ public class ShopService {
         }
         return null;
     }
+
 
     private void cacheShopInfoById(Shop dbShop, KakaoMapSearchDto apiShop) {
         String cacheKey = redisDao.getShopInfoKey(dbShop.getId());
