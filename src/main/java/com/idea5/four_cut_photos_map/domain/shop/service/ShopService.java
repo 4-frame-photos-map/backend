@@ -2,7 +2,6 @@ package com.idea5.four_cut_photos_map.domain.shop.service;
 
 import com.idea5.four_cut_photos_map.domain.favorite.dto.response.FavoriteResponse;
 import com.idea5.four_cut_photos_map.domain.favorite.entity.Favorite;
-import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteRepository;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ShopReviewInfoDto;
 import com.idea5.four_cut_photos_map.domain.shop.dto.response.*;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
@@ -19,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.INVALID_SHOP_ID;
@@ -38,7 +38,7 @@ public class ShopService {
     public <T extends ResponseShop> List<T> findMatchingShops(List<KakaoMapSearchDto> apiShops, Class<T> responseClass) {
         List<T> resultShop = new ArrayList<>();
         for (KakaoMapSearchDto apiShop : apiShops) {
-            // 도로명주소 비교로 반환하는 지점 없을 시, 지번주소로 비교
+            // DB 주소체계가 도로명주소와 지번주소가 섞여있기 때문에 도로명주소와 지번주소 둘 다 인수로 전달
             Shop dbShop = compareWithPlaceNameOrAddress(apiShop.getPlaceName(), apiShop.getRoadAddressName(), apiShop.getAddressName());
 
             if (dbShop != null) {
@@ -62,39 +62,15 @@ public class ShopService {
     }
 
     /**
-     * 지점명 일치여부나 주소명 포함여부로 비교하여 Kakao API Shop과 일치하는 DB Shop 객체 반환하는 메서드입니다.
-     * @param placeName 카카오 API 지점명
-     * @param addresses 카카오 API 도로명주소, 지번주소
-     * @return DB Shop
+     * 지점명과 주소를 비교하여 일치하는 DB Shop 객체를 조회하는 메서드입니다.
+     * 조회 우선순위:
+     * 1. 장소명이 일치하고 DB 주소가 카카오맵 API 도로명주소를 포함하는 경우
+     * 2. 장소명이 일치하고 DB 주소가 카카오맵 API 지번주소를 포함하는 경우
+     * 3. 장소명이 일치하고 DB 주소가 NULL인 경우
      */
-    @Transactional(readOnly = true)
-    public Shop compareWithPlaceNameOrAddress(String placeName, String... addresses) {
-        for (String address : addresses) {
-            List<Shop> matchedShops = shopRepository.findByPlaceNameOrAddressIgnoringSpace(
-                    Util.removeSpace(placeName),
-                    Util.removeSpace(address)
-            );
-            if (matchedShops.size() == 1) {
-                if(Util.removeSpace(matchedShops.get(0).getPlaceName()).equals(Util.removeSpace(placeName))) {
-                    return matchedShops.get(0);
-                }
-            } else if (matchedShops.size() > 1){
-                Shop matchingShop = matchedShops.stream()
-                        .filter(shop -> Util.removeSpace(shop.getPlaceName()).equals(Util.removeSpace(placeName)))
-                        .findFirst()
-                        .orElse(null);
-                if (matchingShop != null) {
-                    return matchingShop;
-                }
-            }
-            log.info("Not Matched: DB shops ({} - {}), Kakao API shop ({} - {})",
-                    matchedShops.stream().map(Shop::getPlaceName).collect(Collectors.toList()),
-                    matchedShops.stream().map(Shop::getAddress).collect(Collectors.toList()),
-                    placeName,
-                    address
-            );
-        }
-        return null;
+    public Shop compareWithPlaceNameOrAddress(String placeName, String roadAddress, String address) {
+        return shopRepository.findByPlaceNameOrAddressIgnoringSpace(Util.removeSpace(placeName), Util.removeSpace(roadAddress), Util.removeSpace(address))
+                .orElse(null);
     }
 
     private void cacheShopInfoById(Shop dbShop, KakaoMapSearchDto apiShop) {
