@@ -59,9 +59,6 @@ jobs:
         password: ${{ secrets.BACKEND_PASSWORD }}
         port: ${{ secrets.BACKEND_PORT }}
         script: |
-            docker stop ${{ secrets.BACKEND_PROJECT_NAME }}
-            docker rm ${{ secrets.BACKEND_PROJECT_NAME }}
-            docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/photosmap
             
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/photosmap
       
