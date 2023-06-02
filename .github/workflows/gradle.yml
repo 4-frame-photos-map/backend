@@ -48,8 +48,8 @@ jobs:
 
     - name: web docker build and push
       run: |
-        docker build -t ${{ secrets.DOCKERHUB_REPO }}/photosmap .
-        docker push ${{ secrets.DOCKERHUB_REPO }}/photosmap
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/photosmap .
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/photosmap
       
     - name: remote ssh commands using password
       uses: appleboy/ssh-action@master
@@ -61,9 +61,9 @@ jobs:
         script: |
             docker stop ${{ secrets.BACKEND_PROJECT_NAME }}
             docker rm ${{ secrets.BACKEND_PROJECT_NAME }}
-            docker rmi ${{ secrets.DOCKERHUB_REPO }}/photosmap
+            docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/photosmap
             
-            docker pull ${{ secrets.DOCKERHUB_REPO }}/photosmap
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/photosmap
       
-            docker run --name=${{ secrets.BACKEND_PROJECT_NAME }} -p 8080:8080 -v /docker_projects/photosmap/volume/gen:/gen --restart unless-stopped -e TZ=Asia/Seoul -d ${{ secrets.DOCKERHUB_REPO }}/photosmap
+            docker run --name=${{ secrets.BACKEND_PROJECT_NAME }} -p 8080:8080 -v /docker_projects/photosmap/volume/gen:/gen --restart unless-stopped -e TZ=Asia/Seoul -d ${{ secrets.DOCKERHUB_USERNAME }}/photosmap
             docker image prune -f
