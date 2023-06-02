@@ -13,8 +13,9 @@ spring:
 
   # redis 설정
   redis:
-    host: 49.50.175.194
-    port: 6379
+    host: ${redis.host}
+    port: ${redis.port}
+
 # 운영 환경의 경우 요청이 많았을 경우 디버깅의 경우에 로그가 너무 많아 디스크 용량이 부족할 수 있어서 "info"로 변경
 logging:
   level:
