@@ -59,6 +59,7 @@ jobs:
         password: ${{ secrets.BACKEND_PASSWORD }}
         port: ${{ secrets.BACKEND_PORT }}
         script: |
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -P ${{ secrets.DOCKERHUB_PASSWORD }}
             
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/photosmap
       
