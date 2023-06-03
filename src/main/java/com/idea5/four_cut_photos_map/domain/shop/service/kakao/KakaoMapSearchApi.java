@@ -123,42 +123,40 @@ public class KakaoMapSearchApi {
     }
 
     /**
-     * Kakao Maps API 호출하여 지점명이나 주소로 특정 즉석사진 지점 정보 가져오는 메서드입니다.
+     * Kakao Maps API 호출하여 지점명으로 특정 즉석사진 지점 정보 가져오는 메서드입니다.
      * @param dbShop
      * @param userLat
      * @param userLng
      * @return 검색 결과로부터 가져온 특정 지점의 카카오맵 바로가기 URL(placeUrl), 위도(placeLat), 경도(placeLng),
      *          사용자의 현재위치 좌표로부터 지점까지의 거리(distance)를 반환합니다.
      */
-    public String[] searchSingleShopByQueryWord(Shop dbShop, Double userLat, Double userLng, String...queryWords) {
+    public String[] searchOneSpecificShopByName(Shop dbShop, Double userLat, Double userLng, String placeName) {
         // 1. Redis에서 조회
         String[] cachedArr = getShopInfoFromCacheAndCalcDist(dbShop, userLat, userLng);
-        if (cachedArr != null) {return cachedArr;}
-
-        for (String queryWord : queryWords) {
-            // 2. API 호출을 위한 요청 설정
-            String apiPath = "/v2/local/search/keyword.json";
-            UriComponentsBuilder builder = UriComponentsBuilder.fromPath(apiPath)
-                    .queryParam("query", queryWord);
-
-            if (userLat != null && userLng != null) {
-                builder.queryParam("y", userLat)
-                        .queryParam("x", userLng);
-            }
-
-            String apiUrl = builder.build().toString();
-
-            // 3. API 호출
-            JsonNode documents = getResponse(apiUrl).get("documents");
-
-            // 4. JSON -> String 역직렬화
-            // 도로명주소와 DEFAULT_QUERY_WORD로 검색 시
-            // 100% 일치하는 데이터가 항상 상단에 노출되지 않음
-            // 따라서, 여러 데이터 중 요청 도로명 주소와 브랜드명으로 비교하여 일치하는 데이터 1개만 찾아서 반환
-            String[] results = matchAndDeserialize(documents, dbShop.getAddress(), dbShop.getPlaceName());
-            if(results != null) {return results;}
+        if (cachedArr != null) {
+            return cachedArr;
         }
-        return null;
+
+        // 2. API 호출을 위한 요청 설정
+        String apiPath = "/v2/local/search/keyword.json";
+        UriComponentsBuilder builder = UriComponentsBuilder.fromPath(apiPath)
+                .queryParam("query", placeName);
+
+        if (userLat != null && userLng != null) {
+            builder.queryParam("y", userLat)
+                    .queryParam("x", userLng);
+        }
+
+        String apiUrl = builder.build().toString();
+
+        // 3. API 호출
+        JsonNode documents = getResponse(apiUrl).get("documents");
+
+        // 4. JSON -> String 역직렬화
+        // 도로명주소와 DEFAULT_QUERY_WORD로 검색 시
+        // 100% 일치하는 데이터가 항상 상단에 노출되지 않음
+        // 따라서, 여러 데이터 중 요청 도로명 주소와 브랜드명으로 비교하여 일치하는 데이터 1개만 찾아서 반환
+        return matchAndDeserialize(documents, dbShop.getAddress(), dbShop.getPlaceName());
     }
 
     /**
@@ -218,7 +216,7 @@ public class KakaoMapSearchApi {
                 );
             }
         } else {
-            String[] apiShop = searchSingleShopByQueryWord(dbShop, userLat, userLng, dbShop.getPlaceName());
+            String[] apiShop = searchOneSpecificShopByName(dbShop, userLat, userLng, dbShop.getPlaceName());
             if (apiShop != null) {
                 return apiShop[3];
             }
