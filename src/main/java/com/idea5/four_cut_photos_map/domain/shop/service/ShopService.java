@@ -104,13 +104,9 @@ public class ShopService {
         if (cachedArr != null) {
             return cachedArr[3];
         } else {
-            if (dbShop.getAddress() != null) {
-                return kakaoMapSearchApi.convertAddressToCoordAndCalcDist(dbShop, userLat, userLng);
-            } else {
-                String[] apiShop = kakaoMapSearchApi.searchOneSpecificShopByName(dbShop, userLat, userLng, dbShop.getPlaceName());
-                if (apiShop != null) {
-                    return apiShop[3];
-                }
+            String[] apiShop = kakaoMapSearchApi.searchOneSpecificShopByName(dbShop, userLat, userLng, dbShop.getPlaceName());
+            if (apiShop != null) {
+                return apiShop[3];
             }
         }
         return null;

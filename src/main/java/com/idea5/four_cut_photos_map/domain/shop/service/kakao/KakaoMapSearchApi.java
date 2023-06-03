@@ -187,43 +187,6 @@ public class KakaoMapSearchApi {
         return address;
     }
 
-    /**
-     * Kakao Maps API 호출하여 지점 주소를 좌표로 변환하고, 사용자의 현재위치로부터 지점까지의 거리를 계산하는 메서드입니다.
-     * @param dbShop
-     * @param userLat
-     * @param userLng
-     * @return distance
-     */
-    public String convertAddressToCoordAndCalcDist(Shop dbShop, Double userLat, Double userLng) {
-        // 1. API 호출을 위한 요청 설정
-        String apiPath = "/v2/local/search/address.json";
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiPath)
-                .queryParam("query", dbShop.getAddress())
-                .queryParam("size", 1);
-
-        String apiUrl = uriBuilder.build().toString();
-
-        // 2. API 호출
-        JsonNode response = getResponse(apiUrl);
-
-        // 3. JSON -> DTO 역직렬화 및 사용자 현재위치 좌표로부터 지점까지의 거리 계산
-        if(response.get("meta").get("total_count").asInt() != 0) {
-            JsonNode documents = response.get("documents");
-            if (documents.get(0).hasNonNull("y") && documents.get(0).hasNonNull("x")) {
-                return Util.calculateDist(
-                        documents.get(0).get("y").asDouble(), documents.get(0).get("x").asDouble(),
-                        userLat, userLng
-                );
-            }
-        } else {
-            String[] apiShop = searchOneSpecificShopByName(dbShop, userLat, userLng, dbShop.getPlaceName());
-            if (apiShop != null) {
-                return apiShop[3];
-            }
-        }
-        return null;
-    }
-
     private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
