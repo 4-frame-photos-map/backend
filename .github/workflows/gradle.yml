@@ -59,7 +59,9 @@ jobs:
         password: ${{ secrets.BACKEND_PASSWORD }}
         port: ${{ secrets.BACKEND_PORT }}
         script: |
-            docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin ${{ secrets.DOCKERHUB_PASSWORD }}
+            docker stop ${{ secrets.BACKEND_PROJECT_NAME }}
+            docker rm ${{ secrets.BACKEND_PROJECT_NAME }}
+            docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/photosmap
             
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/photosmap
       
