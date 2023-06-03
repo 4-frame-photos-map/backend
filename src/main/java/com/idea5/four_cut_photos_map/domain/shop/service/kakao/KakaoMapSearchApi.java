@@ -206,28 +206,35 @@ public class KakaoMapSearchApi {
         String apiUrl = uriBuilder.build().toString();
 
         // 2. API 호출
-        JsonNode documents = getResponse(apiUrl).get("documents");
+        JsonNode response = getResponse(apiUrl);
 
         // 3. JSON -> DTO 역직렬화 및 사용자 현재위치 좌표로부터 지점까지의 거리 계산
-        if(documents.get(0).hasNonNull("y") && documents.get(0).hasNonNull("x")) {
-            return Util.calculateDist(
-                    documents.get(0).get("y").asDouble(),documents.get(0).get("x").asDouble(),
-                    userLat, userLng
-            );
+        if(response.get("meta").get("total_count").asInt() != 0) {
+            JsonNode documents = response.get("documents");
+            if (documents.get(0).hasNonNull("y") && documents.get(0).hasNonNull("x")) {
+                return Util.calculateDist(
+                        documents.get(0).get("y").asDouble(), documents.get(0).get("x").asDouble(),
+                        userLat, userLng
+                );
+            }
         } else {
-            return null;
+            String[] apiShop = searchSingleShopByQueryWord(dbShop, userLat, userLng, dbShop.getPlaceName());
+            if (apiShop != null) {
+                return apiShop[3];
+            }
         }
+        return null;
     }
 
     private List<KakaoMapSearchDto> deserialize(List<KakaoMapSearchDto> resultList, JsonNode documents) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (JsonNode document : documents) {
-                try {
-                    KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
-                    dto.setDistance(Util.distanceFormatting(dto.getDistance()));
-                    resultList.add(dto);
-                } catch (Exception e) {
-                    log.error(e.getMessage());
+            try {
+                KakaoMapSearchDto dto = objectMapper.treeToValue(document, KakaoMapSearchDto.class);
+                dto.setDistance(Util.distanceFormatting(dto.getDistance()));
+                resultList.add(dto);
+            } catch (Exception e) {
+                log.error(e.getMessage());
             }
         }
         return resultList;
@@ -267,7 +274,7 @@ public class KakaoMapSearchApi {
                 String apiAddressName = dto.getAddressName();
 
                 if (isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiRoadAddressName)
-                            || isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiAddressName)) {
+                        || isMatchedShop(dbPlaceName, apiPlaceName, dbAddress, apiAddressName)) {
                     return new String[]{
                             dto.getPlaceUrl(),
                             dto.getLatitude(),
@@ -326,8 +333,8 @@ public class KakaoMapSearchApi {
     }
 
     private boolean isMatchedShop(String dbPlaceName, String apiPlaceName, String dbAddress, String apiAddress) {
-     return Util.removeSpace(dbPlaceName).equals(Util.removeSpace(apiPlaceName))
-             || Util.removeSpace(dbAddress).contains(Util.removeSpace(apiAddress));
+        return Util.removeSpace(dbPlaceName).equals(Util.removeSpace(apiPlaceName))
+                || Util.removeSpace(dbAddress).contains(Util.removeSpace(apiAddress));
     }
 
     private JsonNode getResponse(String apiUrl) {
