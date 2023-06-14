@@ -1,33 +1,50 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.idea5.four_cut_photos_map.domain.brand.dto.response.ResponseBrandDto;
+import com.idea5.four_cut_photos_map.domain.brand.entity.Brand;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
+/**
+ * 키워드 조회, 전체/브랜드별 조회 공통 응답 DTO
+ */
 @Getter
-@AllArgsConstructor
+@Setter
+@SuperBuilder
+@NoArgsConstructor
 @ToString
-@Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ResponseShop {
+    private Long id;
+    private String placeName;
+    private String longitude;
+    private String latitude;
+    private String distance;
+    private double starRatingAvg;
+    private int reviewCnt;
+    private int favoriteCnt;
+    private boolean isFavorite;
+    private ResponseBrandDto brand;
 
-    private String brand; // 브랜드명
-    private String name;// 장소명
+    static public ResponseShop of(Shop dbShop, KakaoMapSearchDto apiShop, Brand brand){
+        ResponseBrandDto brandDto = ResponseBrandDto.builder()
+                .brandName(brand.getBrandName())
+                .filePath(brand.getFilePath())
+                .build();
 
-    private String address; // 전체 도로명 주소
-    private double latitude; // 위도
-    private double longitude; // 경도
-    private String distance; // 중심좌표까지의 거리
-
-    public static ResponseShop from(Shop shop){
         return ResponseShop.builder()
-                .brand(shop.getBrand())
-                .name(shop.getName())
-                .address(shop.getAddress())
-                .latitude(shop.getLatitude())
-                .longitude(shop.getLongitude())
+                .id(dbShop.getId())
+                .placeName(dbShop.getPlaceName())
+                .longitude(apiShop.getLongitude())
+                .latitude(apiShop.getLatitude())
+                .distance(apiShop.getDistance())
+                .starRatingAvg(dbShop.getStarRatingAvg())
+                .reviewCnt(dbShop.getReviewCnt())
+                .favoriteCnt(dbShop.getFavoriteCnt())
+                .brand(brandDto)
                 .build();
     }
-    public void setDistance(String distance){
-        this.distance = distance;
-    }
-
 }

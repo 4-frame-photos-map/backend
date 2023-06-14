@@ -1,8 +1,8 @@
 package com.idea5.four_cut_photos_map.security.jwt;
 
-import com.idea5.four_cut_photos_map.global.common.RedisDao;
-import com.idea5.four_cut_photos_map.security.jwt.dto.response.AccessToken;
+import com.idea5.four_cut_photos_map.security.jwt.exception.NonTokenException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
@@ -10,8 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.Date;
 
@@ -29,7 +31,6 @@ import static com.idea5.four_cut_photos_map.security.jwt.dto.TokenType.REFRESH_T
 @Component
 @RequiredArgsConstructor
 public class JwtProvider {
-    // TODO: 테스트를 위해 유효기간을 30초로 세팅
     @Value("${jwt.atk.expiration}")
     private long accessTokenValidationSecond; // accessToken 유효기간(30분)
 
@@ -37,14 +38,18 @@ public class JwtProvider {
     private long refreshTokenValidationSecond;    // accessToken 유효기간(1달)
 
     private final SecretKey jwtSecretKey;   // 비밀키
-    private final RedisDao redisDao;
+
+    private final String BEARER_TOKEN_PREFIX = "Bearer ";   // 토큰 prefix
+
+    @Value("${jwt.atk.header}")
+    private String tokenHeader;
 
     private SecretKey getSecretKey() {
         return jwtSecretKey;
     }
 
     /**
-     * JWT Access Token 발급
+     * JWT Access JwtToken 발급
      * @param memberId 회원 id
      * @param authorities 회원 Authority 리스트
      * @param tokenValid 토큰 유효기간
@@ -79,7 +84,19 @@ public class JwtProvider {
         return generateToken(memberId, authorities, REFRESH_TOKEN.getName(), refreshTokenValidationSecond);
     }
 
-    // JWT Access Token 검증
+    // request Authorization header 의 jwt token 값 꺼내기
+    public String getJwtToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader(tokenHeader);
+        // 1. Authorization 헤더에 값이 없는 경우
+        if(bearerToken == null)
+            throw new NonTokenException();
+        // 2. 공백이나 Bearer 로 시작하지 않는 경우
+        if(!StringUtils.hasText(bearerToken) || !bearerToken.startsWith(BEARER_TOKEN_PREFIX))
+            throw new JwtException("");
+        return bearerToken.substring(BEARER_TOKEN_PREFIX.length());
+    }
+
+    // JWT Access JwtToken 검증
     public boolean verify(String accessToken) {
         Jwts.parserBuilder()
                 .setSigningKey(getSecretKey())  // 비밀키
@@ -106,25 +123,24 @@ public class JwtProvider {
         return ((Number) claims.get("id")).longValue();
     }
 
-    // Claims 에서 id 조회
+    // Claims 에서 TokenType 조회
     public String getTokenType(String accessToken) {
         Claims claims = parseClaims(accessToken);
-        // java.lang.Integer cannot be cast to java.lang.Long 오류해결
         return claims.get("token_type").toString();
     }
 
-    // accessToken 재발급
-    public AccessToken reissueAccessToken(String refreshToken, Long memberId, Collection<? extends GrantedAuthority> authorities) {
-        // 1. redis 에서 memberId(key)로 refreshToken 조회
-        String redisRefreshToken = redisDao.getValues(memberId.toString());
-        // 2. redis 에 저장된 refreshToken 과 요청 헤더로 전달된 refreshToken 값이 일치하는지 확인
-        if(!refreshToken.equals(redisRefreshToken)) {
-            throw new RuntimeException("refreshToken 불일치");
-        }
-        // 3. accessToken 재발급
-        String newAccessToken = generateAccessToken(memberId, authorities);
-        return AccessToken.builder()
-                .accessToken(newAccessToken)
-                .build();
+    // Claims 에서 남은 유효기간 조회
+    public Long getExpiration(String accessToken) {
+        Claims claims = parseClaims(accessToken);
+        // 남은 유효기간 = 만료일시 - 현재일시
+        return claims.getExpiration().getTime() - new Date().getTime();
+    }
+
+    // accessToken 인지 검증
+    public boolean isAccessToken(String accessToken) {
+        String tokenType = getTokenType(accessToken);
+        if(!tokenType.equals(ACCESS_TOKEN.getName()))
+            throw new JwtException("");
+        return true;
     }
 }

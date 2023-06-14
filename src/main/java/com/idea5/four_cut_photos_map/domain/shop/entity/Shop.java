@@ -1,33 +1,48 @@
 package com.idea5.four_cut_photos_map.domain.shop.entity;
 
-import com.idea5.four_cut_photos_map.domain.like.entity.Like;
+import com.idea5.four_cut_photos_map.domain.brand.entity.Brand;
 import com.idea5.four_cut_photos_map.global.base.entity.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-
-import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
+@DynamicUpdate
+@Table(indexes = {
+        @Index(name ="idx_shop_place_name", columnList ="placeName"),
+        @Index(name="idx_shop_brand", columnList="brand_id")})
 public class Shop extends BaseEntity {
-    private String brand; // 브랜드명
-    private String name; // 지점명
-    private String address; // 주소
-    private double latitude; // 위도
-    private double longitude; // 경도
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id")
+    private Brand brand;
+    private String placeName;
+    private String address;
+    private Integer favoriteCnt;
+    private Integer reviewCnt;
+    private Double starRatingAvg;
 
-    @OneToMany
-    @JoinColumn(name = "shop_id")
-    private List<Like> likes = new ArrayList<>();
+
+    public Shop(String placeName, String address) {
+        this.placeName = placeName;
+        this.address = address;
+    }
+
+    public Shop(Long id, int favoriteCnt) {
+        super.setId(id);
+        this.favoriteCnt = favoriteCnt;
+    }
+
+    public Shop(Long id, int reviewCnt, double starRatingAvg) {
+        super.setId(id);
+        this.reviewCnt = reviewCnt;
+        this.starRatingAvg = starRatingAvg;
+    }
 }

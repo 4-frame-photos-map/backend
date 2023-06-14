@@ -1,41 +1,51 @@
 package com.idea5.four_cut_photos_map.domain.shop.dto.response;
 
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.idea5.four_cut_photos_map.domain.review.dto.response.ShopReviewResp;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
-@AllArgsConstructor
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * 상세 조회 응답 DTO
+ */
 @Getter
+@Setter
 @Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ResponseShopDetail {
+    private long id;
+    private String placeName;
+    private String distance;
+    private double starRatingAvg;
+    private int reviewCnt;
+    private int favoriteCnt;
+    private boolean isFavorite;
+    private List<String> shopTitles;
+    private String latitude;
+    private String longitude;
+    private String placeUrl;
+    private List<ShopReviewResp> recentReviews;
 
-    private Long id; // PK
-    private String name;// 장소명
-    private String address; // 전체 도로명 주소
-    private double latitude; // 위도
-    private double longitude; // 경도
-    private String distance; // 중심좌표까지의 거리
 
-    // todo : Review, 찜 추가
-
-
-    public static ResponseShopDetail of(Shop shop, String distance){
+    public static ResponseShopDetail of(Shop dbShop, String placeUrl, String placeLat, String placeLng,  String distance){
         return ResponseShopDetail.builder()
-                .id(shop.getId())
-                .name(shop.getName())
-                .address(shop.getAddress())
-                .latitude(shop.getLatitude())
-                .longitude(shop.getLongitude())
+                .id(dbShop.getId())
+                .placeName(dbShop.getPlaceName())
+                .latitude(placeLat)
+                .longitude(placeLng)
                 .distance(distance)
+                .placeUrl(placeUrl)
+                .starRatingAvg(dbShop.getStarRatingAvg())
+                .reviewCnt(dbShop.getReviewCnt())
+                .favoriteCnt(dbShop.getFavoriteCnt())
+                .shopTitles(new ArrayList<>())
                 .build();
     }
-
-    public void setDistance(String distance){
-        this.distance = distance;
-    }
-
-
-    // todo : Review 추가;
 }
