@@ -47,8 +47,9 @@ public class MemberTitle extends BaseEntity {
         this.content = content;
     }
 
-    public MemberTitle(String name, String content, String colorImageUrl, String bwImageUrl) {
+    public MemberTitle(String name, String standard, String content, String colorImageUrl, String bwImageUrl) {
         this.name = name;
+        this.standard = standard;
         this.content = content;
         this.colorImageUrl = colorImageUrl;
         this.bwImageUrl = bwImageUrl;

@@ -1,10 +1,12 @@
 spring:
   datasource:
-    url: jdbc:mysql://${testDbIp:localhost}:3306/four_cut_photos_map_test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
-    username: ${testDbId:user1}
-    password: ${testDbPw:Ttest12341234@}
+    url: jdbc:mariadb://${testDbIp:localhost}:3306/four_cut_photos_map_test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
+    username: ${testDbId:root}
+    password: ${testDbPw:0114}
 
   jpa:
+#    database: mysql   # 추가 해준 부분
+#    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect # 추가 해준 부분
     hibernate:
       ddl-auto: create
 

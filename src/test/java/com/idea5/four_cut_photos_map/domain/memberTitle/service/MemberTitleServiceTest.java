@@ -44,11 +44,11 @@ class MemberTitleServiceTest {
     @BeforeEach
     void init() {
         log.info("---Before init()---");
-        memberTitleRepository.save(new MemberTitle("뉴비", "회원가입", "뉴비 컬러 이미지", "뉴비 흑백 이미지"));
-        memberTitleRepository.save(new MemberTitle("리뷰 첫 걸음", "첫번째 리뷰 작성", "리뷰 첫 걸음 컬러 이미지", "리뷰 첫 걸음 흑백 이미지"));
-        memberTitleRepository.save(new MemberTitle("리뷰 홀릭", "리뷰 3개 이상 작성", "리뷰 홀릭 컬러 이미지", "리뷰 홀릭 흑백 이미지"));
-        memberTitleRepository.save(new MemberTitle("찜 첫 걸음", "첫번째 찜 추가", "찜 첫 걸음 컬러 이미지", "찜 첫 걸음 흑백 이미지"));
-        memberTitleRepository.save(new MemberTitle("찜 홀릭", "찜 3개 이상 추가", "찜 홀릭 컬러 이미지", "찜 홀릭 흑백 이미지"));
+        memberTitleRepository.save(new MemberTitle("뉴비", "회원가입", "회원가입을 했어요. 저희 서비스 이용을 응원해요!", "뉴비 컬러 이미지", "뉴비 흑백 이미지"));
+        memberTitleRepository.save(new MemberTitle("리뷰 첫 걸음", "첫번째 리뷰 작성", "리뷰를 작성했어요.", "리뷰 첫 걸음 컬러 이미지", "리뷰 첫 걸음 흑백 이미지"));
+        memberTitleRepository.save(new MemberTitle("리뷰 홀릭", "리뷰 3개 작성", "벌써 리뷰를 3회 작성했어요.", "리뷰 홀릭 컬러 이미지", "리뷰 홀릭 흑백 이미지"));
+        memberTitleRepository.save(new MemberTitle("찜 첫 걸음", "첫번째 찜 추가", "찜한 지점이 생겼어요.", "찜 첫 걸음 컬러 이미지", "찜 첫 걸음 흑백 이미지"));
+        memberTitleRepository.save(new MemberTitle("찜 홀릭", "찜 3개 추가", "벌써 3개의 지점을 찜 했어요.", "찜 홀릭 컬러 이미지", "찜 홀릭 흑백 이미지"));
     }
 
     @Autowired
@@ -72,6 +72,7 @@ class MemberTitleServiceTest {
                 () -> assertThat(memberTitleInfo.getId()).isEqualTo(2L),
                 () -> assertThat(memberTitleInfo.getName()).isEqualTo("리뷰 첫 걸음"),
                 () -> assertThat(memberTitleInfo.getStandard()).isEqualTo("첫번째 리뷰 작성"),
+                () -> assertThat(memberTitleInfo.getContent()).isEqualTo("리뷰를 작성했어요."),
                 () -> assertThat(memberTitleInfo.getImageUrl()).isEqualTo("리뷰 첫 걸음 흑백 이미지"),
                 () -> assertThat(memberTitleInfo.getIsHolding()).isEqualTo(false),
                 () -> assertThat(memberTitleInfo.getIsMain()).isEqualTo(false)
@@ -93,6 +94,7 @@ class MemberTitleServiceTest {
                 () -> assertThat(memberTitleInfo.getId()).isEqualTo(1L),
                 () -> assertThat(memberTitleInfo.getName()).isEqualTo("뉴비"),
                 () -> assertThat(memberTitleInfo.getStandard()).isEqualTo("회원가입"),
+                () -> assertThat(memberTitleInfo.getContent()).isEqualTo("회원가입을 했어요. 저희 서비스 이용을 응원해요!"),
                 () -> assertThat(memberTitleInfo.getImageUrl()).isEqualTo("뉴비 컬러 이미지"),
                 () -> assertThat(memberTitleInfo.getIsHolding()).isEqualTo(true),
                 () -> assertThat(memberTitleInfo.getIsMain()).isEqualTo(true)
@@ -114,6 +116,7 @@ class MemberTitleServiceTest {
                 () -> assertThat(memberTitleInfo.getId()).isEqualTo(1L),
                 () -> assertThat(memberTitleInfo.getName()).isEqualTo("뉴비"),
                 () -> assertThat(memberTitleInfo.getStandard()).isEqualTo("회원가입"),
+                () -> assertThat(memberTitleInfo.getContent()).isEqualTo("회원가입을 했어요. 저희 서비스 이용을 응원해요!"),
                 () -> assertThat(memberTitleInfo.getImageUrl()).isEqualTo("뉴비 컬러 이미지"),
                 () -> assertThat(memberTitleInfo.getIsHolding()).isEqualTo(true),
                 () -> assertThat(memberTitleInfo.getIsMain()).isEqualTo(false)
