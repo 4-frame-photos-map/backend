@@ -3,6 +3,7 @@ package com.idea5.four_cut_photos_map.domain.memberTitle.service;
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.member.repository.MemberRepository;
 import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitleResp;
+import com.idea5.four_cut_photos_map.domain.memberTitle.dto.response.MemberTitlesResp;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitle;
 import com.idea5.four_cut_photos_map.domain.memberTitle.entity.MemberTitleLog;
 import com.idea5.four_cut_photos_map.domain.memberTitle.repository.MemberTitleLogRepository;
@@ -19,8 +20,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static com.idea5.four_cut_photos_map.global.error.ErrorCode.MEMBER_TITLE_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -134,5 +138,52 @@ class MemberTitleServiceTest {
                 memberTitleService.getMemberTitle(memberTitleId, member)
         );
         assertThat(e.getMessage()).isEqualTo(MEMBER_TITLE_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("1번 회원이 전체 회원 칭호를 조회한다. 1, 2번 칭호를 보유했고 1번 칭호는 대표 칭호이다.")
+    void t5() {
+        // given
+        Member member = memberRepository.save(Member.builder().id(1L).nickname("user").build());
+        long memberTitleId1 = 1L;
+        long memberTitleId2 = 2L;
+        MemberTitle memberTitle1 = memberTitleRepository.findById(memberTitleId1).orElse(null);
+        MemberTitle memberTitle2 = memberTitleRepository.findById(memberTitleId2).orElse(null);
+        memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle1, true));
+        memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle2, false));
+        // when
+        MemberTitlesResp memberTitleResp = memberTitleService.getMemberTitles(member);
+        List<MemberTitleResp> memberTitles = memberTitleResp.getMemberTitles();
+        MemberTitleResp mainMemberTitle = memberTitleResp.getMainMemberTitle();
+        int holdingCount = memberTitleResp.getHoldingCount();
+        assertSoftly(softly -> {
+            softly.assertThat(holdingCount).isEqualTo(2);
+            softly.assertThat(mainMemberTitle.getId()).isEqualTo(memberTitleId1);
+
+            MemberTitleResp mt1 = memberTitles.get(0);
+            softly.assertThat(mt1.getIsHolding()).isEqualTo(true);
+            softly.assertThat(mt1.getImageUrl()).isEqualTo("뉴비 컬러 이미지");
+            softly.assertThat(mt1.getIsMain()).isEqualTo(true);
+
+            MemberTitleResp mt2 = memberTitles.get(1);
+            softly.assertThat(mt2.getIsHolding()).isEqualTo(true);
+            softly.assertThat(mt2.getImageUrl()).isEqualTo("리뷰 첫 걸음 컬러 이미지");
+            softly.assertThat(mt2.getIsMain()).isEqualTo(false);
+
+            MemberTitleResp mt3 = memberTitles.get(2);
+            softly.assertThat(mt3.getIsHolding()).isEqualTo(false);
+            softly.assertThat(mt3.getImageUrl()).isEqualTo("리뷰 홀릭 흑백 이미지");
+            softly.assertThat(mt3.getIsMain()).isEqualTo(false);
+
+            MemberTitleResp mt4 = memberTitles.get(3);
+            softly.assertThat(mt4.getIsHolding()).isEqualTo(false);
+            softly.assertThat(mt4.getImageUrl()).isEqualTo("찜 첫 걸음 흑백 이미지");
+            softly.assertThat(mt4.getIsMain()).isEqualTo(false);
+
+            MemberTitleResp mt5 = memberTitles.get(4);
+            softly.assertThat(mt5.getIsHolding()).isEqualTo(false);
+            softly.assertThat(mt5.getImageUrl()).isEqualTo("찜 홀릭 흑백 이미지");
+            softly.assertThat(mt5.getIsMain()).isEqualTo(false);
+        });
     }
 }
