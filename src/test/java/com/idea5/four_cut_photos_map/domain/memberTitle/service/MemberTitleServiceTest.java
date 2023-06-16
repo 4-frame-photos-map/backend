@@ -153,6 +153,7 @@ class MemberTitleServiceTest {
         memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle2, false));
         // when
         MemberTitlesResp memberTitleResp = memberTitleService.getMemberTitles(member);
+        // then
         List<MemberTitleResp> memberTitles = memberTitleResp.getMemberTitles();
         MemberTitleResp mainMemberTitle = memberTitleResp.getMainMemberTitle();
         int holdingCount = memberTitleResp.getHoldingCount();
@@ -184,6 +185,29 @@ class MemberTitleServiceTest {
             softly.assertThat(mt5.getIsHolding()).isEqualTo(false);
             softly.assertThat(mt5.getImageUrl()).isEqualTo("찜 홀릭 흑백 이미지");
             softly.assertThat(mt5.getIsMain()).isEqualTo(false);
+        });
+    }
+
+    @Test
+    @DisplayName("1번 회원이 2번 칭호를 대표칭호로 설정한다. 1번 대표칭호 설정 해제, 2번 대표칭호 설정")
+    void t6() {
+        // given
+        Member member = memberRepository.save(Member.builder().id(1L).nickname("user").build());
+        long memberTitleId1 = 1L;
+        long memberTitleId2 = 2L;
+        MemberTitle memberTitle1 = memberTitleRepository.findById(memberTitleId1).orElse(null);
+        MemberTitle memberTitle2 = memberTitleRepository.findById(memberTitleId2).orElse(null);
+        memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle1, true));
+        memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle2, false));
+        // when
+        memberTitleService.updateMainMemberTitle(member, memberTitleId2);
+        // then
+        MemberTitleResp mt1 = memberTitleService.getMemberTitle(memberTitleId1, member);
+        MemberTitleResp mt2 = memberTitleService.getMemberTitle(memberTitleId2, member);
+
+        assertSoftly(softly -> {
+            softly.assertThat(mt1.getIsMain()).isEqualTo(false);
+            softly.assertThat(mt2.getIsMain()).isEqualTo(true);
         });
     }
 }
