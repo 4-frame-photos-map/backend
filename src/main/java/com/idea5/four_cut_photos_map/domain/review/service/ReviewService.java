@@ -119,19 +119,9 @@ public class ReviewService {
             throw new BusinessException(ErrorCode.WRITER_DOES_NOT_MATCH);
         }
 
-        review = updateReview(review, reviewDto);
+        ReviewMapper.update(review, reviewDto);
 
         return ReviewMapper.toResponseReviewDto(review);
-    }
-
-    private Review updateReview(Review review, RequestReviewDto dto) {
-        review.setStarRating(dto.getStarRating());
-        review.setContent(dto.getContent());
-        review.setPurity(dto.getPurity() == null ? PurityScore.UNSELECTED : PurityScore.valueOf(dto.getPurity()));
-        review.setRetouch(dto.getRetouch() == null ? RetouchScore.UNSELECTED : RetouchScore.valueOf(dto.getRetouch()));
-        review.setItem(dto.getItem() == null ? ItemScore.UNSELECTED : ItemScore.valueOf(dto.getItem()));
-
-        return review;
     }
 
     public Long delete(Member member, Long reviewId) {
