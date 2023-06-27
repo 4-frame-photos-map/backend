@@ -5,7 +5,8 @@ import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseMemberRe
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ShopReviewInfoDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ShopReviewResp;
-import com.idea5.four_cut_photos_map.domain.review.service.ReviewService;
+import com.idea5.four_cut_photos_map.domain.review.service.ReviewReadService;
+import com.idea5.four_cut_photos_map.domain.review.service.ReviewWriteService;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
 import com.idea5.four_cut_photos_map.security.jwt.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
@@ -24,15 +25,17 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/reviews")
 public class ReviewController {
-    private final ReviewService reviewService;
+    private final ReviewReadService reviewReadService;
+    private final ReviewWriteService reviewWriteService;
     private final ShopService shopService;
+
 
     /**
      * 리뷰 단건 조회
      */
     @GetMapping("/{review-id}")
     public ResponseEntity<ResponseReviewDto> getReview(@PathVariable("review-id") Long reviewId) {
-        ResponseReviewDto responseReviewDto = reviewService.getReviewById(reviewId);
+        ResponseReviewDto responseReviewDto = reviewReadService.getReviewById(reviewId);
 
         return ResponseEntity.ok(responseReviewDto);
     }
@@ -45,10 +48,10 @@ public class ReviewController {
     public ResponseEntity<String> modifyReview(@PathVariable("review-id") Long reviewId,
                                                @AuthenticationPrincipal MemberContext memberContext,
                                                @Valid @RequestBody RequestReviewDto reviewDto) {
-        ResponseReviewDto responseReviewDto = reviewService.modify(memberContext.getMember(), reviewId, reviewDto);
+        ResponseReviewDto responseReviewDto = reviewWriteService.modify(memberContext.getMember(), reviewId, reviewDto);
 
         // 추후 배치 등 이용해서 상점 정보 갱신
-        ShopReviewInfoDto shopReviewInfo = reviewService.getShopReviewInfo(responseReviewDto.getShopInfo().getId());
+        ShopReviewInfoDto shopReviewInfo = reviewReadService.getShopReviewInfo(responseReviewDto.getShopInfo().getId());
         shopService.updateReviewInfo(shopReviewInfo);
 
         return ResponseEntity.ok("리뷰 수정 완료");
@@ -61,10 +64,10 @@ public class ReviewController {
     @DeleteMapping("/{review-id}")
     public ResponseEntity<String> deleteReview(@PathVariable("review-id") Long reviewId,
                                                @AuthenticationPrincipal MemberContext memberContext) {
-        Long shopId = reviewService.delete(memberContext.getMember(), reviewId);
+        Long shopId = reviewWriteService.delete(memberContext.getMember(), reviewId);
 
         // 추후 배치 등 이용해서 상점 정보 갱신
-        ShopReviewInfoDto shopReviewInfo = reviewService.getShopReviewInfo(shopId);
+        ShopReviewInfoDto shopReviewInfo = reviewReadService.getShopReviewInfo(shopId);
         shopService.updateReviewInfo(shopReviewInfo);
 
         return ResponseEntity.ok("리뷰 삭제 완료");
@@ -76,7 +79,7 @@ public class ReviewController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/member")
     public ResponseEntity<List<ResponseMemberReviewDto>> getMemberReviews(@AuthenticationPrincipal MemberContext memberContext) {
-        List<ResponseMemberReviewDto> reviews = reviewService.getAllMemberReviews(memberContext.getId());
+        List<ResponseMemberReviewDto> reviews = reviewReadService.getAllMemberReviews(memberContext.getId());
 
         return ResponseEntity.ok(reviews);
     }
@@ -86,7 +89,7 @@ public class ReviewController {
      */
     @GetMapping("/shop/{shop-id}")
     public ResponseEntity<List<ShopReviewResp>> getShopReviews(@PathVariable("shop-id") Long shopId) {
-        List<ShopReviewResp> reviews = reviewService.getAllShopReview(shopId);
+        List<ShopReviewResp> reviews = reviewReadService.getAllShopReview(shopId);
 
         return ResponseEntity.ok(reviews);
     }
@@ -99,10 +102,10 @@ public class ReviewController {
     public ResponseEntity<String> writeReview(@PathVariable("shop-id") Long shopId,
                                               @AuthenticationPrincipal MemberContext memberContext,
                                               @Valid @RequestBody RequestReviewDto reviewDto) {
-        ResponseReviewDto responseReviewDto = reviewService.write(memberContext.getMember(), shopId, reviewDto);
+        ResponseReviewDto responseReviewDto = reviewWriteService.write(memberContext.getMember(), shopId, reviewDto);
 
         // 추후 배치 등 이용해서 상점 정보 갱신
-        ShopReviewInfoDto shopReviewInfo = reviewService.getShopReviewInfo(responseReviewDto.getShopInfo().getId());
+        ShopReviewInfoDto shopReviewInfo = reviewReadService.getShopReviewInfo(responseReviewDto.getShopInfo().getId());
         shopService.updateReviewInfo(shopReviewInfo);
 
         return ResponseEntity.ok("상점 리뷰 작성 성공");

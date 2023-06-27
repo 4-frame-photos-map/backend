@@ -17,21 +17,31 @@ import com.idea5.four_cut_photos_map.domain.review.entity.score.RetouchScore;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 
 public class ReviewMapper {
-    public static Review toEntity(Member writer, Shop shop, RequestReviewDto reviewDto) {
-        Review review = toEntity(reviewDto);
-        review.setWriter(writer);
-        review.setShop(shop);
+    private static RequestReviewDto setDefaultScore(RequestReviewDto dto) {
+        if(dto.getPurity() == null) dto.setPurity("UNSELECTED");
+        if(dto.getRetouch() == null) dto.setRetouch("UNSELECTED");
+        if(dto.getItem() == null) dto.setItem("UNSELECTED");
 
-        return review;
+        return dto;
     }
-    public static Review toEntity(RequestReviewDto reviewDto) {
+    public static Review toEntity(Member writer, Shop shop, RequestReviewDto dto) {
+        dto = setDefaultScore(dto);
+
         return Review.builder()
-                .starRating(reviewDto.getStarRating())
-                .content(reviewDto.getContent())
-                .purity(reviewDto.getPurity() == null ? PurityScore.UNSELECTED : PurityScore.valueOf(reviewDto.getPurity()))
-                .retouch(reviewDto.getRetouch() == null ? RetouchScore.UNSELECTED : RetouchScore.valueOf(reviewDto.getRetouch()))
-                .item(reviewDto.getItem() == null ? ItemScore.UNSELECTED : ItemScore.valueOf(reviewDto.getItem()))
+                .writer(writer)
+                .shop(shop)
+                .starRating(dto.getStarRating())
+                .content(dto.getContent())
+                .purity(PurityScore.valueOf(dto.getPurity()))
+                .retouch(RetouchScore.valueOf(dto.getRetouch()))
+                .item(ItemScore.valueOf(dto.getItem()))
                 .build();
+    }
+
+    public static Review update(Review review, RequestReviewDto dto) {
+        dto = setDefaultScore(dto);
+
+        return review.update(dto);
     }
 
     /**
