@@ -210,4 +210,27 @@ class MemberTitleServiceTest {
             softly.assertThat(mt2.getIsMain()).isEqualTo(true);
         });
     }
+
+    @Test
+    @DisplayName("1번 회원은 보유지 않은 3번 칭호를 대표 칭호로 설정할 수 없다.")
+    void t7() {
+        // given
+        Member member = memberRepository.save(Member.builder().id(1L).nickname("user").build());
+        long memberTitleId1 = 1L;
+        long memberTitleId2 = 2L;
+        long memberTitleId3 = 3L;
+        MemberTitle memberTitle1 = memberTitleRepository.findById(memberTitleId1).orElse(null);
+        MemberTitle memberTitle2 = memberTitleRepository.findById(memberTitleId2).orElse(null);
+        memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle1, true));
+        memberTitleLogRepository.save(new MemberTitleLog(member, memberTitle2, false));
+
+        // when
+        memberTitleService.updateMainMemberTitle(member, memberTitleId3);
+
+        // then
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThatThrownBy(() -> {throw new Exception("");})
+                    .isInstanceOf(BusinessException.class);
+        });
+    }
 }
