@@ -17,12 +17,10 @@ import javax.persistence.Entity;
 @SuperBuilder
 @ToString
 public class ShopTitle extends BaseEntity {
+
     @Column(unique=true)
     private String name; // 칭호명
     private String conditions; // 칭호 획득 조건
     private String content; // 칭호 부연 설명
-
-
-
 
 }

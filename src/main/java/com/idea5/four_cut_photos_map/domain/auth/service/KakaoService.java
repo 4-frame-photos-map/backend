@@ -60,7 +60,7 @@ public class KakaoService {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", clientId);
-        params.add("redirect_uri", redirectURI);
+        params.add("redirect_uri",redirectURI);
         params.add("code", code);
         // header + body 를 합쳐 request 생성
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);

@@ -10,6 +10,8 @@ name: Java CI with Gradle
 on:
   push:
     branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
 
 permissions:
   contents: read
@@ -63,7 +65,9 @@ jobs:
             docker rm ${{ secrets.BACKEND_PROJECT_NAME }}
             docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/photosmap
             
+            docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin ${{ secrets.DOCKERHUB_PASSWORD }}
+            
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/photosmap
       
-            docker run --name=${{ secrets.BACKEND_PROJECT_NAME }} -p 8080:8080 -v /docker_projects/photosmap/volumes/gen:/gen --restart unless-stopped -e TZ=Asia/Seoul -d ${{ secrets.DOCKERHUB_USERNAME }}/photosmap
+            docker run --name=${{ secrets.BACKEND_PROJECT_NAME }} -p 8080:8080 -v /docker_projects/photosmap/volume/gen:/gen --restart unless-stopped -e TZ=Asia/Seoul -d ${{ secrets.DOCKERHUB_USERNAME }}/photosmap
             docker image prune -f

@@ -22,18 +22,16 @@ public class ResponseShopKeyword extends ResponseShop {
 
     static public ResponseShopKeyword of(Shop dbShop, KakaoMapSearchDto apiShop, Brand brand){
         ResponseBrandDto brandDto = ResponseBrandDto.builder()
-                .id(brand.getId())
                 .brandName(brand.getBrandName())
                 .filePath(brand.getFilePath())
                 .build();
 
         return ResponseShopKeyword.builder()
                 .id(dbShop.getId())
-                .placeName(apiShop.getPlaceName())
+                .placeName(dbShop.getPlaceName())
                 .longitude(apiShop.getLongitude())
                 .latitude(apiShop.getLatitude())
                 .distance(apiShop.getDistance())
-                .placeUrl(apiShop.getPlaceUrl())
                 .starRatingAvg(dbShop.getStarRatingAvg())
                 .reviewCnt(dbShop.getReviewCnt())
                 .favoriteCnt(dbShop.getFavoriteCnt())

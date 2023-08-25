@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.global.common;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +34,11 @@ public class RedisDao {
         values.set(key, data, duration);
     }
 
+    // Set 타입으로 저장 (만료기간 설정 X)
+    public void addSet(String key, String data) {
+        redisTemplate.opsForSet().add(key, data);
+    }
+
     // key 로 value 조회
     public String getValues(String key) {
         ValueOperations<String, String> values = redisTemplate.opsForValue();
@@ -63,5 +69,10 @@ public class RedisDao {
     public static String getBlackListAtkKey(String accessToken) {
         return "jwt_black_list:" + accessToken;
     }
-    public String getRoadAddressKey(String roadAddressName) {return "search:" + roadAddressName;}
+
+    // 지점 정보(placeUrl, lat, lng)를 저장하는 key
+    public String getShopInfoKey(long shopId) {return "shop:" + shopId;}
+
+    // 유효하지 않은 shop id를 저장하는 key
+    public String getInvalidShopIdKey() {return "invalid_shop_ids";}
 }

@@ -6,8 +6,6 @@ import com.idea5.four_cut_photos_map.domain.favorite.repository.FavoriteReposito
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 import com.idea5.four_cut_photos_map.domain.shop.service.ShopService;
-import com.idea5.four_cut_photos_map.domain.shoptitle.service.ShopTitleService;
-import com.idea5.four_cut_photos_map.domain.shoptitlelog.service.ShopTitleLogService;
 import com.idea5.four_cut_photos_map.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,15 +27,11 @@ public class FavoriteService {
     private final ShopService shopService;
     private final FavoriteRepository favoriteRepository;
 
-    private final ShopTitleLogService shopTitleLogService;
-    private final ShopTitleService shopTitleService;
-
-
     // 찜하기
     @Transactional
     public Shop save(Long shopId, Member member) {
         // 1. 중복 데이터 생성 불가 -> 기존 데이터 생성 여부 체크
-        if(findByShopIdAndMemberId(shopId, member.getId()) != null){
+        if(favoriteRepository.existsByShopIdAndMemberId(shopId, member.getId())){
             throw new BusinessException(DUPLICATE_FAVORITE);
         }
 
@@ -59,7 +53,7 @@ public class FavoriteService {
 
     // 찜 취소
     @Transactional
-    public void cancel(Long shopId, Long memberId) {
+    public Shop cancel(Long shopId, Long memberId) {
         // 1. 데이터 존재 여부 체크
         Favorite favorite = findByShopIdAndMemberId(shopId, memberId);
         if (favorite == null) {
@@ -69,11 +63,11 @@ public class FavoriteService {
         // 2. 삭제
         try {
             try {
-                favoriteRepository.deleteByShopIdAndMemberId(shopId, memberId);
+                favoriteRepository.deleteById(favorite.getId());
             } catch (ObjectOptimisticLockingFailureException oe) {
                 log.info("===Retry to delete due to concurrency===");
                 if (favoriteRepository.existsById(favorite.getId())) {
-                    favoriteRepository.deleteByShopIdAndMemberId(shopId, memberId);
+                    favoriteRepository.deleteById(favorite.getId());
                 } else {
                     throw oe;
                 }
@@ -81,6 +75,8 @@ public class FavoriteService {
         } catch (Exception e) {
             throw new BusinessException(DELETED_FAVORITE);
         }
+
+        return favorite.getShop();
     }
 
     // 찜 목록 조회
@@ -89,7 +85,7 @@ public class FavoriteService {
 
         return  favorites
                 .stream()
-                .map(favorite -> shopService.renameShopAndSetResponseDto(favorite, userLat, userLng))
+                .map(favorite -> shopService.setResponseDto(favorite, userLat, userLng))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
@@ -97,21 +93,6 @@ public class FavoriteService {
     public Favorite findByShopIdAndMemberId(Long shopId, Long memberId) {
         return favoriteRepository.findByShopIdAndMemberId(shopId, memberId).orElse(null);
     }
-
-    // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
-//    @Transactional
-//    public boolean isHotPlace(Long shopId) {
-//        // Favorite DB에 저장된 Shop 찾기
-//        List<Favorite> list = favoriteRepository.findByShopId(shopId);
-//
-//        // 찜수가 5개 이상이면 칭호부여
-//        if (list.size() >= 5) {
-//            shopTitleLogService.save(shopId, HOT_PLACE.getId());
-//            return true;
-//        }
-//
-//        return false;
-//    }
 
     public void deleteByMemberId(Long memberId) {
         List<Favorite> favorites = favoriteRepository.findByMember(Member.builder().id(memberId).build());

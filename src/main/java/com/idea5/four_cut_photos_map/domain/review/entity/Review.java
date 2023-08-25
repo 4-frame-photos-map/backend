@@ -1,6 +1,7 @@
 package com.idea5.four_cut_photos_map.domain.review.entity;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
+import com.idea5.four_cut_photos_map.domain.review.dto.request.RequestReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.ItemScore;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.PurityScore;
 import com.idea5.four_cut_photos_map.domain.review.entity.score.RetouchScore;
@@ -13,7 +14,6 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
@@ -42,4 +42,13 @@ public class Review extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ItemScore item;
 
+    public Review update(RequestReviewDto dto) {
+        this.starRating = dto.getStarRating();
+        this.content = dto.getContent();
+        this.purity = PurityScore.valueOf(dto.getPurity());
+        this.retouch = RetouchScore.valueOf(dto.getRetouch());
+        this.item = ItemScore.valueOf(dto.getItem());
+
+        return this;
+    }
 }

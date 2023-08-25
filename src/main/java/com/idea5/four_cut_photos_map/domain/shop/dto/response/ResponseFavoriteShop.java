@@ -24,10 +24,10 @@ public class ResponseFavoriteShop {
     private int reviewCnt;
     private int favoriteCnt;
 
-    public static ResponseFavoriteShop from(Shop shop, String placeName, String distance) {
+    public static ResponseFavoriteShop from(Shop shop, String distance) {
         return ResponseFavoriteShop.builder()
                 .id(shop.getId())
-                .placeName(placeName)
+                .placeName(shop.getPlaceName())
                 .distance(distance)
                 .starRatingAvg(shop.getStarRatingAvg())
                 .reviewCnt(shop.getReviewCnt())

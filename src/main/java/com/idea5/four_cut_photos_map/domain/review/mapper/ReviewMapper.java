@@ -2,15 +2,47 @@ package com.idea5.four_cut_photos_map.domain.review.mapper;
 
 import com.idea5.four_cut_photos_map.domain.member.entity.Member;
 import com.idea5.four_cut_photos_map.domain.review.dto.entity.MemberDto;
+import com.idea5.four_cut_photos_map.domain.review.dto.entity.MemberResp;
 import com.idea5.four_cut_photos_map.domain.review.dto.entity.ReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.entity.ShopDto;
+import com.idea5.four_cut_photos_map.domain.review.dto.request.RequestReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseMemberReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseReviewDto;
 import com.idea5.four_cut_photos_map.domain.review.dto.response.ResponseShopReviewDto;
+import com.idea5.four_cut_photos_map.domain.review.dto.response.ShopReviewResp;
 import com.idea5.four_cut_photos_map.domain.review.entity.Review;
+import com.idea5.four_cut_photos_map.domain.review.entity.score.ItemScore;
+import com.idea5.four_cut_photos_map.domain.review.entity.score.PurityScore;
+import com.idea5.four_cut_photos_map.domain.review.entity.score.RetouchScore;
 import com.idea5.four_cut_photos_map.domain.shop.entity.Shop;
 
 public class ReviewMapper {
+    private static RequestReviewDto setDefaultScore(RequestReviewDto dto) {
+        if(dto.getPurity() == null) dto.setPurity("UNSELECTED");
+        if(dto.getRetouch() == null) dto.setRetouch("UNSELECTED");
+        if(dto.getItem() == null) dto.setItem("UNSELECTED");
+
+        return dto;
+    }
+    public static Review toEntity(Member writer, Shop shop, RequestReviewDto dto) {
+        dto = setDefaultScore(dto);
+
+        return Review.builder()
+                .writer(writer)
+                .shop(shop)
+                .starRating(dto.getStarRating())
+                .content(dto.getContent())
+                .purity(PurityScore.valueOf(dto.getPurity()))
+                .retouch(RetouchScore.valueOf(dto.getRetouch()))
+                .item(ItemScore.valueOf(dto.getItem()))
+                .build();
+    }
+
+    public static Review update(Review review, RequestReviewDto dto) {
+        dto = setDefaultScore(dto);
+
+        return review.update(dto);
+    }
 
     /**
      * Review -> ReviewDto
@@ -35,6 +67,14 @@ public class ReviewMapper {
         return MemberDto.builder()
                 .id(writer.getId())
                 .nickname(writer.getNickname())
+                .build();
+    }
+
+    private static MemberResp toMemberResp(Member writer, String mainMemberTitle) {
+        return MemberResp.builder()
+                .id(writer.getId())
+                .nickname(writer.getNickname())
+                .mainMemberTitle(mainMemberTitle)
                 .build();
     }
 
@@ -69,6 +109,14 @@ public class ReviewMapper {
         return ResponseShopReviewDto.builder()
                 .reviewInfo(toReviewDto(review))
                 .memberInfo(toMemberDto(review.getWriter()))
+                .build();
+    }
+
+    // 리뷰, 회원 정보가 담긴 지점 리뷰 정보 반환
+    public static ShopReviewResp toShopReviewResp(Review review, String mainMemberTitle) {
+        return ShopReviewResp.builder()
+                .reviewInfo(toReviewDto(review))
+                .memberInfo(toMemberResp(review.getWriter(), mainMemberTitle))
                 .build();
     }
 

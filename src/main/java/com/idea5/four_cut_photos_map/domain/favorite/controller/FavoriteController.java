@@ -44,9 +44,6 @@ public class FavoriteController {
         Shop shop = favoriteService.save(shopId, memberContext.getMember());
 
         shopService.increaseFavoriteCnt(shop);
-
-        // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
-//        favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크
     }
 
 
@@ -55,11 +52,8 @@ public class FavoriteController {
     public void cancelShopFromFavorites(@PathVariable Long shopId,
                                         @AuthenticationPrincipal MemberContext memberContext) {
 
-        favoriteService.cancel(shopId, memberContext.getId());
+        Shop shop = favoriteService.cancel(shopId, memberContext.getId());
 
-        shopService.reduceFavoriteCnt(shopId);
-
-        // todo: ShopTitle 관련 로직 임의로 주석 처리, 리팩토링 필요
-//        favoriteService.isHotPlace(shopId); // 칭호부여 여부 체크
+        shopService.reduceFavoriteCnt(shop);
     }
 }

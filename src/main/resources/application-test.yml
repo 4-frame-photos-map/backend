@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mariadb://${testDbIp:localhost}:3306/four_cut_photos_map_test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
-    username: ${testDbId:root}
-    password: ${testDbPw:1234}
+    url: jdbc:mysql://${testDbIp:localhost}:3306/four_cut_photos_map_test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
+    username: ${testDbId:user1}
+    password: ${testDbPw:Ttest12341234@}
 
   jpa:
     hibernate:
