@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 @Slf4j
 public class Util {
@@ -148,5 +149,10 @@ public class Util {
 
     public static String removeSpace(String str) {
         return str.replaceAll("\\s+", "");
+    }
+
+    // s3 업로드를 위한 고유한 객체 키 생성
+    public static String generateS3ObjectKey(String dirName, String originalFileName) {
+        return dirName + "/" + UUID.randomUUID() + "_" + originalFileName;
     }
 }

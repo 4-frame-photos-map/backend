@@ -41,7 +41,11 @@ public enum ErrorCode {
     // Request Parameter, Body 관련 오류(0번대)
     INVALID_JSON(HttpStatus.BAD_REQUEST, "001", "Request Body JSON 형식이 잘못되었습니다."),
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "002", "파라미터 형식이 잘못되었습니다."),
-    MISSING_PARAMETER(HttpStatus.BAD_REQUEST, "003", "필수 파라미터가 누락되었습니다.");
+    MISSING_PARAMETER(HttpStatus.BAD_REQUEST, "003", "필수 파라미터가 누락되었습니다"),
+
+    // 파일 업로드 오류
+    NOT_IMAGE_FILE(HttpStatus.BAD_REQUEST, "004", "이미지 파일(png, jpeg, gif, webp)이 아닙니다."),
+    FILE_SIZE_EXCEED(HttpStatus.BAD_REQUEST, "005", "업로드 가능한 파일 용량을 초과했습니다.");
 
     private HttpStatus httpStatus;
     private String errorCode;
