@@ -23,14 +23,5 @@ public class Favorite extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "shop_id")
     private Shop shop;
-
-//    @Version
-//    @Setter(AccessLevel.NONE) // 버전은 JPA가 관리하므로 외부 수정을 막음
-//    private Long version = 0L;
-//
-//    public Favorite(Member member, Shop shop) {
-//        this.member = member;
-//        this.shop = shop;
-//    }
 }
 

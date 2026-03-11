@@ -70,28 +70,6 @@ public class FavoriteService {
         return favorite.getShop();
     }
 
-    // 테스트용 임의 메서드
-    @Transactional
-    public void updateTest(Long shopId, Long memberId) {
-        Favorite favorite = favoriteRepository.findByShopIdAndMemberId(shopId, memberId)
-                .orElseThrow(() -> new BusinessException(DELETED_FAVORITE));
-
-        try {
-            // 1. 상태 변경 (Dirty Checking 유발)
-            // 실제 운영 환경의 '수정' 상황을 재현. (Favorite에 memo 같은 필드가 있다고 가정)
-            favorite.setShop(shopService.findById(2L)); // 예시로 shop을 다시 set하는 식으로 변경사항을 만든다
-
-
-            // 2. [핵심] 수정 이후에 'JPQL 기반 조회'를 실행
-            // 하이버네이트는 "수정사항(Update)이 있으니 조회 전 Flush해야지!"라고 판단
-            favoriteRepository.findAll();
-
-        } catch (ObjectOptimisticLockingFailureException oe) {
-            System.out.println("===Retry to UPDATE due to concurrency===");
-            // 여기서 예외가 잡힌다면 가설 증명
-        }
-    }
-
     // 찜 목록 조회
     public List<FavoriteResponse> getFavoritesList(Long memberId, Double userLat, Double userLng) {
         List<Favorite> favorites = favoriteRepository.findByMemberIdOrderByCreateDateDesc(memberId);
