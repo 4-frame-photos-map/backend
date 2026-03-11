@@ -85,6 +85,10 @@ dependencies {
     implementation 'com.github.downgoon:MarvinPlugins:1.5.5'
     implementation 'org.springframework:spring-test:5.3.24'
 //    compile group: 'org.springframework', name: 'spring-test'
+    // Spring Retry
+    implementation 'org.springframework.retry:spring-retry'
+    // AOP (Retry는 AOP 기반으로 동작하므로 필수)
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
 }
 
 tasks.named('test') {
